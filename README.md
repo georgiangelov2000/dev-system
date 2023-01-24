@@ -1,7 +1,7 @@
 # Dev System docker setup guide
 
 ## Only if in src/ directory files aren't exist
-###### docker-compose run --rm composer create-project --prefer-dist laravel/laravel:^8.0 .
+#### docker-compose run --rm composer create-project --prefer-dist laravel/laravel:^8.0 .
 
 ## Existing project
 #### docker-compose up -d nginx mysql or || docker-compose up -d (this command will setup all services in docker-compose.yml)
