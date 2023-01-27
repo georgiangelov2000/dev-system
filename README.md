@@ -17,4 +17,4 @@
 
 ## Generate nginx protection
 #### htpasswd -c /etc/pwd/.htpasswd <username>
-#### /etc/pwd/.htpasswd - directory for generated credentials: usernamel:<hashed password>
+#### /etc/pwd/.htpasswd - directory for generated credentials: username:hashed password
