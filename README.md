@@ -15,3 +15,7 @@
 #### PhpMyadmin: port 81
 #### Mysql: Port 3306
 #### FPM: Port 9000
+
+## Generate nginx protection
+#### htpasswd -c /etc/pwd/.htpasswd <username>
+#### /etc/pwd/.htpasswd - directory for generated credentials: usernamel:<hashed password>
