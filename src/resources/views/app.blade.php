@@ -8,10 +8,16 @@
 
         <link type="text/css" href="{{ asset('css/adminlte.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ asset('css/all.min.css') }}" rel="stylesheet" />
+        <link type="text/css" href="{{mix('css/app.css')}}" rel="stylesheet" />
     </head>
 
     <body class="sidebar-mini layout-fixed" style="height: auto;">
-        <div class='wrapper'> 
+        <div class='wrapper'>
+            @include("layouts.header")
+
+            <div class="container">
+                @yield('content')
+            </div>
         </div>
     </body>
 
