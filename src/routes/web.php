@@ -13,14 +13,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('app');
-});
-
-Route::get('/register', function () {
-    return view('layouts.register');
-})->name('register');
-
-Route::get('/login', function () {
-    return view('layouts.login');
-})->name('login');
+require_once __DIR__ . '/route/auth.php';
