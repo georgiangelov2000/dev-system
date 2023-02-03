@@ -20,7 +20,9 @@
         <div class='wrapper'>
             @include("layouts.header")
             @auth
+            <div class='container'>
                 @yield('content')
+            </div>
             @else
                 @include('layouts.auth')
             @endauth
@@ -30,18 +32,18 @@
         <script type="text/javascript" src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('js/adminlte.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('js/jqueryui.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('js/app.js') }}"></script>
 
         @stack('scripts')
 
         <script type='text/javascript'>
-$(document).ready(function () {
-    console.log('yes');
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-});
+        $(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        });
         </script>
 
     </body>
