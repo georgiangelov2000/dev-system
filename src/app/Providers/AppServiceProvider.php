@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider {
             
             $isAuth = Auth::check();
             
-            $isAuth  ? $user = Auth::user()->email: false;
+            $isAuth  ? $user = Auth::user()->email: $user = false;  
 
             return $view
                     ->with('isAuth', $isAuth)

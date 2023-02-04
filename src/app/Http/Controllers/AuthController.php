@@ -73,7 +73,7 @@ class AuthController extends Controller {
             Log::info($e->getMessage());
         }
 
-        return redirect()->route('register');
+        return back();
     }
 
     public function logout(Request $request) {
