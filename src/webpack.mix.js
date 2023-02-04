@@ -11,8 +11,8 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
-    .react()
-    .postCss('resources/css/app.css', 'public/css', [
-        //
-    ]);
+mix.js('resources/js/*.js', 'public/js');
+mix.js('resources/js/components/Category.js', 'public/js/components')
+mix.js('resources/js/components/ModalFormOne.js', 'public/js/components')
+    .react();
+    mix.sass('resources/sass/template.scss', 'public/css');
