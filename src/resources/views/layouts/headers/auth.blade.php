@@ -1,17 +1,12 @@
 <nav class="main-header navbar navbar-expand header-navigation mb-5 navbar-white">
     <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            <a class="nav-link burgerLink" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item">
             <div class="form-inline">
                 <div class="input-group" data-widget="sidebar-search">
                     <input class="form-control form-control-sm" type="search" placeholder="Search" aria-label="Search">
-                    <div class="input-group-append">
-                        <button class="btn btn-sm btn-sidebar">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
                 </div>
             </div>
         </li>
