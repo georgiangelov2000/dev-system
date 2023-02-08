@@ -2,28 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
+use App\Models\Category;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use App\Http\Requests\CategoryRequest;
 
-class CategoryController extends Controller
-{
+class CategoryController extends Controller {
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index() {
         return view('categories.index');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -32,9 +25,31 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(CategoryRequest $request) {
+        $data = $request->validated();
+
+        DB::beginTransaction();
+
+        try {
+
+            foreach ($data['name'] as $key => $value) {
+                Category::create([
+                    'name' => $data['name'][$key],
+                    'description' => $data['description'][$key]
+                ]);
+            }
+
+            DB::commit();
+
+            Log::info('Succesfully created category');
+        } catch (\Exception $e) {
+            dd($e);
+            DB::rollback();
+            Log::info($e->getMessage());
+        }
+        
+        return response()->json(['message'=>"Succesfully created category"],200);
+
     }
 
     /**
@@ -43,8 +58,7 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show($id) {
         //
     }
 
@@ -54,8 +68,7 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
+    public function edit($id) {
         //
     }
 
@@ -66,8 +79,7 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         //
     }
 
@@ -77,8 +89,8 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
         //
     }
+
 }
