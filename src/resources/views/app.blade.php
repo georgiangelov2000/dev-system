@@ -9,11 +9,11 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <link type="text/css" href="{{ asset('css/adminlte.min.css') }}" rel="stylesheet" />
-        <link type="text/css" href="{{ asset('css/all.min.css') }}" rel="stylesheet" />
-        <link type="text/css" href="{{ asset('css/toastr.min.css') }}" rel="stylesheet"/>
+        <link type="text/css" href="{{ mix('css/all.min.css') }}" rel="stylesheet" />
+        <link type="text/css" href="{{ mix('css/toastr.min.css') }}" rel="stylesheet"/>
+        <link type="text/css" href="{{ mix('css/template.css') }}" rel="stylesheet" />
+        <link type="text/css" href="{{ mix('css/dataTables.bootstrap4.min.css') }}" rel="stylesheet" />
 
-        <link type="text/css" href="{{mix('css/template.css')}}" rel="stylesheet" />
-    
     </head>
     <!--"sidebar-mini layout-fixed"-->
     <body class="sidebar-mini layout-fixed {{$isAuth ? "" : "body-class"}}" style="height: auto;">
@@ -28,15 +28,19 @@
             @endauth
         </div>
 
-        <script type="text/javascript" src="{{ asset('js/jquery.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('js/adminlte.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('js/jqueryui.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('js/toastr.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('js/modal.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/app.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/jqueryui.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/bootstrap.bundle.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/adminlte.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/toastr.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/modal.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/jquery.dataTables.min.js') }}"></script>
 
         <script type="text/javascript">
             $(document).ready(function() {
+                console.log(toastr);
+                
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

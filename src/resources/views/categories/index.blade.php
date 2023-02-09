@@ -33,6 +33,7 @@
     'formIdentificator' => "categoryForm"
     ])
     @endsection
+    
     @push('scripts')
-    <script type="text/javascript" src="{{mix('js/categories.js')}}"></script>
+    <script type="text/javascript" src="{{ mix('js/categories.js') }}"></script>
     @endpush

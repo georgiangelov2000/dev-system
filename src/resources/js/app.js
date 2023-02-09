@@ -4,6 +4,8 @@
  * building robust, powerful web applications using React + Laravel.
  */
 
+window.toastr = require('./toastr.min.js');
+
 require('./bootstrap');
 
 /**
