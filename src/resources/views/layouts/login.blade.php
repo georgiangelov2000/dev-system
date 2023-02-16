@@ -19,6 +19,7 @@
                         class="form-control" 
                         id="email" 
                         name='email'
+                        value='{{ old('email') ? e(old('email')) : '' }}'
                         placeholder='Enter valid e-mail'
                         />
                     @include("layouts.validation_messages",["input"=>"email"])
@@ -30,6 +31,7 @@
                         class="form-control" 
                         id="password" 
                         name='password'
+                        value='{{ old('password') ? e(old('password')) : '' }}'
                         placeholder='Enter password'
                         />
                     @include("layouts.validation_messages",["input"=>"password"])

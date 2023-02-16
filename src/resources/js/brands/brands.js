@@ -1,8 +1,6 @@
-/* global Swal, CATEGORY_ROUTE */
 import { createData, updateData } from './ajaxFunctions.js';
 $(document).ready(function () {
-
-    let table = $('#categoriesTable');
+    let table = $('#brandsTable');
     //Global category variables
 
     let createModal = $('#createModal');
@@ -11,10 +9,9 @@ $(document).ready(function () {
     let createForm = createModal.find('form');
     let editForm = editModal.find('form');
 
-
     table.DataTable({
         ajax: {
-            url: CATEGORY_ROUTE
+            url: BRAND_ROUTE
         },
         columns: [
             {
@@ -22,7 +19,7 @@ $(document).ready(function () {
                 width: "5%",
                 render: function (data, type, row) {
                     let checkbox = '<div div class="form-check">\n\
-                       <input name="checkbox" class="form-check-input" onchange="selectCategory(this)" data-id=' + row.id + ' data-name= ' + row.name + ' type="checkbox"> \n\
+                       <input name="checkbox" class="form-check-input" onchange="selectBrand(this)" data-id=' + row.id + ' data-name= ' + row.name + ' type="checkbox"> \n\
                     </div>';
 
                     return `${checkbox}`;
@@ -49,8 +46,8 @@ $(document).ready(function () {
                 orderable: false,
                 width: '15%',
                 render: function (data, type, row) {
-                    let deleteButton = '<a data-id=' + row.id + ' data-name=' + row.name + ' class="btn deleteCategory"- onclick="deleteCategory(this)" title="Delete"><i class="fa-solid fa-trash text-danger"></i></a>';
-                    let editButton = '<a data-id=' + row.id + ' class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-solid fa-pencil text-warning"></i></a>';
+                    let deleteButton = '<a data-id=' + row.id + ' data-name=' + row.name + ' class="btn" onclick="deleteBrand(this)" title="Delete"><i class="fa-solid fa-trash text-danger"></i></a>';
+                    let editButton = '<a data-id=' + row.id + ' class="btn" onclick="editBrand(this)" title="Edit"><i class="fa-solid fa-pencil text-warning"></i></a>';
                     let productsButton = '<a data-id=' + row.id + ' class="btn" title="Products"><i class="fa-solid fa-box-open text-primary"></i></a>';
                     return `${deleteButton} ${editButton} ${productsButton}`;
                 }
@@ -60,6 +57,10 @@ $(document).ready(function () {
     });
 
     //ACTIONS
+    $('.createBrand').on("click", function () {
+        createForm.attr('action', STORE_BRAND_ROUTE);
+        createModal.modal('show');
+    });
 
     $('#submitForm').on("click", function (e) {
         e.preventDefault();
@@ -81,45 +82,7 @@ $(document).ready(function () {
         );
     });
 
-    $('#updateForm').on("click", function (e) {
-        e.preventDefault();
-
-        var actionUrl = editForm.attr('action');
-        var data = editForm.serialize();
-
-        updateData(actionUrl, data,
-                function (response) {
-                    toastr['success'](response.message);
-                    editForm.trigger('reset');
-                    editModal.modal('toggle');
-                    table.DataTable().ajax.reload();
-                },
-                function (error) {
-                    toastr['error']('Category has not been updated');
-                    ajaxResponse(error.responseJSON.errors);
-                }
-        );
-    });
-
-    $('.createCategory').on("click", function () {
-        createForm.attr('action', STORE_CATEGORY_ROUTE);
-        createModal.modal('show');
-    });
-
-    $('.selectAction').on('change', function () {
-        switch ($(this).val()) {
-            case 'delete':
-                deleteMultipleCategories();
-                break;
-            default:
-        }
-    });
-
-    $('.modalCloseBtn').on('click', function () {
-        $('.modal').modal('hide');
-    });
-
-    window.deleteCategory = function (e) {
+    window.deleteBrand = function (e) {
         let id = $(e).attr('data-id');
         let name = $(e).attr('data-name');
 
@@ -138,7 +101,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $.ajax({
                     method: "GET",
-                    url: REMOVE_CATEGORY_ROUTE.replace(':id', id),
+                    url: REMOVE_BRAND_ROUTE.replace(':id', id),
                     contentType: 'application/json',
                     success: function (response) {
                         toastr['success'](response.message);
@@ -152,15 +115,15 @@ $(document).ready(function () {
         });
     };
 
-    window.editCategory = function (e) {
+    window.editBrand = function (e) {
         let id = $(e).attr('data-id');
         $.ajax({
             method: "GET",
-            url: EDIT_CATEGORY_ROUTE.replace(':id', id),
+            url: EDIT_BRAND_ROUTE.replace(':id', id),
             contentType: 'application/json',
             success: function (data) {
                 $('#editModal').modal('show');
-                editForm.attr('action', UPDATE_CATEGORY_ROUTE.replace(':id', id));
+                editForm.attr('action', UPDATE_BRAND_ROUTE.replace(':id', id));
                 editForm.find('input[name="name"]').val(data.name);
                 editForm.find('textarea[name="description"]').val(data.description);
             },
@@ -168,10 +131,9 @@ $(document).ready(function () {
                 toastr['error'](errors.message);
             }
         });
+    };
 
-    }
-
-    window.selectCategory = function (e) {
+    window.selectBrand = function (e) {
         if ($('tbody input[type="checkbox"]:checked').length === 0) {
             $('.actions').addClass('d-none');
         } else {
@@ -179,22 +141,16 @@ $(document).ready(function () {
         }
     };
 
-    $(document).on('change', ".selectAll", function () {
-        if (this.checked) {
-            $('.actions').removeClass('d-none');
-            $(':checkbox').each(function () {
-                this.checked = true;
-            });
-        } else {
-            $('.actions').addClass('d-none');
-
-            $(':checkbox').each(function () {
-                this.checked = false;
-            });
+    $('.selectAction').on('change', function () {
+        switch ($(this).val()) {
+            case 'delete':
+                deleteMultipleBrands();
+                break;
+            default:
         }
     });
 
-    let deleteMultipleCategories = function () {
+    let deleteMultipleBrands = function () {
         let searchedIds = [];
         let searchedNames = [];
 
@@ -219,14 +175,14 @@ $(document).ready(function () {
                 searchedIds.forEach(function (id, index) {
                     $.ajax({
                         method: "GET",
-                        url: REMOVE_CATEGORY_ROUTE.replace(':id', id),
+                        url: REMOVE_BRAND_ROUTE.replace(':id', id),
                         contentType: 'application/json',
                         success: function (data) {
-                            toastr['success']('Category has been deleted');
+                            toastr['success']('Brand has been deleted');
                             table.DataTable().ajax.reload();
                         },
                         error: function (errors) {
-                            toastr['error']('Category has not been deleted');
+                            toastr['error']('Brand has not been deleted');
                             table.DataTable().ajax.reload();
                         }
                     });
@@ -234,7 +190,8 @@ $(document).ready(function () {
             }
         });
     };
-    
+
+
     let swalText = function (params) {
         let text = '<div class="col-12 d-flex flex-wrap justify-content-center">';
 
@@ -266,5 +223,24 @@ $(document).ready(function () {
         ;
     }
 
+    $('#updateForm').on("click", function (e) {
+        e.preventDefault();
+
+        var actionUrl = editForm.attr('action');
+        var data = editForm.serialize();
+
+        updateData(actionUrl, data,
+                function (response) {
+                    toastr['success'](response.message);
+                    editForm.trigger('reset');
+                    editModal.modal('toggle');
+                    table.DataTable().ajax.reload();
+                },
+                function (error) {
+                    toastr['error']('Category has not been updated');
+                    ajaxResponse(error.responseJSON.errors);
+                }
+        );
+    });
 
 });

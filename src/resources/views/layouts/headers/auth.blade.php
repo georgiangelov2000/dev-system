@@ -34,7 +34,6 @@
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
-
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fas fa-box"></i>
@@ -49,14 +48,9 @@
                                 <p>Categories</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
+                        <li>
+                            <a href="{{route('brand.index')}}" class="nav-link">
                                 <p>Brands</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="pages/charts/inline.html" class="nav-link">
-                                <p>Units</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -70,7 +64,7 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa fa-users"></i>
+                        <i class="fa-solid fa-truck"></i>
                         <p>
                             Supplier Managment
                             <i class="right fas fa-angle-left"></i>
@@ -112,7 +106,103 @@
                     </ul>
                 </li>
 
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                        <p>
+                            Employee Managment
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="pages/charts/flot.html" class="nav-link">
+                                <p>Employees</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/charts/chartjs.html" class="nav-link">
+                                <p>Create employee</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <p>
+                            Purchase Management
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="pages/charts/flot.html" class="nav-link">
+                                <p>Purchases</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/charts/chartjs.html" class="nav-link">
+                                <p>Create purchase</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-solid fa-handshake"></i>
+                        <p>
+                            Sale Management
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="pages/charts/flot.html" class="nav-link">
+                                <p>Sales</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/charts/flot.html" class="nav-link">
+                                <p>Create sale</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/charts/chartjs.html" class="nav-link">
+                                <p>Sales return</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-solid fa-coins"></i>
+                        <p>
+                            Salary Management
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="pages/charts/flot.html" class="nav-link">
+                                <p></p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/charts/flot.html" class="nav-link">
+                                <p></p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/charts/chartjs.html" class="nav-link">
+                                <p></p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
             </ul>
         </nav>

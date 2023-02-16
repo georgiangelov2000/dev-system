@@ -1,13 +1,13 @@
 @extends('app')
-@section('title', 'Categories')
+@section('title', 'Brands')
 
 @section('content')
 <div id='categories-page'>
     <div class="container">
         <div class="row justify-content-between mb-3">
-            <h3 class="mb-0">Categories</h3>
-            <button type="button" class="btn btn-primary createCategory">
-                <i class="fa fa-plus"></i> Add category
+            <h3 class="mb-0">Brands</h3>
+            <button type="button" class="btn btn-primary createBrand">
+                <i class="fa fa-plus"></i> Add brand
             </button>   
         </div>
         <div class="row">
@@ -24,7 +24,7 @@
                             </div>
                         </div>
                     </div>
-                    <table id="categoriesTable" class="table  table-hover table-sm dataTable no-footer">
+                    <table id="brandsTable" class="table  table-hover table-sm dataTable no-footer">
                         <thead>
                             <tr>
                                 <th>
@@ -53,7 +53,7 @@
     'inputOne' => "name",
     'inputTwo' => "description",
 
-    'title'=>"Add Category",
+    'title'=>"Add Brand",
 
     'formMethod' => "post",
     ])
@@ -66,19 +66,20 @@
     'inputOne' => "name",
     'inputTwo' => "description",
 
-    'title'=>"Edit Category",
+    'title'=>"Edit Brand",
 
     'formMethod' => "post",
     ])
 
     @push('scripts')
-    <script type="text/javascript" src="{{ mix('js/categories.js') }}"></script>
+    <script type="text/javascript" src="{{ mix('js/brands.js') }}"></script>
+
     <script type="text/javascript">
-        let CATEGORY_ROUTE = "{{route('api.categories')}}";
-        let REMOVE_CATEGORY_ROUTE = "{{route('category.delete',':id')}}";
-        let EDIT_CATEGORY_ROUTE = "{{route('category.edit',':id')}}";
-        let UPDATE_CATEGORY_ROUTE = "{{route('category.update',':id')}}";
-        let STORE_CATEGORY_ROUTE = "{{route('category.store')}}";
+        let BRAND_ROUTE = "{{route('api.brands')}}";
+        let REMOVE_BRAND_ROUTE = "{{route('brand.delete',':id')}}";
+        let EDIT_BRAND_ROUTE = "{{route('brand.edit',':id')}}";
+        let UPDATE_BRAND_ROUTE = "{{route('brand.update',':id')}}";
+        let STORE_BRAND_ROUTE = "{{route('brand.store')}}";
     </script>
     @endpush
 

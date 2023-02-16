@@ -5,6 +5,8 @@
  */
 
 window.toastr = require('./toastr.min.js');
+window.Swal = require('./sweetalert2.min.js');
+window.DataTable = require('./datatables.min.js');
 
 require('./bootstrap');
 

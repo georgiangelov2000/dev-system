@@ -12,8 +12,8 @@
         <link type="text/css" href="{{ mix('css/all.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/toastr.min.css') }}" rel="stylesheet"/>
         <link type="text/css" href="{{ mix('css/template.css') }}" rel="stylesheet" />
-        <link type="text/css" href="{{ mix('css/dataTables.bootstrap4.min.css') }}" rel="stylesheet" />
-
+        <link type="text/css" href="{{ mix('css/sweetalert2.css') }}" rel="stylesheet" />
+        <link type="text/css" href="{{ mix('css/datatables.min.css') }}" rel="stylesheet" />
     </head>
     <!--"sidebar-mini layout-fixed"-->
     <body class="sidebar-mini layout-fixed {{$isAuth ? "" : "body-class"}}" style="height: auto;">
@@ -34,13 +34,11 @@
         <script type="text/javascript" src="{{ mix('js/bootstrap.bundle.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/adminlte.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/toastr.min.js') }}"></script>
-        <script type="text/javascript" src="{{ mix('js/modal.js') }}"></script>
-        <script type="text/javascript" src="{{ mix('js/jquery.dataTables.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/sweetalert2.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/datatables.min.js') }}"></script>
 
         <script type="text/javascript">
-            $(document).ready(function() {
-                console.log(toastr);
-                
+            $(document).ready(function() {                
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

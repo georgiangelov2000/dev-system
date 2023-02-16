@@ -14,4 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 require_once __DIR__ . '/route/auth.php';
+require_once __DIR__ . '/route/apiManagment.php';
 require_once __DIR__ . '/route/managment.php';

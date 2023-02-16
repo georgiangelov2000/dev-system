@@ -90,8 +90,23 @@ label.required:after {
 		}
 	}
 }
+
 .btn-sidebar {
 	border: 1px solid #ced4da;
 	background: #fff;
 	color: inherit;
+}
+
+table.dataTable{
+    thead th {
+        vertical-align: bottom;
+        border-bottom: none !important;
+    }
+    select{
+        box-shadow: unset;
+    }
+}
+.cardTemplate{
+    box-shadow:unset;
+    border:1px solid #dee2e6;
 }
