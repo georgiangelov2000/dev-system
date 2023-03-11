@@ -1,4 +1,4 @@
-<nav class="main-header navbar navbar-expand header-navigation mb-5 navbar-white">
+<nav class="main-header navbar navbar-expand header-navigation mb-3 navbar-white">
     <ul class="navbar-nav">
         <li class="nav-item">
             <a class="nav-link burgerLink" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
@@ -18,11 +18,14 @@
                 Account: {{$user !== false ? $user : ''}}
             </span>
         </li>
-        <li class="nav-item">
-            <a title="Logout" class="nav-link" href="{{route('logout')}}">
-                <i class="fa fa-sign-in-alt"></i>
-            </a>
-        </li>
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <li class="nav-item">
+                <button type="submit" title="Logout" class="nav-link btn btn-link pt-0 pb-0">
+                    <i class="fa fa-sign-in-alt"></i>
+                </button>
+            </li>
+        </form>
     </ul>
 </nav>
 <aside class="main-sidebar elevation-4 navbar-white">
@@ -54,7 +57,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="pages/charts/uplot.html" class="nav-link">
+                            <a href="{{route('product.index')}}" class="nav-link">
                                 <p>Products</p>
                             </a>
                         </li>
@@ -72,12 +75,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="pages/charts/uplot.html" class="nav-link">
+                            <a href="{{route('supplier.index')}}" class="nav-link">
                                 <p>Suppliers</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="pages/charts/chartjs.html" class="nav-link">
+                            <a href="{{route('supplier.create')}}"  class="nav-link">
                                 <p>Create supplier</p>
                             </a>
                         </li>

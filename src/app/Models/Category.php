@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\SubCategory;
+use App\Models\Supplier;
 
 class Category extends Model {
 
@@ -34,5 +36,14 @@ class Category extends Model {
      * @var array
      */
     protected $fillable = ['id','name','description'];
+    
+    public function subCategories()
+    {
+        return $this->belongsToMany(SubCategory::class);
+    }
 
+    public function suppliers()
+    {
+        return $this->belongsToMany(Supplier::class,'suppliers_categories');
+    }
 }

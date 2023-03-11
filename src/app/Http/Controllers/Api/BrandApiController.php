@@ -12,12 +12,12 @@ class BrandApiController extends Controller {
         $brand = Brand::query();
 
         $brand->select('id', 'name', 'description')
-                ->orderBy('id', 'desc');
-
+                ->orderBy('id', 'asc');
+        
         $result = $brand
                 ->get()
                 ->toArray();
-
+        
         return response()->json(['data' => $result]);
     }
 

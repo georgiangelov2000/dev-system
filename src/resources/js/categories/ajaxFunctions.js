@@ -36,3 +36,21 @@ export function updateData(url, data, successCallback, errorCallback) {
         }
     });
 }
+
+export function detachSubCategory  (url, successCallback, errorCallback) {
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function (response)
+        {
+            if (typeof successCallback === 'function') {
+                successCallback(response);
+            }
+        },
+        error: function (error) {
+            if (typeof errorCallback === 'function') {
+                errorCallback(error);
+            }
+        }
+    });
+}

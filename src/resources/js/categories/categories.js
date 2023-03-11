@@ -1,5 +1,5 @@
 /* global Swal, CATEGORY_ROUTE */
-import { createData, updateData } from './ajaxFunctions.js';
+import { createData, updateData, detachSubCategory } from './ajaxFunctions.js';
 $(document).ready(function () {
 
     let table = $('#categoriesTable');
@@ -11,8 +11,7 @@ $(document).ready(function () {
     let createForm = createModal.find('form');
     let editForm = editModal.find('form');
 
-
-    table.DataTable({
+    var dataT = table.DataTable({
         ajax: {
             url: CATEGORY_ROUTE
         },
@@ -46,18 +45,82 @@ $(document).ready(function () {
                 data: "description"
             },
             {
+                width: '25%',
+                orderable: false,
+                name: 'subcategories',
+                render: function (data, type, row) {
+                    if (row.sub_categories) {
+                        var subcategoryNames = row.sub_categories.map(function (subcategory) {
+                            return "<span class='font-weight-bold'> " + subcategory.name + " </span>";
+                        });
+                        return subcategoryNames.join(', ');
+                    } else {
+                        return '';
+                    }
+                }
+            },
+            {
                 orderable: false,
                 width: '15%',
                 render: function (data, type, row) {
                     let deleteButton = '<a data-id=' + row.id + ' data-name=' + row.name + ' class="btn deleteCategory"- onclick="deleteCategory(this)" title="Delete"><i class="fa-solid fa-trash text-danger"></i></a>';
                     let editButton = '<a data-id=' + row.id + ' class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-solid fa-pencil text-warning"></i></a>';
                     let productsButton = '<a data-id=' + row.id + ' class="btn" title="Products"><i class="fa-solid fa-box-open text-primary"></i></a>';
-                    return `${deleteButton} ${editButton} ${productsButton}`;
+                    let subCategories = "<button data-toggle='collapse' data-target='#subcategories_" + row.id + "' title='Sub categories' class='btn btn-outline-muted showSubCategories'><i class='fa-solid fa-list' aria-hidden='true'></i></button>";
+                    return `${subCategories} ${deleteButton} ${editButton} ${productsButton}` +
+                        "<div class='collapse' id='subcategories_" + row.id + "'></div>";
                 }
             }
+            
         ],
-        order: [[1, 'desc']]
+        order: [[1, 'asc']]
     });
+    
+    $('tbody').on('click', '.showSubCategories', function(){
+        var tr = $(this).closest('tr');
+        var row = dataT.row( tr );
+
+        if(row.child.isShown()){
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        } else {
+            // Open this row
+            row.child(format(row.data())).show();
+            tr.addClass('shown');
+        }
+    });
+    
+    function format(d) {
+        
+        // `d` is the original data object for the row
+        let tableRows = "";
+        
+        if(d.sub_categories.length > 0) {
+            d.sub_categories.forEach(function(subcategory) {
+        
+            tableRows += '<tr>'+
+                '<td>'+subcategory.name+'</td>'+
+                '<td><button data-related-subcategory-id='+subcategory.id+' data-category-id='+d.id+' onclick=detachSubCategory(this) class="btn deleteSubCategory"><i class="fa-solid fa-trash text-danger"></i></button></td>'+
+            '</tr>';
+        });
+        
+        return '<table class="subTable subcategories w-100" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
+            '<thead>' +
+                '<tr>'+
+                    '<th>Name</th>'+
+                    '<th>Actions</th>'+
+                '</tr>'+
+            '</thead>' +
+            '<tbody>'+
+                tableRows +
+            '</tbody>'+
+        '</table>';
+
+        } else {
+            return false;
+        }
+    }
 
     //ACTIONS
 
@@ -118,7 +181,20 @@ $(document).ready(function () {
     $('.modalCloseBtn').on('click', function () {
         $('.modal').modal('hide');
     });
-
+    
+     window.detachSubCategory = function (e) {
+         let related_subcategoryId = $(e).attr('data-related-subcategory-id');
+         let currentTr = $(e).closest('tr'); // get the nearest parent <tr> element
+         console.log(SUBCATEGORY_ROUTE.replace(':id',related_subcategoryId));
+         
+         detachSubCategory(SUBCATEGORY_ROUTE.replace(':id',related_subcategoryId),function(response){
+             toastr['success'](response.message);
+             currentTr.remove(); // remove the current <tr> element
+         },function(error){
+             toastr['error']('Subcategory has not been detached');
+         });
+     };
+    
     window.deleteCategory = function (e) {
         let id = $(e).attr('data-id');
         let name = $(e).attr('data-name');
@@ -154,21 +230,31 @@ $(document).ready(function () {
 
     window.editCategory = function (e) {
         let id = $(e).attr('data-id');
+
         $.ajax({
             method: "GET",
             url: EDIT_CATEGORY_ROUTE.replace(':id', id),
             contentType: 'application/json',
             success: function (data) {
+                
                 $('#editModal').modal('show');
                 editForm.attr('action', UPDATE_CATEGORY_ROUTE.replace(':id', id));
-                editForm.find('input[name="name"]').val(data.name);
-                editForm.find('textarea[name="description"]').val(data.description);
+                editForm.find('input[name="name"]').val(data.category.name);
+                editForm.find('textarea[name="description"]').val(data.category.description);
+
+                data.allSubCategories.forEach(cat => {
+                    const option =
+                            `<option value="${cat.id}" class="d-flex justify-content-between align-items-center">
+                                ${cat.name}
+                            </option>`;
+                    $('.relatedSubcategories').append(option);
+                });
+
             },
             error: function (errors) {
                 toastr['error'](errors.message);
             }
         });
-
     }
 
     window.selectCategory = function (e) {
@@ -234,7 +320,7 @@ $(document).ready(function () {
             }
         });
     };
-    
+
     let swalText = function (params) {
         let text = '<div class="col-12 d-flex flex-wrap justify-content-center">';
 

@@ -2,8 +2,7 @@
 @section('title', 'Brands')
 
 @section('content')
-<div id='categories-page'>
-    <div class="container">
+
         <div class="row justify-content-between mb-3">
             <h3 class="mb-0">Brands</h3>
             <button type="button" class="btn btn-primary createBrand">
@@ -42,8 +41,7 @@
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
+
 
     <!--create modal-->
     @include('templates.modal_form',[
@@ -56,6 +54,8 @@
     'title'=>"Add Brand",
 
     'formMethod' => "post",
+    
+    'isAvailableMultiple' => false
     ])
 
     <!--create modal-->
@@ -69,6 +69,7 @@
     'title'=>"Edit Brand",
 
     'formMethod' => "post",
+    'isAvailableMultiple' => false
     ])
 
     @push('scripts')

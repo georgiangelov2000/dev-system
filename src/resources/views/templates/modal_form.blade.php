@@ -5,7 +5,7 @@
     role="dialog" 
     aria-labelledby="createModal" 
     aria-hidden="true"
->
+    >
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -16,9 +16,9 @@
             </div>
             <div class="modal-body">
                 <form 
-                      method="{{$formMethod}}"
-                      action=""
-                >
+                    method="{{$formMethod}}"
+                    action=""
+                    >
                     @csrf
                     <div class='modal-form'>
                         <label class="required">{{ucfirst($labelOne)}}</label>
@@ -42,9 +42,19 @@
                                 cols='2' 
                                 id='{{$inputTwo}}' 
                                 name='{{$inputTwo}}'
-                            ></textarea>
+                                ></textarea>
                             <span id="{{$inputTwo}}" class="d-none text-danger"> </span>
                         </div>
+                        @if($isAvailableMultiple)
+                        <div class="form-group">
+                            <label>Assign subcategories</label>
+                            <select multiple="" class="form-control" name="subcategory[]">
+                                @foreach($subcategories as $subcategory)
+                                    <option value="{{$subcategory->id}}">{{$subcategory->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
                     </div>
                 </form>
             </div>

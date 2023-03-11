@@ -45,6 +45,13 @@
                             ></textarea>
                             <span id="{{$inputTwo}}" class="d-none text-danger"> </span>
                         </div>
+                        @if($isAvailableMultiple)
+                            <div class="form-group">
+                                <label>Assign subcategories</label>
+                                <select multiple="" class="form-control relatedSubcategories" name="subcategory[]">
+                                </select>
+                            </div>
+                        @endif
                     </div>
                 </form>
             </div>

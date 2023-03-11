@@ -53,7 +53,7 @@ $(document).ready(function () {
                 }
             }
         ],
-        order: [[1, 'desc']]
+        order: [[1, 'asc']]
     });
 
     //ACTIONS

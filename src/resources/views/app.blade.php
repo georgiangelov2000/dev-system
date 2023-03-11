@@ -14,14 +14,23 @@
         <link type="text/css" href="{{ mix('css/template.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/sweetalert2.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/datatables.min.css') }}" rel="stylesheet" />
+        <link type="text/css" href="{{ mix('css/bootstrap-select.min.css') }}" rel="stylesheet" />
+        <link type="text/css" href="{{ mix('css/datepicker.min.css') }}" rel="stylesheet" />
+
     </head>
     <!--"sidebar-mini layout-fixed"-->
-    <body class="sidebar-mini layout-fixed {{$isAuth ? "" : "body-class"}}" style="height: auto;">
+    <body class="sidebar-mini layout-fixed sidebar-collapse {{$isAuth ? "" : "body-class"}}" style="height: auto;">
         <div class='wrapper'>
             @include("layouts.header")
             @auth
-            <div class='container'>
-                @yield('content')
+            <div class="content-wrapper">
+                <section class="content">
+                    <div class='container-fluid'>
+                        <div class="col-12">
+                            @yield('content')
+                        </div>
+                    </div>
+                </section>
             </div>
             @else
                 @include('layouts.auth')
@@ -36,6 +45,46 @@
         <script type="text/javascript" src="{{ mix('js/toastr.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/sweetalert2.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/datatables.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/bootstrap-select-min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/datepicker.min.js') }}"></script>
+
+        <script>
+            @if (Session::has('message'))
+                toastr.options = {
+                    "closeButton": true,
+                    "progressBar": true
+                }
+                toastr.success("{{ session('message') }}");
+            @endif
+            @if (Session::has('success'))
+                toastr.options = {
+                    "closeButton": true,
+                    "progressBar": true
+                }
+                toastr.success("{{ session('success') }}");
+            @endif
+            @if (Session::has('error'))
+                toastr.options = {
+                    "closeButton": true,
+                    "progressBar": true
+                }
+                toastr.error("{{ session('error') }}");
+            @endif
+            @if (Session::has('info'))
+                toastr.options = {
+                    "closeButton": true,
+                    "progressBar": true
+                }
+                toastr.info("{{ session('info') }}");
+            @endif
+            @if (Session::has('warning'))
+                toastr.options = {
+                    "closeButton": true,
+                    "progressBar": true
+                }
+                toastr.warning("{{ session('warning') }}");
+            @endif
+        </script>
 
         <script type="text/javascript">
             $(document).ready(function() {                
@@ -46,6 +95,8 @@
                 });
             })
         </script>
+        
+        
         
     @stack('scripts')
         

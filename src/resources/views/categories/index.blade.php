@@ -2,8 +2,6 @@
 @section('title', 'Categories')
 
 @section('content')
-<div id='categories-page'>
-    <div class="container">
         <div class="row justify-content-between mb-3">
             <h3 class="mb-0">Categories</h3>
             <button type="button" class="btn btn-primary createCategory">
@@ -36,14 +34,13 @@
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Description</th>
+                                <th>Subcategories</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
 
     <!--create modal-->
     @include('templates.modal_form',[
@@ -56,6 +53,8 @@
     'title'=>"Add Category",
 
     'formMethod' => "post",
+    
+    'isAvailableMultiple' => true
     ])
 
     <!--create modal-->
@@ -68,17 +67,21 @@
 
     'title'=>"Edit Category",
 
-    'formMethod' => "post",
+    'formMethod' => "post",    
+    
+    'isAvailableMultiple' => true
     ])
 
     @push('scripts')
     <script type="text/javascript" src="{{ mix('js/categories.js') }}"></script>
     <script type="text/javascript">
         let CATEGORY_ROUTE = "{{route('api.categories')}}";
+        console.log(CATEGORY_ROUTE);
         let REMOVE_CATEGORY_ROUTE = "{{route('category.delete',':id')}}";
         let EDIT_CATEGORY_ROUTE = "{{route('category.edit',':id')}}";
         let UPDATE_CATEGORY_ROUTE = "{{route('category.update',':id')}}";
         let STORE_CATEGORY_ROUTE = "{{route('category.store')}}";
+        let SUBCATEGORY_ROUTE = "{{route('category.detach.subcategory',':id')}}";
     </script>
     @endpush
 
