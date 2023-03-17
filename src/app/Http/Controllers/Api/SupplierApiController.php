@@ -13,45 +13,67 @@ class SupplierApiController extends Controller {
         $country = $request->country;
         $state = $request->state;
         $category = $request->category;
-        
-        $suppliers = Supplier::query()
-                ->with([
-                    'states:id,name', 
-                    'image:id,supplier_id,path,name', 
-                    'country:id,name', 
-                ])
-                ->select([
-                    'id', 
-                    'name', 
-                    'email', 
-                    'phone', 
-                    'address', 
-                    'zip', 
-                    'website', 
-                    'notes', 
-                    'state_id', 
-                    'country_id'
-                ])
-                ->with(['categories' => function ($query) {
-                    $query->select('suppliers_categories.id','name');
-                }]);
 
-        if (isset($country) && $country && $country !== '9999') {
-            $suppliers->where('country_id', $country);
-            if (isset($state) && $state !== 'all') {
-                $suppliers->where('state_id', $state);
+        $supplierQuery = $this->buildSupplierQuery();
+
+        if ($country && $country !== '9999') {
+
+            $this->supplierByCountry($country, $supplierQuery);
+
+            if ($state) {
+                $this->supplierByState($state, $supplierQuery);
             }
         }
 
-        if (isset($category) && $category) {
-            $suppliers->whereHas('categories', function ($query) use ($category) {
-                $query->whereIn('categories.id', $category);
-            });
+        if ($category) {
+            $this->supplierByCategory($category, $supplierQuery);
         }
 
-        $result = $suppliers->get();
+        $result = $this->getSuppliers($supplierQuery);
 
         return response()->json(['data' => $result]);
+    }
+
+    private function buildSupplierQuery() {
+        return Supplier::query()
+                        ->with([
+                            'states:id,name',
+                            'image:id,supplier_id,path,name',
+                            'country:id,name',
+                        ])
+                        ->select([
+                            'id',
+                            'name',
+                            'email',
+                            'phone',
+                            'address',
+                            'zip',
+                            'website',
+                            'notes',
+                            'state_id',
+                            'country_id'
+                        ])
+                        ->with(['categories' => function ($query) {
+                                $query->select('suppliers_categories.id', 'name');
+                            }]);
+    }
+
+    private function supplierByCountry($country, $query) {
+        $query->where('country_id', $country);
+    }
+
+    private function supplierByState($state, $query) {
+        $query->where('state_id', $state);
+    }
+
+    private function supplierByCategory($category, $query) {
+        $query->whereHas('categories', function ($query) use ($category) {
+            $query->whereIn('categories.id', $category);
+        });
+    }
+
+    private function getSuppliers($query) {
+        return $query->get();
     }
 
 }

@@ -26,7 +26,6 @@ $(document).ready(function () {
                     return `${checkbox}`;
                 }
             },
-
             {
                 width: '3%',
                 name: "id",
@@ -174,7 +173,7 @@ $(document).ready(function () {
                             selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
                         });
                     } else {
-                        selectState.append('<option disabled>All</option>');
+                        selectState.append('<option value="" disabled>Nothing selected</option>');
                     }
                     selectState.selectpicker('refresh');
                 }, function (error) {
@@ -301,7 +300,6 @@ $(document).ready(function () {
 
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
             searchedIds.forEach(function(id,index){
-                co
                 deleteSupplier(REMOVE_SUPPLIER_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);
                     table.DataTable().ajax.reload();

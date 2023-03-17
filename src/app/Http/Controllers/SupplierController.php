@@ -171,6 +171,7 @@ class SupplierController extends Controller {
     }
 
     public function delete(Supplier $supplier) {
+        
         DB::beginTransaction();
         try {
             $supplierImage = $supplier->image;
@@ -182,13 +183,8 @@ class SupplierController extends Controller {
                     unlink($imagePath);
                 }
 
-                $supplierImage->delete();
-            }
-            
-            if($supplier->categories()){
-                $supplier->categories()->detach();
-            }
-
+            }   
+                     
             $supplier->delete();
 
             DB::commit();

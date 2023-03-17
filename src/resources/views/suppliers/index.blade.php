@@ -41,7 +41,7 @@
                     <div class="form-group">
                         <label>State</label>
                         <select class="form-control selectState">
-                            <option value="">All</option>
+                            <option value="" disabled>Nothing selected</option>
                         </select>
                     </div>
                 </div>

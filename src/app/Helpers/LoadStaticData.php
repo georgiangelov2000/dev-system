@@ -8,6 +8,7 @@ use App\Models\State;
 use App\Models\Country;
 use App\Models\Category;
 use App\Models\Supplier;
+use App\Models\Brand;
 
 class LoadStaticData {
 
@@ -63,6 +64,14 @@ class LoadStaticData {
                 ->get();
 
         return $suppliers;
+    }
+
+    static function callBrands() {
+        $query = Brand::query();
+        $brands = $query->select('id', 'name')
+                ->get();
+
+        return $brands;
     }
 
 }

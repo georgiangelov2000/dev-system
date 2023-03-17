@@ -4,30 +4,35 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProductRequest extends FormRequest
-{
+class ProductRequest extends FormRequest {
 
     /**
      * Get the validation rules that apply to the request.
      *
      * @return array
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             "image" => "image|mimes:jpeg,png,jpg,gif|max:2048",
             "name" => "required|string",
-            "supplier_id" => "required|string",
-            "categories" => "array",
-            "subcategories" => "array",
             "quantity" => "required|integer",
-            "price" => "required|integer",
-            "discount_price" => "required|integer",
-            "discount_percent" => "required|integer",
+            "price" => ['required', function ($attribute, $value, $fail) {
+                    if (is_int($value)) {
+                        $value = number_format($value / 100, 2, '.', '');
+                    } else if (is_numeric($value) && strpos($value, '.') === false) {
+                        $value = number_format($value, 2, '.', '');
+                    }
+                    if (!preg_match('/^\d+(\.\d{1,2})?$/', $value)) {
+                        return $fail($attribute . ' is not a valid price format.');
+                    }
+                }],
             "code" => "required|string",
-            "start_date_discount" => "date|required",
-            "end_date_discount" => "date|required",
-            "notes" => 'string'
+            "supplier_id" => "required|integer",
+            "category_id" => "required|string",
+            "subcategories" => "array|required",
+            "notes" => 'nullable|string',
+            "brands" => "array"
         ];
     }
+
 }

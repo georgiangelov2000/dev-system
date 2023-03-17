@@ -47,6 +47,7 @@
         <script type="text/javascript" src="{{ mix('js/datatables.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/bootstrap-select-min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/datepicker.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/moment.min.js') }}"></script>
 
         <script>
             @if (Session::has('message'))

@@ -24,7 +24,7 @@ class CreateProductSubcategoriesTable extends Migration
                     ->onUpdate('cascade')
                     ->onDelete('cascade');
 
-            $table->foreign('subcategory_id')
+            $table->foreign('sub_category_id')
                     ->references('id')
                     ->on('subcategories')
                     ->onUpdate('cascade')

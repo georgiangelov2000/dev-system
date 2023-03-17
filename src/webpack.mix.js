@@ -25,7 +25,8 @@ mix.js('resources/js/bootstrap.bundle.min.js', 'public/js');
 mix.js('resources/js/sweetalert2.min.js', 'public/js');
 mix.js('resources/js/datatables.min.js', 'public/js');
 mix.js('resources/js/bootstrap-select-min.js', 'public/js');
-mix.js('resources/js/datepicker.min.js', 'public/js')
+mix.js('resources/js/datepicker.min.js', 'public/js'),
+mix.js('resources/js/moment.min.js', 'public/js')
 .version();
 
 mix.sass('resources/sass/_variables.scss', 'public/css');

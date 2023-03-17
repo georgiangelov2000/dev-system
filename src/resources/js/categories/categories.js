@@ -67,8 +67,7 @@ $(document).ready(function () {
                     let editButton = '<a data-id=' + row.id + ' class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-solid fa-pencil text-warning"></i></a>';
                     let productsButton = '<a data-id=' + row.id + ' class="btn" title="Products"><i class="fa-solid fa-box-open text-primary"></i></a>';
                     let subCategories = "<button data-toggle='collapse' data-target='#subcategories_" + row.id + "' title='Sub categories' class='btn btn-outline-muted showSubCategories'><i class='fa-solid fa-list' aria-hidden='true'></i></button>";
-                    return `${subCategories} ${deleteButton} ${editButton} ${productsButton}` +
-                        "<div class='collapse' id='subcategories_" + row.id + "'></div>";
+                    return `${subCategories} ${deleteButton} ${editButton} ${productsButton}`;
                 }
             }
             
@@ -190,6 +189,7 @@ $(document).ready(function () {
          detachSubCategory(SUBCATEGORY_ROUTE.replace(':id',related_subcategoryId),function(response){
              toastr['success'](response.message);
              currentTr.remove(); // remove the current <tr> element
+             table.DataTable().ajax.reload();
          },function(error){
              toastr['error']('Subcategory has not been detached');
          });

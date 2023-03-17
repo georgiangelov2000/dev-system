@@ -10,6 +10,8 @@ window.DataTable = require('./datatables.min.js');
 require('./bootstrap');
 window.selectpicker = require('./bootstrap-select-min.js');
 window.datepicker = require('./datepicker.min.js');
+window.moment = require('./moment.min.js');
+
 /**
  * Next, we will create a fresh React component instance and attach it to
  * the page. Then, you may begin adding components to this application

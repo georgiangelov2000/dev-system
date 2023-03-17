@@ -22,12 +22,7 @@ class CreateProductsTable extends Migration {
             $table->integer('quantity')->default(0);
             $table->text('notes')->nullable();
             $table->decimal('price', 8, 2);
-            $table->integer('discount_price')->nullable();
-            $table->decimal('discount_percent', 8, 2)->nullable();
             $table->string('code',20);
-            $table->date('start_date_discount');
-            $table->date('end_date_discount');
-
             $table->timestamps();
         });
     }

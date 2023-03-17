@@ -5,30 +5,54 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 
 class CategoryApiController extends Controller {
 
     public function getData(Request $request) {
-        $user = $request->user;
+        $supplierId = $request->supplier;
+        $categoryId = $request->category;
 
-        $category = Category::with(['subCategories' => function ($query) {
-            $query->select('category_sub_category.id', 'name');
-        }]);
+        $categoriesQuery = $this->buildCategoriesQuery();
 
-        if (isset($user) && $user) {
-            $category->whereHas('suppliers', function ($query) {
-                $query->where('supplier_id', $user);
-            });
+        if ($supplierId || $supplierId == '0' ) {
+            $this->filterCategoriesBySupplier($categoriesQuery, $supplierId);
         }
 
-        $category->select('id', 'name', 'description')
+        if ($categoryId) {
+            $subcategories = $this->getSubcategories($categoryId);
+            return response()->json(['data' => $subcategories]);
+        }
+
+        $categories = $this->getCategories($categoriesQuery);
+        return response()->json(['data' => $categories]);
+    }
+
+    private function buildCategoriesQuery() {
+        return Category::with(['subCategories' => function ($query) {
+                $query->select('category_sub_category.id', 'name');
+                }])
+                ->select('id', 'name', 'description')
                 ->orderBy('id', 'asc');
+    }
 
-        $result = $category
-                ->get()
-                ->toArray();
+    private function filterCategoriesBySupplier($query, $supplierId) {        
+        $query->whereHas('suppliers', function ($query) use ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        });
+    }
 
-        return response()->json(['data' => $result]);
+    private function getSubcategories($categoryId) {
+        return DB::table('category_sub_category')
+                        ->join('subcategories', 'category_sub_category.sub_category_id', '=', 'subcategories.id')
+                        ->select('subcategories.name', 'subcategories.id')
+                        ->where('category_sub_category.category_id', '=', $categoryId)
+                        ->get()
+                        ->toArray();
+    }
+
+    private function getCategories($query) {
+        return $query->get()->toArray();
     }
 
 }

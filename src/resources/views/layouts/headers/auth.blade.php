@@ -39,9 +39,30 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
                     <a href="#" class="nav-link">
+                        <i class="fa-sharp fa-solid fa-chart-line"></i> 
+                        <p>
+                            General
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a class="nav-link">
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link">
+                                <p>Statistics</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
                         <i class="fas fa-box"></i>
                         <p>
-                            Product Managment
+                            Product widgets
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -51,17 +72,16 @@
                                 <p>Categories</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{route('category.index')}}" class="nav-link">
+                                <p>Subcategories</p>
+                            </a>
+                        </li>
                         <li>
                             <a href="{{route('brand.index')}}" class="nav-link">
                                 <p>Brands</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{route('product.index')}}" class="nav-link">
-                                <p>Products</p>
-                            </a>
-                        </li>
-
                     </ul>
                 </li>
 
@@ -111,28 +131,6 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa fa-users" aria-hidden="true"></i>
-                        <p>
-                            Employee Managment
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
-                                <p>Employees</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="pages/charts/chartjs.html" class="nav-link">
-                                <p>Create employee</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
                         <i class="fa-solid fa-cart-shopping"></i>
                         <p>
                             Purchase Management
@@ -141,13 +139,35 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
+                            <a href="{{route('product.index')}}" class="nav-link">
                                 <p>Purchases</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="pages/charts/chartjs.html" class="nav-link">
+                            <a href="{{route('product.create')}}" class="nav-link">
                                 <p>Create purchase</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-sharp fa-solid fa-bookmark"></i>
+                        <p>
+                            Order Management
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="pages/charts/flot.html" class="nav-link">
+                                <p>Orders</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/charts/flot.html" class="nav-link">
+                                <p>Create order</p>
                             </a>
                         </li>
                     </ul>
@@ -175,6 +195,28 @@
                         <li class="nav-item">
                             <a href="pages/charts/chartjs.html" class="nav-link">
                                 <p>Sales return</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                        <p>
+                            Employee Managment
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="pages/charts/flot.html" class="nav-link">
+                                <p>Employees</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pages/charts/chartjs.html" class="nav-link">
+                                <p>Create employee</p>
                             </a>
                         </li>
                     </ul>

@@ -115,7 +115,7 @@ class CategoryController extends Controller {
         return response()->json(['message' => 'Category has been deleted'], 200);
     }
 
-    public function detachCategory($id) {
+    public function detachSubCategory($id) {
         DB::beginTransaction();
 
         try {

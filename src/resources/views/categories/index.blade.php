@@ -76,7 +76,6 @@
     <script type="text/javascript" src="{{ mix('js/categories.js') }}"></script>
     <script type="text/javascript">
         let CATEGORY_ROUTE = "{{route('api.categories')}}";
-        console.log(CATEGORY_ROUTE);
         let REMOVE_CATEGORY_ROUTE = "{{route('category.delete',':id')}}";
         let EDIT_CATEGORY_ROUTE = "{{route('category.edit',':id')}}";
         let UPDATE_CATEGORY_ROUTE = "{{route('category.update',':id')}}";
