@@ -23,6 +23,31 @@ body {
 	margin: 0;
 }
 
+select.form-control:not(.selectpicker) {
+	display: none;
+}
+  
+select.form-control.selectpicker {
+	display: block;
+}
+
+.bootstrap-select{
+	button{
+		background: inherit;
+		color: #444 !important;
+	}
+}
+  
+.input-daterange{
+	input{
+		border-radius: .25rem;
+	}
+	.input-group-addon{
+		border-top: 1px solid #ced4da;
+		border-bottom: 1px solid #ced4da;
+	}
+}
+
 .main-header .burgerLink{
     height: 0;
 }
@@ -106,7 +131,7 @@ table.dataTable{
         }
     }
     img{
-        object-fit: contain;
+        object-fit: cover;
         height: 100px;
     }
     thead th {

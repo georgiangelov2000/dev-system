@@ -40,7 +40,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/detach/category/{category}', [SupplierController::class, 'detachCategory'])->name('detach.category');
     });
     
-    Route::prefix('products')->name('product.')->group(function () {
+    Route::prefix('purchases')->name('purchase.')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
         Route::get('/create', [ProductController::class, 'create'])->name('create');
         Route::get('/edit/{product}', [ProductController::class, 'edit'])->name('edit');

@@ -39,7 +39,7 @@ class Category extends Model {
     
     public function subCategories()
     {
-        return $this->belongsToMany(SubCategory::class);
+        return $this->belongsToMany(SubCategory::class,'category_sub_category');
     }
 
     public function suppliers()

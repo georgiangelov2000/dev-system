@@ -1,5 +1,5 @@
 /* global Swal, CATEGORY_ROUTE */
-import { createData, updateData, detachSubCategory } from './ajaxFunctions.js';
+import { createData, updateData, detachSubCategory, apiCategories, getEditDataCategory } from './ajaxFunctions.js';
 $(document).ready(function () {
 
     let table = $('#categoriesTable');
@@ -10,6 +10,8 @@ $(document).ready(function () {
 
     let createForm = createModal.find('form');
     let editForm = editModal.find('form');
+
+    $('.selectSubCategory').selectpicker();
 
     var dataT = table.DataTable({
         ajax: {
@@ -70,16 +72,16 @@ $(document).ready(function () {
                     return `${subCategories} ${deleteButton} ${editButton} ${productsButton}`;
                 }
             }
-            
+
         ],
         order: [[1, 'asc']]
     });
-    
-    $('tbody').on('click', '.showSubCategories', function(){
-        var tr = $(this).closest('tr');
-        var row = dataT.row( tr );
 
-        if(row.child.isShown()){
+    $('tbody').on('click', '.showSubCategories', function () {
+        var tr = $(this).closest('tr');
+        var row = dataT.row(tr);
+
+        if (row.child.isShown()) {
             // This row is already open - close it
             row.child.hide();
             tr.removeClass('shown');
@@ -89,32 +91,32 @@ $(document).ready(function () {
             tr.addClass('shown');
         }
     });
-    
+
     function format(d) {
-        
+
         // `d` is the original data object for the row
         let tableRows = "";
-        
-        if(d.sub_categories.length > 0) {
-            d.sub_categories.forEach(function(subcategory) {
-        
-            tableRows += '<tr>'+
-                '<td>'+subcategory.name+'</td>'+
-                '<td><button data-related-subcategory-id='+subcategory.id+' data-category-id='+d.id+' onclick=detachSubCategory(this) class="btn deleteSubCategory"><i class="fa-solid fa-trash text-danger"></i></button></td>'+
-            '</tr>';
-        });
-        
-        return '<table class="subTable subcategories w-100" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
-            '<thead>' +
-                '<tr>'+
-                    '<th>Name</th>'+
-                    '<th>Actions</th>'+
-                '</tr>'+
-            '</thead>' +
-            '<tbody>'+
+
+        if (d.sub_categories.length > 0) {
+            d.sub_categories.forEach(function (subcategory) {
+
+                tableRows += '<tr>' +
+                    '<td>' + subcategory.name + '</td>' +
+                    '<td><button data-related-subcategory-id=' + subcategory.id + ' data-category-id=' + d.id + ' onclick=detachSubCategory(this) class="btn deleteSubCategory"><i class="fa-solid fa-trash text-danger"></i></button></td>' +
+                    '</tr>';
+            });
+
+            return '<table class="subTable subcategories w-100" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+                '<thead>' +
+                '<tr>' +
+                '<th>Name</th>' +
+                '<th>Actions</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>' +
                 tableRows +
-            '</tbody>'+
-        '</table>';
+                '</tbody>' +
+                '</table>';
 
         } else {
             return false;
@@ -130,16 +132,16 @@ $(document).ready(function () {
         var data = createForm.serialize();
 
         createData(actionUrl, data,
-                function (response) {
-                    toastr['success'](response.message);
-                    createForm.trigger('reset');
-                    createModal.modal('toggle');
-                    table.DataTable().ajax.reload();
-                },
-                function (error) {
-                    toastr['error']('Category has not been created');
-                    ajaxResponse(error.responseJSON.errors);
-                }
+            function (response) {
+                toastr['success'](response.message);
+                createForm.trigger('reset');
+                createModal.modal('toggle');
+                table.DataTable().ajax.reload();
+            },
+            function (error) {
+                toastr['error']('Category has not been created');
+                ajaxResponse(error.responseJSON.errors);
+            }
         );
     });
 
@@ -150,16 +152,16 @@ $(document).ready(function () {
         var data = editForm.serialize();
 
         updateData(actionUrl, data,
-                function (response) {
-                    toastr['success'](response.message);
-                    editForm.trigger('reset');
-                    editModal.modal('toggle');
-                    table.DataTable().ajax.reload();
-                },
-                function (error) {
-                    toastr['error']('Category has not been updated');
-                    ajaxResponse(error.responseJSON.errors);
-                }
+            function (response) {
+                toastr['success'](response.message);
+                editForm.trigger('reset');
+                editModal.modal('toggle');
+                table.DataTable().ajax.reload();
+            },
+            function (error) {
+                toastr['error']('Category has not been updated');
+                ajaxResponse(error.responseJSON.errors);
+            }
         );
     });
 
@@ -180,21 +182,21 @@ $(document).ready(function () {
     $('.modalCloseBtn').on('click', function () {
         $('.modal').modal('hide');
     });
-    
-     window.detachSubCategory = function (e) {
-         let related_subcategoryId = $(e).attr('data-related-subcategory-id');
-         let currentTr = $(e).closest('tr'); // get the nearest parent <tr> element
-         console.log(SUBCATEGORY_ROUTE.replace(':id',related_subcategoryId));
-         
-         detachSubCategory(SUBCATEGORY_ROUTE.replace(':id',related_subcategoryId),function(response){
-             toastr['success'](response.message);
-             currentTr.remove(); // remove the current <tr> element
-             table.DataTable().ajax.reload();
-         },function(error){
-             toastr['error']('Subcategory has not been detached');
-         });
-     };
-    
+
+    window.detachSubCategory = function (e) {
+        let related_subcategoryId = $(e).attr('data-related-subcategory-id');
+        let currentTr = $(e).closest('tr'); // get the nearest parent <tr> element
+        console.log(SUBCATEGORY_ROUTE.replace(':id', related_subcategoryId));
+
+        detachSubCategory(SUBCATEGORY_ROUTE.replace(':id', related_subcategoryId), function (response) {
+            toastr['success'](response.message);
+            currentTr.remove(); // remove the current <tr> element
+            table.DataTable().ajax.reload();
+        }, function (error) {
+            toastr['error']('Subcategory has not been detached');
+        });
+    };
+
     window.deleteCategory = function (e) {
         let id = $(e).attr('data-id');
         let name = $(e).attr('data-name');
@@ -228,33 +230,39 @@ $(document).ready(function () {
         });
     };
 
+    $('.modal').on('hidden.bs.modal', function () {
+        $(this).find('form').find('select').empty();
+        $(this).find('form')[0].reset();
+    });
+
     window.editCategory = function (e) {
         let id = $(e).attr('data-id');
 
-        $.ajax({
-            method: "GET",
-            url: EDIT_CATEGORY_ROUTE.replace(':id', id),
-            contentType: 'application/json',
-            success: function (data) {
-                
-                $('#editModal').modal('show');
-                editForm.attr('action', UPDATE_CATEGORY_ROUTE.replace(':id', id));
-                editForm.find('input[name="name"]').val(data.category.name);
-                editForm.find('textarea[name="description"]').val(data.category.description);
-
-                data.allSubCategories.forEach(cat => {
-                    const option =
-                            `<option value="${cat.id}" class="d-flex justify-content-between align-items-center">
-                                ${cat.name}
-                            </option>`;
-                    $('.relatedSubcategories').append(option);
-                });
-
-            },
-            error: function (errors) {
-                toastr['error'](errors.message);
-            }
-        });
+        getEditDataCategory(EDIT_CATEGORY_ROUTE.replace(':id', id), function (data) {
+            let responseDataSubCategories = data.allSubCategories;
+    
+            editModal.modal('show');
+            editForm.attr('action', UPDATE_CATEGORY_ROUTE.replace(':id', id));
+            editForm.find('input[name="name"]').val(data.category.name);
+            editForm.find('textarea[name="description"]').val(data.category.description);
+            
+                apiCategories(CATEGORY_ROUTE, { "category": id }, function (response) {
+                    let relatedSubCategories = response.data;
+                        for (let index = 0; index < responseDataSubCategories.length; index++) {
+                            let idToCheck = responseDataSubCategories[index].id;
+                            let matchingObj = relatedSubCategories.find(obj => obj.id == idToCheck ) ? 'selected' : "";
+                            
+                            editModal.find('.bootstrap-select .selectSubCategory').append(`<option ${matchingObj} value="${idToCheck}">${responseDataSubCategories[index].name}</option>`);
+                        }
+                        editModal.find('.bootstrap-select .selectSubCategory').selectpicker('refresh');
+    
+                }, function (error) {
+                    toastr['error'](error.message);
+                })
+        }, function (error) {
+            toastr['error'](error.message);
+        })
+    
     }
 
     window.selectCategory = function (e) {
@@ -326,7 +334,7 @@ $(document).ready(function () {
 
         if (Array.isArray(params)) {
             params.forEach(function (name, index) {
-                text += `<p class="font-weight-bold m-0">${index !== params.length - 1 ? name + ', ' : name }</p>`;
+                text += `<p class="font-weight-bold m-0">${index !== params.length - 1 ? name + ', ' : name}</p>`;
             });
         } else {
             text += `<p class="font-weight-bold m-0">${params}</p>`;

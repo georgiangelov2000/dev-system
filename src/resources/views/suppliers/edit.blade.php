@@ -12,19 +12,32 @@
         <form class="d-flex flex-wrap" action='{{route('supplier.update',$supplier->id)}}' method='POST' enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            <div class="form-group col-12">
-                <img class="img-fluid w-25 h-100" src="{{$supplier->image ? $supplier->image->path . $supplier->image->name : "https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg" }}"/>
+            <div class="col-12 d-none imagePreview">
+                <h5>Preview</h5>
+                <img id="preview-image" class="img-thumbnail w-50">
             </div>
-            <div class="form-group col-6">
-                <label for="image">Choose Image:</label>
-                <input 
-                    type="file" 
-                    name="image" 
-                    id="image" 
-                    value="{{$supplier->image ? $supplier->image->path . $supplier->image->name : ''}}" 
-                    class="form-control"
-                    accept="image/*"
-                    >
+            <div class="form-group col-12">
+                <img class="img-thumbnail w-25 h-100" 
+                    src="{{$relatedRecords['image'] ? $relatedRecords['image']->path . $relatedRecords['image']->name : "https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg" }}"/>
+            </div>
+            <div class="col-6">
+                <div style="height:30px">
+                    <label for="image">File</label>
+                </div>
+                <div class="custom-file col-12">
+                    <input 
+                        type="file" 
+                        class="custom-file-input" 
+                        name="image" 
+                        id="image"
+                        accept="image/*"
+                        value="{{$relatedRecords['image'] ? $relatedRecords['image']->path . $relatedRecords['image']->name : ''}}" 
+                        >
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                    @error('image')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                </div>
             </div>
             <div class="form-group col-6"> 
                 <label for="name">Name</label>
@@ -112,7 +125,7 @@
             </div>
             <div class="form-group col-6"> 
                 <label for="country">Country</label>
-                <select class="form-control" id="country" name="country_id">
+                <select class="form-control selectCountry" id="country" name="country_id">
                     <option value="0" >Select country</option>
                     @foreach($countries as $country)
                     <option 
@@ -127,7 +140,7 @@
             </div>
             <div class="form-group col-6"> 
                 <label for="country">State</label>
-                <select id="state" name="state_id" class="form-control @error('state_id')  is-invalid @enderror">
+                <select id="state" name="state_id" class="form-control @error('state_id')  is-invalid @enderror selectState">
                     <option value="0" >Select state</option>
                     @foreach($states as $state)
                     <option 
@@ -145,9 +158,18 @@
             </div>
             <div class="form-group col-6">
                 <label for="country">Categories</label>
-                <select multiple="" class="form-control" name="categories[]">
+                <select 
+                    multiple="" 
+                    class="form-control selectMultiple" 
+                    name="categories[]"
+                    data-actions-box="true" 
+                    data-dropup-auto="false"
+                >
                     @foreach($categories as $category)
-                    <option value="{{$category->id}}">{{$category->name}}</option>
+                        <option 
+                            value="{{$category->id}}"
+                            {{ in_array($category->id, $relatedRecords['categories']) ? "selected" : "" }}
+                        >{{$category->name}}</option>
                     @endforeach
                 </select>
             </div>
@@ -172,7 +194,7 @@
 @endsection
 
 @push('scripts')
-<script type="text/javascript" src="{{ mix('js/suppliers/create.js') }}"></script>
+<script type="text/javascript" src="{{ mix('js/suppliers/form.js') }}"></script>
 <script>
     let STATE_ROUTE = "{{route('state',':id')}}";
 </script>

@@ -1,4 +1,4 @@
-export function apiGetCategoriesForSupplier(url,data,callback){
+export function APICaller(url,data,callback){
     $.ajax({
         method: 'GET',
         url: url,

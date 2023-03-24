@@ -5,8 +5,6 @@ namespace App\Services;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use App\Models\ProductSubcategory;
-use App\Models\ProductCategory;
 
 class ProductService
 {

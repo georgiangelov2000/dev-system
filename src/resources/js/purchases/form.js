@@ -1,4 +1,4 @@
-import { apiGetCategoriesForSupplier} from './ajaxFunctions.js';
+import { APICaller} from './ajaxFunctions.js';
 
 $(document).ready(function () {
 
@@ -16,7 +16,7 @@ $(document).ready(function () {
     const selectSubCategory = $('.bootstrap-select .selectSubCategory')
 
     if(selectedSupplier !== null) {
-        apiGetCategoriesForSupplier(CATEGORY_ROUTE, {"supplier": selectedSupplier}, function (response) {
+        APICaller(CATEGORY_ROUTE, {"supplier": selectedSupplier}, function (response) {
             const categories = response.data;
             if (categories.length > 0) {
                 $.each(categories, function (key, category) {
@@ -29,7 +29,7 @@ $(document).ready(function () {
             const selectedCategory = categories.find(category => category.id == SELECTED_CATEGORY);
 
             if (selectedCategory !== undefined) { 
-                apiGetCategoriesForSupplier(CATEGORY_ROUTE, {"category": SELECTED_CATEGORY}, function (response) {
+                APICaller(CATEGORY_ROUTE, {"category": SELECTED_CATEGORY}, function (response) {
                     let subCategories = response.data;
                     if (subCategories.length > 0) {
                         selectSubCategory.append('<option value="0">All</option>');
@@ -58,7 +58,7 @@ $(document).ready(function () {
 
         selectSubCategory.empty();
 
-        apiGetCategoriesForSupplier(CATEGORY_ROUTE, {"supplier": supplier}, function (response) {
+        APICaller(CATEGORY_ROUTE, {"supplier": supplier}, function (response) {
             if (response.data.length > 0) {
                 selectCategory.append('<option value="">Nothing selected</option>');
                 $.each(response.data, function (key, value) {
@@ -78,7 +78,7 @@ $(document).ready(function () {
         let category = $(this).val();
         selectSubCategory.empty();
 
-        apiGetCategoriesForSupplier(CATEGORY_ROUTE, {"category": category}, function (response) {
+        APICaller(CATEGORY_ROUTE, {"category": category}, function (response) {
             if (response.data.length > 0) {
                 selectSubCategory.append('<option value="0">All</option>');
                 $.each(response.data, function (key, value) {

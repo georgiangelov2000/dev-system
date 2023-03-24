@@ -47,7 +47,7 @@
                 </div>
                 <div class="col-3">
                     <label>Categories</label>
-                    <select class="selectCategory" multiple>
+                    <select class="form-control selectCategory" multiple>
                         @foreach($categories as $category)
                             <option value="{{$category->id}}" >{{$category->name}}</option>
                         @endforeach
@@ -88,6 +88,7 @@
     <script type="text/javascript" src="{{mix('js/suppliers/suppliers.js')}}"></script>
     <script type="text/javascript">
         let SUPPLIER_ROUTE_API_ROUTE = "{{route('api.suppliers')}}";
+        console.log(SUPPLIER_ROUTE_API_ROUTE);
         let REMOVE_SUPPLIER_ROUTE = "{{route('supplier.delete',':id')}}";
         let EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
         let UPDATE_SUPPLIER_ROUTE = "{{route('supplier.update',':id')}}";

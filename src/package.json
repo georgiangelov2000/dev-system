@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "jquery": "^3.6.3",
+        "moment": "^2.29.4",
         "react-data-table-component": "^7.5.3"
     }
 }

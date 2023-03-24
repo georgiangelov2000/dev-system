@@ -5,10 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\LoadStaticData;
 use App\Models\Product;
-use App\Models\ProductBrand;
-use App\Models\ProductCategory;
 use App\Models\ProductImage;
-use App\Models\ProductSubcategory;
 use App\Http\Requests\ProductRequest;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;
@@ -29,14 +26,19 @@ class ProductController extends Controller
 
     public function index()
     {
-        return view('products.index');
+        return view('purchases.index',[
+            'suppliers' => $this->staticDataHelper->callSupliers(),
+            'categories' => $this->staticDataHelper->loadCallCategories(),
+            'brands' => $this->staticDataHelper->callBrands()
+        ]);
     }
 
     public function create()
     {
         $suppliers = $this->staticDataHelper->callSupliers();
         $brands = $this->staticDataHelper->callBrands();
-        return view('products.create', ['suppliers' => $suppliers, 'brands' => $brands]);
+        $categories = $this->staticDataHelper->loadCallCategories();
+        return view('purchases.create', ['suppliers' => $suppliers, 'brands' => $brands,'categories' => $categories]);
     }
 
 
@@ -47,7 +49,7 @@ class ProductController extends Controller
         $relatedRecords  = $productService->getEditData();
         $brands = $this->staticDataHelper::callBrands();
         $suppliers = $this->staticDataHelper::callSupliers();
-        return view('products.edit', compact('product', 'relatedRecords', 'suppliers', 'brands'));
+        return view('purchases.edit', compact('product', 'relatedRecords', 'suppliers', 'brands'));
     }
 
     public function update(Product $product, ProductRequest $request)
@@ -73,6 +75,20 @@ class ProductController extends Controller
                 $productService->attachProductBrands($data['brands']);
             }
 
+            $total_price = $data['price'] * $data['quantity'];
+            $formatted_total_price = number_format($total_price, 8, '.', ',');
+
+            $product->update([
+                "name" => $data['name'],
+                "supplier_id" => $data['supplier_id'],
+                "quantity" => $data['quantity'],
+                "notes" => $data["notes"],
+                "price" => $data["price"],
+                "code" => $data["code"],
+                "status" => $data['quantity'] > 0 ? 'enabled' : 'disabled',
+                "total_price" => $formatted_total_price
+            ]);
+
             DB::commit();
 
             Log::info('Product has been updated');
@@ -81,7 +97,7 @@ class ProductController extends Controller
             DB::rollback();
             Log::error($e->getMessage());
         }
-        return redirect()->route('product.index')->with('success', 'Product has been updated');
+        return redirect()->route('purchase.index')->with('success', 'Product has been updated');
     }
 
     public function store(ProductRequest $request)
@@ -107,28 +123,14 @@ class ProductController extends Controller
                 "total_price" => $formatted_total_price
             ]);
 
+
             if ($product) {
 
-                $image = $request->file('image');
-
-                if ($image) {
-                    $hashedImage = Str::random(10) . '.' . $image->getClientOriginalExtension();
-
-                    $createdProductImage = $this->createProductImage(
-                        $product->id,
-                        config('app.url') . '/storage/images/products/',
-                        $hashedImage
-                    );
-
-                    if ($createdProductImage) {
-                        if (!Storage::exists($this->storage_static_files)) {
-                            Storage::makeDirectory($this->storage_static_files);
-                        }
-                        Storage::putFileAs($this->storage_static_files, $image, $hashedImage);
-                    }
-                }
-
                 $productService = new ProductService($product);
+
+                if ($request->hasFile('image')) {
+                    $productService->imageUploader($request->file('image'));
+                }
 
                 $productService->attachProductCategory($data['category_id']);
 
@@ -139,14 +141,16 @@ class ProductController extends Controller
                 if (isset($data['brands']) && count($data['brands'])) {
                     $productService->attachProductBrands($data['brands']);
                 }
+
             }
 
             DB::commit();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            dd($e);
             DB::rollback();
             Log::error($e->getMessage());
         }
-        return redirect()->route('product.index')->with('success', 'Product has been created');
+        return redirect()->route('purchase.index')->with('success', 'Product has been created');
     }
 
     public function delete(Product $product)

@@ -48,7 +48,14 @@
                         @if($isAvailableMultiple)
                             <div class="form-group">
                                 <label>Assign subcategories</label>
-                                <select multiple="" class="form-control relatedSubcategories" name="subcategory[]">
+                                <select 
+                                    multiple="" 
+                                    class="form-control selectSubCategory" 
+                                    name="subcategory[]"
+                                    multiple data-selected-text-format="count > 7" 
+                                    data-actions-box="true" 
+                                    data-dropup-auto="false" 
+                                >
                                 </select>
                             </div>
                         @endif

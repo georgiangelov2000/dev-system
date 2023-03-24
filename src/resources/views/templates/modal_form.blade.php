@@ -48,7 +48,14 @@
                         @if($isAvailableMultiple)
                         <div class="form-group">
                             <label>Assign subcategories</label>
-                            <select multiple="" class="form-control" name="subcategory[]">
+                            <select 
+                                multiple="" 
+                                class="form-control selectSubCategory" 
+                                name="subcategory[]"
+                                data-actions-box="true" 
+                                data-dropup-auto="false"
+                                multiple data-selected-text-format="count > 7"  
+                            >
                                 @foreach($subcategories as $subcategory)
                                     <option value="{{$subcategory->id}}">{{$subcategory->name}}</option>
                                 @endforeach

@@ -9,32 +9,60 @@
         </div>
     </div>
     <div class="card-body">
-        <form class="d-flex flex-wrap" action='{{route('product.store')}}' method='POST' enctype="multipart/form-data">
+        <form class="d-flex flex-wrap" action='{{route('purchase.update',$product->id)}}' method='POST' enctype="multipart/form-data">
             @csrf
+            @method('PUT')
+            <div class="form-group col-12">
+                <img class="img-fluid w-25 h-100" src="{{$product->images ? $product->images->path . $product->images->name : "https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg" }}"/>
+            </div>
             <div class="form-group col-6">
                 <label for="image">Choose Image:</label>
-                <input type="file" name="image" id="image" class="form-control">
-                @error('image')
-                    <span class="text-danger">{{ $message }}</span>
-                @enderror
+                <input 
+                    type="file" 
+                    name="image" 
+                    id="image" 
+                    value="{{$product->images ? $product->images->path . $product->images->name : ''}}" 
+                    class="form-control"
+                    accept="image/*"
+                    >
             </div>
             <div class="form-group col-6"> 
                 <label for="name">Name</label>
-                <input type="text" class="form-control @error('name')  is-invalid @enderror" id="name" name="name" value='{{ old("name") ? e(old("name")) : '' }}' placeholder="Enter name">
+                <input 
+                    type="text" 
+                    class="form-control @error('name')  is-invalid @enderror" 
+                    id="name" 
+                    name="name" 
+                    value='{{e($product->name)}}' 
+                    placeholder="Enter name">
                 @error('name')
                 <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
             <div class="form-group col-6"> 
                 <label for="quantity">Quantity</label>
-                <input type="number" placeholder="Enter quantity" class="form-control @error('quantity')  is-invalid @enderror" id="quantity" name="quantity" value='{{ old("quantity") ? e(old("quantity")) : '' }}'>
+                <input 
+                    type="number" 
+                    placeholder="Enter quantity" 
+                    class="form-control @error('quantity')  is-invalid @enderror" 
+                    id="quantity" 
+                    name="quantity" 
+                    value='{{e($product->quantity)}}'
+                >
                 @error('quantity')
                 <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
             <div class="form-group col-6"> 
                 <label for="price">Price</label>
-                <input type="text" class="form-control @error('price')  is-invalid @enderror" id="price" name="price" value='{{ old("price") ? e(old("price")) : '' }}' placeholder="Enter price">
+                <input 
+                    type="text" 
+                    class="form-control @error('price')  is-invalid @enderror" 
+                    id="price" 
+                    name="price" 
+                    value='{{e($product->price)}}'
+                    placeholder="Enter price"
+                >
                 @error('price')
                 <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -48,7 +76,7 @@
                             class="form-control @error('code')  is-invalid @enderror" 
                             id="code" 
                             name="code" 
-                            value='{{ old("code") ? e(old("code")) : '' }}' 
+                            value='{{e($product->code)}}'
                             placeholder="Generate code"
                             >
                         <span class="input-group-append">
@@ -61,16 +89,15 @@
                 </div>
                 <div class="form-group">
                     <label for="notes">Notes</label>
-                    <textarea cols="3" rows="8" class="form-control" name="notes"></textarea>
+                    <textarea cols="3" rows="8" class="form-control" name="notes">{{e($product->notes)}}</textarea>
                 </div>
             </div>
             <div class="form-group col-6">
                 <div class="form-group">
                     <label>Suppliers</label>
                     <select class="form-control selectSupplier" name="supplier_id">
-                        <option value="0">Nothing selected</option>
                         @foreach($suppliers as $supplier)
-                        <option value="{{$supplier->id}}">{{$supplier->name}}</option>
+                            <option value="{{ $supplier->id }}" {{ $supplier->id == $relatedRecords['supplier'] ? 'selected' : '' }}>{{ $supplier->name }}</option>
                         @endforeach
                     </select>
                     @error('supplier_id')
@@ -101,7 +128,7 @@
                         name="brands[]"
                         >
                         @foreach($brands as $brand)
-                        <option value="{{$brand->id}}">{{$brand->name}}</option>
+                            <option {{ in_array($brand->id, $relatedRecords['brands']) ? "selected" : "" }} value="{{ $brand->id }}">{{ $brand->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -116,10 +143,13 @@
 </div>
 
 @push("scripts")
-<script type="text/javascript" src="{{mix('js/products/form.js')}}"></script>
-<script type="text/javascript">
-    let CATEGORY_ROUTE = "{{route('api.categories')}}";
-</script>
+    <script type="text/javascript" src="{{mix('js/purchases/form.js')}}"></script>
+    
+    <script type="text/javascript">
+        let CATEGORY_ROUTE = "{{route('api.categories')}}";
+        let SELECTED_CATEGORY = "{{$relatedRecords['category']}}";
+        let SELECTED_SUBCATEGORIES = "{{$relatedRecords['sub_categories']}}";
+    </script>
 @endpush
 
 @endsection

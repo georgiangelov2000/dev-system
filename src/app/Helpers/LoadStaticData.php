@@ -12,20 +12,22 @@ use App\Models\Brand;
 
 class LoadStaticData {
 
-    static function loadSubcategories() {
+    static function callSubCategories($option = null) {
+        $subCategoryQ = SubCategory::query()->select('id','name');
 
-        $unAssignedSubcategories = SubCategory::whereDoesntHave('categories')
-                ->select('id', 'name')
-                ->get();
+        if($option === 'assigned') {
+            $subCategoryQ->has('categories');
+        }
+        else if ($option === 'unnasigned') {
+            $subCategoryQ->whereDoesntHave('categories');
+        }
 
-        $assignedSubCategories = SubCategory::has('categories')
-                ->select('id', 'name')
-                ->get();
+        $result = $subCategoryQ->get();
 
-        return ['unAssignedSubcategories' => $unAssignedSubcategories, 'assignedSubCategories' => $assignedSubCategories];
+        return $result;
     }
 
-    static function loadCallStatesAndCountries($country = null) {
+    static function callStatesAndCountries($country = null) {
 
         $statesQuery = State::select('id', 'name');
 

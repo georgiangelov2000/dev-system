@@ -19,7 +19,7 @@ services:
     context: .
     dockerfile: docker/php.dockerfile
   volumes:
-    - ./src:/var/www/html:delegated
+    - ./src:/var/www/html:cached
     - ./logs/fpm:/var/log
  mysql:
   image: mysql:latest

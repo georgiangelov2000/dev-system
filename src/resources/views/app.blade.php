@@ -16,6 +16,7 @@
         <link type="text/css" href="{{ mix('css/datatables.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/bootstrap-select.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/datepicker.min.css') }}" rel="stylesheet" />
+        <link type="text/css" href="{{ mix('css/daterangepicker.min.css') }}" rel="stylesheet" />
 
     </head>
     <!--"sidebar-mini layout-fixed"-->
@@ -36,7 +37,6 @@
                 @include('layouts.auth')
             @endauth
         </div>
-
         <script type="text/javascript" src="{{ mix('js/app.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/jquery.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/jqueryui.min.js') }}"></script>
@@ -48,6 +48,7 @@
         <script type="text/javascript" src="{{ mix('js/bootstrap-select-min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/datepicker.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/moment.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/daterangepicker.min.js') }}"></script>
 
         <script>
             @if (Session::has('message'))

@@ -10,6 +10,7 @@ window.DataTable = require('./datatables.min.js');
 require('./bootstrap');
 window.selectpicker = require('./bootstrap-select-min.js');
 window.datepicker = require('./datepicker.min.js');
+window.daterangepicker = require('./daterangepicker.min.js');
 window.moment = require('./moment.min.js');
 
 /**

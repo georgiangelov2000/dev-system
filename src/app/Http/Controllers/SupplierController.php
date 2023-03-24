@@ -5,25 +5,25 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\SupplierRequest;
+use App\Services\SupplierService;
 use App\Models\Supplier;
-use App\Models\State;
-use App\Models\Country;
-use App\Models\SupplierImage;
 use App\Models\SupplierCategory;
 use App\Helpers\LoadStaticData;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 class SupplierController extends Controller {
 
-    protected $storage_static_files = 'public/images/suppliers';
+    private $staticDataHelper;
+
+    public function __construct(LoadStaticData $staticDataHelper)
+    {
+        $this->staticDataHelper = $staticDataHelper;
+    }
 
     public function index() {
-        $countries = LoadStaticData::loadCallStatesAndCountries()["countries"];
-        $states = LoadStaticData::loadCallStatesAndCountries()["states"];
-        $categories = LoadStaticData::loadCallCategories();
+        $countries = $this->staticDataHelper->callStatesAndCountries()["countries"];
+        $states = $this->staticDataHelper->callStatesAndCountries()["states"];
+        $categories = $this->staticDataHelper->loadCallCategories();
         
         return view('suppliers.index',[
             'countries' => $countries,
@@ -33,20 +33,18 @@ class SupplierController extends Controller {
     }
 
     public function create() {
-        $countries = LoadStaticData::loadCallStatesAndCountries()["countries"];
-        $categories = LoadStaticData::loadCallCategories();
+        $countries = $this->staticDataHelper->callStatesAndCountries()["countries"];
+        $categories = $this->staticDataHelper->loadCallCategories();
+
         return view('suppliers.create', ["countries" => $countries,"categories"=>$categories]);
     }
 
     public function getState($countryId) {
-        return response()->json(LoadStaticData::loadCallStatesAndCountries($countryId)["states"]);
+        return response()->json($this->staticDataHelper->callStatesAndCountries($countryId)["states"]);
     }
 
     public function store(SupplierRequest $request) {
         $data = $request->validated();
-
-        $image = $request->file('image');
-        $hashedImage = Str::random(10) . '.' . $image->getClientOriginalExtension();
         
         DB::beginTransaction();
  
@@ -54,33 +52,21 @@ class SupplierController extends Controller {
             $supplier = Supplier::create($data);
 
             if ($supplier) {
-                $supplierImage = SupplierImage::create([
-                            'supplier_id' => $supplier->id,
-                            'path' => config('app.url') . '/storage/images/suppliers/',
-                            'name' => $hashedImage,
-                ]); 
+                $supplierService = new SupplierService($supplier);
 
-                if ($supplierImage) {
-                    if (!Storage::exists($this->storage_static_files)) {
-                        Storage::makeDirectory($this->storage_static_files);
-                    }
-                    Storage::putFileAs($this->storage_static_files, $image, $hashedImage);
+                if($request->file('image')){
+                    $supplierService->imageUploader($request->file('image'));
                 }
-                                
+                            
                 if ($supplier && isset($data['categories']) && count($data['categories'])) {
-                    foreach ($data['categories'] as $subcategoryId) {
-                        SupplierCategory::create([
-                            'supplier_id' => $supplier->id,
-                            'category_id' => $subcategoryId
-                        ]);
+                    $supplierService->attachSupplierCategories( $data['categories'] );
                 }
-            }
             }
 
             DB::commit();
 
             Log::info('Successfully created supplier');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
         }
@@ -90,72 +76,53 @@ class SupplierController extends Controller {
 
     public function edit(Supplier $supplier)
     {
+        $service = new SupplierService($supplier);
 
-        $callStatesAndCountries = LoadStaticData::loadCallStatesAndCountries($supplier->country_id);
-        $countries = $callStatesAndCountries["countries"];
-        $states = [];
-        
+        $categories = $this->staticDataHelper->loadCallCategories();
+
         if($supplier->country_id) {
-            $states = $callStatesAndCountries["states"];
-        }
-        
-        $supplier->load('image:id,supplier_id,path,name');
-        
-        $categories = LoadStaticData::loadCallCategories();
+            $callStatesAndCountries = $this->staticDataHelper->callStatesAndCountries($supplier->country_id);
 
+            $states = $callStatesAndCountries["states"];
+
+            $countries = $callStatesAndCountries["countries"];
+        }
+                
         return view('suppliers.edit', compact('supplier'), [
             'countries' => $countries,
             'states' => $states,
-            'categories' => $categories
+            'categories' => $categories,
+            'relatedRecords' => $service->getEditData()
         ]);
     }
 
     public function update(Supplier $supplier, SupplierRequest $request) {
 
+        $supplierService = new SupplierService($supplier);
+
         DB::beginTransaction();
 
         try {
-
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $hashedImage = Str::random(10) . '.' . $image->getClientOriginalExtension();
-
-                $supplierImage = $supplier->image;
-
-                if ($supplierImage) {
-                    $currentFile = Storage::exists($this->storage_static_files . '/' . $supplierImage->name);
-
-                    if ($currentFile) {
-                        Storage::delete($this->storage_static_files . '/' . $supplierImage->name);
-                    }
-                } else {
-                    $supplierImage = new SupplierImage;
-                    $supplierImage->supplier_id = $supplier->id;
-                }   
-
-                $supplierImage->path = config('app.url').'/storage/images/suppliers/' ;
-                $supplierImage->name = $hashedImage;
-                $supplierImage->save();
-
-                Storage::putFileAs($this->storage_static_files, $image, $hashedImage);
-            }
             
+            if ($request->hasFile('image')) {
+                $supplierService->imageUploader($request->file('image'));
+            }
                         
             if (isset($request->categories) && count($request->categories)) {
-                $supplier->categories()->syncWithoutDetaching($request->categories);
+                $supplierService->attachSupplierCategories($request->categories);
             }
             
-            $supplier->name = $request->name;
-            $supplier->email = $request->email;
-            $supplier->phone = $request->phone;
-            $supplier->address = $request->address;
-            $supplier->zip = $request->zip;
-            $supplier->website = $request->website;
-            $supplier->state_id = $request->state_id;
-            $supplier->country_id = $request->country_id;
-            $supplier->notes = $request->notes;
-
-            $supplier->save();
+            $supplier->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'zip' => $request->zip,
+                'website' => $request->website,
+                'state_id' => $request->state_id,
+                'country_id' => $request->country_id,
+                'notes' => $request->notes,
+            ]);            
 
             DB::commit();
 
