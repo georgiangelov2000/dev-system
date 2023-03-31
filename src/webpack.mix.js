@@ -15,6 +15,12 @@ mix.js('resources/js/purchases/form.js', 'public/js/purchases');
 mix.js('resources/js/purchases/purchases.js', 'public/js/purchases');
 mix.js('resources/js/purchases/ajaxFunctions.js', 'public/js/purchases');
 
+mix.js('resources/js/customers/form.js', 'public/js/customers');
+mix.js('resources/js/customers/customers.js', 'public/js/customers');
+
+mix.js('resources/js/orders/form.js', 'public/js/orders');
+
+
 mix.js('resources/js/adminlte.min.js', 'public/js');
 mix.js('resources/js/app.js', 'public/js');
 mix.js('resources/js/bootstrap.js', 'public/js');

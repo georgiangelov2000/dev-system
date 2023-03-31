@@ -117,12 +117,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
+                            <a href="{{route('customer.index')}}" class="nav-link">
                                 <p>Customers</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="pages/charts/chartjs.html" class="nav-link">
+                            <a href="{{route('customer.create')}}" class="nav-link">
                                 <p>Create customer</p>
                             </a>
                         </li>
@@ -161,12 +161,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
+                            <a  class="nav-link">
                                 <p>Orders</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
+                            <a  class="nav-link">
                                 <p>Create order</p>
                             </a>
                         </li>

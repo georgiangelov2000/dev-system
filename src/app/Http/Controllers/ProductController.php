@@ -10,14 +10,11 @@ use App\Http\Requests\ProductRequest;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
 
     private $staticDataHelper;
-    private $storage_static_files = 'public/images/products';
 
     public function __construct(LoadStaticData $staticDataHelper)
     {
@@ -181,16 +178,5 @@ class ProductController extends Controller
             return response()->json(['message' => 'Failed to delete product'], 500);
         }
         return response()->json(['message' => 'Product has been deleted'], 200);
-    }
-
-    private function createProductImage($productId, $path, $name)
-    {
-        $image = ProductImage::create([
-            'product_id' => $productId,
-            'path' => $path,
-            'name' => $name
-        ]);
-
-        return $image;
     }
 }

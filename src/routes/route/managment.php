@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductController;
@@ -48,7 +49,19 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{product}', [ProductController::class, 'update'])->name('update');
         Route::delete('/delete/{product}', [ProductController::class, 'delete'])->name('delete');
     });
+
+    Route::prefix('customers')->name('customer.')->group(function () {
+        Route::get('/', [CustomerController::class, 'index'])->name('index');
+        Route::get('/create', [CustomerController::class, 'create'])->name('create');
+        Route::post('/store', [CustomerController::class, 'store'])->name('store');
+        Route::get('/edit/{customer}', [CustomerController::class, 'edit'])->name('edit');
+        Route::put('/update/{customer}', [CustomerController::class, 'update'])->name('update');
+        Route::get('/delete/{customer}', [CustomerController::class, 'delete'])->name('delete');
+        Route::get('/state/{countryId}', [CustomerController::class, 'getState'])->name('state');
+    });
     
+    Route::prefix('orders')->name('order.')->group(function () {
+    });
     
     Route::prefix('states')->name('state')->group(function(){
         Route::get('/state/{countryId}', [SupplierController::class, 'getState']);

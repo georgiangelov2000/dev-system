@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\State;
+use App\Models\Country;
 use App\Models\SupplierImage;
 use App\Models\Category;
 
