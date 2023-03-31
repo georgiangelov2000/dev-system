@@ -79,6 +79,7 @@
     <script type="text/javascript">
         let CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
         let CUSTOMER_DELETE_ROUTE = "{{route('customer.delete',':id')}}";
+        let CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
         let STATE_ROUTE = "{{ route('state', ':id') }}";
     </script>
 @endpush

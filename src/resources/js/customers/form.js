@@ -8,11 +8,29 @@ $(document).ready(function () {
     let bootstrapCountry = $('.bootstrap-select .selectCountry');
     let bootstrapState = $('.bootstrap-select .selectState');
 
+
+    $('#image').on('change', function () {
+        previewImage(this);
+    })
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('.imagePreview').removeClass('d-none');
+                $('#preview-image').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     bootstrapCountry.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         let countryId = $(this).val();
         let url = STATE_ROUTE.replace(":id", countryId);
         bootstrapState.empty();
-        
+
         APICallerWithoutData(url, function (response) {
             console.log(response);
             if (response.length > 0) {
