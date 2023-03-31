@@ -1,0 +1,164 @@
+Here are some additional examples of product categories that may be useful for suppliers in an inventory management system:
+
+    Electronics - Products related to electronics, such as TVs, computers, or smartphones.
+    Home Goods - Products related to home goods, such as furniture, appliances, or decor.
+    Apparel and Accessories - Products related to clothing and accessories, such as shoes, jewelry, or handbags.
+    Beauty and Personal Care - Products related to beauty and personal care, such as skincare, makeup, or haircare products.
+    Food and Beverage - Products related to food and beverage, such as groceries, snacks, or drinks.
+    Industrial and Construction - Products related to industrial and construction, such as building materials or heavy machinery.
+    Medical and Healthcare - Products related to medical and healthcare, such as medical devices or pharmaceuticals.
+    Sporting Goods - Products related to sporting goods, such as equipment or apparel for sports and outdoor activities.
+    Toys and Games - Products related to toys and games, such as board games, puzzles, or stuffed animals.
+    Automotive - Products related to automotive, such as car parts, accessories, or maintenance products.
+--------------------------------------------------------------------------------------------------------------------------------------------
+There are many possible categories and subcategories for products, and the specific ones that are useful will depend on the nature of the business and the types of products being offered. 
+Here are some examples of categories and subcategories that may be useful for organizing products in an inventory management system:
+
+    Electronics
+
+    Computers
+    Tablets
+    Smartphones
+    TVs
+    Audio equipment
+    Cameras
+    Gaming consoles
+
+    Home Goods
+
+    Furniture
+    Appliances
+    Home decor
+    Bedding and linens
+    Kitchenware and utensils
+    Lighting
+
+    Apparel and Accessories
+
+    Men's clothing
+    Women's clothing
+    Children's clothing
+    Shoes
+    Jewelry
+    Handbags and purses
+
+    Beauty and Personal Care
+
+    Skincare
+    Makeup
+    Haircare
+    Fragrances
+    Personal hygiene
+
+    Food and Beverage
+
+    Groceries
+    Snacks and confectionery
+    Beverages
+    Alcoholic beverages
+    Pet food and treats
+
+    Industrial and Construction
+
+    Building materials
+    Heavy machinery
+    Safety equipment
+    Hand tools and power tools
+    Plumbing and electrical supplies
+
+    Medical and Healthcare
+
+    Medical devices
+    Pharmaceuticals
+    Personal protective equipment
+    First aid supplies
+
+    Sporting Goods
+
+    Exercise equipment
+    Athletic apparel
+    Outdoor gear and accessories
+    Team sports equipment
+
+    Toys and Games
+
+    Board games
+    Puzzles
+    Stuffed animals and plush toys
+    Action figures and dolls
+
+    Automotive
+
+    Car parts and accessories
+    Maintenance products
+    Automotive tools and equipment
+
+
+    Orders: If you want to keep track of the orders placed by customers, you may want to create an orders table that includes information such as order date, customer information, product information, quantity, and price.
+
+    Sales: If you want to track your sales performance, you may want to create a sales table that records the sales made for each product and supplier.
+
+    Inventory: If you want to manage your inventory levels, you may want to create an inventory table that records the current stock levels for each product.
+
+    Transactions: If you want to keep track of financial transactions such as payments, refunds, and credits, you may want to create a transactions table that records the transaction date, amount, type, and status.
+
+    Reviews: If you want to allow customers to leave reviews for your products, you may want to create a reviews table that includes information such as the reviewer's name, product name, rating, and comments.
+
+
+//OPTIMIZED CATEGORY API 
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Category;
+use Illuminate\Support\Facades\DB;
+
+class CategoryApiController extends Controller {
+    
+    public function getData(Request $request) {
+        $supplierId = $request->input('supplier');
+        $categoryId = $request->input('category');
+        
+        $categoriesQuery = $this->buildCategoriesQuery();
+        
+        if ($supplierId) {
+            $this->filterCategoriesBySupplier($categoriesQuery, $supplierId);
+        }
+        
+        if ($categoryId) {
+            $subcategories = $this->getSubcategories($categoryId);
+            return response()->json(['data' => $subcategories]);
+        }
+        
+        $categories = $this->getCategories($categoriesQuery);
+        return response()->json(['data' => $categories]);
+    }
+    
+    private function buildCategoriesQuery() {
+        return Category::with(['subCategories' => function ($query) {
+            $query->select('category_sub_category.id', 'name');
+        }])
+        ->select('id', 'name', 'description')
+        ->orderBy('id', 'asc');
+    }
+    
+    private function filterCategoriesBySupplier($query, $supplierId) {
+        $query->whereHas('suppliers', function ($query) use ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        });
+    }
+    
+    private function getSubcategories($categoryId) {
+        return DB::table('category_sub_category')
+            ->join('subcategories', 'category_sub_category.sub_category_id', '=', 'subcategories.id')
+            ->select('subcategories.name', 'subcategories.id')
+            ->where('category_sub_category.category_id', '=', $categoryId)
+            ->get()
+            ->toArray();
+    }
+    
+    private function getCategories($query) {
+        return $query->get()->toArray();
+    }
+}
