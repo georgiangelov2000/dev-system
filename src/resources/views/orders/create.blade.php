@@ -14,6 +14,7 @@
                 
                 <form action="{{route('order.store')}}" method="POST">
                     @csrf
+
                     <div class="row flex-wrap">
 
                         <div class="form-group col-3">

@@ -124,9 +124,9 @@
         <script type="text/javascript" src="{{ mix('js/purchases/purchases.js') }}"></script>
         <script type='text/javascript'>
             let PRODUCT_API_ROUTE = "{{ route('api.products') }}";
-            console.log(PRODUCT_API_ROUTE);
             let REMOVE_PRODUCT_ROUTE = "{{ route('purchase.delete', ':id') }}";
             let EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
+            let EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
             let CATEGORY_ROUTE = "{{ route('api.categories') }}";
         </script>
     @endpush()

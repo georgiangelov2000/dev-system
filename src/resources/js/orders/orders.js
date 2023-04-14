@@ -55,7 +55,7 @@ $(document).ready(function () {
                 orderable: false,
                 name: "customer",
                 render: function (data, type, row) {
-                    return '<span>' + row.customer.name + '</span>';
+                    return '<a target="_blank" href="'+CUSTOMER_EDIT_ROUTE.replace(':id',row.customer.id)+'" >' + row.customer.name + '</a>';
                 }
             },
             {
@@ -63,7 +63,7 @@ $(document).ready(function () {
                 orderable: false,
                 name: "product",
                 render: function (data, type, row) {
-                    return '<span>' + row.product.name + '</span>';
+                    return '<a target="_blank" href="'+EDIT_PRODUCT_ROUTE.replace(':id',row.product.id)+'">' + row.product.name + '</a>';
                 }
             },
             {
@@ -88,7 +88,9 @@ $(document).ready(function () {
                 width: '10%',
                 orderable: false,
                 name: "discount_percent",
-                data: "discount_percent"
+                render: function (data,type,row){
+                    return `<span>${row.discount_percent}%</span>`;
+                }
             },
             {
                 width: '10%',
@@ -102,13 +104,13 @@ $(document).ready(function () {
                 name: "status",
                 render: function (data, type, row) {
                     if (row.status === 1) {
-                        return "Received";
+                        return '<i title="Reveived" class="fa-solid fa-check"></i>';
                     }
                     else if (row.status === 3) {
-                        return "Pending"
+                        return '<i title="Pending" class="fa-light fa-loader"></i>'
                     }
                     else if (row.status === 4) {
-                        return "Ordered"
+                        return '<i title="Ordered" class="fa-solid fa-truck"></i>'
                     }
                 }
             },
@@ -124,7 +126,7 @@ $(document).ready(function () {
                     <form/>\
                     ";
 
-                    let editButton = '<a data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-solid fa-pen text-warning"></i></a>';
+                    let editButton = '<a href='+ORDER_EDIT_ROUTE.replace(':id',row.id)+' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-solid fa-pen text-warning"></i></a>';
 
                     let dropdown = `
                     <div class="dropdown d-inline">

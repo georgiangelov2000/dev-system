@@ -3,7 +3,6 @@
 namespace App\Helpers;
 
 use App\Models\SubCategory;
-use Illuminate\Support\Facades\Cache;
 use App\Models\State;
 use App\Models\Country;
 use App\Models\Category;
@@ -75,6 +74,14 @@ class LoadStaticData {
                 ->get();
 
         return $brands;
+    }
+
+    static function callCustomers(){
+        $query = Customer::query();
+        
+        $customers = $query->select('id','name')->get();
+
+        return $customers;
     }
 
 }

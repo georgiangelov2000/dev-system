@@ -21,16 +21,13 @@ class SupplierService
 
     public function getEditData()
     {
-
-        $supplier = $this->supplier
-            ->with('categories', 'image')
-            ->find($this->supplier->id);
+        $supplier = $this->supplier->load('categories', 'image');
 
         $result = [
             'categories' => $supplier->categories->pluck('id')->toArray(),
             'image' => $supplier->image
         ];
-
+    
         return $result;
     }
 

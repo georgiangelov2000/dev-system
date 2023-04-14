@@ -11,9 +11,17 @@ $(document).ready(function () {
   let TFOOTquantity = $('.TFOOTquantity');
   let TFOOTtotalPrice = $('.TFOOTtotalPrice');
 
-  $('.datepicker').datepicker({
-    format: 'mm/dd/yyyy'
-  }).datepicker('setDate', new Date());
+
+  if (typeof DATE_OF_SALE !== 'undefined' && DATE_OF_SALE) {
+    $('.datepicker').datepicker({
+      format: 'mm/dd/yyyy'
+    }).datepicker('setDate', new Date(DATE_OF_SALE));
+  } else {
+    $('.datepicker').datepicker({
+      format: 'mm/dd/yyyy'
+    }).datepicker('setDate', new Date());
+  }
+
 
   let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
   let bootstrapProduct = $('.bootstrap-select .productFilter');
@@ -22,6 +30,11 @@ $(document).ready(function () {
   $('.selectCustomer input[type="text"]').on('keyup', function () {
     let text = $(this).val();
     bootstrapCustomer.empty();
+
+    if (text === '') {
+      bootstrapCustomer.selectpicker('refresh');
+      return;
+    }
 
     APICaller(CUSTOMER_API_ROUTE, { 'search': text }, function (response) {
       let customers = response.data;
@@ -39,6 +52,11 @@ $(document).ready(function () {
   $('.productFilter input[type="text"]').on('keyup', function () {
     let text = $(this).val();
     bootstrapProduct.empty();
+
+    if (text === '') {
+      bootstrapProduct.selectpicker('refresh');
+      return;
+    }
 
     APICaller(PRODUCT_API_ROUTE, { 'search': text }, function (response) {
       let products = response.data;
@@ -99,6 +117,7 @@ $(document).ready(function () {
     const orderPrice = parseFloat(row.find('.orderSinglePrice').val()) || 0;
     const purchaseTotal = parseFloat(row.find('.totalPrice').text()).toFixed(2);
     const orderTotal = (orderQuantity * orderPrice).toFixed(2);
+    console.log(purchaseTotal);
 
     if (parseFloat(orderTotal) > parseFloat(purchaseTotal)) {
       row.find('.totalOrderPrice').removeClass('text-danger').addClass('text-success');

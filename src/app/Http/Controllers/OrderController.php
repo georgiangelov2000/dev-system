@@ -7,11 +7,19 @@ use App\Http\Requests\OrderRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Order;
+use App\Helpers\LoadStaticData;
 
 class OrderController extends Controller
 {
+    private $staticDataHelper;
 
-    public function index(){
+    public function __construct(LoadStaticData $staticDataHelper)
+    {
+        $this->staticDataHelper = $staticDataHelper;
+    }
+
+    public function index()
+    {
         return view('orders.index');
     }
     public function create()
@@ -44,16 +52,17 @@ class OrderController extends Controller
 
                 DB::commit();
             }
+            return redirect()->route('order.index')->with('success', 'Order has been created');
         } catch (\Exception $e) {
             dd($e->getMessage());
             DB::rollback();
             Log::error($e->getMessage());
+            return back()->withInput()->with('error', 'Failed to update order');
         }
-
-        return redirect()->back();
     }
 
-    public function updateStatus(Order $order,Request $request) {
+    public function updateStatus(Order $order, Request $request)
+    {
         $status = $request->status;
 
         try {
@@ -69,6 +78,45 @@ class OrderController extends Controller
             'data' => $status,
             'message' => 'Order has been updated'
         ], 200);
+    }
+
+    public function edit(Order $order)
+    {
+        $currentOrder = $order->load('customer:id,name', 'product');
+
+        return view('orders.edit', compact('currentOrder'));
+    }
+
+    public function update(Order $order, OrderRequest $request)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            $validated = $request->validated();
+
+            $order->customer_id = $validated['customer_id'];
+            $order->date_of_sale = date('Y-m-d', strtotime($validated['date_of_sale']));
+            $order->status = $validated['status'];
+
+            foreach ($validated['product_id'] as $index => $value) {
+                $order->product->id = $validated['product_id'][$index];
+                $order->invoice_number = $validated['invoice_number'][$index];
+                $order->sold_quantity = $validated['sold_quantity'][$index];
+                $order->single_sold_price = floatval($validated['single_sold_price'][$index]);
+                $order->total_sold_price = floatval($validated['total_sold_price'][$index]);
+                $order->discount_percent = $validated['discount_percent'][$index];
+            }
+
+            $order->save();
+            DB::commit();
+            return redirect()->route('order.index')->with('success', 'Order has been updated');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            DB::rollback();
+            Log::error($e->getMessage());
+            return back()->withInput()->with('error', 'Failed to update order');
+        }
     }
 
     public function delete(Order $order)

@@ -114,7 +114,7 @@ $(document).ready(function () {
                 orderable: false,
                 render: function (data, type, row) {
                     if (row.suppliers) {
-                        return "<span>" + row.suppliers.name + "</span>"
+                        return "<a href="+EDIT_SUPPLIER_ROUTE.replace(":id",row.suppliers.id)+">" + row.suppliers.name + "</a>"
                     } else {
                         return "";
                     }

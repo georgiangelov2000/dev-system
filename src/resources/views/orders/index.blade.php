@@ -46,6 +46,26 @@
                         </select>
                     </div>
                 </div>
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="font-weight-bold">Legend:</h6>
+                    </div>
+                    <div class="col-12">
+                            <i title="Reveived" class="fa-solid fa-check"></i>
+                            <span>-</span>
+                            <span>The order has been delivered to the customer</span>
+                    </div>
+                    <div class="col-12">
+                        <i title="Pending" class="fa-light fa-loader"></i>
+                        <span>-</span>
+                        <span>The order will be delivered today</span>
+                    </div>
+                    <div class="col-12">
+                        <i title="Ordered" class="fa-solid fa-truck"></i>
+                        <span>-</span>
+                        <span>The order has been placed</span>
+                    </div>
+                </div>
                 <table id="ordersTable" class="table  table-hover table-sm dataTable no-footer">
                     <thead>
                         <tr>
@@ -62,7 +82,7 @@
                             <th>Quantity</th>
                             <th>Single price</th>
                             <th>Total Price</th>
-                            <th>Discount %</th>
+                            <th>Discount</th>
                             <th>Date of sale</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -79,6 +99,9 @@
             let CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
             let ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";
             let ORDER_DELETE_ROUTE = "{{route('order.delete',':id')}}";
+            let ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
+            let EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
+            let CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
         </script>
     @endpush
 @endsection

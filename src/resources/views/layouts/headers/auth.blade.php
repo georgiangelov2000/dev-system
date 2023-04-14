@@ -40,7 +40,7 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa-sharp fa-solid fa-chart-line"></i>
+                        <i class="fa fa-house"></i>
                         <p>
                             General
                             <i class="right fas fa-angle-left"></i>
@@ -176,7 +176,24 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa-solid fa-cart-shopping"></i>
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <p>
+                            Summaries
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{{ route('order.index') }}" class="nav-link">
+                                <p>Customer summary</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-light fa-credit-card"></i>
                         <p>
                             Payments
                             <i class="right fas fa-angle-left"></i>
@@ -190,17 +207,10 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('order.create') }}" class="nav-link">
-                                <p>Company payments</p>
+                                <p>My company payments</p>
                             </a>
                         </li>
                     </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="./index.html" class="nav-link">
-                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
-                        <p>Customer summary</p>
-                    </a>
                 </li>
 
             </ul>
