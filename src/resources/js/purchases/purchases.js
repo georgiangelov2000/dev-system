@@ -68,9 +68,9 @@ $(document).ready(function () {
                 name: "image",
                 render: function (data, type, row) {
                     if (row.images) {
-                        return "<img class='img-thumbnail rounded mx-auto d-block w-100' src=" + row.images.path + row.images.name + " />"
+                        return "<img class='rounded mx-auto w-100' src=" + row.images.path + row.images.name + " />"
                     } else {
-                        return "<img class='img-thumbnail rounded mx-auto d-block w-100' src='https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg'/>";
+                        return "<img class='rounded mx-auto w-100' src='https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg'/>";
                     }
                 }
             },
