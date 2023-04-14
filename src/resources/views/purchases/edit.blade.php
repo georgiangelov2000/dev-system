@@ -1,11 +1,11 @@
 @extends('app')
-@section('title', 'Add purchase')
+@section('title', 'Edit purchase')
 
 @section('content')
 <div class="card card-default cardTemplate">
     <div class="card-header">
         <div class="col-12">
-            <h3 class="card-title">Create purchase</h3>
+            <h3 class="card-title">Edit purchase</h3>
         </div>
     </div>
     <div class="card-body">

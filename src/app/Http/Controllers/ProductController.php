@@ -56,7 +56,7 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
-
+            
             if ($request->hasFile('image')) {
                 $productService->imageUploader($request->file('image'));
             }
@@ -142,7 +142,7 @@ class ProductController extends Controller
 
             DB::commit();
         } catch (\Exception $e) {
-            dd($e);
+            dd($e->getMessage());
             DB::rollback();
             Log::error($e->getMessage());
         }

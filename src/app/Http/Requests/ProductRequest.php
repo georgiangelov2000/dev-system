@@ -29,7 +29,7 @@ class ProductRequest extends FormRequest {
             "code" => "required|string",
             "supplier_id" => "required|integer",
             "category_id" => "required|string",
-            "subcategories" => "array|required",
+            "subcategories" => "array",
             "notes" => 'nullable|string',
             "brands" => "array"
         ];
