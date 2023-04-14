@@ -5,6 +5,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +62,11 @@ Route::middleware(['auth'])->group(function () {
     });
     
     Route::prefix('orders')->name('order.')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/create', [OrderController::class, 'create'])->name('create');
+        Route::post('/store', [OrderController::class, 'store'])->name('store');
+        Route::delete('/delete/{order}', [OrderController::class, 'delete'])->name('delete');
+        Route::post('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
     });
     
     Route::prefix('states')->name('state')->group(function(){

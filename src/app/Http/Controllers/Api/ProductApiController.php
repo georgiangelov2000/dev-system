@@ -21,6 +21,7 @@ class ProductApiController extends Controller
         $start_total_price = $request->start_total_price;
         $end_total_price = $request->end_total_price;
         $single_total_price = $request->single_total_price;
+        $search = $request->search;
 
         $productQuery = $this->buildProductQuery();
 
@@ -57,6 +58,9 @@ class ProductApiController extends Controller
         if ($single_total_price) {
             $productQuery->where('total_price', floatval($single_total_price));
         }
+        if($search) {
+            $productQuery->where('name', 'LIKE', '%'.$search.'%');
+        }
 
         $result = $this->getProducts($productQuery);
 
@@ -87,8 +91,8 @@ class ProductApiController extends Controller
     private function fillterByCreatedAt($query, $start_date, $end_date)
     {
         return $query->whereBetween('created_at', [
-            $start_date->format('Y-m-d H:i:s'),
-            $end_date->format('Y-m-d H:i:s')
+            $start_date,
+            $end_date
         ]);
     }
 

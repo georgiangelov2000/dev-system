@@ -13,7 +13,7 @@ class CreateOrdersTable extends Migration
      */
     public function up()
     {
-        Schema::create('sales', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')
                 ->constrained('customers')
@@ -24,10 +24,10 @@ class CreateOrdersTable extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 
+            $table->string('invoice_number');
             $table->integer('sold_quantity');
             $table->decimal('single_sold_price', 8, 2);
             $table->decimal('total_sold_price', 8, 2);
-            $table->decimal('discount_price', 8, 2);
             $table->integer('discount_percent');
             $table->date('date_of_sale');
             $table->timestamps();
@@ -41,6 +41,6 @@ class CreateOrdersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sales');
+        Schema::dropIfExists('orders');
     }
 }

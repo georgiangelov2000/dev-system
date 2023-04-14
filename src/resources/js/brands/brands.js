@@ -39,6 +39,13 @@ $(document).ready(function () {
             },
             {
                 orderable: false,
+                name: "purchases_count",
+                render: function(data,type,row){
+                    return `<span>${row.purchases_count}</span>`
+                }
+            },
+            {
+                orderable: false,
                 name: "description",
                 data: "description"
             },

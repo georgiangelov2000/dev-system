@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\Category;
 use App\Models\Supplier;
 use App\Models\Brand;
+use App\Models\Customer;
 
 class LoadStaticData {
 

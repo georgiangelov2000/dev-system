@@ -1,7 +1,8 @@
 <nav class="main-header navbar navbar-expand header-navigation mb-3 navbar-white">
     <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link burgerLink" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            <a class="nav-link burgerLink" data-widget="pushmenu" href="#" role="button"><i
+                    class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item">
             <div class="form-inline">
@@ -15,7 +16,7 @@
     <ul class="navbar-nav ml-auto">
         <li class="nav-item d-none d-sm-inline-block">
             <span href="#" class="nav-link">
-                Account: {{$user !== false ? $user : ''}}
+                Account: {{ $user !== false ? $user : '' }}
             </span>
         </li>
         <form action="{{ route('logout') }}" method="POST">
@@ -39,7 +40,7 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa-sharp fa-solid fa-chart-line"></i> 
+                        <i class="fa-sharp fa-solid fa-chart-line"></i>
                         <p>
                             General
                             <i class="right fas fa-angle-left"></i>
@@ -68,17 +69,17 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{route('category.index')}}" class="nav-link">
+                            <a href="{{ route('category.index') }}" class="nav-link">
                                 <p>Categories</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('category.index')}}" class="nav-link">
+                            <a href="{{ route('category.index') }}" class="nav-link">
                                 <p>Subcategories</p>
                             </a>
                         </li>
                         <li>
-                            <a href="{{route('brand.index')}}" class="nav-link">
+                            <a href="{{ route('brand.index') }}" class="nav-link">
                                 <p>Brands</p>
                             </a>
                         </li>
@@ -95,12 +96,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{route('supplier.index')}}" class="nav-link">
+                            <a href="{{ route('supplier.index') }}" class="nav-link">
                                 <p>Suppliers</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('supplier.create')}}"  class="nav-link">
+                            <a href="{{ route('supplier.create') }}" class="nav-link">
                                 <p>Create supplier</p>
                             </a>
                         </li>
@@ -117,12 +118,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{route('customer.index')}}" class="nav-link">
+                            <a href="{{ route('customer.index') }}" class="nav-link">
                                 <p>Customers</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('customer.create')}}" class="nav-link">
+                            <a href="{{ route('customer.create') }}" class="nav-link">
                                 <p>Create customer</p>
                             </a>
                         </li>
@@ -139,12 +140,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{route('purchase.index')}}" class="nav-link">
+                            <a href="{{ route('purchase.index') }}" class="nav-link">
                                 <p>Purchases</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{route('purchase.create')}}" class="nav-link">
+                            <a href="{{ route('purchase.create') }}" class="nav-link">
                                 <p>Create purchase</p>
                             </a>
                         </li>
@@ -161,12 +162,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a  class="nav-link">
+                            <a href="{{ route('order.index') }}" class="nav-link">
                                 <p>Orders</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a  class="nav-link">
+                            <a href="{{ route('order.create') }}" class="nav-link">
                                 <p>Create order</p>
                             </a>
                         </li>
@@ -175,78 +176,31 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa-solid fa-handshake"></i>
+                        <i class="fa-solid fa-cart-shopping"></i>
                         <p>
-                            Sale Management
+                            Payments
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
-                                <p>Sales</p>
+                            <a href="{{ route('order.index') }}" class="nav-link">
+                                <p>Customer payments</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
-                                <p>Create sale</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="pages/charts/chartjs.html" class="nav-link">
-                                <p>Sales return</p>
+                            <a href="{{ route('order.create') }}" class="nav-link">
+                                <p>Company payments</p>
                             </a>
                         </li>
                     </ul>
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa fa-users" aria-hidden="true"></i>
-                        <p>
-                            Employee Managment
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
+                    <a href="./index.html" class="nav-link">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <p>Customer summary</p>
                     </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
-                                <p>Employees</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="pages/charts/chartjs.html" class="nav-link">
-                                <p>Create employee</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-solid fa-coins"></i>
-                        <p>
-                            Salary Management
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
-                                <p></p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="pages/charts/flot.html" class="nav-link">
-                                <p></p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="pages/charts/chartjs.html" class="nav-link">
-                                <p></p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
 
             </ul>

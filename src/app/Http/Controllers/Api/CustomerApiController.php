@@ -11,6 +11,7 @@ class CustomerApiController extends Controller
     public function getData(Request $request){
         $country = $request->country;
         $state = $request->state;
+        $search = $request->search;
 
         $customerQuery = $this->buildCustomerQuery();
 
@@ -20,6 +21,9 @@ class CustomerApiController extends Controller
             if ($state) {
                 $this->customerByState($state, $customerQuery);
             }
+        }
+        if($search) {
+            $customerQuery->where('name', 'LIKE', '%'.$search.'%');
         }
 
         $result = $this->getCustomers($customerQuery);

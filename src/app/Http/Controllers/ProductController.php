@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\LoadStaticData;
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Http\Requests\ProductRequest;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;

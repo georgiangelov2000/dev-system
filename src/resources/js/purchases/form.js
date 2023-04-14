@@ -2,12 +2,7 @@ import { APICaller} from './ajaxFunctions.js';
 
 $(document).ready(function () {
 
-    $('.datepicker').datepicker({
-        format: 'mm/dd/yyyy'
-    }).datepicker('setDate', new Date());
-
     let selectedSupplier = $('.selectSupplier').find('option:selected').val();
-
     
     $('.selectSupplier, .selectCategory, .selectSubCategory, .selectBrands').selectpicker();
 
