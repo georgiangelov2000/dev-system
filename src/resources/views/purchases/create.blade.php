@@ -70,7 +70,11 @@
                 <div class="form-group col-6">
                     <div class="form-group">
                         <label>Suppliers</label>
-                        <select class="form-control selectSupplier" name="supplier_id">
+                        <select 
+                            class="form-control selectSupplier" 
+                            name="supplier_id"
+                            @error('supplier_id')  data-style="border-danger"  is-invalid @enderror
+                            >
                             <option value="0">Nothing selected</option>
                             @foreach ($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
@@ -82,7 +86,11 @@
                     </div>
                     <div class="form-group">
                         <label>Categories (categories for a given supplier)</label>
-                        <select class="form-control selectCategory" name="category_id">
+                        <select 
+                            class="form-control selectCategory" 
+                            name="category_id"
+                            @error('category_id')  data-style="border-danger"  is-invalid @enderror    
+                        >
                             <option value="0">Nothing selected</option>
                         </select>
                         @error('category_id')

@@ -27,8 +27,8 @@ class ProductRequest extends FormRequest {
                     }
                 }],
             "code" => "required|string",
-            "supplier_id" => "required|integer",
-            "category_id" => "required|string",
+            "supplier_id" => "required|integer|not_in:0",
+            "category_id" => "required|integer|not_in:0",
             "subcategories" => "array",
             "notes" => 'nullable|string',
             "brands" => "array"

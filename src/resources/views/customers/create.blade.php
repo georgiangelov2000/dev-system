@@ -77,18 +77,29 @@
                 </div>
                 <div class="form-group col-6">
                     <label for="country">Country</label>
-                    <select class="form-control selectCountry" id="country" name="country_id">
-                        <option value="9999">Select country</option>
+                    <select 
+                        class="form-control selectCountry" 
+                        id="country" 
+                        name="country_id"
+                        @error('country_id') data-style="border-danger"  is-invalid @enderror 
+                    >
+                        <option value="">Select country</option>
                         @foreach ($countries as $country)
                             <option data-country="{{ $country->name }}" value="{{ $country->id }}">{{ $country->name }}
                             </option>
                         @endforeach
                     </select>
+                    @error('state_id')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
                 <div class="form-group col-6">
                     <label for="state_id">State</label>
-                    <select id="state" name="state_id"
-                        class="form-control @error('state_id')  is-invalid @enderror selectState">
+                    <select 
+                        id="state" 
+                        name="state_id"
+                        @error('state_id') data-style="border-danger"  is-invalid @enderror 
+                        class="form-control selectState">
                         <option value="">Select a state</option>
                     </select>
                     @error('state_id')
