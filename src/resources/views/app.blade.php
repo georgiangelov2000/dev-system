@@ -17,6 +17,8 @@
         <link type="text/css" href="{{ mix('css/bootstrap-select.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/datepicker.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/daterangepicker.min.css') }}" rel="stylesheet" />
+        <link type="text/css" href="{{ mix('css/icheck-bootstrap.min.css') }}" rel="stylesheet" />
+
 
     </head>
     <!--"sidebar-mini layout-fixed"-->

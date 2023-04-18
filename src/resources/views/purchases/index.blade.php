@@ -129,6 +129,6 @@
             let EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
             let CATEGORY_ROUTE = "{{ route('api.categories') }}";
         </script>
-    @endpush()
+    @endpush
 
 @endsection

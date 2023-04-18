@@ -21,6 +21,8 @@ mix.js('resources/js/customers/customers.js', 'public/js/customers');
 mix.js('resources/js/orders/form.js', 'public/js/orders');
 mix.js('resources/js/orders/orders.js', 'public/js/orders');
 
+mix.js('resources/js/summaries/customer_summary.js', 'public/js/summaries');
+mix.js('resources/js/summaries/supplier_summary.js', 'public/js/summaries');
 
 mix.js('resources/js/adminlte.min.js', 'public/js');
 mix.js('resources/js/app.js', 'public/js');
@@ -47,4 +49,6 @@ mix.sass('resources/sass/datatables.min.scss', 'public/css');
 mix.sass('resources/sass/bootstrap-select.min.scss', 'public/css');
 mix.sass('resources/sass/datepicker.min.scss', 'public/css')
 mix.sass('resources/sass/daterangepicker.min.scss', 'public/css')
+mix.sass('resources/sass/icheck-bootstrap.min.scss', 'public/css')
+
 .version();

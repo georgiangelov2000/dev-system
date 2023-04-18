@@ -42,6 +42,7 @@
                     </table>
                 </div>
             </div>
+        </div>
 
 
     <!--create modal-->

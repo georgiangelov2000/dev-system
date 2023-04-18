@@ -1,0 +1,1058 @@
+$background-color_1: #e6e6e6;
+$background-color_2: #337ab7;
+$background-color_3: #5cb85c;
+$background-color_4: #5bc0de;
+$background-color_5: #f0ad4e;
+$background-color_6: #d9534f;
+$background-color_7: #1abc9c;
+$background-color_8: #2ecc71;
+$background-color_9: #3498db;
+$background-color_10: #9b59b6;
+$background-color_11: #34495e;
+$background-color_12: #16a085;
+$background-color_13: #27ae60;
+$background-color_14: #2980b9;
+$background-color_15: #8e44ad;
+$background-color_16: #2c3e50;
+$background-color_17: #f1c40f;
+$background-color_18: #e67e22;
+$background-color_19: #e74c3c;
+$background-color_20: #ecf0f1;
+$background-color_21: #95a5a6;
+$background-color_22: #f39c12;
+$background-color_23: #d35400;
+$background-color_24: #c0392b;
+$background-color_25: #bdc3c7;
+$background-color_26: #7f8c8d;
+$border-color_1: #adadad;
+$border-color_2: #2e6da4;
+$border-color_3: #4cae4c;
+$border-color_4: #46b8da;
+$border-color_5: #eea236;
+$border-color_6: #d43f3a;
+$border-color_7: #1abc9c;
+$border-color_8: #2ecc71;
+$border-color_9: #3498db;
+$border-color_10: #9b59b6;
+$border-color_11: #34495e;
+$border-color_12: #16a085;
+$border-color_13: #27ae60;
+$border-color_14: #2980b9;
+$border-color_15: #8e44ad;
+$border-color_16: #2c3e50;
+$border-color_17: #f1c40f;
+$border-color_18: #e67e22;
+$border-color_19: #e74c3c;
+$border-color_20: #ecf0f1;
+$border-color_21: #95a5a6;
+$border-color_22: #f39c12;
+$border-color_23: #d35400;
+$border-color_24: #c0392b;
+$border-color_25: #bdc3c7;
+$border-color_26: #7f8c8d;
+$border-right-color_1: #333;
+$border-right-color_2: #95a5a6;
+$border-bottom-color_1: #333;
+$border-bottom-color_2: #95a5a6;
+
+/*!
+ * icheck-bootstrap v3.0.1 (https://github.com/bantikyan/icheck-bootstrap)
+ * Copyright 2018 Hovhannes Bantikyan.
+ * Licensed under MIT (https://github.com/bantikyan/icheck-bootstrap/blob/master/LICENSE)
+ */
+[class*=icheck-] {
+	min-height: 22px;
+	margin-top: 6px !important;
+	margin-bottom: 6px !important;
+	padding-left: 0;
+	>label {
+		padding-left: 29px !important;
+		min-height: 22px;
+		line-height: 22px;
+		display: inline-block;
+		position: relative;
+		vertical-align: top;
+		margin-bottom: 0;
+		font-weight: 400;
+		cursor: pointer;
+	}
+	>input {
+		&:first-child {
+			position: absolute !important;
+			opacity: 0;
+			margin: 0;
+			&:disabled {
+				cursor: default;
+			}
+			&:checked+input[type=hidden]+label {
+				&::after {
+					content: "";
+					display: inline-block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 7px;
+					height: 10px;
+					border: 2px solid #fff;
+					border-left: none;
+					border-top: none;
+					transform: translate(7.75px,4.5px) rotate(45deg);
+					-ms-transform: translate(7.75px,4.5px) rotate(45deg);
+				}
+			}
+			&:checked+label {
+				&::after {
+					content: "";
+					display: inline-block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 7px;
+					height: 10px;
+					border: 2px solid #fff;
+					border-left: none;
+					border-top: none;
+					transform: translate(7.75px,4.5px) rotate(45deg);
+					-ms-transform: translate(7.75px,4.5px) rotate(45deg);
+				}
+			}
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-width: 2px;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-width: 2px;
+						}
+					}
+				}
+			}
+			&:disabled+input[type=hidden]+label {
+				pointer-events: none;
+				cursor: default;
+				filter: alpha(opacity=65);
+				-webkit-box-shadow: none;
+				box-shadow: none;
+				opacity: .65;
+				&::before {
+					pointer-events: none;
+					cursor: default;
+					filter: alpha(opacity=65);
+					-webkit-box-shadow: none;
+					box-shadow: none;
+					opacity: .65;
+				}
+			}
+			&:disabled+label {
+				pointer-events: none;
+				cursor: default;
+				filter: alpha(opacity=65);
+				-webkit-box-shadow: none;
+				box-shadow: none;
+				opacity: .65;
+				&::before {
+					pointer-events: none;
+					cursor: default;
+					filter: alpha(opacity=65);
+					-webkit-box-shadow: none;
+					box-shadow: none;
+					opacity: .65;
+				}
+			}
+		}
+		&:first-child+input[type=hidden]+label {
+			&::before {
+				content: "";
+				display: inline-block;
+				position: absolute;
+				width: 22px;
+				height: 22px;
+				border: 1px solid #D3CFC8;
+				border-radius: 0;
+				margin-left: -29px;
+			}
+		}
+		&:first-child+label {
+			&::before {
+				content: "";
+				display: inline-block;
+				position: absolute;
+				width: 22px;
+				height: 22px;
+				border: 1px solid #D3CFC8;
+				border-radius: 0;
+				margin-left: -29px;
+			}
+		}
+	}
+	>input[type=radio] {
+		&:first-child+input[type=hidden]+label {
+			&::before {
+				border-radius: 50%;
+			}
+		}
+		&:first-child+label {
+			&::before {
+				border-radius: 50%;
+			}
+		}
+	}
+}
+.icheck-inline {
+	display: inline-block;
+}
+.icheck-inline+.icheck-inline {
+	margin-left: .75rem;
+	margin-top: 6px;
+}
+.icheck-default {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_1;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_1;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_1;
+					border-color: $border-color_1;
+				}
+				&::after {
+					border-bottom-color: $border-bottom-color_1;
+					border-right-color: $border-right-color_1;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_1;
+					border-color: $border-color_1;
+				}
+				&::after {
+					border-bottom-color: $border-bottom-color_1;
+					border-right-color: $border-right-color_1;
+				}
+			}
+		}
+	}
+}
+.icheck-primary {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_2;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_2;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_2;
+					border-color: $border-color_2;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_2;
+					border-color: $border-color_2;
+				}
+			}
+		}
+	}
+}
+.icheck-success {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_3;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_3;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_3;
+					border-color: $border-color_3;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_3;
+					border-color: $border-color_3;
+				}
+			}
+		}
+	}
+}
+.icheck-info {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_4;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_4;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_4;
+					border-color: $border-color_4;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_4;
+					border-color: $border-color_4;
+				}
+			}
+		}
+	}
+}
+.icheck-warning {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_5;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_5;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_5;
+					border-color: $border-color_5;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_5;
+					border-color: $border-color_5;
+				}
+			}
+		}
+	}
+}
+.icheck-danger {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_6;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_6;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_6;
+					border-color: $border-color_6;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_6;
+					border-color: $border-color_6;
+				}
+			}
+		}
+	}
+}
+.icheck-turquoise {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_7;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_7;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_7;
+					border-color: $border-color_7;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_7;
+					border-color: $border-color_7;
+				}
+			}
+		}
+	}
+}
+.icheck-emerland {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_8;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_8;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_8;
+					border-color: $border-color_8;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_8;
+					border-color: $border-color_8;
+				}
+			}
+		}
+	}
+}
+.icheck-peterriver {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_9;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_9;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_9;
+					border-color: $border-color_9;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_9;
+					border-color: $border-color_9;
+				}
+			}
+		}
+	}
+}
+.icheck-amethyst {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_10;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_10;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_10;
+					border-color: $border-color_10;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_10;
+					border-color: $border-color_10;
+				}
+			}
+		}
+	}
+}
+.icheck-wetasphalt {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_11;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_11;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_11;
+					border-color: $border-color_11;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_11;
+					border-color: $border-color_11;
+				}
+			}
+		}
+	}
+}
+.icheck-greensea {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_12;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_12;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_12;
+					border-color: $border-color_12;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_12;
+					border-color: $border-color_12;
+				}
+			}
+		}
+	}
+}
+.icheck-nephritis {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_13;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_13;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_13;
+					border-color: $border-color_13;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_13;
+					border-color: $border-color_13;
+				}
+			}
+		}
+	}
+}
+.icheck-belizehole {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_14;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_14;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_14;
+					border-color: $border-color_14;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_14;
+					border-color: $border-color_14;
+				}
+			}
+		}
+	}
+}
+.icheck-wisteria {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_15;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_15;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_15;
+					border-color: $border-color_15;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_15;
+					border-color: $border-color_15;
+				}
+			}
+		}
+	}
+}
+.icheck-midnightblue {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_16;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_16;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_16;
+					border-color: $border-color_16;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_16;
+					border-color: $border-color_16;
+				}
+			}
+		}
+	}
+}
+.icheck-sunflower {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_17;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_17;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_17;
+					border-color: $border-color_17;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_17;
+					border-color: $border-color_17;
+				}
+			}
+		}
+	}
+}
+.icheck-carrot {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_18;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_18;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_18;
+					border-color: $border-color_18;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_18;
+					border-color: $border-color_18;
+				}
+			}
+		}
+	}
+}
+.icheck-alizarin {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_19;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_19;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_19;
+					border-color: $border-color_19;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_19;
+					border-color: $border-color_19;
+				}
+			}
+		}
+	}
+}
+.icheck-clouds {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_20;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_20;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_20;
+					border-color: $border-color_20;
+				}
+				&::after {
+					border-bottom-color: $border-bottom-color_2;
+					border-right-color: $border-right-color_2;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_20;
+					border-color: $border-color_20;
+				}
+				&::after {
+					border-bottom-color: $border-bottom-color_2;
+					border-right-color: $border-right-color_2;
+				}
+			}
+		}
+	}
+}
+.icheck-concrete {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_21;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_21;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_21;
+					border-color: $border-color_21;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_21;
+					border-color: $border-color_21;
+				}
+			}
+		}
+	}
+}
+.icheck-orange {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_22;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_22;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_22;
+					border-color: $border-color_22;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_22;
+					border-color: $border-color_22;
+				}
+			}
+		}
+	}
+}
+.icheck-pumpkin {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_23;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_23;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_23;
+					border-color: $border-color_23;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_23;
+					border-color: $border-color_23;
+				}
+			}
+		}
+	}
+}
+.icheck-pomegranate {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_24;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_24;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_24;
+					border-color: $border-color_24;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_24;
+					border-color: $border-color_24;
+				}
+			}
+		}
+	}
+}
+.icheck-silver {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_25;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_25;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_25;
+					border-color: $border-color_25;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_25;
+					border-color: $border-color_25;
+				}
+			}
+		}
+	}
+}
+.icheck-asbestos {
+	>input {
+		&:first-child {
+			&:not(:checked) {
+				&:not(:disabled) {
+					&:hover+input[type=hidden]+label {
+						&::before {
+							border-color: $border-color_26;
+						}
+					}
+					&:hover+label {
+						&::before {
+							border-color: $border-color_26;
+						}
+					}
+				}
+			}
+			&:checked+input[type=hidden]+label {
+				&::before {
+					background-color: $background-color_26;
+					border-color: $border-color_26;
+				}
+			}
+			&:checked+label {
+				&::before {
+					background-color: $background-color_26;
+					border-color: $border-color_26;
+				}
+			}
+		}
+	}
+}

@@ -8,6 +8,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CustomerSummaryController;
+use App\Http\Controllers\SupplierSummaryController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -69,6 +71,13 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{order}', [OrderController::class, 'update'])->name('update');
         Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
         Route::post('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
+    });
+
+    Route::prefix('summary')->name('summary.')->group(function () {
+        Route::get('/customers', [CustomerSummaryController::class, 'index'])->name('customer');
+        Route::get('/suppliers', [SupplierSummaryController::class, 'index'])->name('supplier');
+        Route::post('/take/customers', [CustomerSummaryController::class, 'summary'])->name('take.customer');
+        Route::post('/take/suppliers', [SupplierSummaryController::class, 'summary'])->name('take.supplier');
     });
     
     Route::prefix('states')->name('state')->group(function(){

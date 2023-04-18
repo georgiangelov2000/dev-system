@@ -184,8 +184,13 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('order.index') }}" class="nav-link">
+                            <a href="{{ route('summary.customer') }}" class="nav-link">
                                 <p>Customer summary</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('summary.supplier') }}" class="nav-link">
+                                <p>Supplier summary</p>
                             </a>
                         </li>
                     </ul>
@@ -207,7 +212,24 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('order.create') }}" class="nav-link">
-                                <p>My company payments</p>
+                                <p>Company payments</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fal fa-analytics"></i>
+                        <p>
+                            Reports
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{{ route('order.index') }}" class="nav-link">
+                                <p>Company reports</p>
                             </a>
                         </li>
                     </ul>
