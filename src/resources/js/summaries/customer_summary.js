@@ -100,8 +100,8 @@ $(function() {
                     <td>${product.single_sold_price} <i class="fa fa-eur" aria-hidden="true"></i></td>
                     <td>${product.total_sold_price} <i class="fa fa-eur" aria-hidden="true"></i></td>
                     <td>${product.sold_quantity}</td>
-                    <td class="text-success"> + ${product.total_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
-                    <td class="text-success"> + ${product.single_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
+                    <td class="text-success font-weight-bold"> + ${product.total_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
+                    <td class="text-success font-weight-bold"> + ${product.single_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
                 </tr>`;
             });
 
