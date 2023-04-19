@@ -40,7 +40,7 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa fa-house"></i>
+                        <i class="fa-light fa-house"></i>
                         <p>
                             General
                             <i class="right fas fa-angle-left"></i>
@@ -61,7 +61,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fas fa-box"></i>
+                        <i class="fa-light fa-box"></i>
                         <p>
                             Product widgets
                             <i class="right fas fa-angle-left"></i>
@@ -88,7 +88,7 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa-solid fa-truck"></i>
+                        <i class="fa-light fa-truck"></i>
                         <p>
                             Supplier Managment
                             <i class="right fas fa-angle-left"></i>
@@ -110,7 +110,7 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa fa-user-plus" aria-hidden="true"></i>
+                        <i class="fa-light fa-user-plus" aria-hidden="true"></i>
                         <p>
                             Customer Managment
                             <i class="right fas fa-angle-left"></i>
@@ -132,7 +132,7 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa-solid fa-cart-shopping"></i>
+                        <i class="fa-light fa-cart-shopping"></i>
                         <p>
                             Purchase Management
                             <i class="right fas fa-angle-left"></i>
@@ -154,7 +154,29 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa-sharp fa-solid fa-bookmark"></i>
+                        <i class="fa-light fa-boxes-packing"></i>
+                        <p>
+                            Package Management
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{{ route('purchase.index') }}" class="nav-link">
+                                <p>Create package</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('purchase.create') }}" class="nav-link">
+                                <p>Packages</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-light fa-bookmark"></i>
                         <p>
                             Order Management
                             <i class="right fas fa-angle-left"></i>
@@ -176,7 +198,7 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <i class="fa-light fa-bar-chart" aria-hidden="true"></i>
                         <p>
                             Summaries
                             <i class="right fas fa-angle-left"></i>

@@ -180,7 +180,7 @@ $(document).ready(function () {
 
             {
                 orderable: false,
-                width: '5%',
+                width: '6%',
                 render: function (data, type, row) {
                     let deleteFormTemplate = "\
                         <form style='display:inline-block;' id='delete-form' action=" + REMOVE_PRODUCT_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.name + ">\
@@ -190,8 +190,10 @@ $(document).ready(function () {
                         <form>\
                     ";
 
+                    let previewLink = "<a title='Preview' href="+PREVIEW_ROUTE.replace(':id', row.id)+" class='btn p-0'><i class='fa fa-eye text-info' aria-hidden='true'></i></a>"
+
                     let editButton = '<a href=' + EDIT_PRODUCT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + ' class="btn p-1" title="Edit"><i class="fa-solid fa-pencil text-warning"></i></a>';
-                    return `${deleteFormTemplate} ${editButton}`;
+                    return `${deleteFormTemplate} ${editButton} ${previewLink}`;
                 }
             }
 

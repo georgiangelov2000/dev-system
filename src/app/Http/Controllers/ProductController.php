@@ -37,6 +37,63 @@ class ProductController extends Controller
         return view('purchases.create', ['suppliers' => $suppliers, 'brands' => $brands,'categories' => $categories]);
     }
 
+    public function store(ProductRequest $request)
+    {
+        $data = $request->validated();
+
+        DB::beginTransaction();
+
+        try {
+
+            $active = $data['quantity'] > 0 ? $active = 'enabled' : 'disabled';
+            $total_price = $data['price'] * $data['quantity'];
+            $formatted_total_price = number_format($total_price, 8, '.', ',');
+
+            $product = Product::create([
+                "name" => $data['name'],
+                "supplier_id" => $data['supplier_id'],
+                "quantity" => $data['quantity'],
+                "notes" => $data["notes"],
+                "price" => $data["price"],
+                "code" => $data["code"],
+                "status" => $active,
+                "total_price" => $formatted_total_price
+            ]);
+
+
+            if ($product) {
+
+                $productService = new ProductService($product);
+
+                if ($request->hasFile('image')) {
+                    $productService->imageUploader($request->file('image'));
+                }
+
+                $productService->attachProductCategory($data['category_id']);
+
+                if (isset($data['subcategories']) && count($data['subcategories'])) {
+                    $productService->attachProductSubcategories($data['subcategories']);
+                }
+
+                if (isset($data['brands']) && count($data['brands'])) {
+                    $productService->attachProductBrands($data['brands']);
+                }
+
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            DB::rollback();
+            Log::error($e->getMessage());
+        }
+        return redirect()->route('purchase.index')->with('success', 'Product has been created');
+    }
+
+    public function preview(Product $product){
+        $product->load('brands', 'categories', 'suppliers:id,name', 'subcategories','images');
+        return view('purchases.preview', ['product' => $product]);
+    }
 
     public function edit(Product $product)
     {
@@ -95,60 +152,6 @@ class ProductController extends Controller
         }
         return redirect()->route('purchase.index')->with('success', 'Product has been updated');
     }
-
-    public function store(ProductRequest $request)
-    {
-        $data = $request->validated();
-
-        DB::beginTransaction();
-
-        try {
-
-            $active = $data['quantity'] > 0 ? $active = 'enabled' : 'disabled';
-            $total_price = $data['price'] * $data['quantity'];
-            $formatted_total_price = number_format($total_price, 8, '.', ',');
-
-            $product = Product::create([
-                "name" => $data['name'],
-                "supplier_id" => $data['supplier_id'],
-                "quantity" => $data['quantity'],
-                "notes" => $data["notes"],
-                "price" => $data["price"],
-                "code" => $data["code"],
-                "status" => $active,
-                "total_price" => $formatted_total_price
-            ]);
-
-
-            if ($product) {
-
-                $productService = new ProductService($product);
-
-                if ($request->hasFile('image')) {
-                    $productService->imageUploader($request->file('image'));
-                }
-
-                $productService->attachProductCategory($data['category_id']);
-
-                if (isset($data['subcategories']) && count($data['subcategories'])) {
-                    $productService->attachProductSubcategories($data['subcategories']);
-                }
-
-                if (isset($data['brands']) && count($data['brands'])) {
-                    $productService->attachProductBrands($data['brands']);
-                }
-
-            }
-
-            DB::commit();
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-            DB::rollback();
-            Log::error($e->getMessage());
-        }
-        return redirect()->route('purchase.index')->with('success', 'Product has been created');
-    }
-
     public function delete(Product $product)
     {
 
