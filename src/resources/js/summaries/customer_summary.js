@@ -80,12 +80,15 @@ $(function() {
                                 <strong class="text-success"> + ${data.products[status].sum} <i class="fa fa-eur text-dark" aria-hidden="true"></i></strong>
                             </div>
 
-                            <table class="table table-sm table-bordered table-hover col-6">
+                            <table class="table table-sm table-bordered table-without-border table-hover col-6">
                             <thead>
                             <tr>
                                 <th>Product</th>
                                 <th>Single price</th>
                                 <th>Total sold price</th>
+                                <th>Sold quantity</th>
+                                <th>Total mark up</th>
+                                <th>Single mark up</th>
                             </tr>
                         </thead>
                         <tbody>`;
@@ -96,6 +99,9 @@ $(function() {
                     <td>${product.name}</td>
                     <td>${product.single_sold_price} <i class="fa fa-eur" aria-hidden="true"></i></td>
                     <td>${product.total_sold_price} <i class="fa fa-eur" aria-hidden="true"></i></td>
+                    <td>${product.sold_quantity}</td>
+                    <td class="text-success"> + ${product.total_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
+                    <td class="text-success"> + ${product.single_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
                 </tr>`;
             });
 

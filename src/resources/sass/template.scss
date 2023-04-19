@@ -123,6 +123,24 @@ label.required:after {
 	color: inherit;
 }
 
+.table-without-border {
+	thead th {
+	  border: unset !important;
+	}
+  
+	td {
+	  border-bottom: unset;
+	  border-right: unset;
+	  border-left: unset;
+	}
+  
+	tbody tr {
+	  border-bottom: 1px solid #dee2e6;
+	}
+  
+	border: unset;
+}
+
 table.dataTable{
     width:100% !important;
     .subTable{

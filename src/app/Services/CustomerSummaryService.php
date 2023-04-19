@@ -63,7 +63,10 @@ class CustomerSummaryService
 
             $singlePrice = $order->single_sold_price;
             $totalSoldPrice = $order->total_sold_price;
-            
+            $soldQuantity = $order->sold_quantity;
+            $totalMarkup = $totalSoldPrice - $order->product->total_price;
+            $singleMarkup = $singlePrice - $order->product->price;
+
             if (!isset($products[$order->status])) {
                 $products[$order->status] = [
                     'orders_count' => 0,
@@ -80,6 +83,9 @@ class CustomerSummaryService
                 'name' => $order->product->name,
                 'single_sold_price' => $singlePrice,
                 'total_sold_price' => $totalSoldPrice,
+                'sold_quantity' => $soldQuantity,
+                'total_markup' => number_format($totalMarkup, 2, '.', ''),
+                'single_markup' => number_format($singleMarkup, 2, '.', ''),
             ];
         }
 
