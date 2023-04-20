@@ -1,5 +1,5 @@
 /* global Swal, CATEGORY_ROUTE */
-import { createData, updateData, detachSubCategory, apiCategories, getEditDataCategory } from './ajaxFunctions.js';
+import { APIPOSTCALLLER, APICallerWithoutData, APICaller } from './ajaxFunctions.js';
 $(document).ready(function () {
 
     let table = $('#categoriesTable');
@@ -67,7 +67,7 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     let deleteButton = '<a data-id=' + row.id + ' data-name=' + row.name + ' class="btn deleteCategory"- onclick="deleteCategory(this)" title="Delete"><i class="fa-solid fa-trash text-danger"></i></a>';
                     let editButton = '<a data-id=' + row.id + ' class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-solid fa-pencil text-warning"></i></a>';
-                    let productsButton = '<a data-id=' + row.id + ' class="btn" title="Products"><i class="fa-solid fa-box-open text-primary"></i></a>';
+                    let productsButton = '<a onclick="getCategoryProducts(this)" data-id=' + row.id + ' class="btn" title="Products"><i class="fa-solid fa-box-open text-primary"></i></a>';
                     let subCategories = "<button data-toggle='collapse' data-target='#subcategories_" + row.id + "' title='Sub categories' class='btn btn-outline-muted showSubCategories'><i class='fa-solid fa-list' aria-hidden='true'></i></button>";
                     return `${subCategories} ${deleteButton} ${editButton} ${productsButton}`;
                 }
@@ -131,7 +131,7 @@ $(document).ready(function () {
         var actionUrl = createForm.attr('action');
         var data = createForm.serialize();
 
-        createData(actionUrl, data,
+        APIPOSTCALLLER(actionUrl, data,
             function (response) {
                 toastr['success'](response.message);
                 createForm.trigger('reset');
@@ -151,7 +151,7 @@ $(document).ready(function () {
         var actionUrl = editForm.attr('action');
         var data = editForm.serialize();
 
-        updateData(actionUrl, data,
+        APIPOSTCALLLER(actionUrl, data,
             function (response) {
                 toastr['success'](response.message);
                 editForm.trigger('reset');
@@ -186,13 +186,14 @@ $(document).ready(function () {
     window.detachSubCategory = function (e) {
         let related_subcategoryId = $(e).attr('data-related-subcategory-id');
         let currentTr = $(e).closest('tr'); // get the nearest parent <tr> element
-        console.log(SUBCATEGORY_ROUTE.replace(':id', related_subcategoryId));
 
-        detachSubCategory(SUBCATEGORY_ROUTE.replace(':id', related_subcategoryId), function (response) {
+        APICallerWithoutData(SUBCATEGORY_ROUTE.replace(':id', related_subcategoryId), function (response) {
             toastr['success'](response.message);
+            console.log('yes');
             currentTr.remove(); // remove the current <tr> element
             table.DataTable().ajax.reload();
         }, function (error) {
+            console.log(error);
             toastr['error']('Subcategory has not been detached');
         });
     };
@@ -235,10 +236,19 @@ $(document).ready(function () {
         $(this).find('form')[0].reset();
     });
 
+    window.getCategoryProducts = function (e) {
+        let id = $(e).attr('data-id');
+        APICaller(CATEGORY_ROUTE,{'category':id,'category_product':true},function(response){
+            console.log(response);
+        },function(error){
+            console.log(error);
+        })
+    }
+
     window.editCategory = function (e) {
         let id = $(e).attr('data-id');
 
-        getEditDataCategory(EDIT_CATEGORY_ROUTE.replace(':id', id), function (data) {
+        APICallerWithoutData(EDIT_CATEGORY_ROUTE.replace(':id', id), function (data) {
             let responseDataSubCategories = data.allSubCategories;
     
             editModal.modal('show');
@@ -246,7 +256,7 @@ $(document).ready(function () {
             editForm.find('input[name="name"]').val(data.category.name);
             editForm.find('textarea[name="description"]').val(data.category.description);
             
-                apiCategories(CATEGORY_ROUTE, { "category": id }, function (response) {
+            APICaller(CATEGORY_ROUTE, { "category": id }, function (response) {
                     let relatedSubCategories = response.data;
                         for (let index = 0; index < responseDataSubCategories.length; index++) {
                             let idToCheck = responseDataSubCategories[index].id;

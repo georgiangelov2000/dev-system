@@ -86,6 +86,7 @@ class CustomerSummaryService
                 'sold_quantity' => $soldQuantity,
                 'total_markup' => number_format($totalMarkup, 2, '.', ''),
                 'single_markup' => number_format($singleMarkup, 2, '.', ''),
+                'main_product_id' => $order->product->id
             ];
         }
 

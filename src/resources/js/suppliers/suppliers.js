@@ -105,7 +105,7 @@ $(document).ready(function () {
                         var categoryNames = row.categories.map(function (category) {
                             return "<span> " + category.name + " </span>";
                         });
-                        return categoryNames.join(', ');
+                        return '<div class="notes">' + categoryNames.join(', ') + '</div>'
                     } else {
                         return '';
                     }

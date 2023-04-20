@@ -61,7 +61,7 @@ class Product extends Model {
         return $this->hasOne(ProductImage::class, 'product_id');
     }
     
-    public function suppliers() {
+    public function supplier() {
         return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 

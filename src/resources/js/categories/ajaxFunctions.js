@@ -1,82 +1,43 @@
-export function createData(url, data, successCallback, errorCallback) {
+export function APICaller(url,data,callback){
     $.ajax({
-        type: "POST",
+        method: 'GET',
         url: url,
-        data: data,
-        success: function (response)
-        {
-            if (typeof successCallback === 'function') {
-                successCallback(response);
-            }
-        },
-        error: function (error) {
-            if (typeof errorCallback === 'function') {
-                errorCallback(error);
-            }
-        }
-    });
-}
-
-export function updateData(url, data, successCallback, errorCallback) {
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: data,
-        success: function (response)
-        {
-            if (typeof successCallback === 'function') {
-                successCallback(response);
-            }
-        },
-        error: function (error) {
-            if (typeof errorCallback === 'function') {
-                errorCallback(error);
-            }
-        }
-    });
-}
-
-export function detachSubCategory  (url, successCallback, errorCallback) {
-    $.ajax({
-        url: url,
-        type: "GET",
-        success: function (response)
-        {
-            if (typeof successCallback === 'function') {
-                successCallback(response);
-            }
-        },
-        error: function (error) {
-            if (typeof errorCallback === 'function') {
-                errorCallback(error);
-            }
-        }
-    });
-}
-
-export function apiCategories (url, data, successCallback, errorCallback) {
-    $.ajax({
-        url: url,
-        type: "GET",
         data:data,
-        success: function (response)
-        {
-            if (typeof successCallback === 'function') {
-                successCallback(response);
+        success: function (response) {
+            if (typeof callback === 'function') {
+                callback(response);
             }
         },
         error: function (error) {
-            if (typeof errorCallback === 'function') {
-                errorCallback(error);
+            if (typeof callback === 'function') {
+                callback(error);
+            }
+        }
+    })
+}
+
+export function APICallerWithoutData(url, callback) {
+    $.ajax({
+        url: url,
+        method: "GET",
+        success: function (response) {
+            if (typeof callback === 'function') {
+                callback(response);
+            }
+        },
+        error: function (error) {
+            if (typeof callback === 'function') {
+                callback(error);
             }
         }
     });
 }
 
-export function getEditDataCategory(url,successCallback, errorCallback){
+export function APIPOSTCALLLER(url, data, successCallback, errorCallback) {
     $.ajax({
+        type: "POST",
         url: url,
-        type: "GET",
+        data: data,
         success: function (response)
         {
             if (typeof successCallback === 'function') {

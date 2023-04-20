@@ -69,7 +69,7 @@ class ProductApiController extends Controller
 
     private function buildProductQuery()
     {
-        return Product::query()->with(['categories', 'subcategories', 'brands', 'images', 'suppliers:id,name'])
+        return Product::query()->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name'])
             ->select('id', 'name', 'supplier_id', 'quantity', 'notes', 'price', 'total_price', 'code', 'status', 'created_at')
             ->where('status', 'enabled')
             ->where('quantity', '>', 0)

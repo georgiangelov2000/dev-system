@@ -113,8 +113,8 @@ $(document).ready(function () {
                 width: '5%',
                 orderable: false,
                 render: function (data, type, row) {
-                    if (row.suppliers) {
-                        return "<a href="+EDIT_SUPPLIER_ROUTE.replace(":id",row.suppliers.id)+">" + row.suppliers.name + "</a>"
+                    if (row.supplier) {
+                        return "<a href="+EDIT_SUPPLIER_ROUTE.replace(":id",row.supplier.id)+">" + row.supplier.name + "</a>"
                     } else {
                         return "";
                     }

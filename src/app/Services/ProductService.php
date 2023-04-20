@@ -25,7 +25,7 @@ class ProductService
             ->find($this->product->id);
 
         $result = [
-            'supplier' => $product->suppliers->first()->id,
+            'supplier' => $product->supplier->first()->id,
             'category' => $product->categories->first()->id,
             'brands' => $product->brands->pluck('id')->toArray(),
             'sub_categories' => json_encode($product->subcategories->pluck('id')->toArray())

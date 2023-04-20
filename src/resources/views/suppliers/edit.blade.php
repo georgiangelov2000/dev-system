@@ -164,6 +164,7 @@
                     name="categories[]"
                     data-actions-box="true" 
                     data-dropup-auto="false"
+                    multiple data-selected-text-format="count > 5"
                 >
                     @foreach($categories as $category)
                         <option 

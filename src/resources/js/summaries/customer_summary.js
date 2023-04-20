@@ -1,6 +1,6 @@
 import { APIPOSTCALLER } from './ajaxFunctions.js';
 
-$(function() {
+$(function () {
     $('.selectCustomer').selectpicker('refresh').val('');
 
     $('input[name="datetimes"]').daterangepicker({
@@ -54,17 +54,22 @@ $(function() {
             <div>
                 <span>Total orders:</span>
                 <strong>${data.orders_count}</strong>
-            </div>
-
-            <div>
-                <span>Date range: </span>
-                <strong>${data.date}</strong>
-            </div>
-        
-            <div>
-                <span>Total sales: </span>
-                <strong class="text-success"> + ${data.total_sales} <i class="fa fa-eur text-dark" aria-hidden="true"></i> </strong>
             </div>`;
+
+        if (data.date) {
+            template += `
+                <div>
+                    <span>Date range: </span>
+                    <strong>${data.date}</strong>
+                </div>`
+        }
+
+        template += `
+            <div>
+            <span>Total sales: </span>
+            <strong class="text-success"> + ${data.total_sales} <i class="fa fa-eur text-dark" aria-hidden="true"></i> </strong>
+        </div>
+            `
 
         for (let status in data.products) {
             template += `
@@ -89,6 +94,7 @@ $(function() {
                                 <th>Sold quantity</th>
                                 <th>Total mark up</th>
                                 <th>Single mark up</th>
+                                <th>View</th>
                             </tr>
                         </thead>
                         <tbody>`;
@@ -102,6 +108,7 @@ $(function() {
                     <td>${product.sold_quantity}</td>
                     <td class="text-success font-weight-bold"> + ${product.total_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
                     <td class="text-success font-weight-bold"> + ${product.single_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
+                    <td><a title='Preview' href="${PREVIEW_ROUTE.replace(':id', product.main_product_id)}" class='btn p-0'><i class='fa fa-eye text-info' aria-hidden='true'></i></a></td>
                 </tr>`;
             });
 

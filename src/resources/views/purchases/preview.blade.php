@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-12 d-flex justify-content-between border-bottom pl-0 pr-0 pt-2 pb-2">
                         <strong>Note: </strong>
-                        <span class="w-50">{{$product->notes}}</span>
+                        <span class="w-50 text-right">{{$product->notes}}</span>
                     </div>
                     <div class="col-12 d-flex justify-content-between border-bottom pl-0 pr-0 pt-2 pb-2">
                         <strong>Supplier: </strong>

@@ -60,6 +60,7 @@
     @push('scripts')
         <script type="text/javascript">
             let SUMMARY = "{{route('summary.take.customer')}}";
+            let PREVIEW_ROUTE = "{{ route('purchase.preview',':id') }}";
         </script>
         <script type="text/javascript" src="{{ mix('js/summaries/customer_summary.js') }}"></script>
     @endpush

@@ -128,6 +128,7 @@ class CategoryController extends Controller {
             Log::info($e->getMessage());
             return response()->json(['message' => 'Failed to detach sub category'], 500);
         }
+        
         return response()->json(['message' => 'Sub category has been detached'], 200);
     }
 
