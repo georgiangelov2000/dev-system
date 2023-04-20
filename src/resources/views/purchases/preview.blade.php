@@ -46,8 +46,8 @@
                     </div>
                     <div class="col-12 d-flex justify-content-between border-bottom pl-0 pr-0 pt-2 pb-2">
                         <strong>Supplier: </strong>
-                        <a href="{{route('supplier.edit',$product->suppliers->id)}}">
-                            {{$product->suppliers->name}}
+                        <a href="{{route('supplier.edit',$product->supplier->id)}}">
+                            {{$product->supplier->name}}
                         </a>
                     </div>
                     <div class="col-12 d-flex justify-content-between border-bottom pl-0 pr-0 pt-2 pb-2">

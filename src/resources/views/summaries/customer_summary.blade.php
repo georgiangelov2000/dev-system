@@ -22,6 +22,7 @@
                         <div class="col-3">
                             <label for="customRange1">Select Customer</label>
                             <select class="form-control selectCustomer" name="customer">
+                                <option value="0">Nothing selected</option>
                                 @foreach ($customers as $item)
                                     <option value="{{$item->id}}">{{$item->name}}</option>                                    
                                 @endforeach

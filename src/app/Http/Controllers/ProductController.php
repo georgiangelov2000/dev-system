@@ -91,7 +91,7 @@ class ProductController extends Controller
     }
 
     public function preview(Product $product){
-        $product->load('brands', 'categories', 'suppliers:id,name', 'subcategories','images');
+        $product->load('brands', 'categories', 'supplier:id,name', 'subcategories','images');
         return view('purchases.preview', ['product' => $product]);
     }
 
