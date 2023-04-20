@@ -1,7 +1,7 @@
 import { APIPOSTCALLER } from './ajaxFunctions.js';
 
 $(function () {
-    $('.selectSupplier').selectpicker('refresh').val('');
+    $('.selectSupplier').selectpicker('refresh').val('').trigger('change');
 
     $('input[name="datetimes"]').daterangepicker({
         timePicker: false,

@@ -2,10 +2,7 @@ import { APICaller, APICallerWithoutData } from './ajaxFunctions';
 
 $(document).ready(function () {
     let table = $('#customersTable');
-
-    $('.selectAction').selectpicker();
-    $('.selectCountry').selectpicker();
-    $('.selectState').selectpicker();
+    $('.selectAction, .selectCountry, .selectState').selectpicker('refresh').val('').trigger('change');
 
     let selectCountry = $('.bootstrap-select .selectCountry');
     let selectState = $('.bootstrap-select .selectState');

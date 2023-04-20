@@ -3,7 +3,7 @@ import { APICaller} from './ajaxFunctions.js';
 $(document).ready(function () {
 
     let selectedSupplier = $('.selectSupplier').find('option:selected').val();
-    
+
     $('.selectSupplier, .selectCategory, .selectSubCategory, .selectBrands').selectpicker();
 
     const selectSupplier = $('.bootstrap-select .selectSupplier')

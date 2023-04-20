@@ -8,7 +8,7 @@ deleteSupplier,
 $(document).ready(function () {
     let table = $('#suppliersTable');
 
-    $('.selectCategory, .selectCountry, .selectState, .selectAction').selectpicker();
+    $('.selectCategory, .selectCountry, .selectState, .selectAction').selectpicker('refresh').val('').trigger('change');
 
     let dataT = table.DataTable({
         ajax: {

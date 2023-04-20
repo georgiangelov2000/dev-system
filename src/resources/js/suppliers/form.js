@@ -1,10 +1,9 @@
 import { getStates } from './ajaxFunctions';
 
 $(document).ready(function () {
-    $('.selectMultiple').selectpicker();
-    $('.selectCountry').selectpicker();
-    $('.selectState').selectpicker();
-    $('.selectCategory').selectpicker();
+
+    $('.selectMultiple, .selectCountry, .selectState, .selectCategory')
+    .selectpicker();
 
     let bootstrapCountry = $('.bootstrap-select .selectCountry');
     let bootstrapState = $('.bootstrap-select .selectState');

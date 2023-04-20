@@ -1,13 +1,12 @@
 import { deleteProduct, APICaller } from './ajaxFunctions.js';
 $(document).ready(function () {
+    
     let table = $('table#purchasedProducts');
 
-    $('.selectAction').selectpicker('refresh').val('');
-    $('.selectSupplier').selectpicker('refresh').val('');
-    $('.selectCategory').selectpicker('refresh').val('');
-    $('.selectSubCategory').selectpicker('refresh').val('');
-    $('.selectBrands').selectpicker('refresh').val('');
-    $('.selectPrice').selectpicker('refresh').val('');
+    $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice')
+    .selectpicker('refresh')
+    .val('')
+    .trigger('change');
 
     $('input[name="datetimes"]').daterangepicker({
         timePicker: false,
@@ -298,6 +297,9 @@ $(document).ready(function () {
 
     bootstrapSelectBrands.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         let brandId = $(this).val();
+        bootstrapSelectCategory.selectpicker('refresh').val('');
+        bootstrapSelectSupplier.selectpicker('refresh').val('');
+
         APICaller(PRODUCT_API_ROUTE, { "brand": brandId }, function (response) {
             if (response && response.data) {
                 table.DataTable().rows().remove();
