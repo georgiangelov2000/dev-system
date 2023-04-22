@@ -76,7 +76,11 @@
                             <th>Total price</th>
                         </thead>
                         <tbody>
-
+                            <tr id="initalTr">
+                                <td colspan="10" class="text-center">
+                                    <p class="mb-0">Please add data</p>
+                               </td>
+                            </tr>
                         </tbody>
                         <tfoot>
                             <tr>

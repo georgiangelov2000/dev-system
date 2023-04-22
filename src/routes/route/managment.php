@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\CustomerSummaryController;
 use App\Http\Controllers\SupplierSummaryController;
 use Illuminate\Support\Facades\Route;
@@ -79,6 +80,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/suppliers', [SupplierSummaryController::class, 'index'])->name('supplier');
         Route::post('/take/customers', [CustomerSummaryController::class, 'summary'])->name('take.customer');
         Route::post('/take/suppliers', [SupplierSummaryController::class, 'summary'])->name('take.supplier');
+    });
+
+    Route::prefix('packages')->name('package.')->group(function () {
+        Route::get('/', [PackageController::class, 'index'])->name('index');
+        Route::get('/create', [PackageController::class, 'create'])->name('create');
+        Route::post('/store', [PackageController::class, 'store'])->name('store');
+        Route::delete('/delete/{order}', [PackageController::class, 'delete'])->name('delete');
+        Route::put('/update/{order}', [PackageController::class, 'update'])->name('update');
+        Route::get('/edit/{order}', [PackageController::class, 'edit'])->name('edit');
     });
     
     Route::prefix('states')->name('state')->group(function(){

@@ -57,7 +57,7 @@ class OrderController extends Controller
             dd($e->getMessage());
             DB::rollback();
             Log::error($e->getMessage());
-            return back()->withInput()->with('error', 'Failed to update order');
+            return back()->withInput()->with('error', 'Failed to create order');
         }
     }
 

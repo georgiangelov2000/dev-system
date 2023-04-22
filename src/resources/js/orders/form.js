@@ -1,6 +1,6 @@
 import { APICaller } from './ajaxFunctions';
 
-$(document).ready(function () {
+$(function(){
   $('.selectCustomer').selectpicker();
   $('.selectType').selectpicker();
   $('.productFilter').selectpicker();
@@ -80,19 +80,17 @@ $(document).ready(function () {
   })
 
   bootstrapProduct.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-    let productId = $(this).val();
     let selectedOption = $(this).find('option').eq(clickedIndex);
     let { name, quantity, singlePrice, totalPrice } = selectedOption.data();
 
-    let existingRow = table.find(`tr[data-id="${productId}"]`);
-    if (existingRow.length) {
-      return false;
-    } else {
+    if (table.find('#initalTr').remove());
+    
+    if (!table.find(`tr[data-id="${$(this).val()}"]`).length) {
       totalPriceAllProducts += parseFloat(totalPrice);
       availableQuantity += parseInt(quantity);
       TFOOTtotalPrice.html(totalPriceAllProducts.toFixed(2));
       TFOOTquantity.html(availableQuantity);
-      renderData(productId, name, quantity, singlePrice, totalPrice);
+      renderData($(this).val(), name, quantity, singlePrice, totalPrice);
     }
 
   });
@@ -170,6 +168,7 @@ $(document).ready(function () {
     if (table.find(`tr[data-id="${id}"]`).length) {
       return; // skip adding the row
     }
+    table.find('tbody ')
     const template = `
           <tr data-id="${id}">
               <input type="hidden" value='${id}' name="product_id[]" />

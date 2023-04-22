@@ -162,13 +162,13 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('purchase.index') }}" class="nav-link">
-                                <p>Create package</p>
+                            <a href="{{ route('package.index') }}" class="nav-link">
+                                <p>Packages</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('purchase.create') }}" class="nav-link">
-                                <p>Packages</p>
+                            <a href="{{ route('package.create') }}" class="nav-link">
+                                <p>Create package</p>
                             </a>
                         </li>
                     </ul>

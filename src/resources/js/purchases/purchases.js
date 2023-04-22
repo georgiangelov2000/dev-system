@@ -1,6 +1,6 @@
 import { deleteProduct, APICaller } from './ajaxFunctions.js';
-$(document).ready(function () {
-    
+
+$(function () {
     let table = $('table#purchasedProducts');
 
     $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice')

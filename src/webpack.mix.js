@@ -21,6 +21,9 @@ mix.js('resources/js/customers/customers.js', 'public/js/customers');
 mix.js('resources/js/orders/form.js', 'public/js/orders');
 mix.js('resources/js/orders/orders.js', 'public/js/orders');
 
+mix.js('resources/js/packages/form.js', 'public/js/packages');
+mix.js('resources/js/packages/ajaxFunctions.js', 'public/js/packages');
+
 mix.js('resources/js/summaries/customer_summary.js', 'public/js/summaries');
 mix.js('resources/js/summaries/supplier_summary.js', 'public/js/summaries');
 
