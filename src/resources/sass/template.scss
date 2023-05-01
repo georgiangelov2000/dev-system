@@ -23,6 +23,12 @@ body {
 	margin: 0;
 }
 
+.staticDashboardImages{
+	width: 180px;
+	height: 180px;
+	object-fit: contain;
+}
+
 select.form-control:not(.selectpicker) {
 	display: none;
 }

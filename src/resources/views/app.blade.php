@@ -18,8 +18,7 @@
         <link type="text/css" href="{{ mix('css/datepicker.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/daterangepicker.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/icheck-bootstrap.min.css') }}" rel="stylesheet" />
-
-
+        <link rel="icon" type="image/png" href="/storage/images/static/logo-removebg-preview.png" sizes="100x100">
     </head>
     <!--"sidebar-mini layout-fixed"-->
     <body class="sidebar-mini layout-fixed sidebar-collapse {{$isAuth ? "" : "body-class"}}" style="height: auto;">

@@ -11,11 +11,16 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\CustomerSummaryController;
 use App\Http\Controllers\SupplierSummaryController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', [HomeController::class, 'home'])->name('home');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::prefix('dashboard')->name('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'index']);
+    });
 
     Route::prefix('categories')->name('category.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');

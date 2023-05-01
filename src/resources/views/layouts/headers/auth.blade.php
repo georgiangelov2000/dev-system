@@ -48,13 +48,8 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a class="nav-link">
+                            <a class="nav-link" href="{{ route('dashboard') }}">
                                 <p>Dashboard</p>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="nav-link">
-                                <p>Statistics</p>
                             </a>
                         </li>
                     </ul>
