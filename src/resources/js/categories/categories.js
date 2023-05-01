@@ -65,10 +65,10 @@ $(document).ready(function () {
                 orderable: false,
                 width: '15%',
                 render: function (data, type, row) {
-                    let deleteButton = '<a data-id=' + row.id + ' data-name=' + row.name + ' class="btn deleteCategory"- onclick="deleteCategory(this)" title="Delete"><i class="fa-solid fa-trash text-danger"></i></a>';
-                    let editButton = '<a data-id=' + row.id + ' class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-solid fa-pencil text-warning"></i></a>';
-                    let productsButton = '<a onclick="getCategoryProducts(this)" data-id=' + row.id + ' class="btn" title="Products"><i class="fa-solid fa-box-open text-primary"></i></a>';
-                    let subCategories = "<button data-toggle='collapse' data-target='#subcategories_" + row.id + "' title='Sub categories' class='btn btn-outline-muted showSubCategories'><i class='fa-solid fa-list' aria-hidden='true'></i></button>";
+                    let deleteButton = '<a data-id=' + row.id + ' data-name="' + row.name + '" class="btn deleteCategory" onclick="deleteCategory(this)" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
+                    let editButton = '<a data-id=' + row.id + ' class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
+                    let productsButton = '<a onclick="getCategoryProducts(this)" data-id=' + row.id + ' class="btn" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
+                    let subCategories = "<button data-toggle='collapse' data-target='#subcategories_" + row.id + "' title='Sub categories' class='btn btn-outline-muted showSubCategories'><i class='fa-light fa-list' aria-hidden='true'></i></button>";
                     return `${subCategories} ${deleteButton} ${editButton} ${productsButton}`;
                 }
             }

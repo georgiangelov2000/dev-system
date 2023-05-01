@@ -23,7 +23,8 @@ class PackageRequest extends FormRequest
             "delievery_date" => "required|date",
             "package_notes" => "string",
             "customer_notes" => "string",
-            "order_id" => "required|array"
+            "order_id" => "required|array",
+            "total_order_price" => "required|array"
         ];
     }
 }

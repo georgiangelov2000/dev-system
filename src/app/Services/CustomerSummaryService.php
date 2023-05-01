@@ -109,49 +109,4 @@ class CustomerSummaryService
 
         return $summary;
     }
-
-    // ANOTHER WAY
-    // $orderQ = Order::query()->with('product');
-    // $product = new \stdClass;
-
-    // $orders = $orderQ->get();
-
-    // $product->orders_count = $orderQ->count();
-
-    // $sum = 0;
-
-    // $products = [];
-
-    // $orders->map(function ($order) use (&$sum, &$products, &$count) {
-    //     $single_price = $order->product->price;
-    //     $total_sold_price = $order->total_sold_price;
-
-    //     $sum += $order->total_sold_price;
-
-    //     if (!isset($products[$order->status])) {
-    //         $products[$order->status] = [
-    //             'orders_count' => 0,
-    //             'sum' => 0,
-    //             'products' => []
-    //         ];
-    //     }
-
-    //     $products[$order->status]['orders_count']++;
-    //     $products[$order->status]['sum'] += $order->total_sold_price;
-    //     $products[$order->status]['products'][] = [
-    //         'name' => $order->product->name,
-    //         'single_price' => $single_price,
-    //         'total_sold_price' => $total_sold_price,
-    //     ];
-    // });
-
-    // $product->total_sales = $sum;
-    // $product->products = $products;
-
-    // // Calculate the sum of product prices by status as a float number with two trailing zeros
-    // foreach ($products as $status => $data) {
-    //     $products[$status]['sum'] = floatval(number_format($data['sum'], 3, '.', ''));
-    // }
-
-    // dd($product);
 }

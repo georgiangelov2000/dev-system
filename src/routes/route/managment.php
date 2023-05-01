@@ -86,9 +86,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [PackageController::class, 'index'])->name('index');
         Route::get('/create', [PackageController::class, 'create'])->name('create');
         Route::post('/store', [PackageController::class, 'store'])->name('store');
-        Route::delete('/delete/{order}', [PackageController::class, 'delete'])->name('delete');
-        Route::put('/update/{order}', [PackageController::class, 'update'])->name('update');
-        Route::get('/edit/{order}', [PackageController::class, 'edit'])->name('edit');
+        Route::delete('/delete/{package}', [PackageController::class, 'delete'])->name('delete');
+        Route::put('/update/{package}', [PackageController::class, 'update'])->name('update');
+        Route::get('/edit/{package}', [PackageController::class, 'edit'])->name('edit');
+        Route::put('/status/{package}', [PackageController::class, 'status'])->name('status');
     });
     
     Route::prefix('states')->name('state')->group(function(){

@@ -53,9 +53,9 @@ $(document).ready(function () {
                 orderable: false,
                 width: '15%',
                 render: function (data, type, row) {
-                    let deleteButton = '<a data-id=' + row.id + ' data-name=' + row.name + ' class="btn" onclick="deleteBrand(this)" title="Delete"><i class="fa-solid fa-trash text-danger"></i></a>';
-                    let editButton = '<a data-id=' + row.id + ' class="btn" onclick="editBrand(this)" title="Edit"><i class="fa-solid fa-pencil text-warning"></i></a>';
-                    let productsButton = '<a data-id=' + row.id + ' class="btn" title="Products"><i class="fa-solid fa-box-open text-primary"></i></a>';
+                    let deleteButton = '<a data-id=' + row.id + ' data-name=' + row.name + ' class="btn" onclick="deleteBrand(this)" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
+                    let editButton = '<a data-id=' + row.id + ' class="btn" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
+                    let productsButton = '<a data-id=' + row.id + ' class="btn" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
                     return `${deleteButton} ${editButton} ${productsButton}`;
                 }
             }

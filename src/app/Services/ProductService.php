@@ -21,12 +21,12 @@ class ProductService
     public function getEditData()
     {
         $product = $this->product
-            ->with('categories', 'subcategories', 'brands')
-            ->find($this->product->id);
-
+            ->with('categories:id,name', 'subcategories:id,name', 'brands:id,name')
+            ->firstOrFail();
+            
         $result = [
             'supplier' => $product->supplier->first()->id,
-            'category' => $product->categories->first()->id,
+            'category' => $product->categories->pluck('id')->first(),
             'brands' => $product->brands->pluck('id')->toArray(),
             'sub_categories' => json_encode($product->subcategories->pluck('id')->toArray())
         ];
@@ -43,7 +43,7 @@ class ProductService
             'name' => $hashedImage,
         ]);
 
-        $storedFile = Storage::putFileAs($this->storage_static_files, $file, $hashedImage);
+        $storedFile = $file->storeAs($this->storage_static_files, $hashedImage);
 
         return $storedFile ? $image : false;
     }

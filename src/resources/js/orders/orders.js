@@ -104,13 +104,13 @@ $(document).ready(function () {
                 name: "status",
                 render: function (data, type, row) {
                     if (row.status === 1) {
-                        return '<i title="Reveived" class="fa-solid fa-check"></i>';
+                        return '<i title="Reveived" class="fa-light fa-check"></i>';
                     }
                     else if (row.status === 3) {
                         return '<i title="Pending" class="fa-light fa-loader"></i>'
                     }
                     else if (row.status === 4) {
-                        return '<i title="Ordered" class="fa-solid fa-truck"></i>'
+                        return '<i title="Ordered" class="fa-light fa-truck"></i>'
                     }
                 }
             },
@@ -122,16 +122,16 @@ $(document).ready(function () {
                     <form style='display:inline-block;' id='delete-form' action=" + ORDER_DELETE_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.invoice_number + ">\
                         <input type='hidden' name='_method' value='DELETE'>\
                         <input type='hidden' name='id' value='" + row.id + "'>\
-                        <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentOrder(this);'><i class='fa-solid fa-trash text-danger'></i></button>\
+                        <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentOrder(this);'><i class='fa-light fa-trash text-danger'></i></button>\
                     <form/>\
                     ";
 
-                    let editButton = '<a href='+ORDER_EDIT_ROUTE.replace(':id',row.id)+' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-solid fa-pen text-warning"></i></a>';
+                    let editButton = '<a href='+ORDER_EDIT_ROUTE.replace(':id',row.id)+' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
 
                     let dropdown = `
                     <div class="dropdown d-inline">
                         <button class="btn text-info p-0" title="Change status" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa-solid fa-rotate-right"></i>
+                            <i class="fa-light fa-rotate-right"></i>
                         </button>
                         <div id="changeStatus" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <button type="button" order-id=${row.id} value="1" onclick="changeStatus(this)" class="dropdown-item">Received</button>

@@ -185,13 +185,13 @@ $(function () {
                         <form style='display:inline-block;' id='delete-form' action=" + REMOVE_PRODUCT_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.name + ">\
                             <input type='hidden' name='_method' value='DELETE'>\
                             <input type='hidden' name='id' value='" + row.id + "'>\
-                            <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'><i class='fa-solid fa-trash text-danger'></i></button>\
+                            <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'><i class='fa-light fa-trash text-danger'></i></button>\
                         <form>\
                     ";
 
                     let previewLink = "<a title='Preview' href="+PREVIEW_ROUTE.replace(':id', row.id)+" class='btn p-0'><i class='fa fa-eye text-info' aria-hidden='true'></i></a>"
 
-                    let editButton = '<a href=' + EDIT_PRODUCT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + ' class="btn p-1" title="Edit"><i class="fa-solid fa-pencil text-warning"></i></a>';
+                    let editButton = '<a href=' + EDIT_PRODUCT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + ' class="btn p-1" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
                     return `${deleteFormTemplate} ${editButton} ${previewLink}`;
                 }
             }

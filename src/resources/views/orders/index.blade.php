@@ -2,13 +2,13 @@
 @section('title', 'Orders')
 
 @section('content')
-    <div class="row justify-content-between mb-3">
-        <div class="col-12">
-            <h3 class="mb-0">Orders</h3>
-        </div>
-    </div>
     <div class="row">
         <div class="card col-12 cardTemplate">
+            <div class="card-header">
+                <div class="col-12">
+                    <h3 class="card-title">Orders</h3>
+                </div>
+            </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
@@ -62,7 +62,7 @@
                         <span>The order will be delivered today</span>
                     </div>
                     <div class="col-12">
-                        <i title="Ordered" class="fa-solid fa-truck"></i>
+                        <i title="Ordered" class="fa-light fa-truck"></i>
                         <span>-</span>
                         <span>The order has been placed</span>
                     </div>

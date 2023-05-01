@@ -23,6 +23,10 @@ class CreatePackagesTable extends Migration
             $table->date('delievery_date');
             $table->text('package_notes');
             $table->text('customer_notes');
+            $table->foreignId('customer_id')
+            ->constrained('customers')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Order;
 
 class Package extends Model
 {
@@ -32,12 +33,23 @@ class Package extends Model
         "tracking_number",
         "customer_id",
         "package_name",
+        "package_price",
         "package_type",
         "delievery_method",
         "delievery_date",
         "package_notes",
         "customer_notes",
         "order_id",
+        "customer_id"
     ];
+
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'packages_orders');
+    }
+
+    public function customer(){
+        return $this->belongsTo(Customer::class,'customer_id');
+    }
 
 }

@@ -10,15 +10,16 @@ use App\Models\Supplier;
 use App\Models\Brand;
 use App\Models\Customer;
 
-class LoadStaticData {
+class LoadStaticData
+{
 
-    static function callSubCategories($option = null) {
-        $subCategoryQ = SubCategory::query()->select('id','name');
+    static function callSubCategories($option = null)
+    {
+        $subCategoryQ = SubCategory::query()->select('id', 'name');
 
-        if($option === 'assigned') {
+        if ($option === 'assigned') {
             $subCategoryQ->has('categories');
-        }
-        else if ($option === 'unnasigned') {
+        } else if ($option === 'unnasigned') {
             $subCategoryQ->whereDoesntHave('categories');
         }
 
@@ -27,7 +28,8 @@ class LoadStaticData {
         return $result;
     }
 
-    static function callStatesAndCountries($country = null) {
+    static function callStatesAndCountries($country = null)
+    {
 
         $statesQuery = State::select('id', 'name');
 
@@ -44,7 +46,8 @@ class LoadStaticData {
         ];
     }
 
-    static function loadCallCategories($option = null) {
+    static function loadCallCategories($option = null)
+    {
         $query = Category::select('id', 'name');
 
         if ($option == 'unnasigned') {
@@ -56,32 +59,34 @@ class LoadStaticData {
         return $query->get();
     }
 
-    static function callSupliers() {
+    static function callSupliers()
+    {
         $query = Supplier::query()->with('categories');
 
         $suppliers = $query
-                ->whereNotNull('country_id')
-                ->whereNotNull('state_id')
-                ->whereHas('categories')
-                ->get();
+            ->whereNotNull('country_id')
+            ->whereNotNull('state_id')
+            ->whereHas('categories')
+            ->get();
 
         return $suppliers;
     }
 
-    static function callBrands() {
+    static function callBrands()
+    {
         $query = Brand::query();
         $brands = $query->select('id', 'name')
-                ->get();
+            ->get();
 
         return $brands;
     }
 
-    static function callCustomers(){
+    static function callCustomers()
+    {
         $query = Customer::query();
-        
-        $customers = $query->select('id','name')->get();
+
+        $customers = $query->select('id', 'name')->get();
 
         return $customers;
     }
-
 }

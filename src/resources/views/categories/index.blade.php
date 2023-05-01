@@ -2,14 +2,18 @@
 @section('title', 'Categories')
 
 @section('content')
-        <div class="row justify-content-between mb-3">
-            <h3 class="mb-0">Categories</h3>
-            <button type="button" class="btn btn-primary createCategory">
-                <i class="fa fa-plus"></i> Add category
-            </button>   
-        </div>
         <div class="row">
             <div class="card col-12 cardTemplate">
+                <div class="card-header d-flex align-items-center p-2">
+                    <div class="col-10">
+                        <h3 class="card-title">Categories</h3>
+                    </div>
+                    <div class="col-2 text-right">
+                        <button type="button" class="btn btn-primary createCategory">
+                            <i class="fa fa-plus"></i> Add category
+                        </button> 
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-3">
