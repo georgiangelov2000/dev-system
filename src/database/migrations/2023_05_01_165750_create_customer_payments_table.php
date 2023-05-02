@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePackagesOrdersTable extends Migration
+class CreateCustomerPaymentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,21 @@ class CreatePackagesOrdersTable extends Migration
      */
     public function up()
     {
-        Schema::create('packages_orders', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('package_id')
-            ->constrained('packages')
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('package_id');
+            $table->foreign('order_id')
+            ->references('id')
+            ->on('orders')
             ->onUpdate('cascade')
             ->onDelete('cascade');
-            $table->foreignId('order_id')
-            ->constrained('orders')
+            $table->foreign('package_id')
+            ->references('id')
+            ->on('packages')
             ->onUpdate('cascade')
             ->onDelete('cascade');
+            $table->date('date_of_payment');
         });
     }
 
@@ -33,6 +38,6 @@ class CreatePackagesOrdersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('packages_orders');
+        Schema::dropIfExists('payments');
     }
 }

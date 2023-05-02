@@ -223,7 +223,7 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('order.index') }}" class="nav-link">
+                            <a href="{{ route('payment.customer') }}" class="nav-link">
                                 <p>Customer payments</p>
                             </a>
                         </li>
