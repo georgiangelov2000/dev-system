@@ -123,7 +123,6 @@ $(function () {
                 width: '5%',
                 orderable: false,
                 render: function (data, type, row) {
-                    console.log(row.categories);
                     if (row.categories.length > 0) {
                         var categoryNames = row.categories.map(function (category) {
                             return "<span> " + category.name + " </span>";
@@ -262,8 +261,7 @@ $(function () {
                 table.DataTable().rows.add(response.data).draw();
 
                 APICaller(CATEGORY_ROUTE, { "category": categoryId }, function (response) {
-                    let subCategories = response.data;
-                    console.log(subCategories);
+                    let subCategories = response.data[0].sub_categories;
                     if (subCategories.length > 0) {
                         $.each(subCategories, function (key, subCategory) {
                             bootstrapSelectSubCategory.append(`<option value="${subCategory.id}">${subCategory.name}</option>`);
@@ -282,10 +280,12 @@ $(function () {
     });
 
     bootstrapSelectSubCategory.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let subCategoryId = $(this).val();
+        let sub_category = $(this).val();
+        let category = bootstrapSelectCategory.val()
+
         $('.selectSupplier').selectpicker('refresh').val('');
 
-        APICaller(PRODUCT_API_ROUTE, { "sub_category": subCategoryId }, function (response) {
+        APICaller(PRODUCT_API_ROUTE, { "category":category, "sub_category": sub_category }, function (response) {
             if (response && response.data) {
                 table.DataTable().rows().remove();
                 table.DataTable().rows.add(response.data).draw();
@@ -434,6 +434,5 @@ $(function () {
             }
         });
     };
-
 
 });

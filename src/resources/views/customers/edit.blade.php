@@ -12,14 +12,26 @@
         <form class="d-flex flex-wrap" action='{{route('customer.update',$customer->id)}}' method='POST' enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            <div class="col-12 d-none imagePreview">
-                <h5>Preview</h5>
-                <img id="preview-image" class="img-thumbnail w-50">
+            
+            <div class="row w-100 mb-2">
+                @if ($relatedRecords['image'])
+                    <div class="col-3">
+                        <img class="card card-widget widget-user w-100 h-100 m-0"
+                            src="{{ $relatedRecords['image'] ? $relatedRecords['image']->path . $relatedRecords['image']->name : 'https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg' }}" />
+                    </div>
+                @endif
+                <div class="col-3 d-none imagePreview">
+                    <div class="position-relative">
+                        <img id="preview-image" alt="Preview" class="img-fluid card card-widget widget-user w-100 h-100 m-0">
+                        <div class="ribbon-wrapper ribbon-lg">
+                            <div class="ribbon bg-success text-lg">
+                                Preview
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group col-12">
-                <img class="img-thumbnail w-25 h-100" 
-                    src="{{$relatedRecords['image'] ? $relatedRecords['image']->path . $relatedRecords['image']->name : "https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg" }}"/>
-            </div>
+
             <div class="col-6">
                 <div style="height:30px">
                     <label for="image">File</label>

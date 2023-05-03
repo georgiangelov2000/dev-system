@@ -28,6 +28,9 @@ mix.js('resources/js/packages/ajaxFunctions.js', 'public/js/packages');
 mix.js('resources/js/summaries/customer_summary.js', 'public/js/summaries');
 mix.js('resources/js/summaries/supplier_summary.js', 'public/js/summaries');
 
+mix.js('resources/js/payments/customer_payments.js', 'public/js/payments');
+mix.js('resources/js/payments/supplier_payments.js', 'public/js/payments');
+
 mix.js('resources/js/adminlte.min.js', 'public/js');
 mix.js('resources/js/app.js', 'public/js');
 mix.js('resources/js/bootstrap.js', 'public/js');

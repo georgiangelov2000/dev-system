@@ -51,6 +51,7 @@ $(document).ready(function () {
                 orderable: false,
                 name: 'subcategories',
                 render: function (data, type, row) {
+                    console.log(row);
                     if (row.sub_categories) {
                         var subcategoryNames = row.sub_categories.map(function (subcategory) {
                             return "<span class='font-weight-bold'> " + subcategory.name + " </span>";
@@ -257,7 +258,8 @@ $(document).ready(function () {
             editForm.find('textarea[name="description"]').val(data.category.description);
             
             APICaller(CATEGORY_ROUTE, { "category": id }, function (response) {
-                    let relatedSubCategories = response.data;
+                    let relatedSubCategories = response.data[0].sub_categories;
+
                         for (let index = 0; index < responseDataSubCategories.length; index++) {
                             let idToCheck = responseDataSubCategories[index].id;
                             let matchingObj = relatedSubCategories.find(obj => obj.id == idToCheck ) ? 'selected' : "";

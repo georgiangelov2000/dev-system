@@ -5,23 +5,22 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Category;
-use Illuminate\Support\Facades\DB;
+use App\Models\CategorySubCategory;
 
 class CategoryApiController extends Controller {
 
     public function getData(Request $request) {
-        $supplierId = $request->supplier;
-        $categoryId = $request->category;
+        $supplier = $request->supplier;
+        $category = $request->category;
 
         $categoriesQuery = $this->buildCategoriesQuery();
 
-        if ($supplierId || $supplierId == '0' ) {
-            $this->filterCategoriesBySupplier($categoriesQuery, $supplierId);
+        if ($supplier || $supplier == '0') {
+            $this->filterCategoriesBySupplier($categoriesQuery, $supplier);
         }
 
-        if ($categoryId) {
-            $subcategories = $this->getSubcategories($categoryId);
-            return response()->json(['data' => $subcategories]);
+        if ($category) {
+            $this->findCategory($categoriesQuery,$category);
         }
 
         $categories = $this->getCategories($categoriesQuery);
@@ -29,26 +28,17 @@ class CategoryApiController extends Controller {
     }
 
     private function buildCategoriesQuery() {
-        return Category::with(['subCategories' => function ($query) {
-                $query->select('category_sub_category.id', 'name');
-                }])
-                ->select('id', 'name', 'description')
-                ->orderBy('id', 'asc');
+        return Category::query()->select('id','name','description')->with('subCategories');
     }
 
-    private function filterCategoriesBySupplier($query, $supplierId) {        
-        $query->whereHas('suppliers', function ($query) use ($supplierId) {
-            $query->where('supplier_id', $supplierId);
+    private function filterCategoriesBySupplier($query, $supplier) {        
+        $query->whereHas('suppliers', function ($query) use ($supplier) {
+            $query->where('supplier_id', $supplier);
         });
     }
 
-    private function getSubcategories($categoryId) {
-        return DB::table('category_sub_category')
-                        ->join('subcategories', 'category_sub_category.sub_category_id', '=', 'subcategories.id')
-                        ->select('subcategories.name', 'subcategories.id')
-                        ->where('category_sub_category.category_id', '=', $categoryId)
-                        ->get()
-                        ->toArray();
+    private function findCategory($query,$category){
+        return $query->where('id',$category);
     }
 
     private function getCategories($query) {

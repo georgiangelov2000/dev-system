@@ -30,11 +30,10 @@ class ProductApiController extends Controller
         }
         if ($category) {
             $this->fillterByCategories($productQuery, $category);
-        }
-        if ($sub_category) {
-            $productQuery->whereHas('subcategories', function ($query) use ($sub_category) {
-                $query->whereIn('subcategories.id', $sub_category);
-            });
+
+            if ($sub_category) {
+                $this->fillterBySubCategories($productQuery,$category);
+            }
         }
         if ($brand) {
             $productQuery->whereHas('brands', function ($query) use ($brand) {
@@ -83,9 +82,10 @@ class ProductApiController extends Controller
         });
     }
 
-    private function getProducts($query)
-    {
-        return $query->get();
+    private function fillterBySubCategories($query, $sub_category) {
+        $query->whereHas('subcategories', function ($query) use ($sub_category) {
+            $query->whereIn('subcategories.id', $sub_category);
+        });
     }
 
     private function fillterByCreatedAt($query, $start_date, $end_date)
@@ -101,5 +101,10 @@ class ProductApiController extends Controller
             floatval($start_price),
             floatval($end_price)
         ]);
+    }
+
+    private function getProducts($query)
+    {
+        return $query->get();
     }
 }

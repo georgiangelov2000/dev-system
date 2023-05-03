@@ -57,6 +57,7 @@ class PackageController extends Controller
             $package->orders()->attach($orderIds);
             Order::whereIn('id', $orderIds)->update([
                 'date_of_sale' => date('Y-m-d', strtotime($data['delievery_date'])),
+                'package_id' => $package->id
             ]);
 
             DB::commit();
@@ -102,6 +103,7 @@ class PackageController extends Controller
 
             Order::whereIn('id', $orderIds)->update([
                 'date_of_sale' => date('Y-m-d', strtotime($data['delievery_date'])),
+                'package_id' => $package->id
             ]);
 
             DB::commit();

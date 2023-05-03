@@ -47,7 +47,6 @@ class ProductController extends Controller
 
             $active = $data['quantity'] > 0 ? $active = 'enabled' : 'disabled';
             $total_price = $data['price'] * $data['quantity'];
-            $formatted_total_price = number_format($total_price, 8, '.', ',');
 
             $product = Product::create([
                 "name" => $data['name'],
@@ -57,7 +56,7 @@ class ProductController extends Controller
                 "price" => $data["price"],
                 "code" => $data["code"],
                 "status" => $active,
-                "total_price" => $formatted_total_price
+                "total_price" => $total_price
             ]);
 
 
@@ -129,7 +128,6 @@ class ProductController extends Controller
             }
 
             $total_price = $data['price'] * $data['quantity'];
-            $formatted_total_price = number_format($total_price, 8, '.', ',');
 
             $product->update([
                 "name" => $data['name'],
@@ -139,7 +137,7 @@ class ProductController extends Controller
                 "price" => $data["price"],
                 "code" => $data["code"],
                 "status" => $data['quantity'] > 0 ? 'enabled' : 'disabled',
-                "total_price" => $formatted_total_price
+                "total_price" => $total_price
             ]);
 
             DB::commit();

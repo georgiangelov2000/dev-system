@@ -18,7 +18,7 @@ class CustomerSummaryService
     public function customerQueryBuilder()
     {
 
-        $order = Order::with('product')
+        $order = Order::with(['product', 'package:id,package_name'])
             ->where('customer_id', $this->customer);
 
         if (!empty($this->date)) {
@@ -51,13 +51,12 @@ class CustomerSummaryService
     {
 
         $statusNames = config('statuses.order_statuses');
-        
+
         $orderQ = $this->customerQueryBuilder();
 
         $orders = $orderQ->get();
 
         $products = [];
-
 
         foreach ($orders as $order) {
 
@@ -66,20 +65,32 @@ class CustomerSummaryService
             $soldQuantity = $order->sold_quantity;
             $totalMarkup = $totalSoldPrice - $order->product->total_price;
             $singleMarkup = $singlePrice - $order->product->price;
+            $package = $order->package ? $order->package->package_name : 'No Package';
 
-            if (!isset($products[$order->status])) {
-                $products[$order->status] = [
+            if (!isset($products[$package])) {
+                $products[$package] = [
                     'orders_count' => 0,
-                    'status_name' => '',
+                    'sum' => 0,
+                    'status' => []
+                ];
+            }
+            $products[$package]['orders_count']++;
+            $products[$package]['sum'] += $totalSoldPrice;
+            $products[$package]['sum'] = number_format($products[$package]['sum'], 2, '.', ''); // add this line to format the number
+
+            if (!isset($products[$package]['status'][$statusNames[$order->status] ?? ''])) {
+                $products[$package]['status'][$statusNames[$order->status] ?? ''] = [
+                    'orders_count' => 0,
                     'sum' => 0,
                     'products' => []
                 ];
             }
 
-            $products[$order->status]['orders_count']++;
-            $products[$order->status]['status_name'] = array_key_exists($order->status,$statusNames) ? $statusNames[$order->status] : ''; 
-            $products[$order->status]['sum'] += $totalSoldPrice;
-            $products[$order->status]['products'][] = [
+            $products[$package]['status'][$statusNames[$order->status] ?? '']['orders_count']++;
+            $products[$package]['status'][$statusNames[$order->status] ?? '']['sum'] += $totalSoldPrice;
+            $products[$package]['status'][$statusNames[$order->status] ?? '']['sum'] = number_format($products[$package]['status'][$statusNames[$order->status] ?? '']['sum'], 2, '.', ''); // add this line to format the number
+            $products[$package]['status'][$statusNames[$order->status] ?? '']['products'][] = [
+                'id' => $order->id,
                 'name' => $order->product->name,
                 'single_sold_price' => $singlePrice,
                 'total_sold_price' => $totalSoldPrice,
@@ -88,11 +99,6 @@ class CustomerSummaryService
                 'single_markup' => number_format($singleMarkup, 2, '.', ''),
                 'main_product_id' => $order->product->id
             ];
-        }
-
-        // Calculate the sum of product prices by status as a float number with two trailing zeros
-        foreach ($products as $status => $data) {
-            $products[$status]['sum'] = number_format($data['sum'], 2, '.', '');
         }
 
         return $products;
@@ -105,7 +111,7 @@ class CustomerSummaryService
         $summary->date = $this->date;
         $summary->total_sales = number_format($this->getTotalSales(), 2, '.', '');
         $summary->products = $this->getProductsByStatus();
-        
+
 
         return $summary;
     }

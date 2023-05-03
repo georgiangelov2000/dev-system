@@ -41,6 +41,7 @@ class Order extends Model
         "single_sold_price",
         "total_sold_price",
         "discount_percent",
+        "package_id"
     ];
 
     public function customer()
@@ -51,5 +52,9 @@ class Order extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function package(){
+        return $this->belongsTo(Package::class);
     }
 }

@@ -55,7 +55,6 @@ $(document).ready(function () {
 
         APICaller(CATEGORY_ROUTE, {"supplier": supplier}, function (response) {
             if (response.data.length > 0) {
-                selectCategory.append('<option value="">Nothing selected</option>');
                 $.each(response.data, function (key, value) {
                     selectCategory.append('<option value=' + value.id + '>' + value.name + '</option>');
                 });
@@ -74,13 +73,12 @@ $(document).ready(function () {
         selectSubCategory.empty();
 
         APICaller(CATEGORY_ROUTE, {"category": category}, function (response) {
-            if (response.data.length > 0) {
-                selectSubCategory.append('<option value="0">All</option>');
-                $.each(response.data, function (key, value) {
+            let responseData = response.data[0].sub_categories;
+            
+            if (responseData.length > 0) {
+                $.each(responseData, function (key, value) {
                     selectSubCategory.append('<option value=' + value.id + '>' + value.name + '</option>');
                 });
-            } else {
-                selectSubCategory.append('<option value="0">Nothing selected</option>');
             }
             selectSubCategory.selectpicker('refresh');
         }, function (error) {
@@ -102,6 +100,23 @@ $(document).ready(function () {
         $('input[name="code"]').val(randomString);
 
     });
+
+    $('#image').on('change',function(){
+        previewImage(this);
+    })
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          
+          reader.onload = function(e) {
+            $('.imagePreview').removeClass('d-none');
+            $('#preview-image').attr('src', e.target.result);
+          }
+          
+          reader.readAsDataURL(input.files[0]);
+        }
+      }
 
 });
     

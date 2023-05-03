@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\CustomerSummaryController;
 use App\Http\Controllers\SupplierSummaryController;
+use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -97,6 +98,10 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/status/{package}', [PackageController::class, 'status'])->name('status');
     });
     
+    Route::prefix('payments')->name('payment.')->group(function(){
+        Route::get('/', [CustomerPaymentController::class, 'index'])->name('customer');
+    });
+
     Route::prefix('states')->name('state')->group(function(){
         Route::get('/state/{countryId}', [SupplierController::class, 'getState']);
     });

@@ -175,7 +175,11 @@
                                     </td>
                                     <td name="total-sold-price">
                                         {{$order->total_sold_price}}
-                                        <input type="hidden" name="total_order_price[]" value="{{$order->total_order_price}}">
+                                        <input 
+                                            type="hidden" 
+                                            name="total_order_price[]" 
+                                            value="{{$order->total_sold_price}}"
+                                        >
                                     </td>
                                     <td>{{$order->sold_quantity}}</td>
                                 </tr>
