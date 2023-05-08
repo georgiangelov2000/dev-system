@@ -112,7 +112,7 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     let deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentCustomer(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash-can text-danger"></i></a>';
                     let editButton = '<a data-id=' + row.id + ' href="'+CUSTOMER_EDIT_ROUTE.replace(':id',row.id)+'" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
-                    let ordersButton = "<a data-id=' + row.id + ' title='Orders'> <i class='text-success fa fa-light fa-shopping-cart' aria-hidden='true'></i>  </a>"
+                    let ordersButton = '<a data-id=' + row.id + ' href="'+ CUSTOMER_ORDERS_ROUTE.replace(':id',row.id)+'" title="Orders"> <i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i>  </a>';
                     return `${deleteButton} ${editButton} ${ordersButton}`;
                 }
             }

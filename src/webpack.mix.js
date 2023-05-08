@@ -56,6 +56,5 @@ mix.sass('resources/sass/datatables.min.scss', 'public/css'),
 mix.sass('resources/sass/bootstrap-select.min.scss', 'public/css'),
 mix.sass('resources/sass/datepicker.min.scss', 'public/css'),
 mix.sass('resources/sass/daterangepicker.min.scss', 'public/css'),
-mix.sass('resources/sass/icheck-bootstrap.min.scss', 'public/css'),
-mix.sass('resources/sass/flag-icons.scss', 'public/css')
+mix.sass('resources/sass/icheck-bootstrap.min.scss', 'public/css')
 .version();

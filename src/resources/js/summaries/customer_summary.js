@@ -45,9 +45,7 @@ $(function () {
         APIPOSTCALLER(SUMMARY, { "customer": customer, 'date': date }, function (response) {
             let respData = response;
 
-            if (respData) {
-                summaryTemplate(respData);
-            }
+            summaryTemplate(respData);
 
             $('#loader').hide();
         }, function (error) {
@@ -58,80 +56,88 @@ $(function () {
 
 
     const summaryTemplate = function (data) {
+    
+        const summaryContainer = $('#summary-container');
+
+        if(Object.keys(data.products).length !== 0) {
+            const tableClass = 'table-summary';
+    
+            let template = '';
         
-        const summaryContainer = document.getElementById('summary-container');
-        const tableClass = 'table-summary';
+            template += '<div class="summary">';;
     
-        let template = '';
+            for (const key in data.products) {
     
-        template += '<div class="summary">';
+                template += `${renderPackageData(data.products[key],key)}`;
+                const product = data.products[key];
+                
+                if (product.status) {           
     
-        for (const key in data.products) {
-
-            template += `${renderPackageData(data.products[key],key)}`;
-
-            const product = data.products[key];
-            
-            if (product.status) {           
-
-                const statuses = Object.keys(product.status);
-
-                statuses.forEach((status) => {
-
-                    const statusData = product.status[status];
-                    const products = statusData.products;
-                    
-                    if (products.length > 0) {
-                        template+=`
-                            ${renderStatusData(statusData,status)}
-                            <div style="background-color:rgb(244, 246, 249);" class="p-4 rounded m-2">
-                                <table class="${tableClass} table table-sm table-bordered table-without-border table-hover col-6">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Single sold price</th>
-                                            <th>Total sold price</th>
-                                            <th>Regular price</th>
-                                            <th>Sold quantity</th>
-                                            <th>Single markup</th>
-                                            <th>Total markup</th>
-                                            <th>Discount %</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${renderProductTable(products)}
-                                    </tbody>
-                                </table>
+                    const statuses = Object.keys(product.status);
+    
+                    statuses.forEach((status) => {
+    
+                        const statusData = product.status[status];
+                        const products = statusData.products;
+                        
+                        if (products.length > 0) {
+                            template+=`
+                                ${renderStatusData(statusData,status)}
+                                <div style="background-color:rgb(244, 246, 249);" class="p-4 rounded m-2">
+                                    <table class="${tableClass} table table-sm table-bordered table-without-border table-hover col-6">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Single sold price</th>
+                                                <th>Total sold price</th>
+                                                <th>Regular price</th>
+                                                <th>Sold quantity</th>
+                                                <th>Single markup</th>
+                                                <th>Total markup</th>
+                                                <th>Discount %</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${renderProductTable(products)}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                        `;
-                    }
+                            `;
+                        }
+                    });
+                }
+            }
+        
+            template += '</div>';
+        
+            summaryContainer.html(template);
+        
+            const dataTables = $(`.${tableClass}`);
+            
+            for (let i = 0; i < dataTables.length; i++) {
+                new DataTable(dataTables[i], {
+                    columns: [
+                        { orderable: false },
+                        { orderable: false },
+                        { orderable: false }, 
+                        { orderable: false },
+                        { orderable: false },
+                        { orderable: false },
+                        { orderable: false },
+                        { orderable: false },
+                        { orderable: false },
+                    ]
                 });
             }
+        } else {
+            summaryContainer.html( 
+            `<span class="text-danger">
+                No orders found for the current customer! Please try again
+            </span>`); 
         }
-    
-        template += '</div>';
-    
-        summaryContainer.innerHTML = template;
-    
-        const dataTables = document.getElementsByClassName(tableClass);
-        
-        for (let i = 0; i < dataTables.length; i++) {
-            new DataTable(dataTables[i], {
-                columns: [
-                    { orderable: false },
-                    { orderable: false },
-                    { orderable: false }, 
-                    { orderable: false },
-                    { orderable: false },
-                    { orderable: false },
-                    { orderable: false },
-                    { orderable: false },
-                    { orderable: false },
-                ]
-            });
-        }
+
     }
     
     const renderPackageData = (productData,packageKey) => {

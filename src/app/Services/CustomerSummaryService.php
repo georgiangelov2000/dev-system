@@ -15,7 +15,7 @@ class CustomerSummaryService
         $this->customer = $customer;
         $this->date = $date;
     }
-    public function customerQueryBuilder()
+    public function orderQueryBuilder()
     {
         $order = Order::select([
             'id',
@@ -53,12 +53,12 @@ class CustomerSummaryService
 
     public function getOrdersCount()
     {
-        return $this->customerQueryBuilder()->count();
+        return $this->orderQueryBuilder()->count();
     }
 
     public function getTotalSales()
     {
-        return $this->customerQueryBuilder()->sum('total_sold_price');
+        return $this->orderQueryBuilder()->sum('total_sold_price');
     }
 
     public function getProductsByStatus()
@@ -66,7 +66,7 @@ class CustomerSummaryService
 
         $statusNames = config('statuses.order_statuses');
 
-        $orderQ = $this->customerQueryBuilder();
+        $orderQ = $this->orderQueryBuilder();
 
         $orders = $orderQ->get();
 

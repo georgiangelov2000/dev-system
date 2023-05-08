@@ -81,6 +81,7 @@
         let CUSTOMER_DELETE_ROUTE = "{{route('customer.delete',':id')}}";
         let CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
         let STATE_ROUTE = "{{ route('state', ':id') }}";
+        let CUSTOMER_ORDERS_ROUTE = "{{ route('customer.orders', ':id') }}";
     </script>
 @endpush
 @endsection

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\State;
 use App\Models\Country;
+use App\Models\Order;
 
 class Customer extends Model
 {
@@ -53,5 +54,9 @@ class Customer extends Model
 
     public function country(){
         return $this->belongsTo(Country::class,'country_id');
+    }
+
+    public function orders(){
+        return $this->hasMany(Order::class);
     }
 }
