@@ -91,6 +91,7 @@ $(function () {
                                             <th>Name</th>
                                             <th>Single sold price</th>
                                             <th>Total sold price</th>
+                                            <th>Regular price</th>
                                             <th>Sold quantity</th>
                                             <th>Single markup</th>
                                             <th>Total markup</th>
@@ -119,6 +120,7 @@ $(function () {
         for (let i = 0; i < dataTables.length; i++) {
             new DataTable(dataTables[i], {
                 columns: [
+                    { orderable: false },
                     { orderable: false },
                     { orderable: false }, 
                     { orderable: false },
@@ -185,6 +187,7 @@ $(function () {
                     <td>${product.name}</td>
                     <td>${product.single_sold_price} €</td>
                     <td>${product.total_sold_price} €</td>
+                    <td>${product.regular_price} €</td>
                     <td>${product.sold_quantity}</td>
                     <td>${product.single_markup} €</td>
                     <td>${product.total_markup} €</td>

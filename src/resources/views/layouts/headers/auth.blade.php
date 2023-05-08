@@ -5,25 +5,33 @@
                     class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item">
-            <div class="form-inline">
-                <div class="input-group" data-widget="sidebar-search">
-                    <input class="form-control form-control-sm" type="search" placeholder="Search" aria-label="Search">
-                </div>
-            </div>
+            <button title="Calculator" class="btn btn-dark">
+                <i class="fa-light fa-calculator-simple"></i>
+            </button>
+        </li>
+        <li class="nav-item ml-2">
+            <button title="Change style" class="btn btn-dark">
+                <i class="fa-light fa-frame"></i>
+            </button>
+        </li>
+        <li class="nav-item ml-2">
+            <button title="Language" class="btn btn-dark">
+                <i class="fa-light fa-globe"></i>
+            </button>
         </li>
     </ul>
 
     <ul class="navbar-nav ml-auto">
         <li class="nav-item d-none d-sm-inline-block">
-            <span href="#" class="nav-link">
-                Account: {{ $user !== false ? $user : '' }}
+            <span href="#" class="nav-link bg-danger rounded">
+                <i title="User" class="fa-light fa-user"></i> {{ $user !== false ? $user : '' }}
             </span>
         </li>
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <li class="nav-item">
                 <button type="submit" title="Logout" class="nav-link btn btn-link pt-0 pb-0">
-                    <i class="fa fa-sign-in-alt"></i>
+                    <i class="fa fa-light fa-sign-in-alt"></i>
                 </button>
             </li>
         </form>
@@ -38,7 +46,14 @@
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
-                <li class="nav-item">
+                    <li  class="nav-item">
+                        <img 
+                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png" 
+                            alt="Company logo"
+                            id="company-logo"
+                            >
+                    </li>
+                    <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa-light fa-house"></i>
                         <p>
@@ -247,6 +262,29 @@
                         <li class="nav-item">
                             <a href="{{ route('order.index') }}" class="nav-link">
                                 <p>Company reports</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa fa-light fa-cog" aria-hidden="true"></i>
+                        <p>
+                            Settings
+                             <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{{ route('order.index') }}" class="nav-link">
+                                <p>Company info</p>
+                            </a>
+                            <a href="{{ route('order.index') }}" class="nav-link">
+                                <p>E-mails</p>
+                            </a>
+                            <a href="{{ route('order.index') }}" class="nav-link">
+                                <p>Server information</p>
                             </a>
                         </li>
                     </ul>

@@ -81,7 +81,8 @@ class CustomerSummaryService
             $totalMarkup = $totalSoldPrice - $order->product->total_price;
             $singleMarkup = $singlePrice - $order->product->price;
             $package = $order->package ? $order->package->package_name : 'No Package';
-
+            $regularPrice = $totalSoldPrice / (1 - ($order->discount_percent / 100));
+            
             if (!isset($products[$package])) {
                 $products[$package] = [
                     'paid_sales_total_price' => 0,
@@ -113,10 +114,11 @@ class CustomerSummaryService
                 'total_markup' => number_format($totalMarkup, 2, '.', ''),
                 'single_markup' => number_format($singleMarkup, 2, '.', ''),
                 'main_product_id' => $order->product->id,
-                'discount' => $order->discount_percent
+                'discount' => $order->discount_percent,
+                'regular_price' => $regularPrice ? number_format($regularPrice, 2, '.', '') : 0
             ];
         }
-
+        //27.50÷(1−(1÷100))
         foreach ($products as &$package) {
             $package['paid_sales_total_price'] = number_format($package['paid_sales_total_price'], 2, '.', '');
             $package['sum'] = number_format($package['sum'], 2, '.', '');

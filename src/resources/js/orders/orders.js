@@ -153,6 +153,8 @@ $(document).ready(function () {
 
                     let editButton = '<a href='+ORDER_EDIT_ROUTE.replace(':id',row.id)+' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
 
+                    let previewButton = '<a title="Review" class="btn p-1"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
+
                     let payButton = "";
                     
                     if(row.status === "Received" && !row.is_paid) {
@@ -172,7 +174,7 @@ $(document).ready(function () {
                     </div>
                     `;
 
-                    return `${deleteFormTemplate} ${editButton} ${dropdown} ${payButton}`;
+                    return `${deleteFormTemplate} ${editButton} ${dropdown} ${payButton} ${previewButton}`;
                 }
             },
         ],

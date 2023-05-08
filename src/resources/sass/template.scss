@@ -29,6 +29,12 @@ body {
 	object-fit: contain;
 }
 
+#company-logo{
+	height: 100px;
+	width: 100%;
+	object-fit: contain;
+}
+
 select.form-control:not(.selectpicker) {
 	display: none;
 }
