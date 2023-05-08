@@ -23,6 +23,10 @@ class CreateOrdersTable extends Migration
                 ->constrained('products')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->foreignId('package_id')
+                ->constrained('packages')
+                ->onUpdate('cascade')
+                ->onDelete('cascade');    
 
             $table->string('invoice_number');
             $table->integer('sold_quantity');
@@ -30,6 +34,7 @@ class CreateOrdersTable extends Migration
             $table->decimal('total_sold_price', 8, 2);
             $table->integer('discount_percent');
             $table->date('date_of_sale');
+            $table->string('tracking_number');
             $table->timestamps();
         });
     }

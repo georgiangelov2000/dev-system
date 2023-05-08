@@ -83,7 +83,11 @@ $(document).ready(function () {
                 orderable: false,
                 name: "country",
                 render: function (data, type, row) {
-                    return row.country ? row.country.name : "";
+                    if(row.country) {
+                        return `<span title="${row.country.name}" class="flag-icon flag-icon-${row.country.short_name.toLowerCase()}"></span>`
+                    } else {
+                        return ``;
+                    }
                 }
             },
             {
@@ -108,7 +112,8 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     let deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentCustomer(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash-can text-danger"></i></a>';
                     let editButton = '<a data-id=' + row.id + ' href="'+CUSTOMER_EDIT_ROUTE.replace(':id',row.id)+'" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
-                    return `${deleteButton} ${editButton}`;
+                    let ordersButton = "<a data-id=' + row.id + ' title='Orders'> <i class='text-success fa fa-light fa-shopping-cart' aria-hidden='true'></i>  </a>"
+                    return `${deleteButton} ${editButton} ${ordersButton}`;
                 }
             }
 

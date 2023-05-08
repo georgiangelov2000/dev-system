@@ -31,7 +31,6 @@ class PackageApiController extends Controller
         foreach ($result as $key => $package) {
             $package->package_type = array_key_exists($package->package_type, config('statuses.package_types')) ? config('statuses.package_types.' . $package->package_type) : $package->package_type;
             $package->delievery_method = array_key_exists($package->delievery_method, config('statuses.delievery_methods')) ? config('statuses.delievery_methods.' . $package->delievery_method) : $package->delievery_method;
-
         }
         
         return response()->json(['data' => $result],200);

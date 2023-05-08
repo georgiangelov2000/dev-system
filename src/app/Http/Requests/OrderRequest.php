@@ -29,6 +29,7 @@ class OrderRequest extends FormRequest
             'single_sold_price.*' => 'required',
             "total_sold_price.*" => 'required',
             "discount_percent.*" => 'required',
+            "tracking_number" => "required|string"
         ];
     }
 }

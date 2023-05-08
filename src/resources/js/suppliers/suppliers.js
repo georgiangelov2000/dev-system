@@ -85,7 +85,11 @@ $(document).ready(function () {
                 orderable: false,
                 name: "country",
                 render: function (data, type, row) {
-                    return row.country ? row.country.name : "";
+                    if(row.country) {
+                        return `<span title="${row.country.name}" class="flag-icon flag-icon-${row.country.short_name.toLowerCase()}"></span>`
+                    } else {
+                        return ``;
+                    }
                 }
             },
             {

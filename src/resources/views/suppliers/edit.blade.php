@@ -14,10 +14,10 @@
                 @csrf
                 @method('PUT')
                 <div class="row w-100 mb-2">
-                    @if ($relatedRecords['image'])
+                    @if ($supplier->image)
                         <div class="col-3">
                             <img class="card card-widget widget-user w-100 h-100 m-0"
-                                src="{{ $relatedRecords['image'] ? $relatedRecords['image']->path . $relatedRecords['image']->name : 'https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg' }}" />
+                                src="{{$supplier->image->path . $supplier->image->name}}" />
                         </div>
                     @endif
                     <div class="col-3 d-none imagePreview">
@@ -37,7 +37,7 @@
                     </div>
                     <div class="custom-file col-12">
                         <input type="file" class="custom-file-input" name="image" id="image" accept="image/*"
-                            value="{{ $relatedRecords['image'] ? $relatedRecords['image']->path . $relatedRecords['image']->name : '' }}">
+                            value="{{ $supplier ? $supplier->path . $supplier->name : '' }}">
                         <label class="custom-file-label" for="customFile">Choose file</label>
                         @error('image')
                             <span class="text-danger">{{ $message }}</span>
@@ -126,7 +126,7 @@
                         data-actions-box="true" data-dropup-auto="false" multiple data-selected-text-format="count > 5">
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}"
-                                {{ in_array($category->id, $relatedRecords['categories']) ? 'selected' : '' }}>
+                                {{ in_array($category->id, $related_categories) ? 'selected' : '' }}>
                                 {{ $category->name }}</option>
                         @endforeach
                     </select>

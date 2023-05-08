@@ -18,19 +18,6 @@ class SupplierService
         $this->supplier = $supplier;
     }
 
-
-    public function getEditData()
-    {
-        $supplier = $this->supplier->load('categories', 'image');
-
-        $result = [
-            'categories' => $supplier->categories->pluck('id')->toArray(),
-            'image' => $supplier->image
-        ];
-    
-        return $result;
-    }
-
     public function imageUploader($file)
     {
         $imageInfo = @getimagesize($file);

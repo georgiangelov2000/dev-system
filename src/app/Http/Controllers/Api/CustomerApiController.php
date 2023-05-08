@@ -44,7 +44,7 @@ class CustomerApiController extends Controller
             'state_id',
             'country_id'
         )
-        ->with('state','country','image');
+        ->with(['state:id,country_id,name','country:id,name,country_code,short_name','image']);
     }
 
     private function customerByCountry($country, $query) {

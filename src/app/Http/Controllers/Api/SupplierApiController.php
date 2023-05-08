@@ -39,7 +39,8 @@ class SupplierApiController extends Controller {
                         ->with([
                             'states:id,name',
                             'image:id,supplier_id,path,name',
-                            'country:id,name',
+                            'country:id,name,short_name',
+                            'categories:id,name'
                         ])
                         ->select([
                             'id',
@@ -52,10 +53,7 @@ class SupplierApiController extends Controller {
                             'notes',
                             'state_id',
                             'country_id'
-                        ])
-                        ->with(['categories' => function ($query) {
-                                $query->select('suppliers_categories.id', 'name');
-                            }]);
+                        ]);
     }
 
     private function supplierByCountry($country, $query) {

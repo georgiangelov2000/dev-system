@@ -9,6 +9,7 @@ use App\Services\SupplierService;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use App\Helpers\LoadStaticData;
+use App\Models\Category;
 use Illuminate\Support\Facades\Log;
 
 class SupplierController extends Controller {
@@ -78,21 +79,24 @@ class SupplierController extends Controller {
     {
         $service = new SupplierService($supplier);
 
+        // Load all categories
         $categories = $this->staticDataHelper->loadCallCategories();
 
         if($supplier->country_id) {
-            $callStatesAndCountries = $this->staticDataHelper->callStatesAndCountries($supplier->country_id);
-
+            $callStatesAndCountries = $this->staticDataHelper->callStatesAndCountries(
+                $supplier->country_id
+            );
             $states = $callStatesAndCountries["states"];
-
             $countries = $callStatesAndCountries["countries"];
         }
-                
+
+        $supplier = $supplier->load('image');
+
         return view('suppliers.edit', compact('supplier'), [
             'countries' => $countries,
             'states' => $states,
             'categories' => $categories,
-            'relatedRecords' => $service->getEditData()
+            'related_categories' => $supplier->categories->pluck('id')->toArray()
         ]);
     }
 

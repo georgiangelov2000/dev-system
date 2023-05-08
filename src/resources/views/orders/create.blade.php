@@ -17,7 +17,7 @@
 
                     <div class="row flex-wrap">
 
-                        <div class="form-group col-3">
+                        <div class="col-3">
                             <label for="">Customer</label>
                             <select name="customer_id" id="" class="form-control selectCustomer" data-live-search="true">
                             </select>
@@ -26,7 +26,7 @@
                             @enderror
                         </div>
         
-                        <div class="form-group col-3">
+                        <div class="col-3">
                             <label>Date order:</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -41,9 +41,9 @@
                             @enderror
                         </div>
         
-                        <div class="form-group col-3">
-                            <label for="">Order status</label>
-                            <select name="status" id="" class="form-control selectType">
+                        <div class="col-3">
+                            <label for="order_status">Order status</label>
+                            <select name="status" id="order_status" class="form-control selectType">
                                 @foreach ( config('statuses.order_statuses') as $key => $status  )
                                     <option value="{{$key}}">{{$status}}</option>
                                 @endforeach
@@ -51,6 +51,16 @@
                             @error('status')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
+                        </div>
+
+                        <div class="col-3">
+                            <label for="order_status">Tracking number</label>
+                            <div class="input-group mb-3">
+                                <input type="text" name="tracking_number" class="form-control rounded-0">
+                                <span class="input-group-append">
+                                    <button type="button" id="generateCode" class="btn btn-info btn-flat">Generate</button>
+                                </span>
+                            </div>
                         </div>
         
                         <div class="form-group col-12">

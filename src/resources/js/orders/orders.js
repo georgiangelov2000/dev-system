@@ -6,6 +6,9 @@ $(document).ready(function () {
     let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
     let bootstrapOrderStatus = $('.bootstrap-select .selectType');
     let bootstrapSelectAction = $('.bootstrap-select .selectAction');
+    let modal = $('#transaction_modal');
+    let payForm = $('#payOrderForm');
+    let payButton = $('#savePayOrder');
 
     $('input[name="datetimes"]').daterangepicker({
         timePicker: false,
@@ -15,6 +18,10 @@ $(document).ready(function () {
             format: 'YYYY-MM-DD'
         }
     });
+
+    $('.datepicker').datepicker({
+        format: 'mm/dd/yyyy'
+    }).datepicker('setDate', new Date());
 
     let table = $('#ordersTable');
     let applyBtn = $('.applyBtn');
@@ -76,13 +83,17 @@ $(document).ready(function () {
                 width: '10%',
                 orderable: false,
                 name: "single_sold_price",
-                data: "single_sold_price"
+                render: function(data,type,row) {
+                    return `<span>${row.single_sold_price} €</span>`
+                }
             },
             {
                 width: '10%',
                 orderable: false,
                 name: "total_sold_price",
-                data: "total_sold_price"
+                render: function(data,type,row) {
+                    return `<span>${row.total_sold_price} €</span>`
+                }
             },
             {
                 width: '10%',
@@ -99,18 +110,31 @@ $(document).ready(function () {
                 data: "date_of_sale"
             },
             {
-                width: '10%',
+                width: '5%',
                 orderable: false,
                 name: "status",
                 render: function (data, type, row) {
-                    if (row.status === 1) {
+                    if (row.status === 'Received') {
                         return '<i title="Reveived" class="fa-light fa-check"></i>';
                     }
-                    else if (row.status === 3) {
+                    else if (row.status === 'Pending') {
                         return '<i title="Pending" class="fa-light fa-loader"></i>'
                     }
-                    else if (row.status === 4) {
+                    else if (row.status === 'Ordered') {
                         return '<i title="Ordered" class="fa-light fa-truck"></i>'
+                    }
+                }
+            },
+            {
+                width: '5%',
+                orderable: false,
+                name: "is_paid",
+                render: function (data, type, row) {
+                    console.log(row.is_paid);
+                    if(row.is_paid) {
+                        return '<span class="text-success">Yes</span>';
+                    } else {
+                        return '<span class="text-danger">No</span>';
                     }
                 }
             },
@@ -118,6 +142,7 @@ $(document).ready(function () {
                 width: '10%',
                 orderable: false,
                 render: function (data, type, row) {
+                    console.log(row.is_paid);
                     let deleteFormTemplate = "\
                     <form style='display:inline-block;' id='delete-form' action=" + ORDER_DELETE_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.invoice_number + ">\
                         <input type='hidden' name='_method' value='DELETE'>\
@@ -127,6 +152,12 @@ $(document).ready(function () {
                     ";
 
                     let editButton = '<a href='+ORDER_EDIT_ROUTE.replace(':id',row.id)+' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+
+                    let payButton = "";
+                    
+                    if(row.status === "Received" && !row.is_paid) {
+                        payButton = `<a onclick="payment(this)" order-price="${row.total_sold_price}" customer-id=${row.customer.id} order-id=${row.id} class='btn p-0' title="Payment"><i class="fa-thin fa-cash-register"></i></a>`;
+                    }
 
                     let dropdown = `
                     <div class="dropdown d-inline">
@@ -141,7 +172,7 @@ $(document).ready(function () {
                     </div>
                     `;
 
-                    return `${deleteFormTemplate} ${editButton} ${dropdown}`;
+                    return `${deleteFormTemplate} ${editButton} ${dropdown} ${payButton}`;
                 }
             },
         ],
@@ -330,5 +361,45 @@ $(document).ready(function () {
             }
         });
     };
+
+    window.payment = function(e) {
+        modal.modal('show');
+        let order =$(e).attr('order-id');
+        let price = $(e).attr('order-price');
+        let customer = $(e).attr('customer-id');
+
+        modal.find('form input[name="price"]').val(price);
+        modal.find('form input[name="order_id"]').val(order);
+        modal.find('form input[name="customer_id"]').val(customer);
+    }
+
+    $('.modalCloseBtn').on('click', function () {
+        modal.modal('hide');
+    });
+
+    payButton.on('click',function(e){
+        e.preventDefault();
+        
+        let dateInput = payForm.find('input[name="date_of_payment"]');
+        let priceInput = payForm.find('input[name="price"]');
+        let orderInput = payForm.find('input[name="order_id"]');
+        let customerInput = payForm.find('input[name="customer_id"]');
+
+        let date = moment(dateInput.val()).format('YYYY-MM-DD');
+        let price = parseFloat(priceInput.val()).toLocaleString('en-US');
+        let orderId = parseInt(orderInput.val());
+        let customerId = parseInt(customerInput.val());
+
+        let url = ORDER_PAY_ROUTE.replace(':id', orderId);
+
+        APIPOSTCALLER(url,{'customer':customerId,'price':price,'date':date},function(response){
+            toastr['success'](response.message);
+            table.DataTable().ajax.reload();
+            modal.modal('hide');
+        },function(error){
+            toastr['error'](error.message);
+        })
+
+    })
 
 });

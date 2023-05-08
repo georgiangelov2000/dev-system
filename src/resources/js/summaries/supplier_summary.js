@@ -35,62 +35,85 @@ $(function () {
         let supplier = bootstrapSelectSupplier.selectpicker('val');
         let date = dateRangePicker.val();
 
+         $('#loader').show();
+
         APIPOSTCALLER(SUMMARY, { "supplier": supplier, 'date': date }, function (response) {
             let respData = response;
 
             if (respData) {
                 summaryTemplate(respData);
             }
+
+            $('#loader').hide();
         }, function (error) {
             console.log(error);
         })
     })
 
-    let summaryTemplate = function (data) {
+    const summaryTemplate = function (data) {
+        const summaryContainer = $('#summary-container');
+        const tableClass = 'table-summary';
+
         let template = '';
 
-        template += `<div class="summary">
-        <div>
-            <span>Total products:</span>
-            <strong>${data.products_count}</strong>
-        </div>
+        template += '<div class="summary">';
 
-        <div>
-            <span>Date range: </span>
-            <strong>${data.date}</strong>
-        </div>
-    
-        <div>
-            <span>Due amount: </span>
-            <strong class="text-danger"> - ${data.total_sales} <i class="fa fa-eur text-dark" aria-hidden="true"></i> </strong>
-        </div>`;
+            template +=`
+                <div>
+                  <span>Total products:</span>
+                  <strong>${data.products_count}</strong>
+                </div>
+                <div>
+                    <span>Date range: </span>
+                    <strong>${data.date}</strong>
+                </div>
+                <div>
+                    <span>Due amount: </span>
+                    ${data.total_sales != 0  ?  '<strong class="text-danger">  - '+ data.total_sales +' </strong>' : '<strong>' + data.total_sales + ' </strong>'}€
+                </div>`;
 
-        template+=`<table class="table table-sm table-bordered table-hover col-6">
-        <thead>
+                template+=`
+                <div style="background-color:rgb(244, 246, 249);" class="p-4 rounded m-2">
+                    <table class="${tableClass} table table-sm table-bordered table-without-border table-hover col-6">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Single price</th>
+                                <th>Total price</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${summaryTable(data.products)}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
+
+        summaryContainer.html(template); 
+   
+        const dataTables = document.getElementsByClassName(tableClass);
+
+        for (let i = 0; i < dataTables.length; i++) {
+            new DataTable(dataTables[i]);
+        }
+
+    }
+
+    const summaryTable = function (products) {
+        let tableHtml = '';
+
+        products.forEach((product)=>{
+            tableHtml += `
             <tr>
-                <th>Product</th>
-                <th>Single price</th>
-                <th>Total price</th>
-                <th>Quantity</th>
-            </tr>
-        </thead>
-        <tbody>`;
+                <td>${product.name}</td>
+                <td>${product.price} €</td>
+                <td>${product.total_price} €</td>
+                <td>${product.quantity}</td>
+            </tr>`
+        });
 
-        data.products.forEach(product => {
-            template += `
-                <tr>
-                    <td>${product.name}</td>
-                    <td>${product.price} <i class="fa fa-eur" aria-hidden="true"></i></td>
-                    <td>${product.total_price} <i class="fa fa-eur" aria-hidden="true"></i></td>
-                    <td>${product.quantity}</td>
-                </tr>`;
-        })
-
-        template += `</tbody></table>`;
-
-        template += `</div>`;
-
-        // Append the template to a container element
-        document.getElementById('summary-container').innerHTML = template;
-    };
+        return tableHtml;
+    }
+    
 });

@@ -17,6 +17,21 @@
                             in general.</span>
                     </div>
                 </div>
+                <div class="col-12 mb-3 pl-0">
+                    <div class="col-12">
+                        <h6 class="font-weight-bold">Legend:</h6>
+                    </div>
+                    <div class="col-12">
+                        Total sales
+                        <span>-</span>
+                        <span>The total sum of sales for each package and status</span>
+                    </div>
+                    <div class="col-12">
+                        Paid sales
+                        <span>-</span>
+                        <span>Sales that have been paid by the customer and received</span>
+                    </div>
+                </div>                  
                 <form action="" id="filterForm">
                     <div class="form-row">
                         <div class="col-3">
@@ -33,7 +48,7 @@
                             <div class="d-flex align-items-center">
                                 <input type="text" class="form-control pull-right" name="datetimes" />
                             </div>
-                        </div>
+                        </div>                    
                         <div class="col-3">
                             <div class="col mb-2">
                                 <label></label>
@@ -52,45 +67,14 @@
                             <label class="form-check-label"></label>
                         </div>
                     </div>
+                    <div id="loader" class="spinner-border text-dark" role="status" style="display: none;">
+                        <span class="sr-only">Loading...</span>
+                    </div>    
                 </div>
                 <div id="summary-container"></div>
             </div>
         </div>
     </div>
-
-    <div id="transaction_modal" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Marked paid order</h5>
-              <button type="button" class="close modalCloseBtn" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Payment date</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">
-                                <i class="far fa-calendar-alt"></i>
-                            </span>
-                        </div>
-                        <input type="text" class="form-control datepicker" name="date_of_payment">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Price</label>
-                    <input type="text" id="price" class="form-control" value="" >
-                </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary">Save changes</button>
-              <button type="button" class="btn btn-secondary modalCloseBtn" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>  
 
     @push('scripts')
         <script type="text/javascript">

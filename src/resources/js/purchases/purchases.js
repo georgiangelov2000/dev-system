@@ -188,7 +188,7 @@ $(function () {
                         <form>\
                     ";
 
-                    let previewLink = "<a title='Preview' href="+PREVIEW_ROUTE.replace(':id', row.id)+" class='btn p-0'><i class='fa fa-eye text-info' aria-hidden='true'></i></a>"
+                    let previewLink = "<a title='Preview' href="+PREVIEW_ROUTE.replace(':id', row.id)+" class='btn p-0'><i class='fa fa-light fa-eye text-info' aria-hidden='true'></i></a>"
 
                     let editButton = '<a href=' + EDIT_PRODUCT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + ' class="btn p-1" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
                     return `${deleteFormTemplate} ${editButton} ${previewLink}`;

@@ -79,6 +79,21 @@ $(function(){
     })
   })
 
+  $('#generateCode').on('click', function () {
+    // Define the character set that you want to use
+    var charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var length = 20;
+
+    var randomString = '';
+    for (var i = 0; i < length; i++) {
+        var randomIndex = Math.floor(Math.random() * charset.length);
+        randomString += charset[randomIndex];
+    }
+
+    $('input[name="tracking_number"]').val(randomString);
+
+});
+
   bootstrapProduct.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
     let selectedOption = $(this).find('option').eq(clickedIndex);
     let { name, quantity, singlePrice, totalPrice } = selectedOption.data();

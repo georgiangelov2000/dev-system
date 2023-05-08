@@ -52,6 +52,9 @@
                             <label class="form-check-label"></label>
                         </div>
                     </div>
+                    <div id="loader" class="spinner-border text-dark" role="status" style="display: none;">
+                        <span class="sr-only">Loading...</span>
+                    </div>  
                 </div>
                 <div id="summary-container"></div>
             </div>

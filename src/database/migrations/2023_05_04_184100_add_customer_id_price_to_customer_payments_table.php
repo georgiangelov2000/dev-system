@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCustomerPaymentsTable extends Migration
+class AddCustomerIdPriceToCustomerPaymentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,12 @@ class CreateCustomerPaymentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('customer_payments', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('order_id');
-            $table->foreign('order_id')
-            ->references('id')
-            ->on('orders')
+        Schema::table('customer_payments', function (Blueprint $table) {
+            $table->decimal('price',8,2);
+            $table->foreignId('customer_id')
+            ->constrained('customers')
             ->onUpdate('cascade')
             ->onDelete('cascade');
-            $table->date('date_of_payment');
         });
     }
 
@@ -32,6 +29,8 @@ class CreateCustomerPaymentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('customer_payments');
+        Schema::table('customer_payments', function (Blueprint $table) {
+            Schema::dropIfExists('customer_id');
+        });
     }
 }

@@ -18,6 +18,7 @@
         <link type="text/css" href="{{ mix('css/datepicker.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/daterangepicker.min.css') }}" rel="stylesheet" />
         <link type="text/css" href="{{ mix('css/icheck-bootstrap.min.css') }}" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" />
         <link rel="icon" type="image/png" href="/storage/images/static/favicon-32x32.png">
     </head>
     <!--"sidebar-mini layout-fixed"-->

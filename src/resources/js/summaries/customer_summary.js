@@ -22,7 +22,6 @@ $(function () {
     let dateRangeCol = $('.dateRange');
     let bootstrapSelectCustomer = $('.bootstrap-select .selectCustomer');
     let form = $('#filterForm');
-    let modal = $('#transaction_modal');
 
     disabledOption.on('click', function () {
         if ($(this).is(':checked')) {
@@ -41,133 +40,163 @@ $(function () {
         let customer = bootstrapSelectCustomer.selectpicker('val');
         let date = dateRangePicker.val();
 
+        $('#loader').show();
+
         APIPOSTCALLER(SUMMARY, { "customer": customer, 'date': date }, function (response) {
             let respData = response;
 
             if (respData) {
                 summaryTemplate(respData);
             }
+
+            $('#loader').hide();
         }, function (error) {
             console.log(error);
         })
 
     })
 
-    let summaryTemplate = function (data) {
+
+    const summaryTemplate = function (data) {
+        
+        const summaryContainer = document.getElementById('summary-container');
+        const tableClass = 'table-summary';
+    
         let template = '';
+    
+        template += '<div class="summary">';
+    
+        for (const key in data.products) {
 
-        template += `<div class="summary">
-            <div>
-                <span>Total orders:</span>
-                <strong>${data.orders_count}</strong>
-            </div>`;
+            template += `${renderPackageData(data.products[key],key)}`;
 
-        if (data.date) {
-            template += `
-                <div>
-                    <span>Date range: </span>
-                    <strong>${data.date}</strong>
-                </div>`
+            const product = data.products[key];
+            
+            if (product.status) {           
+
+                const statuses = Object.keys(product.status);
+
+                statuses.forEach((status) => {
+
+                    const statusData = product.status[status];
+                    const products = statusData.products;
+                    
+                    if (products.length > 0) {
+                        template+=`
+                            ${renderStatusData(statusData,status)}
+                            <div style="background-color:rgb(244, 246, 249);" class="p-4 rounded m-2">
+                                <table class="${tableClass} table table-sm table-bordered table-without-border table-hover col-6">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Single sold price</th>
+                                            <th>Total sold price</th>
+                                            <th>Sold quantity</th>
+                                            <th>Single markup</th>
+                                            <th>Total markup</th>
+                                            <th>Discount %</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${renderProductTable(products)}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        `;
+                    }
+                });
+            }
         }
-
-        template += `
+    
+        template += '</div>';
+    
+        summaryContainer.innerHTML = template;
+    
+        const dataTables = document.getElementsByClassName(tableClass);
+        
+        for (let i = 0; i < dataTables.length; i++) {
+            new DataTable(dataTables[i], {
+                columns: [
+                    { orderable: false },
+                    { orderable: false }, 
+                    { orderable: false },
+                    { orderable: false },
+                    { orderable: false },
+                    { orderable: false },
+                    { orderable: false },
+                    { orderable: false },
+                ]
+            });
+        }
+    }
+    
+    const renderPackageData = (productData,packageKey) => {
+        return `
+        <h6 title="Package" class="mb-0 mt-2">
+                <strong class="badge bg-primary">
+                    ${packageKey}
+                </strong>
+        </h6> 
+        <div class="mb-2">
+            <div>
+                <span>Orders count:</span>
+                <strong> ${productData.orders_count}</strong>
+            </div>
             <div>
                 <span>Total sales: </span>
-                <strong class="text-success"> + ${data.total_sales} <i class="fa fa-eur text-dark" aria-hidden="true"></i> </strong>
-            </div>`
-
-        template+=`<div>`
-
-        for(let key in data.products){
-            template+=`
-                <h6 title="Package" class="mb-0 mt-2">
-                    <strong class="badge bg-primary">
-                        ${key}
+                <strong class="text-success"> + ${productData.sum}</strong> €
+            </div>
+            <div>
+                <span>Paid sales: </span>
+                <strong class="text-success"> + ${productData.paid_sales_total_price}</strong> €
+            </div>
+        </div>
+        `;
+    }
+    
+    const renderStatusData = (statusData,status) => {
+        return `
+            <div class="col">
+                <h6 title="Status" class="mb-0">
+                    <strong class="badge bg-secondary">
+                        ${status} (${statusData.products.length})
                     </strong>
-                </h6>
+                </h6> 
                 <div>
                     <span>Orders count:</span>
-                    <strong> ${data.products[key].orders_count}</strong>
+                    <strong> ${statusData.orders_count}</strong>
                 </div>
                 <div>
-                    <span>Total sales: </span>
-                    <strong class="text-success"> + ${data.products[key].sum} <i class="fa fa-eur text-dark" aria-hidden="true"></i></strong>
-                </div>`;
-            
-                if (data.products[key].status) {
-                    let keys = Object.keys(data.products[key].status);
-                    keys.forEach(status => {
-                      let products = data.products[key].status[status].products;
-                      let sum = data.products[key].status[status].sum;
-                      let orders_counts = data.products[key].status[status].orders_count;
-
-                      if (products.length > 0) {
-                        template += `
-                          <div>
-                            <h6 title="Status">
-                              <strong class="badge bg-secondary">
-                                ${status} (${products.length})
-                              </strong>
-                            </h6>
-                            <div>
-                                <span>Orders count:</span>
-                                <strong> ${orders_counts}</strong>
-                            </div>
-                            <div>
-                                <span>Total sales:</span>
-                                <strong class="text-success"> ${sum}  <i class="fa fa-eur text-dark" aria-hidden="true"></i></strong>
-                            </div>
-                            <table class="table table-sm table-bordered table-without-border table-hover col-6">
-                              <thead>
-                                <tr>
-                                  <th>Name</th>
-                                  <th>Single price</th>
-                                  <th>Total sold price</th>
-                                  <th>Sold quantity</th>
-                                  <th>Total mark up</th>
-                                  <th>Single mark up</th>
-                                  <th>Actions</th>
-                                </tr>
-                              </thead>
-                              <tbody>`;
-                        products.forEach(product => {
-                          template += `
-                            <tr data_id='${product.id}' data_price ='${product.total_sold_price}' >
-                              <td>${product.name}</td>
-                              <td>${product.single_sold_price} <i class="fa fa-eur" aria-hidden="true"></i></td>
-                              <td>${product.total_sold_price} <i class="fa fa-eur" aria-hidden="true"></i></td>
-                              <td>${product.sold_quantity}</td>
-                              <td class="text-success font-weight-bold"> + ${product.total_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
-                              <td class="text-success font-weight-bold"> + ${product.single_markup} <i class="fa fa-eur text-dark" aria-hidden="true"></i></td>
-                              <td>
-                                <a title='Preview' href="${PREVIEW_ROUTE.replace(':id', product.main_product_id)}" class='btn p-0'><i class='fa fa-eye text-info' aria-hidden='true'></i></a>
-                                <a onclick="payment(this)" class='btn p-0' title="Payment"><i class="fa-thin fa-money-check-dollar-pen"></i></a>
-                              </td>
-                            </tr>`;
-                        });
-                        template += `
-                              </tbody>
-                            </table>
-                          </div>`;
-                      }
-                    });
-                  }       
-        }
-        template+='</div>';
-        template += `</div>`;
-
-        // Append the template to a container element
-        document.getElementById('summary-container').innerHTML = template;
+                    <span>Total sales:</span>
+                    <strong class="text-success"> ${statusData.sum} </strong> €
+                </div>
+            </div>
+        `;
     }
-
-    window.payment = function(e) {
-        modal.modal('show');
-        let price = $(e).closest('tr').attr('data_price');
-        modal.find('input[id="price"]').val(price);
+    
+    const renderProductTable = (products) => {
+        let tableHtml = '';
+    
+        products.forEach((product) => {
+            tableHtml += `
+                <tr data_id="${product.id}" data_price="${product.total_sold_price}">
+                    <td>${product.name}</td>
+                    <td>${product.single_sold_price} €</td>
+                    <td>${product.total_sold_price} €</td>
+                    <td>${product.sold_quantity}</td>
+                    <td>${product.single_markup} €</td>
+                    <td>${product.total_markup} €</td>
+                    <td>${product.discount}</td>
+                    <td>
+                        <a title='Preview' href="${PREVIEW_ROUTE.replace(':id', product.main_product_id)}" class='btn p-0'><i class='fa fa-light fa-eye text-info' aria-hidden='true'></i></a>
+                    </td>
+                </tr>
+            `;
+        });
+    
+        return tableHtml;
     }
-
-    $('.modalCloseBtn').on('click', function () {
-        modal.modal('hide');
-    });
 
 });

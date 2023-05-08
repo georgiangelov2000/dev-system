@@ -14,6 +14,10 @@ return [
         1 => "Ground",
         2 => "Air",
         3 => "Sea"
+    ],
+    'is_paid_statuses' => [
+        0 => false,
+        1 => true
     ]
 ]
 

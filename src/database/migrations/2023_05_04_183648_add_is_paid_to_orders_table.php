@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPackageIdToOrdersTable extends Migration
+class AddIsPaidToOrdersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,10 +14,7 @@ class AddPackageIdToOrdersTable extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->foreignId('package_id')
-            ->constrained('packages')
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
+            $table->tinyInteger('is_paid')->comment('1=paid,0=not paid')->default(0);
         });
     }
 
@@ -29,7 +26,7 @@ class AddPackageIdToOrdersTable extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            Schema::dropIfExists('package_id');
+            Schema::dropIfExists('is_paid');
         });
     }
 }

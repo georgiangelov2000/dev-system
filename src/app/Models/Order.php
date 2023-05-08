@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\CustomerPayments;
 
 class Order extends Model
 {
@@ -30,6 +31,7 @@ class Order extends Model
      *
      * @var array
      */
+
     protected $fillable = [
         "customer_id",
         "product_id",
@@ -41,7 +43,8 @@ class Order extends Model
         "single_sold_price",
         "total_sold_price",
         "discount_percent",
-        "package_id"
+        "package_id",
+        "tracking_number"
     ];
 
     public function customer()
@@ -56,5 +59,9 @@ class Order extends Model
 
     public function package(){
         return $this->belongsTo(Package::class);
+    }
+
+    public function customerPayments(){
+        return $this->hasMany(CustomerPayments::class);
     }
 }

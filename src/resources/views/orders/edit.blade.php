@@ -59,6 +59,16 @@
                             @enderror
                         </div>
 
+                        <div class="col-3">
+                            <label for="order_status">Tracking code</label>
+                            <div class="input-group mb-3">
+                                <input type="text" name="tracking_number" value="{{$currentOrder->tracking_number}}" class="form-control rounded-0">
+                                <span class="input-group-append">
+                                    <button type="button" id="generateCode" class="btn btn-info btn-flat">Generate</button>
+                                </span>
+                            </div>
+                        </div>
+
                     </div>
 
                     <table class="table table-hover productOrderTable ">

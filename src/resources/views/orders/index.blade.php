@@ -86,6 +86,7 @@
                             <th>Discount</th>
                             <th>Date of sale</th>
                             <th>Status</th>
+                            <th>Paid</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -93,6 +94,44 @@
             </div>
         </div>
     </div>
+    <div id="transaction_modal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Marked paid order</h5>
+              <button type="button" class="close modalCloseBtn" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST" id="payOrderForm">
+                    @csrf
+                    <div class="form-group">
+                        <label>Payment date</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="far fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                            <input type="text" class="form-control datepicker" name="date_of_payment">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="text" name="price" class="form-control" value="" >
+                    </div>
+                    <input type="hidden" name="order_id" value="">
+                    <input type="hidden" name="customer_id" value="">                  
+                </form>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary" id="savePayOrder">Save changes</button>
+              <button type="button" class="btn btn-secondary modalCloseBtn" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>  
     @push('scripts')
         <script type="text/javascript" src="{{ mix('js/orders/orders.js') }}"></script>
         <script type="text/javascript">
@@ -103,6 +142,7 @@
             let ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
             let EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
             let CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
+            let ORDER_PAY_ROUTE = "{{route('order.pay',':id')}}";
         </script>
     @endpush
 @endsection

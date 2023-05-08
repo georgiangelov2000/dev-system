@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Order;
 use App\Helpers\LoadStaticData;
+use DateTime;
 
 class OrderController extends Controller
 {
@@ -34,30 +35,39 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
+            $orders = [];
+
             foreach ($data['product_id'] as $key => $productId) {
 
-                $order = new Order();
+                $order = [
+                    'customer_id' => $data['customer_id'],
+                    'product_id' => $productId,
+                    'invoice_number' => $data['invoice_number'][$key],
+                    'sold_quantity' => $data['sold_quantity'][$key],
+                    'single_sold_price' => $data['single_sold_price'][$key],
+                    'total_sold_price' => $data['total_sold_price'][$key],
+                    'discount_percent' => $data['discount_percent'][$key],
+                    'date_of_sale' => date('Y-m-d', strtotime($data['date_of_sale'])),
+                    'status' => $data['status'],
+                    'tracking_number' => $data['tracking_number'],
+                    'package_id' => 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
 
-                $order->customer_id = $data['customer_id'];
-                $order->product_id = $productId;
-                $order->invoice_number = $data['invoice_number'][$key];
-                $order->sold_quantity = $data['sold_quantity'][$key];
-                $order->single_sold_price = floatval($data['single_sold_price'][$key]);
-                $order->total_sold_price = floatval($data['total_sold_price'][$key]);
-                $order->discount_percent = $data['discount_percent'][$key];
-                $order->date_of_sale = date('Y-m-d', strtotime($data['date_of_sale']));
-                $order->status = $data['status'];
+                $orders[] = $order;
 
-                $order->save();
-
-                DB::commit();
             }
+
+            DB::table('orders')->insert($orders);
+
+            DB::commit();
+
             return redirect()->route('order.index')->with('success', 'Order has been created');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
             Log::error($e->getMessage());
-            return back()->withInput()->with('error', 'Failed to create order');
+            return back()->withInput()->with('error', 'Order has not been created');
         }
     }
 
@@ -94,7 +104,7 @@ class OrderController extends Controller
         try {
 
             $validated = $request->validated();
-
+            
             $order->customer_id = $validated['customer_id'];
             $order->date_of_sale = date('Y-m-d', strtotime($validated['date_of_sale']));
             $order->status = $validated['status'];
@@ -103,19 +113,59 @@ class OrderController extends Controller
                 $order->product->id = $validated['product_id'][$index];
                 $order->invoice_number = $validated['invoice_number'][$index];
                 $order->sold_quantity = $validated['sold_quantity'][$index];
-                $order->single_sold_price = floatval($validated['single_sold_price'][$index]);
-                $order->total_sold_price = floatval($validated['total_sold_price'][$index]);
+                $order->single_sold_price = $validated['single_sold_price'][$index];
+                $order->total_sold_price = $validated['total_sold_price'][$index];
                 $order->discount_percent = $validated['discount_percent'][$index];
+                $order->tracking_number = $validated['tracking_number'];
             }
 
             $order->save();
             DB::commit();
             return redirect()->route('order.index')->with('success', 'Order has been updated');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
             Log::error($e->getMessage());
             return back()->withInput()->with('error', 'Failed to update order');
+        }
+    }
+
+    public function markAsPaid(Order $order, Request $request)
+    {
+        if ($order->is_paid) {
+            return response()->json(['message' => 'This order has already been paid'], 200);
+        }
+    
+        $validatedData = $request->validate([
+            'price' => 'required|numeric|min:0',
+            'customer' => 'required|exists:customers,id',
+            'date' => 'required|date',
+        ]);
+
+        $date = new DateTime($validatedData['date']);
+        $formatted_date = $date->format('Y-m-d');
+
+        DB::beginTransaction();
+    
+        try {
+            $order->is_paid = true;
+            $order->save();
+    
+            $order->customerPayments()->create([
+                'customer_id' => $validatedData['customer'],
+                'price' => $validatedData['price'],
+                'date_of_payment' => $formatted_date
+            ]);
+    
+            DB::commit();
+    
+            return response()->json(['message' => 'Payment for order has been successfully processed'], 200);
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            DB::rollback();
+    
+            Log::error($e->getMessage());
+    
+            return response()->json(['message' => 'Payment for order has not been successfully processed'], 500);
         }
     }
 

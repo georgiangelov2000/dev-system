@@ -52,8 +52,6 @@ class LoadStaticData
 
         if ($option == 'unnasigned') {
             $query->whereDoesntHave('suppliers');
-        } else {
-            $query->get();
         }
 
         return $query->get();
