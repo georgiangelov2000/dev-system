@@ -187,35 +187,37 @@ class CustomerController extends Controller
             Log::error($e->getMessage());
             return back()->withInput()->with('error', 'Orders has not been updated');
         }
-        }
-    
+    }
 
     public function delete(Customer $customer)
-    {
+{
+    DB::beginTransaction();
+    try {
 
-        DB::beginTransaction();
-        try {
-            $customerImage = $customer->image;
-
-            if ($customerImage) {
-                $imagePath = storage_path('app/public/images/customers/' . $customerImage->name);
-
-                if (file_exists($imagePath)) {
-                    unlink($imagePath);
-                }
-            }
-
-            $customer->delete();
-
-            DB::commit();
-
-            Log::info('Succesfully deleted customer');
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error('Error deleting customer: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to delete customer', $e->getMessage()], 500);
+        if ($customer->orders()->exists()) {
+            return response()->json(['message' => 'Customer has related orders and cannot be deleted'], 500);
         }
 
-        return response()->json(['message' => 'Customer has been deleted'], 200);
+        $customer->orders()->delete();
+        $customer_image = $customer->image;
+        if ($customer_image) {
+            $imagePath = storage_path('app/public/images/customers/' . $customer_image->name);
+
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        };
+
+        $customer->delete();
+        DB::commit();
+        Log::info('Successfully deleted customer');
+        return response()->json(['message' => 'Customer has been deleted'], 200);   
+    } catch (\Exception $e) {
+        DB::rollback();
+        Log::error('Error deleting customer: ' . $e->getMessage());
+        return response()->json(['message' => 'Customer has not been deleted', 'error' => $e->getMessage()], 500);
     }
+}
+
+    
 }

@@ -1,4 +1,4 @@
-import { APICaller, APIPOSTCALLER, DELETEAPICALLER } from './ajaxFunctions';
+import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
 
 $(function () {
     let table = $('#packagesTable');
@@ -262,7 +262,7 @@ $(function () {
         let template = swalText(name);
 
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
-            DELETEAPICALLER(url, function (response) {
+            APIDELETECALLER(url, function (response) {
                 toastr['success'](response.message);
                 table.DataTable().ajax.reload();
             }, function (error) {
@@ -285,7 +285,7 @@ $(function () {
 
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
             searchedIds.forEach(function (id, index) {
-                DELETEAPICALLER(PACKAGE_DELETE_ROUTE.replace(':id', id), function (response) {
+                APIDELETECALLER(PACKAGE_DELETE_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);
                     table.DataTable().ajax.reload();
                 }, function (error) {

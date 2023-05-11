@@ -1,4 +1,4 @@
-import { APICaller, APICallerWithoutData } from './ajaxFunctions';
+import { APICaller, APICallerWithoutData, test } from '../ajax/methods';
 
 $(document).ready(function () {
     let table = $('#customersTable');
@@ -8,6 +8,44 @@ $(document).ready(function () {
     let selectState = $('.bootstrap-select .selectState');
 
     let dataT = table.DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            {
+              extend: 'copy',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
+              }
+            },
+            {
+              extend: 'csv',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
+              }
+            },
+            {
+              extend: 'excel',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10] 
+              }
+            },
+            {
+              extend: 'pdf',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
+              }
+            },
+            {
+              extend: 'print',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
+              }
+            }
+          ],
         ajax: {
             url: CUSTOMER_API_ROUTE
         },
@@ -110,7 +148,7 @@ $(document).ready(function () {
                 orderable: false,
                 width: '20%',
                 render: function (data, type, row) {
-                    let deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentCustomer(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash-can text-danger"></i></a>';
+                    let deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentCustomer(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
                     let editButton = '<a data-id=' + row.id + ' href="'+CUSTOMER_EDIT_ROUTE.replace(':id',row.id)+'" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
                     let ordersButton = '<a data-id=' + row.id + ' href="'+ CUSTOMER_ORDERS_ROUTE.replace(':id',row.id)+'" title="Orders"> <i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i>  </a>';
                     return `${deleteButton} ${editButton} ${ordersButton}`;
@@ -122,15 +160,13 @@ $(document).ready(function () {
         pageLength: 10,
         order: [[1, 'asc']]
     });
-
+    
     //ACTIONS
 
     selectCountry.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         let countryId = $(this).val();
         let selectState = $('.bootstrap-select .selectState');
         selectState.empty();
-
-        $('.selectCategory').val('').selectpicker('refresh');
 
         APICaller(CUSTOMER_API_ROUTE, { "country": countryId }, function (response) {
             if (response && response.data) {
@@ -186,7 +222,7 @@ $(document).ready(function () {
     window.deleteCurrentCustomer = function (e) {
         let id = $(e).attr('data-id');
         let name = $(e).attr('data-name');
-        let url = CUSTOMER_DELETE_ROUTE.replace(':id', id);
+        let url = CUSTOMER_DELETE_ROUTE.replace(':id', id); 
 
         let template = swalText(name);
 

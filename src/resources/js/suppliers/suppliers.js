@@ -127,7 +127,7 @@ $(document).ready(function () {
                 orderable: false,
                 width: '32%',
                 render: function (data, type, row) {
-                    let deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentSupplier(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash-can text-danger"></i></a>';
+                    let deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentSupplier(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
                     let editButton = '<a data-id=' + row.id + ' href=' + EDIT_SUPPLIER_ROUTE.replace(":id", row.id) + ' class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
                     let productsButton = '<a data-id=' + row.id + ' class="btn p-1" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
                     let categories = "<button data-toggle='collapse' data-target='#categories_" + row.id + "' title='Categories' class='btn btn-outline-muted showCategories p-1'><i class='fa-light fa-list' aria-hidden='true'></i></button>";

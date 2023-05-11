@@ -1,4 +1,4 @@
-import { APICallerWithoutData } from './ajaxFunctions';
+import { APICallerWithoutData } from '../ajax/methods';
 
 $(document).ready(function () {
     $('.selectCountry').selectpicker();

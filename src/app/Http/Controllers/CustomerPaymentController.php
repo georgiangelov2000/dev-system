@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\CustomerPaymentService;
 use App\Helpers\LoadStaticData;
+use Illuminate\Support\Facades\View;
 
 class CustomerPaymentController extends Controller
 {
     private $staticDataHelper;
+
+    private $date;
+    private $customer;
 
     public function __construct(LoadStaticData $staticDataHelper)
     {
@@ -21,8 +25,32 @@ class CustomerPaymentController extends Controller
         ]);
     }
 
-    public function summary(Request $request) {
+    public function payment(Request $request) {
+        $this->date = $request->date;
+        $this->customer = $request->customer;
+
+        $paymentData = $this->getPayment();
         
+        $customer_payments = [
+            'data' => $paymentData
+        ];
+
+        //dd($customer_payments);
+
+        $html = View::make('templates.payments',$customer_payments)->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    public function getPayment(){
+        $customerPaymentService = new CustomerPaymentService(
+            $this->customer,
+            $this->date
+        );
+
+        $result = $customerPaymentService->getData();
+
+        return $result;
     }
 
 }

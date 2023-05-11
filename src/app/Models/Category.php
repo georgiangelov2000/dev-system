@@ -40,7 +40,8 @@ class Category extends Model {
     
     public function subCategories()
     {
-        return $this->belongsToMany(SubCategory::class,'category_sub_category');
+        return $this->belongsToMany(SubCategory::class,'category_sub_category')
+        ->withPivot('id','category_id','sub_category_id');
     }
 
     public function suppliers()

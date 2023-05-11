@@ -1,4 +1,4 @@
-import { APICaller } from './ajaxFunctions';
+import { APICaller } from '../ajax/methods';
 
 $(function(){
   $('.selectCustomer').selectpicker();

@@ -1,4 +1,5 @@
-import { createData, updateData } from './ajaxFunctions.js';
+import { APIPOSTCALLER } from '../ajax/methods';
+
 $(document).ready(function () {
     let table = $('#brandsTable');
     //Global category variables
@@ -75,7 +76,7 @@ $(document).ready(function () {
         var actionUrl = createForm.attr('action');
         var data = createForm.serialize();
 
-        createData(actionUrl, data,
+        APIPOSTCALLER(actionUrl, data,
                 function (response) {
                     toastr['success'](response.message);
                     createForm.trigger('reset');
@@ -236,7 +237,7 @@ $(document).ready(function () {
         var actionUrl = editForm.attr('action');
         var data = editForm.serialize();
 
-        updateData(actionUrl, data,
+        APIPOSTCALLER(actionUrl, data,
                 function (response) {
                     toastr['success'](response.message);
                     editForm.trigger('reset');

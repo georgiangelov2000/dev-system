@@ -19,7 +19,7 @@
                         <div class="col-3">
                             <div class="form-group actions d-none">
                                 <label>Actions</label>
-                                <select class="form-control form-control-sm selectAction">
+                                <select class="form-control selectAction">
                                     <option value="0">Select Option</option>
                                     <option value="delete">Delete</option>
                                 </select>

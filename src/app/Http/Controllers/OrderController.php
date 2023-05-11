@@ -137,7 +137,6 @@ class OrderController extends Controller
     
         $validatedData = $request->validate([
             'price' => 'required|numeric|min:0',
-            'customer' => 'required|exists:customers,id',
             'date' => 'required|date',
         ]);
 
@@ -151,7 +150,6 @@ class OrderController extends Controller
             $order->save();
     
             $order->customerPayments()->create([
-                'customer_id' => $validatedData['customer'],
                 'price' => $validatedData['price'],
                 'date_of_payment' => $formatted_date
             ]);

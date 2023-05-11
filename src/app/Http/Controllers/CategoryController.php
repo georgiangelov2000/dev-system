@@ -119,17 +119,15 @@ class CategoryController extends Controller {
         DB::beginTransaction();
 
         try {
-            $related_subcategory = CategorySubCategory::findOrFail($id);
-            $related_subcategory->delete();
+            CategorySubCategory::find($id)->delete();
             DB::commit();
+            return response()->json(['message' => 'Sub category has been detached'], 200);
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             Log::info($e->getMessage());
-            return response()->json(['message' => 'Failed to detach sub category'], 500);
+            return response()->json(['message' => 'Sub category has not been detached'], 500);
         }
         
-        return response()->json(['message' => 'Sub category has been detached'], 200);
     }
 
 }

@@ -28,8 +28,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/edit/{category}', [CategoryController::class, 'edit'])->name('edit');
         Route::post('/update/{category}', [CategoryController::class, 'update'])->name('update');
         Route::post('/store', [CategoryController::class, 'store'])->name('store');
-        Route::get('/delete/{category}', [CategoryController::class, 'delete'])->name('delete');
-         Route::get('/detach/subcategory/{subcategory}', [CategoryController::class, 'detachSubCategory'])->name('detach.subcategory');
+        Route::delete('/delete/{category}', [CategoryController::class, 'delete'])->name('delete');
+        Route::delete('/detach/subcategory/{subcategory}', [CategoryController::class, 'detachSubCategory'])->name('detach.subcategory');
     });
 
     Route::prefix('brands')->name('brand.')->group(function () {
@@ -103,6 +103,7 @@ Route::middleware(['auth'])->group(function () {
     
     Route::prefix('payments')->name('payment.')->group(function(){
         Route::get('/', [CustomerPaymentController::class, 'index'])->name('customer');
+        Route::post('/check', [CustomerPaymentController::class, 'payment'])->name('check');
     });
 
     Route::prefix('states')->name('state')->group(function(){

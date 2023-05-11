@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="row mb-4">
+                <div class="row">
                     <div class="col-12">
                         <p class="bg-dark p-2 font-weight-bold filters">
                             <i class="fa-solid fa-filter"></i> Filters
@@ -90,7 +90,7 @@
                         <label for="customRange1">Publishing</label>
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div>
-                </div>
+                </div>  
                 <table id="purchasedProducts" class="table table-hover table-sm dataTable no-footer">
                     <thead>
                         <th>
@@ -103,7 +103,7 @@
                         <th>ID</th>
                         <th class='text-center'>Image</th>
                         <th>Name</th>
-                        <th>Price (Single price)</th>
+                        <th>Single price</th>
                         <th>Total price</th>
                         <th>Quantity</th>
                         <th>Notes</th>

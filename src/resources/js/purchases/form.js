@@ -1,4 +1,4 @@
-import { APICaller} from './ajaxFunctions.js';
+import { APICaller} from '../ajax/methods';
 
 $(document).ready(function () {
 

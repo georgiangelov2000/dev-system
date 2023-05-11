@@ -1,5 +1,10 @@
 /* global Swal, CATEGORY_ROUTE */
-import { APIPOSTCALLLER, APICallerWithoutData, APICaller } from './ajaxFunctions.js';
+import { 
+    APIPOSTCALLER, 
+    APICallerWithoutData, 
+    APICaller,
+    APIDELETECALLER 
+} from '../ajax/methods';
 $(document).ready(function () {
 
     let table = $('#categoriesTable');
@@ -11,7 +16,7 @@ $(document).ready(function () {
     let createForm = createModal.find('form');
     let editForm = editModal.find('form');
 
-    $('.selectSubCategory').selectpicker();
+    $('.selectSubCategory,.selectAction').selectpicker();
 
     var dataT = table.DataTable({
         ajax: {
@@ -51,7 +56,6 @@ $(document).ready(function () {
                 orderable: false,
                 name: 'subcategories',
                 render: function (data, type, row) {
-                    console.log(row);
                     if (row.sub_categories) {
                         var subcategoryNames = row.sub_categories.map(function (subcategory) {
                             return "<span class='font-weight-bold'> " + subcategory.name + " </span>";
@@ -66,11 +70,19 @@ $(document).ready(function () {
                 orderable: false,
                 width: '15%',
                 render: function (data, type, row) {
-                    let deleteButton = '<a data-id=' + row.id + ' data-name="' + row.name + '" class="btn deleteCategory" onclick="deleteCategory(this)" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
+
+                    let deleteFormTemplate = "\
+                    <form style='display:inline-block;' id='delete-form' action=" + REMOVE_CATEGORY_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.name + ">\
+                        <input type='hidden' name='_method' value='DELETE'>\
+                        <input type='hidden' name='id' value='" + row.id + "'>\
+                        <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCategory(this);'><i class='fa-light fa-trash text-danger'></i></button>\
+                    <form>\
+                ";
                     let editButton = '<a data-id=' + row.id + ' class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
-                    let productsButton = '<a onclick="getCategoryProducts(this)" data-id=' + row.id + ' class="btn" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
+                    let productsButton = '<a onclick="getCategoryProducts(this)" data-id=' + row.id + ' class="btn p-1" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
                     let subCategories = "<button data-toggle='collapse' data-target='#subcategories_" + row.id + "' title='Sub categories' class='btn btn-outline-muted showSubCategories'><i class='fa-light fa-list' aria-hidden='true'></i></button>";
-                    return `${subCategories} ${deleteButton} ${editButton} ${productsButton}`;
+
+                    return `${subCategories} ${deleteFormTemplate} ${editButton} ${productsButton}`;
                 }
             }
 
@@ -94,19 +106,39 @@ $(document).ready(function () {
     });
 
     function format(d) {
-
         // `d` is the original data object for the row
         let tableRows = "";
-
+    
         if (d.sub_categories.length > 0) {
             d.sub_categories.forEach(function (subcategory) {
-
+                let deleteFormTemplate = `
+                <form 
+                    style='display:inline-block;' 
+                    id='delete-form' 
+                    action='${SUBCATEGORY_ROUTE.replace(':id', subcategory.pivot.id)}' 
+                    method='POST'>
+                    <input type='hidden' name='_method' value='DELETE'>
+                    <input type='hidden' name='id' value='${subcategory.pivot.id}'>
+                    <button 
+                        type='submit' 
+                        class='btn p-1' 
+                        title='Delete'
+                        data-related-subcategory-id='${subcategory.pivot.id}'
+                        data-category-id='${d.id}' 
+                        onclick='event.preventDefault(); detachSubCategory(this);'>
+                        <i class='fa-light fa-trash text-danger'></i>
+                    </button>
+                </form>
+                `;
+    
                 tableRows += '<tr>' +
                     '<td>' + subcategory.name + '</td>' +
-                    '<td><button data-related-subcategory-id=' + subcategory.id + ' data-category-id=' + d.id + ' onclick=detachSubCategory(this) class="btn deleteSubCategory"><i class="fa-solid fa-trash text-danger"></i></button></td>' +
+                    '<td>' +
+                    deleteFormTemplate +
+                    '</td>' +
                     '</tr>';
             });
-
+    
             return '<table class="subTable subcategories w-100" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
                 '<thead>' +
                 '<tr>' +
@@ -118,7 +150,6 @@ $(document).ready(function () {
                 tableRows +
                 '</tbody>' +
                 '</table>';
-
         } else {
             return false;
         }
@@ -132,7 +163,7 @@ $(document).ready(function () {
         var actionUrl = createForm.attr('action');
         var data = createForm.serialize();
 
-        APIPOSTCALLLER(actionUrl, data,
+        APIPOSTCALLER(actionUrl, data,
             function (response) {
                 toastr['success'](response.message);
                 createForm.trigger('reset');
@@ -152,7 +183,7 @@ $(document).ready(function () {
         var actionUrl = editForm.attr('action');
         var data = editForm.serialize();
 
-        APIPOSTCALLLER(actionUrl, data,
+        APIPOSTCALLER(actionUrl, data,
             function (response) {
                 toastr['success'](response.message);
                 editForm.trigger('reset');
@@ -185,24 +216,21 @@ $(document).ready(function () {
     });
 
     window.detachSubCategory = function (e) {
-        let related_subcategoryId = $(e).attr('data-related-subcategory-id');
-        let currentTr = $(e).closest('tr'); // get the nearest parent <tr> element
+        let form = $(e).closest('form');
+        let url = form.attr('action');
 
-        APICallerWithoutData(SUBCATEGORY_ROUTE.replace(':id', related_subcategoryId), function (response) {
+        APIDELETECALLER(url, function (response) {
             toastr['success'](response.message);
-            console.log('yes');
-            currentTr.remove(); // remove the current <tr> element
             table.DataTable().ajax.reload();
         }, function (error) {
-            console.log(error);
-            toastr['error']('Subcategory has not been detached');
+            toastr['error'](error.message);
         });
     };
 
     window.deleteCategory = function (e) {
-        let id = $(e).attr('data-id');
-        let name = $(e).attr('data-name');
-
+        let form = $(e).closest('form');
+        let url = form.attr('action');
+        let name = form.attr('data-name');        
         let template = swalText(name);
 
         Swal.fire({
@@ -216,17 +244,11 @@ $(document).ready(function () {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    method: "GET",
-                    url: REMOVE_CATEGORY_ROUTE.replace(':id', id),
-                    contentType: 'application/json',
-                    success: function (response) {
-                        toastr['success'](response.message);
-                        table.DataTable().ajax.reload();
-                    },
-                    error: function (errors) {
-                        toastr['error'](errors.message);
-                    }
+                APIDELETECALLER(url, function (response) {
+                    toastr['success'](response.message);
+                    table.DataTable().ajax.reload();
+                }, function (error) {
+                    toastr['error'](error.message);
                 });
             }
         });
@@ -304,11 +326,11 @@ $(document).ready(function () {
         let searchedIds = [];
         let searchedNames = [];
 
-        $('input:checked').map(function () {
+        $('tbody tr input[type="checkbox"]:checked').each(function () {
             searchedIds.push($(this).attr('data-id'));
             searchedNames.push($(this).attr('data-name'));
         });
-
+        
         let template = swalText(searchedNames);
 
         Swal.fire({
@@ -323,18 +345,11 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 searchedIds.forEach(function (id, index) {
-                    $.ajax({
-                        method: "GET",
-                        url: REMOVE_CATEGORY_ROUTE.replace(':id', id),
-                        contentType: 'application/json',
-                        success: function (data) {
-                            toastr['success']('Category has been deleted');
-                            table.DataTable().ajax.reload();
-                        },
-                        error: function (errors) {
-                            toastr['error']('Category has not been deleted');
-                            table.DataTable().ajax.reload();
-                        }
+                    APIDELETECALLER(REMOVE_CATEGORY_ROUTE.replace(':id', id), function (response) {
+                        toastr['success'](response.message);
+                        table.DataTable().ajax.reload();
+                    }, function (error) {
+                        toastr['error'](error.message);
                     });
                 });
             }

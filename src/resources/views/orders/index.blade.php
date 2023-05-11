@@ -122,7 +122,6 @@
                         <input type="text" name="price" class="form-control" value="" >
                     </div>
                     <input type="hidden" name="order_id" value="">
-                    <input type="hidden" name="customer_id" value="">                  
                 </form>
             </div>
             <div class="modal-footer">

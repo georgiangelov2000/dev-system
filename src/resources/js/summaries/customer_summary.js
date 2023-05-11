@@ -1,4 +1,4 @@
-import { APIPOSTCALLER } from './ajaxFunctions.js';
+import { APIPOSTCALLER } from '../ajax/methods';
 
 $(function () {
     
@@ -118,6 +118,44 @@ $(function () {
             
             for (let i = 0; i < dataTables.length; i++) {
                 new DataTable(dataTables[i], {
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                          extend: 'copy',
+                          class: 'btn btn-outline-secondary',
+                          exportOptions: {
+                            columns: [1,2,3,4,5,6,7]
+                          }
+                        },
+                        {
+                          extend: 'csv',
+                          class: 'btn btn-outline-secondary',
+                          exportOptions: {
+                            columns: [1,2,3,4,5,6,7]
+                          }
+                        },
+                        {
+                          extend: 'excel',
+                          class: 'btn btn-outline-secondary',
+                          exportOptions: {
+                            columns: [1,2,3,4,5,6,7] 
+                          }
+                        },
+                        {
+                          extend: 'pdf',
+                          class: 'btn btn-outline-secondary',
+                          exportOptions: {
+                            columns: [1,2,3,4,5,6,7]
+                          }
+                        },
+                        {
+                          extend: 'print',
+                          class: 'btn btn-outline-secondary',
+                          exportOptions: {
+                            columns: [1,2,3,4,5,6,7]
+                          }
+                        }
+                      ],
                     columns: [
                         { orderable: false },
                         { orderable: false },
@@ -154,11 +192,11 @@ $(function () {
             </div>
             <div>
                 <span>Total sales: </span>
-                <strong class="text-success"> + ${productData.sum}</strong> €
+                <strong class="text-success"> + ${productData.sum}</strong>
             </div>
             <div>
                 <span>Paid sales: </span>
-                <strong class="text-success"> + ${productData.paid_sales_total_price}</strong> €
+                <strong class="text-success"> + ${productData.paid_sales_total_price}</strong>
             </div>
         </div>
         `;
@@ -178,7 +216,7 @@ $(function () {
                 </div>
                 <div>
                     <span>Total sales:</span>
-                    <strong class="text-success"> ${statusData.sum} </strong> €
+                    <strong class="text-success">${statusData.sum} </strong> 
                 </div>
             </div>
         `;
@@ -191,12 +229,12 @@ $(function () {
             tableHtml += `
                 <tr data_id="${product.id}" data_price="${product.total_sold_price}">
                     <td>${product.name}</td>
-                    <td>${product.single_sold_price} €</td>
-                    <td>${product.total_sold_price} €</td>
-                    <td>${product.regular_price} €</td>
+                    <td>€ ${product.single_sold_price}</td>
+                    <td>€ ${product.total_sold_price}</td>
+                    <td>€ ${product.regular_price}</td>
                     <td>${product.sold_quantity}</td>
-                    <td>${product.single_markup} €</td>
-                    <td>${product.total_markup} €</td>
+                    <td>€ ${product.single_markup}</td>
+                    <td>€ ${product.total_markup}</td>
                     <td>${product.discount}</td>
                     <td>
                         <a title='Preview' href="${PREVIEW_ROUTE.replace(':id', product.main_product_id)}" class='btn p-0'><i class='fa fa-light fa-eye text-info' aria-hidden='true'></i></a>

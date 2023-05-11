@@ -1,4 +1,4 @@
-import { deleteProduct, APICaller } from './ajaxFunctions.js';
+import { APIDELETECALLER , APICaller } from '../ajax/methods';
 
 $(function () {
     let table = $('table#purchasedProducts');
@@ -28,6 +28,44 @@ $(function () {
     let applyBtn = $('.applyBtn');
 
     let dataTable = table.DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            {
+              extend: 'copy',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [2,4,5,6,7,9,10,11,12,13,14]
+              }
+            },
+            {
+              extend: 'csv',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [2,4,5,6,7,9,10,11,12,13,14]
+              }
+            },
+            {
+              extend: 'excel',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [2,4,5,6,7,9,10,11,12,13,14] 
+              }
+            },
+            {
+              extend: 'pdf',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [2,4,5,6,7,9,10,11,12,13,14]
+              }
+            },
+            {
+              extend: 'print',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [2,4,5,6,7,9,10,11,12,13,14]
+              }
+            }
+          ],
         ajax: {
             url: PRODUCT_API_ROUTE
         },
@@ -367,7 +405,7 @@ $(function () {
         let template = swalText(name);
 
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
-            deleteProduct(url, function (response) {
+            APIDELETECALLER(url, function (response) {
                 toastr['success'](response.message);
                 table.DataTable().ajax.reload();
             }, function (error) {
@@ -390,7 +428,7 @@ $(function () {
 
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
             searchedIds.forEach(function (id, index) {
-                deleteProduct(REMOVE_PRODUCT_ROUTE.replace(':id', id), function (response) {
+                APIDELETECALLER(REMOVE_PRODUCT_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);
                     table.DataTable().ajax.reload();
                 }, function (error) {

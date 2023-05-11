@@ -1,7 +1,30 @@
+export function APIPOSTCALLER(url, data, successCallback, errorCallback) {
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: data,
+        success: function (response)
+        {
+            if (typeof successCallback === 'function') {
+                successCallback(response);
+            }
+        },
+        error: function (error) {
+            if (typeof errorCallback === 'function') {
+                errorCallback(error);
+            }
+        }
+    });
+}
+
 export function APICaller(url,data,callback){
+    if (typeof data === 'function') {
+      callback = data;
+      data = undefined;
+    }    
     $.ajax({
+        url: url,
         method: 'GET',
-        url: url,
         data:data,
         success: function (response) {
             if (typeof callback === 'function') {
@@ -16,11 +39,10 @@ export function APICaller(url,data,callback){
     })
 }
 
-export function APIPOSTCALLER(url,data,callback){
+export function APICallerWithoutData(url, callback) {
     $.ajax({
-        method: 'POST',
         url: url,
-        data:data,
+        method: "GET",
         success: function (response) {
             if (typeof callback === 'function') {
                 callback(response);
@@ -31,10 +53,10 @@ export function APIPOSTCALLER(url,data,callback){
                 callback(error);
             }
         }
-    })
+    });
 }
 
-export function DELETEAPICALLER(url, callback) {
+export function APIDELETECALLER(url, callback) {
     $.ajax({
         url: url,
         method: "POST",

@@ -1,4 +1,4 @@
-import { APICaller, APIPOSTCALLER, DELETEAPICALLER } from './ajaxFunctions';
+import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
 
 $(document).ready(function () {
     $('.selectAction, .selectType, .selectCustomer').selectpicker();
@@ -27,6 +27,44 @@ $(document).ready(function () {
     let applyBtn = $('.applyBtn');
 
     let dataT = table.DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            {
+              extend: 'copy',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1,2,3,4,5,6,7,8,9]
+              }
+            },
+            {
+              extend: 'csv',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1,2,3,4,5,6,7,8,9]
+              }
+            },
+            {
+              extend: 'excel',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1,2,3,4,5,6,7,8,9] 
+              }
+            },
+            {
+              extend: 'pdf',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1,2,3,4,5,6,7,8,9]
+              }
+            },
+            {
+              extend: 'print',
+              class: 'btn btn-outline-secondary',
+              exportOptions: {
+                columns: [1,2,3,4,5,6,7,8,9]
+              }
+            }
+          ],
         ajax: {
             url: ORDER_API_ROUTE
         },
@@ -264,7 +302,7 @@ $(document).ready(function () {
         let template = swalText(name);
 
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
-            DELETEAPICALLER(url, function (response) {
+            APIDELETECALLER(url, function (response) {
                 toastr['success'](response.message);
                 table.DataTable().ajax.reload();
             }, function (error) {
@@ -302,7 +340,7 @@ $(document).ready(function () {
 
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
             searchedIds.forEach(function (id, index) {
-                DELETEAPICALLER(ORDER_DELETE_ROUTE.replace(':id', id), function (response) {
+                APIDELETECALLER(ORDER_DELETE_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);
                     table.DataTable().ajax.reload();
                 }, function (error) {
@@ -385,16 +423,14 @@ $(document).ready(function () {
         let dateInput = payForm.find('input[name="date_of_payment"]');
         let priceInput = payForm.find('input[name="price"]');
         let orderInput = payForm.find('input[name="order_id"]');
-        let customerInput = payForm.find('input[name="customer_id"]');
 
         let date = moment(dateInput.val()).format('YYYY-MM-DD');
         let price = parseFloat(priceInput.val()).toLocaleString('en-US');
         let orderId = parseInt(orderInput.val());
-        let customerId = parseInt(customerInput.val());
 
         let url = ORDER_PAY_ROUTE.replace(':id', orderId);
 
-        APIPOSTCALLER(url,{'customer':customerId,'price':price,'date':date},function(response){
+        APIPOSTCALLER(url,{'price':price,'date':date},function(response){
             toastr['success'](response.message);
             table.DataTable().ajax.reload();
             modal.modal('hide');

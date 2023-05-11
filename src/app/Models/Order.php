@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Customer;
 use App\Models\Product;
-use App\Models\CustomerPayments;
+use App\Models\CustomerPayment;
 
 class Order extends Model
 {
@@ -62,6 +62,6 @@ class Order extends Model
     }
 
     public function customerPayments(){
-        return $this->hasMany(CustomerPayments::class);
+        return $this->hasMany(CustomerPayment::class);
     }
 }

@@ -10,7 +10,8 @@
     <div class="row">
         <div class="card col-12 cardTemplate">
             <div class="card-body">
-                <form action="" id="filterForm">
+                <form action="{{route('payment.check')}}" method="POST" id="filterForm">
+                    @csrf
                     <div class="form-row">
                         <div class="col-3">
                             <label for="customRange1">Select Customer</label>
@@ -45,10 +46,13 @@
                             <label class="form-check-label"></label>
                         </div>
                     </div>
+                    <div id="loader" class="spinner-border text-dark" role="status" style="display: none;">
+                        <span class="sr-only">Loading...</span>
+                    </div> 
                 </div>
-                <div id="summary-container"></div>
             </div>
         </div>
+        <div id="paymentTemplate" class="col-12 p-0"></div>
     </div>
 
     @push('scripts')

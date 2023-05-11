@@ -15,7 +15,7 @@ class CustomerApiController extends Controller
 
         $customerQuery = $this->buildCustomerQuery();
 
-        if($country) {
+        if($country && $country !== '9999') {
             $this->customerByCountry($country, $customerQuery);
 
             if ($state) {
