@@ -13,7 +13,7 @@ class ProductRequest extends FormRequest {
      */
     public function rules() {
         return [
-            "image" => "image|mimes:jpeg,png,jpg,gif|max:2048",
+            "image" => "nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048",
             "name" => "required|string",
             "quantity" => "required|integer",
             "price" => ['required', function ($attribute, $value, $fail) {

@@ -17,19 +17,48 @@ class OrderRequest extends FormRequest
             'customer_id' => "required|integer",
             "date_of_sale" => "required|date",
             "status" => "required|integer",
-            'product_id' => ["array", "nullable"],
-            'invoice_number' => ["array", "nullable"],
-            'sold_quantity' => ["array", "nullable"],
-            'single_sold_price' => ["array", "nullable"],
-            "total_sold_price" => ["array", "nullable"],
-            "discount_percent" => ["array", "nullable"],
-            'product_id.*' => 'required',
-            'invoice_number.*' => 'required',
-            'sold_quantity.*' => 'required',
-            'single_sold_price.*' => 'required',
-            "total_sold_price.*" => 'required',
-            "discount_percent.*" => 'required',
-            "tracking_number" => "required|string"
+            "tracking_number" => "required|string",
+            
+            'invoice_number' => 'required|array',
+            'invoice_number.*' => 'required|string',
+            
+            'product_id' => 'required|array',
+            'product_id.*' => 'required|numeric',
+
+            'sold_quantity' => 'required|array',
+            'sold_quantity.*' => 'required|numeric',
+
+            'single_sold_price' => 'required|array',
+            'single_sold_price.*' => 'required|numeric',
+
+            "discount_percent" => 'required|array',
+            "discount_percent.*" => 'required|numeric',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'invoice_number.required' => 'The invoice number field is required.',
+            'invoice_number.array' => 'The invoice number must be an array.',
+            'invoice_number.*.required' => 'Invoice number field is required.',
+            'invoice_number.*.string' => 'invoice number must be a string.',
+            'product_id.required' => 'The product ID field is required.',
+            'product_id.array' => 'The product ID must be an array.',
+            'product_id.*.required' => 'Product ID field is required.',
+            'product_id.*.numeric' => 'Product ID must be a numeric value.',
+            'sold_quantity.required' => 'The sold quantity field is required.',
+            'sold_quantity.array' => 'The sold quantity must be an array.',
+            'sold_quantity.*.required' => 'Sold quantity field is required.',
+            'sold_quantity.*.numeric' => 'Sold quantity must be a numeric value.',
+            'single_sold_price.required' => 'The single sold price field is required.',
+            'single_sold_price.array' => 'The single sold price must be an array.',
+            'single_sold_price.*.required' => 'Single sold price field is required.',
+            'single_sold_price.*.numeric' => 'Single sold price must be a numeric value.',
+            'discount_percent.required' => 'The discount percent field is required.',
+            'discount_percent.array' => 'The discount percent must be an array.',
+            'discount_percent.*.required' => 'Discount percent field is required.',
+            'discount_percent.*.numeric' => 'Discount percent must be a numeric value.',
         ];
     }
 }

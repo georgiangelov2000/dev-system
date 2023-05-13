@@ -9,8 +9,7 @@
             </div>
         </div>
         <div class="card-body">
-            <form class="d-flex flex-wrap" action='{{ route('purchase.update', $product->id) }}' method='POST'
-                enctype="multipart/form-data">
+            <form class="d-flex flex-wrap" action='{{ route('purchase.update', $product->id) }}' method='POST' enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -38,7 +37,10 @@
                         <label for="image">File</label>
                     </div>
                     <div class="custom-file col-12">
-                        <input type="file" name="image" id="image"
+                        <input 
+                            type="file" 
+                            name="image" 
+                            id="image"
                             value="{{ $product->images ? $product->images->path . $product->images->name : '' }}"
                             class="custom-file-input">
                         <label class="custom-file-label" for="customFile">Choose file</label>
@@ -54,8 +56,13 @@
                 </div>
                 <div class="form-group col-6">
                     <label for="quantity">Quantity</label>
-                    <input type="number" placeholder="Enter quantity"
-                        class="form-control @error('quantity')  is-invalid @enderror" id="quantity" name="quantity"
+                    <input 
+                        type="number" 
+                        placeholder="Enter quantity"
+                        class="form-control @error('quantity')  is-invalid @enderror" 
+                        id="quantity" 
+                        name="quantity"
+                        min="1"
                         value='{{ e($product->quantity) }}'>
                     @error('quantity')
                         <span class="text-danger">{{ $message }}</span>
@@ -94,7 +101,7 @@
                         <select class="form-control selectSupplier" name="supplier_id">
                             @foreach ($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}"
-                                    {{ $supplier->id == $relatedRecords['supplier'] ? 'selected' : '' }}>
+                                    {{ $supplier->id == $product->supplier_id ? 'selected' : '' }}>
                                     {{ $supplier->name }}</option>
                             @endforeach
                         </select>
@@ -106,6 +113,12 @@
                         <label>Categories (categories for a given supplier)</label>
                         <select class="form-control selectCategory" name="category_id">
                             <option value="0">Nothing selected</option>
+                            @foreach ($categories as $category)
+                            <option 
+                                {{ $category->id === $relatedProductData['productCategory'] ? 'selected' : '' }}
+                                value="{{ $category->id }}">{{ $category->name }}
+                            </option>
+                            @endforeach
                         </select>
                         @error('category_id')
                             <span class="text-danger">{{ $message }}</span>
@@ -114,14 +127,19 @@
                     <div class="form-group">
                         <label>Subcategories</label>
                         <select class="form-control selectSubCategory" name="subcategories[]" multiple>
+                            @foreach ($relatedProductData['categorySubCategories'] as $subcategory)
+                                <option {{ in_array($subcategory["id"], $relatedProductData['productSubCategories'] ) ? 'selected' : '' }}
+                                    value="{{ $subcategory["id"] }}">{{ $subcategory["name"] }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Brands (not necessarily)</label>
                         <select class="form-control selectBrands" multiple data-selected-text-format="count > 12"
                             data-actions-box="true" data-dropup-auto="false" multiple name="brands[]">
+                            <option value="0">Nothing selected</option>
                             @foreach ($brands as $brand)
-                                <option {{ in_array($brand->id, $relatedRecords['brands']) ? 'selected' : '' }}
+                                <option {{ in_array($brand->id, $relatedProductData['productBrands'] ) ? 'selected' : '' }}
                                     value="{{ $brand->id }}">{{ $brand->name }}</option>
                             @endforeach
                         </select>
@@ -141,8 +159,6 @@
 
         <script type="text/javascript">
             let CATEGORY_ROUTE = "{{ route('api.categories') }}";
-            let SELECTED_CATEGORY = "{{ $relatedRecords['category'] }}";
-            let SELECTED_SUBCATEGORIES = "{{ $relatedRecords['sub_categories'] }}";
         </script>
     @endpush
 

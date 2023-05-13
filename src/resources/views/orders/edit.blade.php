@@ -12,7 +12,7 @@
 
             <div class="col-12">
 
-                <form action="{{ route('order.update',$currentOrder->id) }}" method="POST">
+                <form action="{{ route('order.update', $currentOrder->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 
@@ -62,7 +62,11 @@
                         <div class="col-3">
                             <label for="order_status">Tracking code</label>
                             <div class="input-group mb-3">
-                                <input type="text" name="tracking_number" value="{{$currentOrder->tracking_number}}" class="form-control rounded-0">
+                                <input type="text" name="tracking_number" value="{{ $currentOrder->tracking_number }}"
+                                    class="form-control rounded-0">
+                                @error('tracking_number')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                                 <span class="input-group-append">
                                     <button type="button" id="generateCode" class="btn btn-info btn-flat">Generate</button>
                                 </span>
@@ -93,7 +97,12 @@
                                     <input 
                                         type="text" 
                                         class="form-control form-control-sm"
-                                        value="{{ $currentOrder->invoice_number }}" name="invoice_number[]" />
+                                        value="{{ $currentOrder->invoice_number }}" 
+                                        name="invoice_number[]" 
+                                    />
+                                    @foreach ($errors->get('invoice_number.*') as $error)
+                                        <span class="text-danger">{{ $error[0] }}</span>
+                                    @endforeach
                                 </td>
                                 <td>
                                     {{ $currentOrder->product->name }}
@@ -104,9 +113,13 @@
                                             name="sold_quantity[]" 
                                             type='number'
                                             max='{{ $currentOrder->product->quantity }}'
-                                            class='form-control form-control-sm orderQuantity' 
-                                            value="{{$currentOrder->sold_quantity}}"
-                                            onkeyup="handleOrderQuantity(this)" />
+                                            class='form-control form-control-sm orderQuantity'
+                                            value="{{ $currentOrder->sold_quantity }}"
+                                            onkeyup="handleOrderQuantity(this)" 
+                                        />
+                                        @foreach ($errors->get('sold_quantity.*') as $error)
+                                            <span class="text-danger">{{ $error[0] }}</span>
+                                        @endforeach
                                     </div>
                                 </td>
                                 <td>
@@ -116,35 +129,38 @@
                                             name="single_sold_price[]"
                                             class='form-control form-control-sm orderSinglePrice'
                                             value="{{ $currentOrder->single_sold_price }}"
-                                            onkeyup="handleSinglePrice(this)" />
+                                            onkeyup="handleSinglePrice(this)" 
+                                        />
+                                        @foreach ($errors->get('single_sold_price.*') as $error)
+                                            <span class="text-danger">{{ $error[0] }}</span>
+                                        @endforeach
                                     </div>
                                 </td>
                                 <td>
-                                    <input 
-                                        type='hidden' 
-                                        name="total_sold_price[]"
-                                        value="{{ $currentOrder->total_sold_price }}" />
                                     <span class="totalOrderPrice">{{ $currentOrder->total_sold_price }}</span>
                                 </td>
                                 <td>
                                     <div class="form-group col-12">
                                         <input 
                                             type='text' 
-                                            value="{{$currentOrder->discount_percent}}" 
-                                            class='form-control form-control-sm'
-                                            name="discount_percent[]" 
+                                            value="{{ $currentOrder->discount_percent }}"
+                                            class='form-control form-control-sm' 
+                                            name="discount_percent[]"
                                             onkeyup="handleDiscountChange(this)" 
                                         />
+                                        @foreach ($errors->get('discount_percent.*') as $error)
+                                            <span class="text-danger">{{ $error[0] }}</span>
+                                        @endforeach
                                     </div>
                                 </td>
                                 <td class="purchaseQuantity">
-                                    {{$currentOrder->product->quantity}}
+                                    {{ $currentOrder->product->quantity }}
                                 </td>
                                 <td>
-                                    {{$currentOrder->product->price}}
+                                    {{ $currentOrder->product->price }}
                                 </td>
                                 <td class="totalPrice">
-                                    {{$currentOrder->product->total_price}}
+                                    {{ $currentOrder->product->total_price }}
                                 </td>
                             </tr>
                         </tbody>
@@ -162,7 +178,7 @@
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/orders/form.js') }}"></script>
     <script type="text/javascript">
-        let DATE_OF_SALE = "{{$currentOrder->date_of_sale}}";
+        let DATE_OF_SALE = "{{ $currentOrder->date_of_sale }}";
         let CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
         let PRODUCT_API_ROUTE = "{{ route('api.products') }}"
     </script>

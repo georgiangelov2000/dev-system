@@ -44,28 +44,28 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
+            $price = $data['price'];
+            $quantity = $data['quantity'];
 
-            $active = $data['quantity'] > 0 ? $active = 'enabled' : 'disabled';
-            $total_price = $data['price'] * $data['quantity'];
-
+            $active = $quantity > 0 ? $active = 'enabled' : 'disabled';
+            $totalPrice = $this->totalPrice($price,$quantity);
+            
             $product = Product::create([
                 "name" => $data['name'],
                 "supplier_id" => $data['supplier_id'],
-                "quantity" => $data['quantity'],
+                "quantity" => $quantity,
                 "notes" => $data["notes"],
-                "price" => $data["price"],
+                "price" => $price,
                 "code" => $data["code"],
                 "status" => $active,
-                "total_price" => $total_price
+                "total_price" => $totalPrice
             ]);
 
-
             if ($product) {
-
                 $productService = new ProductService($product);
 
-                if ($request->hasFile('image')) {
-                    $productService->imageUploader($request->file('image'));
+                if (isset($data['image'])) {
+                    $productService->imageUploader($data['image']);
                 }
 
                 $productService->attachProductCategory($data['category_id']);
@@ -77,12 +77,10 @@ class ProductController extends Controller
                 if (isset($data['brands']) && count($data['brands'])) {
                     $productService->attachProductBrands($data['brands']);
                 }
-
             }
 
             DB::commit();
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
             Log::error($e->getMessage());
         }
@@ -96,12 +94,40 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $productService = new ProductService($product);
-
-        $relatedRecords  = $productService->getEditData();
+        $relatedProductData = $this->fetchRelatedProductData($product);
+        
         $brands = $this->staticDataHelper::callBrands();
         $suppliers = $this->staticDataHelper::callSupliers();
-        return view('purchases.edit', compact('product', 'relatedRecords', 'suppliers', 'brands'));
+        $categories = $this->staticDataHelper::loadCallCategories();
+                
+        return view('purchases.edit', compact(
+            'product',
+            'relatedProductData',
+            'suppliers',
+            'brands',
+            'suppliers',
+            'categories'
+        ));
+    }
+    
+    public function fetchRelatedProductData($productModel)
+    {
+        $categorySubCategories = $productModel->categories()
+            ->with('subCategories')
+            ->get()
+            ->pluck('subCategories')
+            ->flatten()
+            ->map(function ($subCategory) {
+                return $subCategory->only(['id', 'name']);
+            })
+            ->toArray();
+        
+        return [
+            'categorySubCategories' => $categorySubCategories,
+            'productCategory' => $productModel->categories->pluck('id')->first(),
+            'productSubCategories' => $productModel->subcategories->pluck('id')->toArray(),
+            'productBrands' => $productModel->brands->pluck('id')->toArray(),
+        ];
     }
 
     public function update(Product $product, ProductRequest $request)
@@ -113,9 +139,8 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             
-            if ($request->hasFile('image')) {
-                $productService->imageUploader($request->file('image'));
-            }
+            $productService->imageUploader($data['image']);
+            
 
             $productService->attachProductCategory($data['category_id']);
 
@@ -178,5 +203,18 @@ class ProductController extends Controller
             return response()->json(['message' => 'Failed to delete product'], 500);
         }
         return response()->json(['message' => 'Product has been deleted'], 200);
+    }
+
+    private function totalPrice($single_price, $quantity){
+        $finalPrice = 0;
+
+        if ( ($single_price && $quantity) && (is_numeric($single_price) && is_numeric($quantity)) ) 
+            {
+                $finalPrice = ($single_price * $quantity);
+            } else {
+                $finalPrice  = $single_price;
+            }
+
+        return $finalPrice;
     }
 }
