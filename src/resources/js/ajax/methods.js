@@ -1,17 +1,16 @@
-export function APIPOSTCALLER(url, data, successCallback, errorCallback) {
+export function APIPOSTCALLER(url, data, callback) {
     $.ajax({
         type: "POST",
         url: url,
         data: data,
-        success: function (response)
-        {
-            if (typeof successCallback === 'function') {
-                successCallback(response);
+        success: function (response) {
+            if (typeof callback === 'function') {
+                callback(response);
             }
         },
         error: function (error) {
-            if (typeof errorCallback === 'function') {
-                errorCallback(error);
+            if (typeof callback === 'function') {
+                callback(error);
             }
         }
     });

@@ -2,7 +2,7 @@ import { APIPOSTCALLER } from '../ajax/methods';
 
 $(function () {
     
-    $('.selectCustomer').selectpicker('refresh').val('').trigger('change')
+    $('.selectCustomer, .orderFilter').selectpicker('refresh').val('').trigger('change')
 
     $('input[name="datetimes"]').daterangepicker({
         timePicker: false,
@@ -21,6 +21,7 @@ $(function () {
     let dateRangePicker = $('input[name="datetimes"]');
     let dateRangeCol = $('.dateRange');
     let bootstrapSelectCustomer = $('.bootstrap-select .selectCustomer');
+    let bootstrapSelectOrderFilters = $('.bootstrap-select .orderFilter');
     let form = $('#filterForm');
 
     disabledOption.on('click', function () {
@@ -38,11 +39,12 @@ $(function () {
     form.on('submit', function (e) {
         e.preventDefault();
         let customer = bootstrapSelectCustomer.selectpicker('val');
+        let orderFilter = bootstrapSelectOrderFilters.selectpicker('val');
         let date = dateRangePicker.val();
 
         $('#loader').show();
 
-        APIPOSTCALLER(SUMMARY, { "customer": customer, 'date': date }, function (response) {
+        APIPOSTCALLER(SUMMARY, { "customer": customer, 'date': date, 'order_filter': orderFilter }, function (response) {
             let respData = response;
 
             summaryTemplate(respData);

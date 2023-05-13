@@ -9,11 +9,13 @@ class CustomerSummaryService
 {
     protected $date;
     protected $customer;
+    protected $order_filter;
 
-    public function __construct($customer, $date)
+    public function __construct($customer, $date, $order_filter)
     {
         $this->customer = $customer;
         $this->date = $date;
+        $this->order_filter = $order_filter;
     }
     public function orderQueryBuilder()
     {
@@ -46,6 +48,13 @@ class CustomerSummaryService
                     $date2_formatted
                 ]);
             });
+        }
+        if( intval($this->order_filter) === 1) {
+            $order->where('is_paid',1);
+        }
+        if( intval($this->order_filter) === 2) {
+            $order
+            ->where('is_paid', 0);
         }
     
         return $order;
@@ -118,7 +127,7 @@ class CustomerSummaryService
                 'regular_price' => $regularPrice ? number_format($regularPrice, 2, '.', '') : 0
             ];
         }
-        //27.50÷(1−(1÷100))
+
         foreach ($products as &$package) {
             $package['paid_sales_total_price'] = number_format($package['paid_sales_total_price'], 2, '.', '');
             $package['sum'] = number_format($package['sum'], 2, '.', '');

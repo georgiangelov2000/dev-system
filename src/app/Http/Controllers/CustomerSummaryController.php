@@ -25,7 +25,8 @@ class CustomerSummaryController extends Controller
     {
         $customer = $request->customer;
         $date = $request->date;
-        $service = new CustomerSummaryService($customer, $date);
+        $order_filter = $request->order_filter;
+        $service = new CustomerSummaryService($customer, $date, $order_filter);
         $summary = $service->getSummary();
 
         return response()->json($summary);

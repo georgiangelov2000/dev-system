@@ -43,6 +43,14 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-3">
+                            <label for="order_filter">Order filters (optional)</label>
+                            <select class="form-control orderFilter"  name="order_filter" id="order_filter">
+                                <option value="0">All</option>
+                                <option value="1">Paid</option>
+                                <option value="2">Not Paid</option>
+                            </select>
+                        </div>
                         <div class="col-3 dateRange">
                             <label for="customRange1">Date range</label>
                             <div class="d-flex align-items-center">
