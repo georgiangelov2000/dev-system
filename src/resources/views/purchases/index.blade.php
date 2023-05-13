@@ -99,13 +99,13 @@
                                 <label class="form-check-label" for="flexCheckDefault"></label>
                             </div>
                         </th>
-                        <th>Status</th>
                         <th>ID</th>
                         <th class='text-center'>Image</th>
                         <th>Name</th>
                         <th>Single price</th>
                         <th>Total price</th>
                         <th>Quantity</th>
+                        <th>Initial quantity</th>
                         <th>Notes</th>
                         <th>Supplier</th>
                         <th>Category</th>
@@ -113,6 +113,7 @@
                         <th>Brands</th>
                         <th>Code</th>
                         <th>Created at</th>
+                        <th>Paid</th>
                         <th>Actions</th>
                     </thead>
                 </table>

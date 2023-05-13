@@ -83,17 +83,6 @@ $(function () {
             },
             {
                 width: '1%',
-                orderable: false,
-                render: function (data, type, row) {
-                    if (row.status === "enabled") {
-                        return "<i title=" + row.status + " class='fa-solid fa-circle text-success'></i>"
-                    } else {
-                        return "<i title=" + row.status + " class='fa-solid fa-circle text-danger'></i>"
-                    }
-                }
-            },
-            {
-                width: '1%',
                 orderable: true,
                 render: function (data, type, row) {
                     return '<span class="font-weight-bold">' + row.id + '</span>';
@@ -105,7 +94,21 @@ $(function () {
                 name: "image",
                 render: function (data, type, row) {
                     if (row.images) {
-                        return "<img class='rounded mx-auto w-100' src=" + row.images.path + row.images.name + " />"
+                        if(row.quantity) {
+                            return `<div class="position-relative">
+                            <img id="preview-image" alt="Preview" class="img-fluid card card-widget widget-user w-100 m-0" src=${row.images.path + row.images.name} />
+                            <div class="ribbon-wrapper ribbon-lg">
+                                <div class="ribbon bg-success ">In stock</div>
+                            </div>
+                        </div>`;
+                        } else {
+                            return `<div class="position-relative">
+                                <img id="preview-image" alt="Preview" class="img-fluid card card-widget widget-user w-100 m-0" src=${row.images.path + row.images.name} />
+                                <div class="ribbon-wrapper ribbon-lg">
+                                    <div class="ribbon bg-danger ">out of stock</div>
+                                </div>
+                            </div>`;
+                        }
                     } else {
                         return "<img class='rounded mx-auto w-100' src='https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg'/>";
                     }
@@ -118,13 +121,13 @@ $(function () {
                 data: "name"
             },
             {
-                width: '10%',
+                width: '6%',
                 orderable: true,
                 name: "price",
                 data: "price"
             },
             {
-                width: '10%',
+                width: '6%',
                 orderable: true,
                 name: "total_price",
                 data: "total_price"
@@ -134,6 +137,12 @@ $(function () {
                 orderable: true,
                 name: "quantity",
                 data: "quantity"
+            },
+            {
+                width: '7%',
+                orderable: true,
+                name: "initial_quantity",
+                data: 'initial_quantity'
             },
             {
                 width: '10%',
@@ -213,7 +222,18 @@ $(function () {
                     return '<span>' + moment(row.created_at).format('YYYY-MM-DD') + '</span>';
                 }
             },
-
+            {
+                width: '2%',
+                orderable: false,
+                name: "is_paid",
+                render: function (data, type, row) {
+                    if(row.is_paid) {
+                        return '<span class="text-success">Yes</span>';
+                    } else {
+                        return '<span class="text-danger">No</span>';
+                    }
+                }
+            },
             {
                 orderable: false,
                 width: '6%',
@@ -222,14 +242,17 @@ $(function () {
                         <form style='display:inline-block;' id='delete-form' action=" + REMOVE_PRODUCT_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.name + ">\
                             <input type='hidden' name='_method' value='DELETE'>\
                             <input type='hidden' name='id' value='" + row.id + "'>\
-                            <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'><i class='fa-light fa-trash text-danger'></i></button>\
+                            <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'><i class='fa-light fa-trash text-danger'></i></button>\
                         <form>\
                     ";
 
                     let previewLink = "<a title='Preview' href="+PREVIEW_ROUTE.replace(':id', row.id)+" class='btn p-0'><i class='fa fa-light fa-eye text-info' aria-hidden='true'></i></a>"
 
-                    let editButton = '<a href=' + EDIT_PRODUCT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + ' class="btn p-1" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
-                    return `${deleteFormTemplate} ${editButton} ${previewLink}`;
+                    let editButton = '<a href=' + EDIT_PRODUCT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + ' class="btn p-0" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
+
+                    let payButton = `<a class='btn p-0' title="Payment"><i class="fa-thin fa-cash-register"></i></a>`;
+
+                    return `${deleteFormTemplate} ${editButton} ${previewLink} ${[payButton]}`;
                 }
             }
 

@@ -7,6 +7,7 @@ use App\Http\Requests\OrderRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Order;
+use App\Models\Product;
 use App\Helpers\LoadStaticData;
 use DateTime;
 
@@ -37,11 +38,20 @@ class OrderController extends Controller
             $orders = [];
 
             foreach ($data['product_id'] as $key => $productId) {
+                
+                $product = Product::find($productId);
 
+                if (!$product || $product->quantity <= 0) {
+                    continue;
+                }
+                
                 $singleSoldPrice = $data['single_sold_price'][$key];
                 $quantity = $data['sold_quantity'][$key];
                 $discount = $data['discount_percent'][$key];
                 
+                $product->quantity -= $quantity;
+                $product->save();
+
                 $finalSinglePrice = $this->calculatedDiscountPrice($singleSoldPrice,$discount);
                 $finalTotalPrice = $this->calculatedFinalPrice($finalSinglePrice,$quantity);
                                 
@@ -50,7 +60,7 @@ class OrderController extends Controller
                     'product_id' => $productId,
                     'invoice_number' => $data['invoice_number'][$key],
                     'sold_quantity' => $quantity,
-                    'single_sold_price' => $finalTotalPrice,
+                    'single_sold_price' => $finalSinglePrice,
                     'total_sold_price' => $finalTotalPrice,
                     'discount_percent' => $discount,
                     'date_of_sale' => date('Y-m-d', strtotime($data['date_of_sale'])),
