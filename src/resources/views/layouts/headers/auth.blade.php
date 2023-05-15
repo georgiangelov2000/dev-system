@@ -84,7 +84,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('category.index') }}" class="nav-link">
+                            <a href="{{ route('subcategory.index') }}" class="nav-link">
                                 <p>Subcategories</p>
                             </a>
                         </li>

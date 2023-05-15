@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ProductApiController as ProductApiController;
 use App\Http\Controllers\Api\CustomerApiController as CustomerApiController;
 use App\Http\Controllers\Api\OrderApiController as OrderApiController;
 use App\Http\Controllers\Api\PackageApiController as PackageApiController;
+use App\Http\Controllers\Api\SubCategoryApiController as SubCategoryApiController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/api/categories', [CategoryApiController::class, 'getData'])->name('api.categories');
@@ -17,5 +18,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/customers', [CustomerApiController::class, 'getData'])->name('api.customers');
     Route::get('/api/orders', [OrderApiController::class, 'getData'])->name('api.orders');
     Route::get('/api/packages', [PackageApiController::class, 'getData'])->name('api.packages');
+    Route::get('/api/subcategories', [SubCategoryApiController::class, 'getData'])->name('api.subcategories');
+    
 });
 

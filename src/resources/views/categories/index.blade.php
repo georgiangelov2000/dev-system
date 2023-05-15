@@ -61,7 +61,7 @@
     'isAvailableMultiple' => true
     ])
 
-    <!--create modal-->
+    <!--edit modal-->
     @include('templates.edit_modal_form',[
     'labelOne' => "name",
     'labelTwo' => "description",

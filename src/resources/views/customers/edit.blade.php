@@ -14,10 +14,10 @@
             @method('PUT')
             
             <div class="row w-100 mb-2">
-                @if ($relatedRecords['image'])
+                @if ($customer->image)
                     <div class="col-3">
                         <img class="card card-widget widget-user w-100 h-100 m-0"
-                            src="{{ $relatedRecords['image'] ? $relatedRecords['image']->path . $relatedRecords['image']->name : 'https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg' }}" />
+                            src="{{ $customer->image ? $customer->image->path . $customer->image->name : 'https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg' }}" />
                     </div>
                 @endif
                 <div class="col-3 d-none imagePreview">
@@ -43,7 +43,7 @@
                         name="image" 
                         id="image"
                         accept="image/*"
-                        value="{{$relatedRecords['image'] ? $relatedRecords['image']->path . $relatedRecords['image']->name : ''}}" 
+                        value="{{$customer->image ? $customer->image->path . $customer->image->name : ''}}" 
                         >
                     <label class="custom-file-label" for="customFile">Choose file</label>
                     @error('image')
