@@ -21,7 +21,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" />
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
 
-        <link rel="icon" type="image/png" href="/storage/images/static/favicon-32x32.png">
+        <link rel="icon" type="image/png" href="/storage/images/static/logo.jpg">
     </head>
     <!--"sidebar-mini layout-fixed"-->
     <body class="sidebar-mini layout-fixed sidebar-collapse {{$isAuth ? "" : "body-class"}}" style="height: auto;">

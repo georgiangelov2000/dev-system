@@ -2,10 +2,19 @@
 import { 
     APIPOSTCALLER, 
     APICallerWithoutData, 
-    APICaller,
     APIDELETECALLER 
 } from '../ajax/methods';
-$(document).ready(function () {
+import {
+    openModal,
+    closeModal,
+    swalText,
+    submit,
+    update,
+    ajaxResponse,
+    showConfirmationDialog,
+
+} from '../helpers/action_helpers';
+$(function(){
 
     let table = $('#categoriesTable');
     //Global category variables
@@ -13,10 +22,17 @@ $(document).ready(function () {
     let createModal = $('#createModal');
     let editModal = $('#editModal');
 
+    let submitForm = $('#submitForm');
+    let updateForm = $('#updateForm');
+
     let createForm = createModal.find('form');
     let editForm = editModal.find('form');
+    
 
-    $('.selectSubCategory,.selectAction').selectpicker();
+    $('.selectSubCategory,.selectAction')
+    .selectpicker('refresh')
+    .val('')
+    .trigger('change');
 
     var dataT = table.DataTable({
         ajax: {
@@ -25,45 +41,57 @@ $(document).ready(function () {
         columns: [
             {
                 orderable: false,
-                width: "5%",
+                width: "1%",
                 render: function (data, type, row) {
-                    let checkbox = '<div div class="form-check">\n\
-                       <input name="checkbox" class="form-check-input" onchange="selectCategory(this)" data-id=' + row.id + ' data-name= ' + row.name + ' type="checkbox"> \n\
-                    </div>';
+                    let checkbox = 
+                    `<div class='form-check'> 
+                        <input 
+                            name = 'checkbox'
+                            class='form-check-input' 
+                            type='checkbox' 
+                            onchange='selectCategory(this)'
+                            data-id = '${row.id}'
+                            data-name = '${row.name}'
+                        />
+                    </div>`;
 
                     return `${checkbox}`;
                 }
             },
             {
-                width: '5%',
+                width: '2%',
                 name: "id",
                 render: function (data, type, row) {
-                    return '<span class="font-weight-bold">' + row.id + '</span>';
+                    return `<span class='font-weight-bold'>${row.id}</span>`;
                 }
             },
             {
                 orderable: false,
-                name: "name",
-                data: "name"
+                name: 'name',
+                width: '15%',
+                render: function (data, type, row) {
+                    return `<span>${row.name}</span>`;
+                }
             },
             {
                 orderable: false,
                 name: "description",
-                data: "description"
+                render: function (data, type, row) {
+                    return `<span>${row.description}</span>`;
+                }
             },
             {
                 width: '25%',
                 orderable: false,
                 name: 'subcategories',
-                render: function (data, type, row) {
-                    if (row.sub_categories) {
-                        var subcategoryNames = row.sub_categories.map(function (subcategory) {
-                            return "<span class='font-weight-bold'> " + subcategory.name + " </span>";
-                        });
-                        return subcategoryNames.join(', ');
-                    } else {
+                render: function(data,type,row) {
+                    if (!row.sub_categories) {
                         return '';
                     }
+                    const subcategoryNames = row.sub_categories.map((subcategory) => {
+                        return `<span class="font-weight-bold">${subcategory.name}</span>`;
+                      });
+                    return subcategoryNames.join(', ');
                 }
             },
             {
@@ -71,18 +99,19 @@ $(document).ready(function () {
                 width: '15%',
                 render: function (data, type, row) {
 
-                    let deleteFormTemplate = "\
-                    <form style='display:inline-block;' id='delete-form' action=" + REMOVE_CATEGORY_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.name + ">\
-                        <input type='hidden' name='_method' value='DELETE'>\
-                        <input type='hidden' name='id' value='" + row.id + "'>\
-                        <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCategory(this);'><i class='fa-light fa-trash text-danger'></i></button>\
-                    <form>\
-                ";
-                    let editButton = '<a data-id=' + row.id + ' class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
-                    let productsButton = '<a onclick="getCategoryProducts(this)" data-id=' + row.id + ' class="btn p-1" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
-                    let subCategories = "<button data-toggle='collapse' data-target='#subcategories_" + row.id + "' title='Sub categories' class='btn btn-outline-muted showSubCategories'><i class='fa-light fa-list' aria-hidden='true'></i></button>";
+                const deleteFormTemplate = `
+                    <form style="display:inline-block;" id="delete-form" action="${REMOVE_CATEGORY_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
+                      <input type="hidden" name="_method" value="DELETE">
+                      <input type="hidden" name="id" value="${row.id}">
+                      <button type="submit" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteCategory(this);"><i class="fa-light fa-trash text-danger"></i></button>
+                    </form>
+                  `;
 
-                    return `${subCategories} ${deleteFormTemplate} ${editButton} ${productsButton}`;
+                  const editButton = `<a data-id="${row.id}" class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>`;
+                  const productsButton = `<a data-id="${row.id}" class="btn p-1" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>`;
+                  const subCategories = `<button data-toggle="collapse" data-target="#subcategories_${row.id}" title="Sub categories" class="btn btn-outline-muted showSubCategories"><i class="fa-light fa-list" aria-hidden="true"></i></button>`;
+              
+                  return `${subCategories} ${deleteFormTemplate} ${editButton} ${productsButton}`;
                 }
             }
 
@@ -100,7 +129,7 @@ $(document).ready(function () {
             tr.removeClass('shown');
         } else {
             // Open this row
-            row.child(format(row.data())).show();
+            row.child(format(row.data().sub_categories)).show();
             tr.addClass('shown');
         }
     });
@@ -109,21 +138,22 @@ $(document).ready(function () {
         // `d` is the original data object for the row
         let tableRows = "";
     
-        if (d.sub_categories.length > 0) {
-            d.sub_categories.forEach(function (subcategory) {
+        if (d.length > 0) {
+            d.forEach(function (subcategory) {
+                
                 let deleteFormTemplate = `
                 <form 
                     style='display:inline-block;' 
                     id='delete-form' 
-                    action='${SUBCATEGORY_ROUTE.replace(':id', subcategory.pivot.id)}' 
+                    action='${SUBCATEGORY_ROUTE.replace(':id', subcategory.id)}' 
                     method='POST'>
                     <input type='hidden' name='_method' value='DELETE'>
-                    <input type='hidden' name='id' value='${subcategory.pivot.id}'>
+                    <input type='hidden' name='id' value='${subcategory.id}'>
                     <button 
                         type='submit' 
                         class='btn p-1' 
                         title='Delete'
-                        data-related-subcategory-id='${subcategory.pivot.id}'
+                        data-related-subcategory-id='${subcategory.id}'
                         data-category-id='${d.id}' 
                         onclick='event.preventDefault(); detachSubCategory(this);'>
                         <i class='fa-light fa-trash text-danger'></i>
@@ -157,22 +187,28 @@ $(document).ready(function () {
 
     //ACTIONS
 
-    $('#submitForm').on("click", function (e) {
+    submitForm.on("click", function (e) {
         e.preventDefault();
 
         var actionUrl = createForm.attr('action');
         var data = createForm.serialize();
 
         APIPOSTCALLER(actionUrl, data,
-            function (response) {
-                toastr['success'](response.message);
-                createForm.trigger('reset');
-                createModal.modal('toggle');
-                table.DataTable().ajax.reload();
+            function (response,xhr) {
+                const status = xhr;
+
+                if(status == 'success'){
+                    toastr['success'](response.message);
+                    createForm.trigger('reset');
+                    createModal.modal('toggle');
+                    table.DataTable().ajax.reload();
+                } else {
+                    toastr['error'](response.message);
+                    ajaxResponse(response.responseJSON, createModal);
+                }
             },
             function (error) {
-                toastr['error']('Category has not been created');
-                ajaxResponse(error.responseJSON.errors);
+                toastr['error'](error.message)
             }
         );
     });
@@ -184,15 +220,21 @@ $(document).ready(function () {
         var data = editForm.serialize();
 
         APIPOSTCALLER(actionUrl, data,
-            function (response) {
-                toastr['success'](response.message);
-                editForm.trigger('reset');
-                editModal.modal('toggle');
-                table.DataTable().ajax.reload();
+            function (response,xhr) {
+                const status = xhr;
+
+                if(status == 'success') {
+                    toastr['success'](response.message);
+                    editForm.trigger('reset');
+                    editModal.modal('toggle');
+                    table.DataTable().ajax.reload();
+                } else {
+                    toastr['error'](response.message);
+                    ajaxResponse(response.responseJSON, editModal);
+                }
             },
             function (error) {
-                toastr['error']('Category has not been updated');
-                ajaxResponse(error.responseJSON.errors);
+                toastr['error'](error.message)
             }
         );
     });
@@ -215,97 +257,10 @@ $(document).ready(function () {
         $('.modal').modal('hide');
     });
 
-    window.detachSubCategory = function (e) {
-        let form = $(e).closest('form');
-        let url = form.attr('action');
-
-        APIDELETECALLER(url, function (response) {
-            toastr['success'](response.message);
-            table.DataTable().ajax.reload();
-        }, function (error) {
-            toastr['error'](error.message);
-        });
-    };
-
-    window.deleteCategory = function (e) {
-        let form = $(e).closest('form');
-        let url = form.attr('action');
-        let name = form.attr('data-name');        
-        let template = swalText(name);
-
-        Swal.fire({
-            title: 'Selected items!',
-            html: template,
-            icon: 'warning',
-            background: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                APIDELETECALLER(url, function (response) {
-                    toastr['success'](response.message);
-                    table.DataTable().ajax.reload();
-                }, function (error) {
-                    toastr['error'](error.message);
-                });
-            }
-        });
-    };
-
     $('.modal').on('hidden.bs.modal', function () {
         $(this).find('form').find('select').empty();
         $(this).find('form')[0].reset();
     });
-
-    window.getCategoryProducts = function (e) {
-        let id = $(e).attr('data-id');
-        APICaller(CATEGORY_ROUTE,{'category':id,'category_product':true},function(response){
-            console.log(response);
-        },function(error){
-            console.log(error);
-        })
-    }
-
-    window.editCategory = function (e) {
-        let id = $(e).attr('data-id');
-
-        APICallerWithoutData(EDIT_CATEGORY_ROUTE.replace(':id', id), function (data) {
-            let responseDataSubCategories = data.allSubCategories;
-    
-            editModal.modal('show');
-            editForm.attr('action', UPDATE_CATEGORY_ROUTE.replace(':id', id));
-            editForm.find('input[name="name"]').val(data.category.name);
-            editForm.find('textarea[name="description"]').val(data.category.description);
-            
-            APICaller(CATEGORY_ROUTE, { "category": id }, function (response) {
-                    let relatedSubCategories = response.data[0].sub_categories;
-
-                        for (let index = 0; index < responseDataSubCategories.length; index++) {
-                            let idToCheck = responseDataSubCategories[index].id;
-                            let matchingObj = relatedSubCategories.find(obj => obj.id == idToCheck ) ? 'selected' : "";
-                            
-                            editModal.find('.bootstrap-select .selectSubCategory').append(`<option ${matchingObj} value="${idToCheck}">${responseDataSubCategories[index].name}</option>`);
-                        }
-                        editModal.find('.bootstrap-select .selectSubCategory').selectpicker('refresh');
-    
-                }, function (error) {
-                    toastr['error'](error.message);
-                })
-        }, function (error) {
-            toastr['error'](error.message);
-        })
-    
-    }
-
-    window.selectCategory = function (e) {
-        if ($('tbody input[type="checkbox"]:checked').length === 0) {
-            $('.actions').addClass('d-none');
-        } else {
-            $('.actions').removeClass('d-none');
-        }
-    };
 
     $(document).on('change', ".selectAll", function () {
         if (this.checked) {
@@ -322,6 +277,77 @@ $(document).ready(function () {
         }
     });
 
+    //Window events
+    window.detachSubCategory = function (e) {
+        let form = $(e).closest('form');
+        let url = form.attr('action');
+
+        APIDELETECALLER(url, function (response) {
+            toastr['success'](response.message);
+            table.DataTable().ajax.reload();
+        }, function (error) {
+            toastr['error'](error.message);
+        });
+    };
+
+    window.deleteCategory = function (e) {
+        const form = $(e).closest('form');
+        const url = form.attr('action');
+        const name = form.attr('data-name');        
+
+        const template = swalText(name);
+
+        showConfirmationDialog('Selected items!', template, function () {
+            APIDELETECALLER(url, function (response) {
+                toastr['success'](response.message);
+                table.DataTable().ajax.reload();
+            }, function (error) {
+                toastr['error'](error.message);
+            });
+        });        
+    };
+
+    window.editCategory = function(e) {
+        let id = $(e).attr('data-id');
+        APICallerWithoutData(EDIT_CATEGORY_ROUTE.replace(':id', id), function(data) {
+            let category = data.category;
+            let allSubCategories = data.allSubCategories;
+            let relatedSubCategories = data.relatedSubCategory;
+
+            editModal.modal('show');
+            editForm.attr('action', UPDATE_CATEGORY_ROUTE.replace(':id', id));
+            editForm.find('input[name="name"]').val(category.name);
+            editForm.find('textarea[name="description"]').val(category.description);
+
+            for (let index = 0; index < allSubCategories.length; index++) {
+                const idToCheck = allSubCategories[index].id;
+                let matchingSubCategory = relatedSubCategories.find(obj => obj == idToCheck ) ? 'selected' : "";
+
+                editModal.find('.bootstrap-select .selectSubCategory')
+                .append(`
+                <option 
+                    ${matchingSubCategory} 
+                    value="${idToCheck}"
+                >
+                    ${allSubCategories[index].name}
+                </option>`);
+            }
+            editModal.find('.bootstrap-select .selectSubCategory').selectpicker('refresh');
+
+        },function(error){
+            toastr['error'](error.message);
+        });
+    }
+
+    window.selectCategory = function (e) {
+        if ($('tbody input[type="checkbox"]:checked').length === 0) {
+            $('.actions').addClass('d-none');
+        } else {
+            $('.actions').removeClass('d-none');
+        }
+    };
+
+    // Variable functions
     let deleteMultipleCategories = function () {
         let searchedIds = [];
         let searchedNames = [];
@@ -333,59 +359,17 @@ $(document).ready(function () {
         
         let template = swalText(searchedNames);
 
-        Swal.fire({
-            title: 'Selected items!',
-            html: template,
-            icon: 'warning',
-            background: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                searchedIds.forEach(function (id, index) {
-                    APIDELETECALLER(REMOVE_CATEGORY_ROUTE.replace(':id', id), function (response) {
-                        toastr['success'](response.message);
-                        table.DataTable().ajax.reload();
-                    }, function (error) {
-                        toastr['error'](error.message);
-                    });
+        showConfirmationDialog('Selected items!',template,function(){
+            searchedIds.forEach(function(id,index){
+                APIDELETECALLER(REMOVE_CATEGORY_ROUTE.replace(':id',id),function(response){
+                    toastr['success'](response.message);
+                    table.DataTable().ajax.reload();
+                },function(error){
+                    toastr['error'](error.message);
                 });
-            }
-        });
+            })
+        })
     };
-
-    let swalText = function (params) {
-        let text = '<div class="col-12 d-flex flex-wrap justify-content-center">';
-
-        if (Array.isArray(params)) {
-            params.forEach(function (name, index) {
-                text += `<p class="font-weight-bold m-0">${index !== params.length - 1 ? name + ', ' : name}</p>`;
-            });
-        } else {
-            text += `<p class="font-weight-bold m-0">${params}</p>`;
-        }
-
-        text += '</div>';
-
-        return text;
-    };
-
-    function ajaxResponse(obj) {
-        let form = $('.modal').find('form');
-
-        for (const [key, value] of Object.entries(obj)) {
-            form.find('span[id*=' + key + ']').removeClass('d-none').html(value);
-            form.find(':input[name*=' + key + ']').addClass('is-invalid');
-
-            setTimeout(function () {
-                form.find('span[id*=' + key + ']').addClass('d-none').html('');
-                form.find(':input[name*=' + key + ']').removeClass('is-invalid');
-            }, 2000);
-        }
-        ;
-    }
 
 
 });

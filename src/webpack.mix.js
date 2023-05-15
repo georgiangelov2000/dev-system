@@ -1,11 +1,13 @@
 const mix = require('laravel-mix');
-const fs = require('fs');
 
 mix.js('resources/js/ajax/methods.js', 'public/js/ajax/'),
 
-mix.js('resources/js/categories/categories.js', 'public/js'),
 
+mix.js('resources/js/categories/categories.js', 'public/js'),
+mix.js('resources/js/subcategories/subcategories.js', 'public/js'),
 mix.js('resources/js/brands/brands.js', 'public/js'),
+
+mix.js('resources/js/helpers/action_helpers.js', 'public/helpers/js'),
 
 mix.js('resources/js/suppliers/form.js', 'public/js/suppliers'),
 mix.js('resources/js/suppliers/suppliers.js', 'public/js/suppliers'),

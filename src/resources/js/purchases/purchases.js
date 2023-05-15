@@ -2,6 +2,7 @@ import { APIDELETECALLER , APICaller } from '../ajax/methods';
 
 $(function () {
     let table = $('table#purchasedProducts');
+    let paymentModal = $('#purchases_modal');
 
     $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice')
     .selectpicker('refresh')
@@ -250,7 +251,7 @@ $(function () {
 
                     let editButton = '<a href=' + EDIT_PRODUCT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + ' class="btn p-0" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
 
-                    let payButton = `<a class='btn p-0' title="Payment"><i class="fa-thin fa-cash-register"></i></a>`;
+                    let payButton = `<a  onclick="openPaymentModal(this)" purchase-price=${row.price} purchase-id=${row.id} class='btn p-0' title="Payment"><i class="fa-thin fa-cash-register"></i></a>`;
 
                     return `${deleteFormTemplate} ${editButton} ${previewLink} ${[payButton]}`;
                 }
@@ -461,6 +462,21 @@ $(function () {
         });
 
     };
+
+    window.openPaymentModal = function(e) {
+        paymentModal.modal('show');
+        let purchase =$(e).attr('purchase-id');
+        // let price = $(e).attr('order-price');
+        // let customer = $(e).attr('customer-id');
+
+        // modal.find('form input[name="price"]').val(price);
+        // modal.find('form input[name="order_id"]').val(order);
+        // modal.find('form input[name="customer_id"]').val(customer);
+    }
+
+    $('.modalCloseBtn').on('click', function () {
+        modal.modal('hide');
+    });
 
     let swalText = function (params) {
         let text = '<div class="col-12 d-flex flex-wrap justify-content-center">';

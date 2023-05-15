@@ -110,19 +110,6 @@ class CustomerService{
         return $products;
     }
 
-    public function getEditData(){
-        $customer = $this->customer
-        ->with('image')
-        ->find($this->customer->id);
-
-        $result = [
-            'image' => $customer->image
-        ];
-
-        return $result;
-
-    }
-
 }
 
 ?>

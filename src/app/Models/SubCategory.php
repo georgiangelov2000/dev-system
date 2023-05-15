@@ -31,11 +31,11 @@ class SubCategory extends Model
      */
     public $timestamps = false;
 
-    protected $fillable = ['id', 'name'];
+    protected $fillable = ['id', 'name','category_id'];
     
-    public function categories()
+    public function category()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsTo(Category::class);
     }
     
 }

@@ -3,9 +3,9 @@ export function APIPOSTCALLER(url, data, callback) {
         type: "POST",
         url: url,
         data: data,
-        success: function (response) {
+        success: function (response,xhr) {
             if (typeof callback === 'function') {
-                callback(response);
+                callback(response,xhr);
             }
         },
         error: function (error) {

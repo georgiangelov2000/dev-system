@@ -1,6 +1,6 @@
 import { APIPOSTCALLER } from '../ajax/methods';
 
-$(document).ready(function () {
+$(function(){
     let table = $('#brandsTable');
     //Global category variables
 

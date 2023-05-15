@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Helpers\LoadStaticData;
 use App\Models\Product;
 use App\Http\Requests\ProductRequest;
+use App\Models\SubCategory;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -34,7 +35,11 @@ class ProductController extends Controller
         $suppliers = $this->staticDataHelper->callSupliers();
         $brands = $this->staticDataHelper->callBrands();
         $categories = $this->staticDataHelper->loadCallCategories();
-        return view('purchases.create', ['suppliers' => $suppliers, 'brands' => $brands,'categories' => $categories]);
+        return view('purchases.create', [
+            'suppliers' => $suppliers, 
+            'brands' => $brands,
+            'categories' => $categories
+        ]);
     }
 
     public function store(ProductRequest $request)
@@ -109,19 +114,16 @@ class ProductController extends Controller
             'categories'
         ));
     }
-    
+
     public function fetchRelatedProductData($productModel)
     {
-        $categorySubCategories = $productModel->categories()
-            ->with('subCategories')
+        $productModel->load('categories:id', 'subcategories:id', 'brands:id');
+
+        $categorySubCategories = SubCategory::select('id', 'name')
+            ->whereIn('category_id', $productModel->categories->pluck('id'))
             ->get()
-            ->pluck('subCategories')
-            ->flatten()
-            ->map(function ($subCategory) {
-                return $subCategory->only(['id', 'name']);
-            })
             ->toArray();
-        
+
         return [
             'categorySubCategories' => $categorySubCategories,
             'productCategory' => $productModel->categories->pluck('id')->first(),
@@ -129,6 +131,8 @@ class ProductController extends Controller
             'productBrands' => $productModel->brands->pluck('id')->toArray(),
         ];
     }
+
+
 
     public function update(Product $product, ProductRequest $request)
     {
@@ -139,8 +143,9 @@ class ProductController extends Controller
         DB::beginTransaction();
         try {
             
-            $productService->imageUploader($data['image']);
-            
+            if (isset($data['image'])) {
+                $productService->imageUploader($data['image']);
+            }
 
             $productService->attachProductCategory($data['category_id']);
 

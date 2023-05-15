@@ -69,18 +69,11 @@ $(function () {
                 </div>
                 <div>
                     <span>Due amount: </span>
-                    ${data.total_sales != 0  ?  '<strong class="text-danger">  - '+ data.total_sales +' </strong>' : '<strong>' + data.total_sales + ' </strong>'}€
+                    ${data.total_sales != 0  ?  '<strong class="text-danger">  - '+ data.total_sales +' </strong>' : '<strong>' + data.total_sales + ' </strong>'}
                 </div>`;
 
                 template+=`
                 <div style="background-color:rgb(244, 246, 249);" class="p-4 rounded m-2">
-                    <div class="dt-buttons btn-group flex-wrap mb-3">
-                        <button class="btn btn-sm btn-outline-secondary mr-2 buttons-copy buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>Copy</span></button> 
-                        <button class="btn btn-sm btn-outline-secondary mr-2 buttons-csv buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>CSV</span></button> 
-                        <button class="btn btn-sm btn-outline-secondary mr-2 buttons-excel buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>Excel</span></button> 
-                        <button class="btn btn-sm btn-outline-secondary mr-2 buttons-pdf buttons-html5" tabindex="0" aria-controls="example1" type="button"><span>PDF</span></button>
-                        <button class="btn btn-sm btn-outline-secondary mr-2 buttons-print" tabindex="0" aria-controls="example1" type="button"><span>Print</span></button> 
-                    </div>
                     <table class="${tableClass} table table-sm table-bordered table-without-border table-hover col-6">
                         <thead>
                             <tr>

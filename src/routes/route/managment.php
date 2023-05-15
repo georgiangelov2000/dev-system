@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
@@ -30,6 +31,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [CategoryController::class, 'store'])->name('store');
         Route::delete('/delete/{category}', [CategoryController::class, 'delete'])->name('delete');
         Route::delete('/detach/subcategory/{subcategory}', [CategoryController::class, 'detachSubCategory'])->name('detach.subcategory');
+    });
+
+    Route::prefix('subcategories')->name('subcategory.')->group(function () {
+        Route::get('/', [SubCategoryController::class, 'index'])->name('index');
+        Route::post('/store', [SubCategoryController::class, 'store'])->name('store');
+        Route::delete('/delete/{subcategory}', [SubCategoryController::class, 'delete'])->name('delete');
+        Route::get('/edit/{subcategory}', [SubCategoryController::class, 'edit'])->name('edit');
+        Route::put('/update/{subcategory}', [SubCategoryController::class, 'update'])->name('update');
     });
 
     Route::prefix('brands')->name('brand.')->group(function () {

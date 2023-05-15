@@ -121,6 +121,44 @@
         </div>
     </div>
 
+    <div id="purchases_modal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Marked paid purchase to supplier</h5>
+              <button type="button" class="close modalCloseBtn" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST" id="payOrderForm">
+                    @csrf
+                    <div class="form-group">
+                        <label>Payment date</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="far fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                            <input type="text" class="form-control datepicker" name="date_of_payment">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="text" name="price" class="form-control" value="" >
+                    </div>
+                    <input type="hidden" name="purchase_id" value="">
+                </form>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary" id="savePayOrder">Save changes</button>
+              <button type="button" class="btn btn-secondary modalCloseBtn" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>  
+
     @push('scripts')
         <script type="text/javascript" src="{{ mix('js/purchases/purchases.js') }}"></script>
         <script type='text/javascript'>

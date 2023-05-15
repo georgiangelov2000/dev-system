@@ -58,7 +58,7 @@ $(function(){
       return;
     }
 
-    APICaller(PRODUCT_API_ROUTE, { 'search': text }, function (response) {
+    APICaller(PRODUCT_API_ROUTE, { 'search': text, 'out_of_stock':true }, function (response) {
       let products = response.data;
 
       if (products.length > 0) {

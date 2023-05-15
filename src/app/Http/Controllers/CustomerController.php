@@ -22,8 +22,8 @@ class CustomerController extends Controller
 
     public function index()
     {
-        $countries = $this->staticDataHelper->callStatesAndCountries()["countries"];
-        $states = $this->staticDataHelper->callStatesAndCountries()["states"];
+        $countries = $this->staticDataHelper->callStatesAndCountries('states');
+        $states = $this->staticDataHelper->callStatesAndCountries();
 
         return view('customers.index', [
             'countries' => $countries,
@@ -73,18 +73,14 @@ class CustomerController extends Controller
 
     public function edit(Customer $customer)
     {
-        $service = new CustomerService($customer);
-
-        $callStatesAndCountries = $this->staticDataHelper->callStatesAndCountries();
-
-        $states = $callStatesAndCountries["states"];
-
-        $countries = $callStatesAndCountries["countries"];
+        $customer->load('image');
+        $country = $customer->country_id;
+        $states = $this->staticDataHelper->callStatesAndCountries($country,'states');
+        $countries = $this->staticDataHelper->callStatesAndCountries();
 
         return view('customers.edit', compact('customer'), [
             'countries' => $countries,
             'states' => $states,
-            'relatedRecords' => $service->getEditData()
         ]);
     }
 
@@ -96,11 +92,11 @@ class CustomerController extends Controller
         DB::beginTransaction();
 
         try {
-            
+
             if ($request->hasFile('image')) {
                 $customerService->imageUploader($request->file('image'));
             }
-                        
+
             $customer->update([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -111,7 +107,7 @@ class CustomerController extends Controller
                 'state_id' => $request->state_id,
                 'country_id' => $request->country_id,
                 'notes' => $request->notes,
-            ]);            
+            ]);
 
             DB::commit();
 
@@ -126,11 +122,12 @@ class CustomerController extends Controller
         return redirect()->route('customer.index')->with('success', 'Customer has been updated');
     }
 
-    public function customerOrders(Customer $customer){
+    public function customerOrders(Customer $customer)
+    {
         $customerService = new CustomerService($customer);
         $orders = $customerService->getOrders();
 
-        return view('customers.orders',compact('orders'));
+        return view('customers.orders', compact('orders'));
     }
 
     public function updateOrders(Request $request)
@@ -150,17 +147,17 @@ class CustomerController extends Controller
             'sold_quantity.*.required' => 'The sold quantity is required.',
             'sold_quantity.*.numeric' => 'The sold quantity must be a numeric value.',
         ]);
-        
+
         $orderIds = $data['order_ids'];
         $singleSoldPrices = $data['single_sold_price'];
         $soldQuantities = $data['sold_quantity'];
         $discounts = $data['discount'];
 
         DB::beginTransaction();
-    
+
         try {
             foreach ($orderIds as $key => $orderId) {
-                
+
                 $newTotalPrice  = ($singleSoldPrices[$key] * $soldQuantities[$key]);
 
                 $order = [
@@ -170,7 +167,7 @@ class CustomerController extends Controller
                     'sold_quantity' => $soldQuantities[$key],
                 ];
                 // Update the order in the database using the update query or Eloquent model
-    
+
                 // Example using Eloquent model:
                 Order::where('id', $order['id'])->update([
                     'single_sold_price' => $order['single_sold_price'],
@@ -178,7 +175,7 @@ class CustomerController extends Controller
                     'sold_quantity' => $order['sold_quantity'],
                 ]);
             }
-    
+
             DB::commit();
 
             return redirect()->route('customer.index')->with('success', 'Orders has been updated');
@@ -190,34 +187,33 @@ class CustomerController extends Controller
     }
 
     public function delete(Customer $customer)
-{
-    DB::beginTransaction();
-    try {
+    {
+        DB::beginTransaction();
+        try {
 
-        if ($customer->orders()->exists()) {
-            return response()->json(['message' => 'Customer has related orders and cannot be deleted'], 500);
-        }
-
-        $customer->orders()->delete();
-        $customer_image = $customer->image;
-        if ($customer_image) {
-            $imagePath = storage_path('app/public/images/customers/' . $customer_image->name);
-
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
+            if ($customer->orders()->exists()) {
+                return response()->json(['message' => 'Customer has related orders and cannot be deleted'], 500);
             }
-        };
 
-        $customer->delete();
-        DB::commit();
-        Log::info('Successfully deleted customer');
-        return response()->json(['message' => 'Customer has been deleted'], 200);   
-    } catch (\Exception $e) {
-        DB::rollback();
-        Log::error('Error deleting customer: ' . $e->getMessage());
-        return response()->json(['message' => 'Customer has not been deleted', 'error' => $e->getMessage()], 500);
+            $customer->orders()->delete();
+            $customer_image = $customer->image;
+            if ($customer_image) {
+                $imagePath = storage_path('app/public/images/customers/' . $customer_image->name);
+
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            };
+
+            $customer->delete();
+            DB::commit();
+            Log::info('Successfully deleted customer');
+            return response()->json(['message' => 'Customer has been deleted'], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error deleting customer: ' . $e->getMessage());
+            return response()->json(['message' => 'Customer has not been deleted', 'error' => $e->getMessage()], 500);
+        }
     }
-}
 
-    
 }

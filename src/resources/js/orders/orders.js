@@ -1,6 +1,6 @@
 import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
 
-$(document).ready(function () {
+$(function(){
     $('.selectAction, .selectType, .selectCustomer').selectpicker();
 
     let bootstrapCustomer = $('.bootstrap-select .selectCustomer');

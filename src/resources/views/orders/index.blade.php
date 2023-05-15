@@ -66,6 +66,11 @@
                         <span>-</span>
                         <span>The order has been placed</span>
                     </div>
+                    <div class="col-12">
+                        <i class="fa-light fa-right-left"></i>
+                        <span>-</span>
+                        <span>When you delete order, the order's quantity will be returned to the current product</span>
+                    </div>
                 </div>
                 <table id="ordersTable" class="table  table-hover table-sm dataTable no-footer">
                     <thead>
@@ -94,6 +99,7 @@
             </div>
         </div>
     </div>
+
     <div id="transaction_modal" class="modal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -131,6 +137,7 @@
           </div>
         </div>
       </div>  
+      
     @push('scripts')
         <script type="text/javascript" src="{{ mix('js/orders/orders.js') }}"></script>
         <script type="text/javascript">

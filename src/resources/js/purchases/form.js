@@ -1,6 +1,6 @@
 import { APICaller} from '../ajax/methods';
 
-$(document).ready(function () {
+$(function(){
 
     $('.selectSupplier, .selectCategory, .selectSubCategory, .selectBrands').selectpicker();
 

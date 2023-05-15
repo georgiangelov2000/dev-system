@@ -1,6 +1,6 @@
-import { APICaller, APICallerWithoutData, test } from '../ajax/methods';
+import { APICaller, APICallerWithoutData } from '../ajax/methods';
 
-$(document).ready(function () {
+$(function(){
     let table = $('#customersTable');
     $('.selectAction, .selectCountry, .selectState').selectpicker('refresh').val('').trigger('change');
 

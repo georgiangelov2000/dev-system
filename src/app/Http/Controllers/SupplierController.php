@@ -22,8 +22,8 @@ class SupplierController extends Controller {
     }
 
     public function index() {
-        $countries = $this->staticDataHelper->callStatesAndCountries()["countries"];
-        $states = $this->staticDataHelper->callStatesAndCountries()["states"];
+        $countries = $this->staticDataHelper->callStatesAndCountries('countries');
+        $states = $this->staticDataHelper->callStatesAndCountries('states');
         $categories = $this->staticDataHelper->loadCallCategories();
         
         return view('suppliers.index',[
@@ -41,7 +41,9 @@ class SupplierController extends Controller {
     }
 
     public function getState($countryId) {
-        return response()->json($this->staticDataHelper->callStatesAndCountries($countryId)["states"]);
+        return response()->json(
+            $this->staticDataHelper->callStatesAndCountries($countryId,'states')
+        );
     }
 
     public function store(SupplierRequest $request) {
@@ -78,17 +80,11 @@ class SupplierController extends Controller {
     public function edit(Supplier $supplier)
     {
         $service = new SupplierService($supplier);
+        $country = $supplier->country_id;
 
-        // Load all categories
         $categories = $this->staticDataHelper->loadCallCategories();
-
-        if($supplier->country_id) {
-            $callStatesAndCountries = $this->staticDataHelper->callStatesAndCountries(
-                $supplier->country_id
-            );
-            $states = $callStatesAndCountries["states"];
-            $countries = $callStatesAndCountries["countries"];
-        }
+        $states = $this->staticDataHelper->callStatesAndCountries($country,'states');
+        $countries = $this->staticDataHelper->callStatesAndCountries('countries');
 
         $supplier = $supplier->load('image');
 

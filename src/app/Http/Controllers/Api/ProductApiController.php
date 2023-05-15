@@ -22,7 +22,8 @@ class ProductApiController extends Controller
         $end_total_price = $request->end_total_price;
         $single_total_price = $request->single_total_price;
         $search = $request->search;
-
+        $out_of_stock = $request->out_of_stock;
+        
         $productQuery = $this->buildProductQuery();
 
         if ($supplier) {
@@ -59,6 +60,9 @@ class ProductApiController extends Controller
         }
         if($search) {
             $productQuery->where('name', 'LIKE', '%'.$search.'%');
+            if($out_of_stock) {
+                $productQuery->where('quantity','>',0);
+            }
         }
 
         $result = $this->getProducts($productQuery);

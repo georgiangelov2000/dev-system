@@ -216,19 +216,31 @@ class OrderController extends Controller
 
     public function delete(Order $order)
     {
-
+        $productId = $order->product_id;
+        $quantity = $order->sold_quantity;
+    
         DB::beginTransaction();
-
+    
         try {
+            $product = Product::find($productId);
+    
+            if (!$product) {
+                throw new \Exception("Product not found");
+            }
+    
+            $product->quantity += $quantity;
+            $product->save();
+    
             $order->delete();
+    
             DB::commit();
+    
+            return redirect()->route('orders.index')->with('success', 'Order has been deleted');
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
-            Log::info($e->getMessage());
-            return response()->json(['message' => 'Failed to delete order'], 500);
+            Log::error($e->getMessage());
+            return back()->with('error', 'Order has not been deleted');
         }
-        return response()->json(['message' => 'Order has been deleted'], 200);
     }
 
 }

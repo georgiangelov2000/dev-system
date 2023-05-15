@@ -51,8 +51,8 @@
                                 <select 
                                     multiple="" 
                                     class="form-control selectSubCategory" 
-                                    name="subcategory[]"
-                                    multiple data-selected-text-format="count > 7" 
+                                    name="sub_categories[]"
+                                    multiple data-selected-text-format="count > 5" 
                                     data-actions-box="true" 
                                     data-dropup-auto="false" 
                                 >

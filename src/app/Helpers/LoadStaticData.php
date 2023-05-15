@@ -13,37 +13,33 @@ use App\Models\Customer;
 class LoadStaticData
 {
 
-    static function callSubCategories($option = null)
+    public static function callSubCategories($option = null)
     {
-        $subCategoryQ = SubCategory::query()->select('id', 'name');
-
+        $subCategoryQ = SubCategory::select('id', 'name');
+    
         if ($option === 'assigned') {
-            $subCategoryQ->has('categories');
-        } else if ($option === 'unnasigned') {
-            $subCategoryQ->whereDoesntHave('categories');
+            $subCategoryQ->has('category');
+        } else if ($option === 'unassigned') {
+            $subCategoryQ->doesntHave('category');
         }
-
+    
         $result = $subCategoryQ->get();
-
+    
         return $result;
     }
 
-    static function callStatesAndCountries($country = null)
+    static function callStatesAndCountries($country = null, $option = null)
     {
 
-        $statesQuery = State::select('id', 'name');
-
-        if ($country) {
-            $statesQuery->where('country_id', $country);
+        if ($country && $option === 'states') {
+           return State::select('id', 'name')->where('country_id', $country)->get();
         }
-
-        $states = $statesQuery->get();
-        $countries = Country::select('id', 'name')->get();
-
-        return [
-            'states' => $states,
-            'countries' => $countries
-        ];
+        else if($option === 'states') {
+           return State::select('id', 'name')->get();
+        }
+        else {
+            return Country::select('id', 'name')->get();
+        };
     }
 
     static function loadCallCategories($option = null)
@@ -59,15 +55,13 @@ class LoadStaticData
 
     static function callSupliers()
     {
-        $query = Supplier::query()->with('categories');
+        $query = Supplier::select('id','name')
+        ->whereNotNull('country_id')
+        ->whereNotNull('state_id')
+        ->whereHas('categories')
+        ->get();
 
-        $suppliers = $query
-            ->whereNotNull('country_id')
-            ->whereNotNull('state_id')
-            ->whereHas('categories')
-            ->get();
-
-        return $suppliers;
+        return $query;
     }
 
     static function callBrands()
