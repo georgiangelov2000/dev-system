@@ -15,24 +15,21 @@ class BrandController extends Controller {
     }
 
     public function store(BrandRequest $request) {
+        
         $data = $request->validated();
-
         DB::beginTransaction();
 
         try {
-
             Brand::create([
                 'name' => $data['name'],
                 'description' => $data['description']
             ]);
-
             DB::commit();
-
             Log::info('Brand has been created');
         } catch (\Exception $e) {
-            dd($e);
             DB::rollback();
             Log::info($e->getMessage());
+            return response()->json(['error' => 'Category has not been created'], 500);
         }
 
         return response()->json(['message' => 'Brand has been created', 200]);

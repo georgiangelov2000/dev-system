@@ -1,8 +1,21 @@
 import { APIDELETECALLER , APICaller } from '../ajax/methods';
 
+// import { 
+//     APIPOSTCALLER, 
+//     APICallerWithoutData, 
+//     APIDELETECALLER 
+// } from '../ajax/methods';
+// import {
+//     swalText,
+//     ajaxResponse,
+//     showConfirmationDialog,
+
+// } from '../helpers/action_helpers';
+
 $(function () {
     let table = $('table#purchasedProducts');
     let paymentModal = $('#purchases_modal');
+    let closeModal = $('.modalCloseBtn');
 
     $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice')
     .selectpicker('refresh')
@@ -474,8 +487,8 @@ $(function () {
         // modal.find('form input[name="customer_id"]').val(customer);
     }
 
-    $('.modalCloseBtn').on('click', function () {
-        modal.modal('hide');
+    closeModal.on('click', function () {
+        closeModal(paymentModal);
     });
 
     let swalText = function (params) {

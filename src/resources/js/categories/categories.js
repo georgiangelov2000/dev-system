@@ -5,15 +5,12 @@ import {
     APIDELETECALLER 
 } from '../ajax/methods';
 import {
-    openModal,
-    closeModal,
     swalText,
-    submit,
-    update,
     ajaxResponse,
     showConfirmationDialog,
-
+    closeModal
 } from '../helpers/action_helpers';
+
 $(function(){
 
     let table = $('#categoriesTable');
@@ -27,7 +24,7 @@ $(function(){
 
     let createForm = createModal.find('form');
     let editForm = editModal.find('form');
-    
+    let closeModalButton = $('.modalCloseBtn');
 
     $('.selectSubCategory,.selectAction')
     .selectpicker('refresh')
@@ -191,6 +188,7 @@ $(function(){
         e.preventDefault();
 
         var actionUrl = createForm.attr('action');
+
         var data = createForm.serialize();
 
         APIPOSTCALLER(actionUrl, data,
@@ -203,7 +201,7 @@ $(function(){
                     createModal.modal('toggle');
                     table.DataTable().ajax.reload();
                 } else {
-                    toastr['error'](response.message);
+                    toastr['error'](response.responseJSON.message);
                     ajaxResponse(response.responseJSON, createModal);
                 }
             },
@@ -213,7 +211,7 @@ $(function(){
         );
     });
 
-    $('#updateForm').on("click", function (e) {
+    updateForm.on("click", function (e) {
         e.preventDefault();
 
         var actionUrl = editForm.attr('action');
@@ -253,13 +251,8 @@ $(function(){
         }
     });
 
-    $('.modalCloseBtn').on('click', function () {
-        $('.modal').modal('hide');
-    });
-
-    $('.modal').on('hidden.bs.modal', function () {
-        $(this).find('form').find('select').empty();
-        $(this).find('form')[0].reset();
+    closeModalButton.on('click', function () {
+        closeModal($(this).closest('.modal'));
     });
 
     $(document).on('change', ".selectAll", function () {

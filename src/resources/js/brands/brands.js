@@ -1,14 +1,29 @@
-import { APIPOSTCALLER } from '../ajax/methods';
+import { APIDELETECALLER, APIPOSTCALLER } from '../ajax/methods';
+import {
+    swalText,
+    ajaxResponse,
+    showConfirmationDialog,
+    openModal,
+    submit
+
+} from '../helpers/action_helpers';
 
 $(function(){
+
+    $('.selectAction')
+    .selectpicker('refresh')
+    .val('')
+    .trigger('change');
+
     let table = $('#brandsTable');
     //Global category variables
 
     let createModal = $('#createModal');
     let editModal = $('#editModal');
 
-    let createForm = createModal.find('form');
     let editForm = editModal.find('form');
+    let createBrand = $('.createBrand');
+
 
     table.DataTable({
         ajax: {
@@ -54,10 +69,18 @@ $(function(){
                 orderable: false,
                 width: '15%',
                 render: function (data, type, row) {
-                    let deleteButton = '<a data-id=' + row.id + ' data-name=' + row.name + ' class="btn" onclick="deleteBrand(this)" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
-                    let editButton = '<a data-id=' + row.id + ' class="btn" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
-                    let productsButton = '<a data-id=' + row.id + ' class="btn" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
-                    return `${deleteButton} ${editButton} ${productsButton}`;
+
+                    const deleteFormTemplate = `
+                    <form style="display:inline-block;" data-name="${row.name}"  id="delete-form" action="${REMOVE_BRAND_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
+                      <input type="hidden" name="_method" value="DELETE">
+                      <input type="hidden" name="id" value="${row.id}">
+                      <button type="submit" data-name="${row.name}" data-id="${row.id}" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteBrand(this);"><i class="fa-light fa-trash text-danger"></i></button>
+                    </form>
+                  `;
+
+                    const editButton = '<a data-id=' + row.id + ' class="btn" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
+                    const productsButton = '<a data-id=' + row.id + ' class="btn" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
+                    return `${deleteFormTemplate} ${editButton} ${productsButton}`;
                 }
             }
         ],
@@ -65,62 +88,60 @@ $(function(){
     });
 
     //ACTIONS
-    $('.createBrand').on("click", function () {
-        createForm.attr('action', STORE_BRAND_ROUTE);
-        createModal.modal('show');
+    createBrand.on("click", function () {
+        openModal(createModal,STORE_BRAND_ROUTE);
     });
 
     $('#submitForm').on("click", function (e) {
         e.preventDefault();
+        submit(e,createModal,table);
+    });
 
-        var actionUrl = createForm.attr('action');
-        var data = createForm.serialize();
+    $('#updateForm').on("click", function (e) {
+        e.preventDefault();
+
+        var actionUrl = editForm.attr('action');
+        var data = editForm.serialize();
 
         APIPOSTCALLER(actionUrl, data,
                 function (response) {
                     toastr['success'](response.message);
-                    createForm.trigger('reset');
-                    createModal.modal('toggle');
+                    editForm.trigger('reset');
+                    editModal.modal('toggle');
                     table.DataTable().ajax.reload();
                 },
                 function (error) {
-                    toastr['error']('Category has not been created');
+                    toastr['error'](response.responseJSON.message);
                     ajaxResponse(error.responseJSON.errors);
                 }
         );
     });
 
+    $('.selectAction').on('change', function () {
+        switch ($(this).val()) {
+            case 'delete':
+                deleteMultipleBrands();
+                break;
+            default:
+        }
+    });
+
+    // Window events
     window.deleteBrand = function (e) {
-        let id = $(e).attr('data-id');
-        let name = $(e).attr('data-name');
+        const form = $(e).closest('form');
+        const url = form.attr('action');
+        const name = form.attr('data-name');        
 
-        let template = swalText(name);
+        const template = swalText(name);
 
-        Swal.fire({
-            title: 'Selected items!',
-            html: template,
-            icon: 'warning',
-            background: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    method: "GET",
-                    url: REMOVE_BRAND_ROUTE.replace(':id', id),
-                    contentType: 'application/json',
-                    success: function (response) {
-                        toastr['success'](response.message);
-                        table.DataTable().ajax.reload();
-                    },
-                    error: function (errors) {
-                        toastr['error'](errors.message);
-                    }
-                });
-            }
-        });
+        showConfirmationDialog('Selected items!', template, function () {
+            APIDELETECALLER(url, function (response) {
+                toastr['success'](response.message);
+                table.DataTable().ajax.reload();
+            }, function (error) {
+                toastr['error'](error.message);
+            });
+        });    
     };
 
     window.editBrand = function (e) {
@@ -149,15 +170,7 @@ $(function(){
         }
     };
 
-    $('.selectAction').on('change', function () {
-        switch ($(this).val()) {
-            case 'delete':
-                deleteMultipleBrands();
-                break;
-            default:
-        }
-    });
-
+    // Variable functions
     let deleteMultipleBrands = function () {
         let searchedIds = [];
         let searchedNames = [];
@@ -169,86 +182,16 @@ $(function(){
 
         let template = swalText(searchedNames);
 
-        Swal.fire({
-            title: 'Selected items!',
-            html: template,
-            icon: 'warning',
-            background: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                searchedIds.forEach(function (id, index) {
-                    $.ajax({
-                        method: "GET",
-                        url: REMOVE_BRAND_ROUTE.replace(':id', id),
-                        contentType: 'application/json',
-                        success: function (data) {
-                            toastr['success']('Brand has been deleted');
-                            table.DataTable().ajax.reload();
-                        },
-                        error: function (errors) {
-                            toastr['error']('Brand has not been deleted');
-                            table.DataTable().ajax.reload();
-                        }
-                    });
-                });
-            }
-        });
-    };
-
-
-    let swalText = function (params) {
-        let text = '<div class="col-12 d-flex flex-wrap justify-content-center">';
-
-        if (Array.isArray(params)) {
-            params.forEach(function (name, index) {
-                text += `<p class="font-weight-bold m-0">${index !== params.length - 1 ? name + ', ' : name }</p>`;
-            });
-        } else {
-            text += `<p class="font-weight-bold m-0">${params}</p>`;
-        }
-
-        text += '</div>';
-
-        return text;
-    };
-
-    function ajaxResponse(obj) {
-        let form = $('.modal').find('form');
-
-        for (const [key, value] of Object.entries(obj)) {
-            form.find('span[id*=' + key + ']').removeClass('d-none').html(value);
-            form.find(':input[name*=' + key + ']').addClass('is-invalid');
-
-            setTimeout(function () {
-                form.find('span[id*=' + key + ']').addClass('d-none').html('');
-                form.find(':input[name*=' + key + ']').removeClass('is-invalid');
-            }, 2000);
-        }
-        ;
-    }
-
-    $('#updateForm').on("click", function (e) {
-        e.preventDefault();
-
-        var actionUrl = editForm.attr('action');
-        var data = editForm.serialize();
-
-        APIPOSTCALLER(actionUrl, data,
-                function (response) {
+        showConfirmationDialog('Selected Items!',template,function(){
+            searchedIds.forEach(function(id,index){
+                APIDELETECALLER(REMOVE_BRAND_ROUTE.replace(':id',id),function(response){
                     toastr['success'](response.message);
-                    editForm.trigger('reset');
-                    editModal.modal('toggle');
                     table.DataTable().ajax.reload();
-                },
-                function (error) {
-                    toastr['error']('Category has not been updated');
-                    ajaxResponse(error.responseJSON.errors);
-                }
-        );
-    });
+                },function(error){
+                    toastr['error'](error.message);
+                });
+            })
+        })
+    };
 
 });

@@ -68,7 +68,7 @@ $(function () {
             {
                 orderable: false,
                 name: 'name',
-                width: '6%',
+                width: '10%',
                 render: function (data, type, row) {
                     return `<span>${row.name}</span>`;
                 }

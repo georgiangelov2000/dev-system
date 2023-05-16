@@ -16,7 +16,6 @@ export function openModal(modal, url, data = null) {
 
 export function closeModal(modal) {
     modal.modal('hide');
-    
 }
 
 export function swalText(params) {
@@ -46,13 +45,12 @@ export function submit(e, modal, table) {
         let status = xhr;
         
         if (status == 'success') {
-            console.log(response);
             toastr['success'](response.message);
             form.trigger('reset');
             modal.modal('toggle');
             table.DataTable().ajax.reload();
         } else {
-            toastr['error'](response.message);
+            toastr['error'](response.responseJSON.message);
             ajaxResponse(response.responseJSON, modal);
         }
     },function(error) {

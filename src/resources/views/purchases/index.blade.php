@@ -131,6 +131,15 @@
               </button>
             </div>
             <div class="modal-body">
+                <div>
+                    <div>
+                        <b>Calculation 1:</b><span>triggers a calculation based on the quantity and single price.</span>
+                    </div>
+                    <div>
+                        <b>Calculation 2:</b> <span>triggers a calculation based on the initial quantity and single price.</span>
+                    </div>
+                </div>
+                <hr class="w-100">
                 <form action="" method="POST" id="payOrderForm">
                     @csrf
                     <div class="form-group">
@@ -150,10 +159,14 @@
                     </div>
                     <input type="hidden" name="purchase_id" value="">
                 </form>
+                <button type="button" class="btn btn-sm btn-outline-primary firstCalculation" data-dismiss="modal">Calculation 1</button>
+                <button type="button" class="btn btn-sm btn-outline-primary secondCalculation" data-dismiss="modal">Calculation 2</button>
             </div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-primary" id="savePayOrder">Save changes</button>
-              <button type="button" class="btn btn-secondary modalCloseBtn" data-dismiss="modal">Close</button>
+                <div class="col-6">
+                    <button type="submit" class="btn btn-primary" id="savePayOrder">Save changes</button>
+                    <button type="button" class="btn btn-secondary modalCloseBtn" data-dismiss="modal">Close</button>
+                </div>
             </div>
           </div>
         </div>

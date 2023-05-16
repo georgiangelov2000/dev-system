@@ -37,10 +37,12 @@ class CategoryController extends Controller
                 'description' => $data['description']
             ]);
 
-            foreach ($data['sub_categories'] as $subCategoryId) {
-                $subCategory = SubCategory::findOrFail($subCategoryId);
-                $subCategory->category_id = $category->id;
-                $subCategory->save();
+            if( isset($data['sub_categories']) && count($data['sub_categories']) ) {
+                foreach ($data['sub_categories'] as $subCategoryId) {
+                    $subCategory = SubCategory::findOrFail($subCategoryId);
+                    $subCategory->category_id = $category->id;
+                    $subCategory->save();
+                }
             }
 
             DB::commit();
@@ -81,18 +83,20 @@ class CategoryController extends Controller
                 'description' => $data['description']
             ]);
 
+        if( isset($data['sub_categories']) && count($data['sub_categories']) ) {
             foreach ($data['sub_categories'] as $subCategoryId) {
                 $subCategory = SubCategory::findOrFail($subCategoryId);
                 $subCategory->category_id = $category->id;
                 $subCategory->save();
             }
+        }
 
             DB::commit();
             Log::info('Category has been updated');
         } catch (\Exception $e) {
             DB::rollback();
             Log::info($e->getMessage());
-            return response()->json(['error' => 'Failed to update category'], 500);
+            return response()->json(['error' => 'Category has been deleted'], 500);
         }
 
         return response()->json(['message' => 'Category has been updated'], 200);
@@ -108,7 +112,7 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             Log::info($e->getMessage());
-            return response()->json(['message' => 'Failed to delete category'], 500);
+            return response()->json(['message' => 'Category has not been deleted'], 500);
         }
 
         return response()->json(['message' => 'Category has been deleted'], 200);

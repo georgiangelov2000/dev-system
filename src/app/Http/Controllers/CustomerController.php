@@ -33,7 +33,7 @@ class CustomerController extends Controller
 
     public function create()
     {
-        $countries = $this->staticDataHelper->callStatesAndCountries()["countries"];
+        $countries = $this->staticDataHelper->callStatesAndCountries('countries');
         $categories = $this->staticDataHelper->loadCallCategories();
 
         return view(

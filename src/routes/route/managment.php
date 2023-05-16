@@ -46,7 +46,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/edit/{brand}', [BrandController::class, 'edit'])->name('edit');
         Route::post('/update/{brand}', [BrandController::class, 'update'])->name('update');
         Route::post('/store', [BrandController::class, 'store'])->name('store');
-        Route::get('/delete/{brand}', [BrandController::class, 'delete'])->name('delete');
+        Route::delete('/delete/{brand}', [BrandController::class, 'delete'])->name('delete');
     });
 
     Route::prefix('suppliers')->name('supplier.')->group(function () {
