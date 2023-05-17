@@ -2,6 +2,20 @@
 @section('title', 'Dashboard')
 
 @section('content')
+
+    @php
+        $order_data_this_month = $dashboard_data['orders']['this_month'];
+        $order_data_previous_month = $dashboard_data['orders']['previous_month'];
+        
+        $packages_data_this_month = $dashboard_data['packages']['this_month'];
+        $packages_data_previous_month = $dashboard_data['packages']['previous_month'];
+        
+        $products_data_this_month = $dashboard_data['products']['this_month'];
+        $products_data_previous_month = $dashboard_data['products']['previous_month'];
+        
+        $top_five_customers = $dashboard_data['top_five_customers'];
+    @endphp
+
     <div class="row">
         <div class="card col-12 cardTemplate">
             <div class="card-header">
@@ -11,66 +25,64 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-3">
-                        <div class="col-12 d-flex flex-wrap rounded border border-primary p-0">
+                    <div class="col-4">
+                        <div class="dashboardBox col-12 d-flex flex-wrap rounded border border-primary p-0">
                             <div class="col-12 p-2 border-bottom border-primary">
                                 <h5 class="text-primary mb-0">Packages</h5>
                             </div>
-                            <div class="col-6 d-flex flex-column align-self-center">
+                            <div class="col-6 d-flex flex-column statisticsColumn align-self-center">
                                 <div class="mb-2 mt-2">
                                     <h6 class="mb-0">This month</h6>
                                     <div class="ml-2 mt-2">
                                         <div>
                                             <strong>Total:</strong>
-                                            <span>
-                                                <small>100</small> / <small>10.05%</small>
-                                            </span>
+                                            {{ $packages_data_this_month['counts'] ?? 0 }}
                                         </div>
                                         <div>
                                             <strong>Air:</strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $packages_data_this_month['by_status']['Air'] ?? 0 }}
                                             </span>
                                         </div>
                                         <div>
-                                            <strong>Ground: </strong>
+                                            <strong>Ground:</strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $packages_data_this_month['by_status']['Ground'] ?? 0 }}
                                             </span>
                                         </div>
                                         <div>
-                                            <strong>Sea: </strong>
+                                            <strong>Sea:</strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $packages_data_this_month['by_status']['Sea'] ?? 0 }}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="mb-2">
-                                    <h6 class="mb-0">Last month</h6>
+                                    <h6 class="mb-0">Previous month</h6>
                                     <div class="ml-2 mt-2">
                                         <div>
                                             <strong>Total:</strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $packages_data_previous_month['counts'] ?? 0 }}
                                             </span>
                                         </div>
                                         <div>
                                             <strong>Air:</strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $packages_data_previous_month['by_status']['Air'] ?? 0 }}
                                             </span>
                                         </div>
                                         <div>
-                                            <strong>Ground: </strong>
+                                            <strong>Ground:</strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $packages_data_previous_month['by_status']['Ground'] ?? 0 }}
                                             </span>
                                         </div>
                                         <div>
-                                            <strong>Sea: </strong>
+                                            <strong>Sea:</strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $packages_data_previous_month['by_status']['Sea'] ?? 0 }}
                                             </span>
                                         </div>
                                     </div>
@@ -87,54 +99,66 @@
                         </div>
                     </div>
 
-                    <div class="col-3">
-                        <div class="col-12 d-flex flex-wrap rounded border border-primary p-0">
+                    <div class="col-4">
+                        <div class="dashboardBox col-12 d-flex flex-wrap rounded border border-primary p-0">
                             <div class="col-12 p-2 border-bottom border-primary">
                                 <h5 class="text-primary mb-0">Orders</h5>
                             </div>
-                            <div class="col-6 d-flex flex-column align-self-center">
+                            <div class="col-6 d-flex flex-column statisticsColumn align-self-center">
                                 <div class="mb-2 mt-2">
                                     <h6 class="mb-0">This month</h6>
                                     <div class="ml-2 mt-2">
                                         <div>
                                             <strong>Total: </strong>
                                             <span>
-                                                <small>150</small> / <small>15.05%</small>
+                                                {{ $order_data_this_month['counts'] ?? 0 }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <strong>Received (Paid): </strong>
+                                            <span>
+                                                {{ $order_data_this_month['by_status']['Received']['count'] ?? 0 }}
                                             </span>
                                         </div>
                                         <div>
                                             <strong>Ordered: </strong>
                                             <span>
-                                                <small>120</small> / <small>12.05%</small>
+                                                {{ $order_data_this_month['by_status']['Ordered']['count'] ?? 0 }}
                                             </span>
                                         </div>
                                         <div>
-                                            <strong>Received: </strong>
+                                            <strong>Pending: </strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $order_data_this_month['by_status']['Pending']['count'] ?? 0 }}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="mb-2">
-                                    <h6 class="mb-0">Last month</h6>
+                                    <h6 class="mb-0">Previous month</h6>
                                     <div class="ml-2 mt-2">
                                         <div>
-                                            <strong>Total:</strong>
+                                            <strong>Total: </strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $order_data_previous_month['counts'] ?? 0 }}
                                             </span>
                                         </div>
                                         <div>
-                                            <strong>Ordered:</strong>
+                                            <strong>Received (Paid): </strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $order_data_previous_month['by_status']['Received']['count'] ?? 0 }}
                                             </span>
                                         </div>
                                         <div>
-                                            <strong>Received: </strong>
+                                            <strong>Ordered: </strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $order_data_previous_month['by_status']['Ordered']['count'] ?? 0 }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <strong>Pending: </strong>
+                                            <span>
+                                                {{ $order_data_previous_month['by_status']['Pending']['count'] ?? 0 }}
                                             </span>
                                         </div>
                                     </div>
@@ -151,30 +175,30 @@
                         </div>
                     </div>
 
-                    <div class="col-3">
-                        <div class="col-12 d-flex flex-wrap rounded border border-primary p-0">
+                    <div class="col-4">
+                        <div class="dashboardBox col-12 d-flex flex-wrap rounded border border-primary p-0">
                             <div class="col-12 p-2 border-bottom border-primary">
                                 <h5 class="text-primary mb-0">Purchases</h5>
                             </div>
-                            <div class="col-6 d-flex flex-column">
+                            <div class="col-6 d-flex flex-column statisticsColumn">
                                 <div class="mb-2 mt-2">
                                     <h6 class="mb-0">This month</h6>
                                     <div class="ml-2 mt-2">
                                         <div>
                                             <strong>Total: </strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $products_data_this_month['counts'] }}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="mb-2 mt-2">
-                                    <h6 class="mb-0">Last month</h6>
+                                    <h6 class="mb-0">Previous month</h6>
                                     <div class="ml-2 mt-2">
                                         <div>
                                             <strong>Total: </strong>
                                             <span>
-                                                <small>100</small> / <small>10.05%</small>
+                                                {{ $products_data_previous_month['counts'] }}
                                             </span>
                                         </div>
                                     </div>
@@ -190,178 +214,191 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="cardTemplate rounded mb-0">
+                            <div class="card-footer rounded bg-white">
+                                <div class="row">
+                                    <div class="col-sm-3 col-6">
+                                        <div class="description-block border-right">
+                                            <span class="description-percentage text-success"><i
+                                                    class="fas fa-caret-up"></i> 17%</span>
+                                            <h5 class="description-header">$35,210.43</h5>
+                                            <span class="description-text">TOTAL REVENUE</span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-sm-3 col-6">
+                                        <div class="description-block border-right">
+                                            <span class="description-percentage text-warning"><i
+                                                    class="fas fa-caret-left"></i> 0%</span>
+                                            <h5 class="description-header">$10,390.90</h5>
+                                            <span class="description-text">TOTAL COST</span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-sm-3 col-6">
+                                        <div class="description-block border-right">
+                                            <span class="description-percentage text-success"><i
+                                                    class="fas fa-caret-up"></i> 20%</span>
+                                            <h5 class="description-header">$24,813.53</h5>
+                                            <span class="description-text">TOTAL PROFIT</span>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-sm-3 col-6">
+                                        <div class="description-block">
+                                            <span class="description-percentage text-danger"><i
+                                                    class="fas fa-caret-down"></i> 18%</span>
+                                            <h5 class="description-header">1200</h5>
+                                            <span class="description-text">GOAL COMPLETIONS</span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mt-4">
                     <div class="col-6">
-                        <div class="card">
+                        <div class="cardTemplate rounded">
                             <div class="card-header">
-                                <h3 class="card-title">Top 5 customers</h3>
-                                <div class="card-tools">
-                                    <a href="#" class="btn btn-tool btn-sm">
-                                        <i class="fas fa-download"></i>
-                                    </a>
-                                </div>
+                                <h3 class="card-title">Top 5 Customers</h3>
                             </div>
                             <div class="card-body table-responsive p-0">
-                                <table class="table table-striped table-valign-middle">
+                                <table class="table table-valign-middle">
                                     <thead>
                                         <tr>
-                                            <th>Customer</th>
-                                            <th>Price</th>
-                                            <th>Sales</th>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Orders</th>
+                                            <th>Profit</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <img src="dist/img/default-150x150.png" alt="Product 1"
-                                                    class="img-circle img-size-32 mr-2">
-                                                Some Product
-                                            </td>
-                                            <td>$13 USD</td>
-                                            <td>
-                                                <small class="text-success mr-1">
-                                                    <i class="fas fa-arrow-up"></i>
-                                                    12%
-                                                </small>
-                                                12,000 Sold
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <img src="dist/img/default-150x150.png" alt="Product 1"
-                                                    class="img-circle img-size-32 mr-2">
-                                                Another Product
-                                            </td>
-                                            <td>$29 USD</td>
-                                            <td>
-                                                <small class="text-warning mr-1">
-                                                    <i class="fas fa-arrow-down"></i>
-                                                    0.5%
-                                                </small>
-                                                123,234 Sold
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <img src="dist/img/default-150x150.png" alt="Product 1"
-                                                    class="img-circle img-size-32 mr-2">
-                                                Amazing Product
-                                            </td>
-                                            <td>$1,230 USD</td>
-                                            <td>
-                                                <small class="text-danger mr-1">
-                                                    <i class="fas fa-arrow-down"></i>
-                                                    3%
-                                                </small>
-                                                198 Sold
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <img src="dist/img/default-150x150.png" alt="Product 1"
-                                                    class="img-circle img-size-32 mr-2">
-                                                Perfect Item
-                                                <span class="badge bg-danger">NEW</span>
-                                            </td>
-                                            <td>$199 USD</td>
-                                            <td>
-                                                <small class="text-success mr-1">
-                                                    <i class="fas fa-arrow-up"></i>
-                                                    63%
-                                                </small>
-                                                87 Sold
-                                            </td>
-                                        </tr>
+                                        @foreach ($top_five_customers as $key => $data)
+                                            <tr>
+                                                <td>
+                                                    {{ $data['customer_id'] }}
+                                                </td>
+                                                <td>
+                                                    {{ $key }}
+                                                </td>
+                                                <td>
+                                                    {{ $data['customer_email'] }}
+                                                </td>
+                                                <td>
+                                                    {{ $data['customer_phone'] }}
+                                                </td>
+                                                <td>{{ $data['orders_count'] }}</td>
+                                                <td>
+                                                    €{{ number_format($data['total_price'], 2, '.', '.') }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Top 5 Suppliers</h3>
-                                <div class="card-tools">
-                                    <a href="#" class="btn btn-tool btn-sm">
-                                        <i class="fas fa-download"></i>
-                                    </a>
-                                </div>
+                        <div class="cardTemplate rounded">
+                            <div class="card-header border-0">
+                                <h3 class="card-title">Online Store Overview</h3>
                             </div>
-                            <div class="card-body table-responsive p-0">
-                                <table class="table table-striped table-valign-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Product</th>
-                                            <th>Price</th>
-                                            <th>Sales</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <img src="dist/img/default-150x150.png" alt="Product 1"
-                                                    class="img-circle img-size-32 mr-2">
-                                                Some Product
-                                            </td>
-                                            <td>$13 USD</td>
-                                            <td>
-                                                <small class="text-success mr-1">
-                                                    <i class="fas fa-arrow-up"></i>
-                                                    12%
-                                                </small>
-                                                12,000 Sold
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <img src="dist/img/default-150x150.png" alt="Product 1"
-                                                    class="img-circle img-size-32 mr-2">
-                                                Another Product
-                                            </td>
-                                            <td>$29 USD</td>
-                                            <td>
-                                                <small class="text-warning mr-1">
-                                                    <i class="fas fa-arrow-down"></i>
-                                                    0.5%
-                                                </small>
-                                                123,234 Sold
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <img src="dist/img/default-150x150.png" alt="Product 1"
-                                                    class="img-circle img-size-32 mr-2">
-                                                Amazing Product
-                                            </td>
-                                            <td>$1,230 USD</td>
-                                            <td>
-                                                <small class="text-danger mr-1">
-                                                    <i class="fas fa-arrow-down"></i>
-                                                    3%
-                                                </small>
-                                                198 Sold
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <img src="dist/img/default-150x150.png" alt="Product 1"
-                                                    class="img-circle img-size-32 mr-2">
-                                                Perfect Item
-                                                <span class="badge bg-danger">NEW</span>
-                                            </td>
-                                            <td>$199 USD</td>
-                                            <td>
-                                                <small class="text-success mr-1">
-                                                    <i class="fas fa-arrow-up"></i>
-                                                    63%
-                                                </small>
-                                                87 Sold
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center border-bottom mb-3">
+                                    <p class="text-lg">
+                                        <i title="Orders review" class="fa-light fa-bookmark"></i>
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-up text-success"></i> €1233
+                                        </span>
+                                        <span class="text-muted">Total</span>
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-up text-success"></i> €1670
+                                        </span>
+                                        <span class="text-muted">Received</span>
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-up text-success"></i> €5424
+                                        </span>
+                                        <span class="text-muted">Ordered</span>
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-up text-success"></i> €6566
+                                        </span>
+                                        <span class="text-muted">Pending</span>
+                                    </p>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center border-bottom mb-3">
+                                    <p class="text-lg">
+                                        <i title="Purchase reviews" class="fa-light fa-cart-shopping"></i>
+                                    </p>
+                                    <p class="d-flex flex-column text-right"></p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-down text-danger"></i> €1230
+                                        </span>
+                                        <span class="text-muted">Total</span>
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-down text-danger"></i> €4344
+                                        </span>
+                                        <span class="text-muted">Paid</span>
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-down text-danger"></i> €1221
+                                        </span>
+                                        <span class="text-muted">Not paid</span>
+                                    </p>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-0">
+                                    <p class="text-lg">
+                                        <i title="More details" class="fa-light fa-grid-2"></i>
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-down text-danger"></i> 1232
+                                        </span>
+                                        <span class="text-muted">Customers</span>
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-down text-danger"></i> 5435
+                                        </span>
+                                        <span class="text-muted">Suppliers</span>
+                                    </p>
+                                    <p class="d-flex flex-column text-right">
+                                        <span class="font-weight-bold">
+                                            <i class="ion ion-android-arrow-down text-danger"></i> 6546
+                                        </span>
+                                        <span class="text-muted">Categories</span>
+                                    </p>
+                                </div>
+
                             </div>
                         </div>
                     </div>

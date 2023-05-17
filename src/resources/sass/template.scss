@@ -29,6 +29,12 @@ body {
 	object-fit: contain;
 }
 
+.dashboardBox{
+	.statisticsColumn{
+		height: 240px;
+	}
+}
+
 .dt-button{
 	background: none !important;
 	border-color: #6c757d !important;
