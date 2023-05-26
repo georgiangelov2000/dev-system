@@ -19,7 +19,7 @@
 #### htpasswd -c /etc/pwd/.htpasswd <username>
 #### /etc/pwd/.htpasswd - directory for generated credentials: username:hashed password
 
-##Countries and states
+## Countries and states
 #### docker-compose run artisan g:c
 #### docker-compose run artisan g:s all
   
