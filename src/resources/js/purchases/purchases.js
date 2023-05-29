@@ -38,7 +38,6 @@ $(function () {
     let bootstrapSelectBrands = $('.bootstrap-select .selectBrands');
     let bootstrapSelectTotalPrice = $('.bootstrap-select .selectPrice');
     let customTotalPrice = $('.customPrice');
-
     let applyBtn = $('.applyBtn');
 
     let dataTable = table.DataTable({
@@ -107,24 +106,43 @@ $(function () {
                 orderable: false,
                 name: "image",
                 render: function (data, type, row) {
-                    if (row.images) {
-                        if(row.quantity) {
-                            return `<div class="position-relative">
-                            <img id="preview-image" alt="Preview" class="img-fluid card card-widget widget-user w-100 m-0" src=${row.images.path + row.images.name} />
-                            <div class="ribbon-wrapper ribbon-lg">
-                                <div class="ribbon bg-success ">In stock</div>
-                            </div>
-                        </div>`;
-                        } else {
-                            return `<div class="position-relative">
-                                <img id="preview-image" alt="Preview" class="img-fluid card card-widget widget-user w-100 m-0" src=${row.images.path + row.images.name} />
-                                <div class="ribbon-wrapper ribbon-lg">
-                                    <div class="ribbon bg-danger ">out of stock</div>
-                                </div>
-                            </div>`;
-                        }
+                    if (row.images && row.images.length > 1) {
+                        // Generate carousel HTML with multiple images
+                        let carouselItems = row.images.map((image, index) => {
+                            let isActive = index === 0 ? 'active' : ''; // Set first image as active
+                            return `<div class="carousel-item ${isActive}">
+                                        <img class="d-block w-100" src="${image.path + image.name}" alt="Slide ${index + 1}">
+                                    </div>`;
+                        }).join('');
+                    
+                        return `<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                                    <div class="carousel-inner">
+                                        ${carouselItems}
+                                    </div>
+                                    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </div>`;
+                    } else if (row.images && row.images.length === 1) {
+                        // Generate HTML with a single image
+                        let imagePath = row.images[0].path + row.images[0].name;
+                        let stockStatus = row.quantity ? 'In stock' : 'Out of stock';
+                        let stockColor = row.quantity ? 'success' : 'danger';
+                    
+                        return `<div class="position-relative">
+                                    <img id="preview-image" alt="Preview" class="img-fluid card card-widget widget-user w-100 m-0" src="${imagePath}" />
+                                    <div class="ribbon-wrapper ribbon-lg">
+                                        <div class="ribbon bg-${stockColor}">${stockStatus}</div>
+                                    </div>
+                                </div>`;
                     } else {
-                        return "<img class='rounded mx-auto w-100' src='https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg'/>";
+                        // Generate HTML for a placeholder image
+                        return `<img class="rounded mx-auto w-100" src="https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg"/>`;
                     }
                 }
             },
