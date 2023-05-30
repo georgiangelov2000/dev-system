@@ -11,19 +11,34 @@ class CategoryApiController extends Controller {
     public function getData(Request $request) {
         $supplier = $request->supplier;
         $category = $request->category;
-
-        $categoriesQuery = $this->buildCategoriesQuery();
+        $search = $request->search;
+        
+        $categoryQuery = $this->buildCategoriesQuery();
 
         if ($supplier || $supplier == '0') {
-            $this->filterCategoriesBySupplier($categoriesQuery, $supplier);
+            $this->filterCategoriesBySupplier($categoryQuery, $supplier);
         }
-
+        if($search) {
+            $categoryQuery->where('name', 'LIKE', '%'.$search.'%');
+        }
         if ($category) {
-            $this->findCategory($categoriesQuery,$category);
+            $this->findCategory($categoryQuery,$category);
         }
 
-        $categories = $this->getCategories($categoriesQuery);
-        return response()->json(['data' => $categories]);
+        $offset = $request->input('start', 0);  
+        $limit = $request->input('length', 10);
+        $totalRecords = Category::count(); 
+        $filteredRecords = $categoryQuery->count();
+        $result = $categoryQuery->skip($offset)->take($limit)->get();
+
+        return response()->json(
+            [
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $filteredRecords,
+                'data' => $result
+            ]
+        );
     }
 
     private function buildCategoriesQuery() {
@@ -41,9 +56,4 @@ class CategoryApiController extends Controller {
     private function findCategory($query,$category){
         return $query->where('id',$category);
     }
-
-    private function getCategories($query) {
-        return $query->get()->toArray();
-    }
-
 }

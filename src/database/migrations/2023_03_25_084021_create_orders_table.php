@@ -20,7 +20,7 @@ class CreateOrdersTable extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->foreignId('product_id')
-                ->constrained('products')
+                ->constrained('purchases')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->foreignId('package_id')
@@ -29,12 +29,14 @@ class CreateOrdersTable extends Migration
                 ->onDelete('cascade');    
 
             $table->string('invoice_number');
-            $table->integer('sold_quantity');
-            $table->decimal('single_sold_price', 8, 2);
-            $table->decimal('total_sold_price', 8, 2);
-            $table->integer('discount_percent');
+            $table->unsignedInteger('sold_quantity')->default(0);
+            $table->unsignedDecimal('single_sold_price', 8, 2)->default(0);
+            $table->unsignedDecimal('total_sold_price', 8, 2)->default(0);
+            $table->unsignedInteger('discount_percent')->default(0);
             $table->date('date_of_sale');
             $table->string('tracking_number');
+            $table->tinyInteger('status')->comment('1-received,2-partial,3-pending,4-ordered');
+            $table->tinyInteger('is_paid')->comment('1=paid,0=not paid')->default(0);
             $table->timestamps();
         });
     }

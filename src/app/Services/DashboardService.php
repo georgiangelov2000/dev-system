@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\Customer;
+use App\Helpers\DashboardHelper;
 use App\Models\Order;
 use App\Models\Product;
 use Carbon\Carbon;
-
 use stdClass;
 
-class DashboardService{
+class DashboardService
+{
 
     public $currentMonthStart;
     public $currentMonthEnd;
@@ -25,118 +25,93 @@ class DashboardService{
     }
 
     //Query Builder
-    private function orderQueryBuilder(){
-        return Order::query()->select(['id','date_of_sale','is_paid','status','customer_id','single_sold_price','total_sold_price']);
+    private function orderQueryBuilder()
+    {
+        return Order::query()->select(['id', 'date_of_sale', 'is_paid', 'status', 'customer_id', 'single_sold_price', 'total_sold_price']);
     }
-    private function productQueryBuilder(){
+    private function productQueryBuilder()
+    {
         return Product::query()
-        ->select(['id','created_at'])
-        ->where('status','enabled');
+            ->select(['id', 'created_at','is_paid','total_price'])
+            ->where('status', 'enabled');
     }
 
     // Logic
-    public function orders(){
-
+    public function orders()
+    {
         $statusNames = config('statuses.order_statuses');
 
-        $currentMonthOrdersCount = $this->orderQueryBuilder()
-            ->whereBetween('date_of_sale', [$this->currentMonthStart, $this->currentMonthEnd
-        ])->count();
+        $curMonthOrderCounts = DashboardHelper::getCounts(
+            $this->orderQueryBuilder()->whereBetween('date_of_sale',[
+                $this->currentMonthStart, $this->currentMonthEnd
+            ])
+        );
 
-        $previousMonthOrdersCount = $this->orderQueryBuilder()
-            ->whereBetween('date_of_sale', [$this->previousMonthStart, $this->previousMonthEnd
-        ])->count();
+        $prevMonthOrderCounts = DashboardHelper::getCounts(
+            $this->orderQueryBuilder()->whereBetween('date_of_sale',[
+                $this->previousMonthStart, $this->previousMonthEnd
+            ])
+        );
 
-        $currentMonthOrderByStatus = $this->orderQueryBuilder()
-        ->whereBetween('date_of_sale', [$this->currentMonthStart, $this->currentMonthEnd])
-        ->get()
-        ->groupBy('status')
-        ->map(function ($query) {
-            return ['count' => $query->count()];
-        })
-        ->mapWithKeys(function ($item, $status) use ($statusNames) {
-            return [$statusNames[$status] => $item];
-        })->toArray();
+        $curMontByStatus = DashboardHelper::getCountsByStatus(
+            $this->orderQueryBuilder()->whereBetween('date_of_sale',[
+                $this->currentMonthStart, $this->currentMonthEnd
+            ]),$statusNames,'status'
+        );
 
-
-        $previousMonthOrders = $this->orderQueryBuilder()
-        ->whereBetween('date_of_sale', [$this->previousMonthStart, $this->previousMonthEnd])
-        ->get()
-        ->groupBy('status')
-        ->map(function ($query) {
-            return ['count' => $query->count()];
-        })
-        ->mapWithKeys(function ($item, $status) use ($statusNames) {
-            return [$statusNames[$status] => $item];
-        })->toArray();
-
+        $prevMontByStatus = DashboardHelper::getCountsByStatus(
+            $this->orderQueryBuilder()->whereBetween('date_of_sale',[
+                $this->previousMonthStart, $this->previousMonthEnd
+            ]),$statusNames,'status'
+        );
 
         return [
             'this_month' => [
-                'counts' => $currentMonthOrdersCount,
-                'by_status' => $currentMonthOrderByStatus
+                'counts' => $curMonthOrderCounts,
+                'by_status' => $curMontByStatus
             ],
             'previous_month' => [
-                'counts' => $previousMonthOrdersCount,
-                'by_status' => $previousMonthOrders
-            ],
+                'counts' => $prevMonthOrderCounts,
+                'by_status' => $prevMontByStatus
+            ]
         ];
     }
-    public function packages(){
+    public function packages()
+    {
         $deliveryMethods = config('statuses.delievery_methods');
 
         $packageBuilder = $this->orderQueryBuilder()
-        ->where('package_id','>',0)
-        ->select('package_id')
-        ->with('package:id,delievery_method');
+            ->where('package_id', '>', 0)
+            ->select('package_id')
+            ->with('package:id,delievery_method');
 
-        $thisMonthCount =0;
-        $previousMonthCount=0;
+        $thisMonthCountGroupedData = DashboardHelper::getCountsByPackage(
+            $packageBuilder->whereBetween('date_of_sale', 
+                [$this->currentMonthStart, $this->currentMonthEnd]
+            ),$deliveryMethods
+        );
 
-        $thisMonthPackages = $packageBuilder
-        ->whereBetween('date_of_sale', [$this->currentMonthStart, $this->currentMonthEnd])
-        ->get()
-        ->groupBy(function ($packageOrder) {
-            return optional($packageOrder->package)->delievery_method;
-        })
-        ->mapWithKeys(function ($group, $key) use ($deliveryMethods,&$thisMonthCount) {
-            $count = count($group);
-            $thisMonthCount += $count;
-            return [$deliveryMethods[$key] => $group->count()];
-        });
-
-        $previousMonthPackages = $packageBuilder
-        ->whereBetween('date_of_sale', [$this->previousMonthStart, $this->previousMonthEnd])
-        ->get()
-        ->groupBy(function ($packageOrder) {
-            return optional($packageOrder->package)->delievery_method;
-        })
-        ->mapWithKeys(function ($group, $key) use ($deliveryMethods,&$previousMonthCount) {
-            $count = count($group);
-            $previousMonthCount += $count;
-            return [$deliveryMethods[$key] => $group->count()];
-        });    
+        $prevMonthCountGroupedData = DashboardHelper::getCountsByPackage(
+            $packageBuilder->whereBetween('date_of_sale', 
+                [$this->previousMonthStart, $this->previousMonthEnd]
+            ),$deliveryMethods
+        );
 
         return [
-            'this_month' => [
-                'counts' => $thisMonthCount,
-                'by_status' => $thisMonthPackages
-            ],
-            'previous_month' => [
-                'counts' => $previousMonthCount,
-                'by_status' => $previousMonthPackages
-            ],
+           "this_month" => $thisMonthCountGroupedData,
+           'previous_month' => $prevMonthCountGroupedData
         ];
     }
-    public function products(){
-        
+    public function products()
+    {
+
         $thisMonthPackageCounts = $this->productQueryBuilder()
-        ->whereBetween('created_at', [$this->currentMonthStart, $this->currentMonthEnd])
-        ->count();
+            ->whereBetween('created_at', [$this->currentMonthStart, $this->currentMonthEnd])
+            ->count();
 
         $previousMonthCounts = $this->productQueryBuilder()
-        ->whereBetween('created_at', [$this->previousMonthStart, $this->previousMonthEnd])
-        ->count();
+            ->whereBetween('created_at', [$this->previousMonthStart, $this->previousMonthEnd])
+            ->count();
 
         return [
             'this_month' => [
@@ -146,44 +121,100 @@ class DashboardService{
                 'counts' => $previousMonthCounts
             ]
         ];
-        
     }
-    public function topFiveCustomers(){
-
+    public function topFiveCustomers()
+    {
         $customerCounts = $this->orderQueryBuilder()
-        ->where('is_paid', 1)
-        ->with(['customer:id,name,email,phone', 'customerPayments:id,order_id,price'])
-        ->get()
-        ->groupBy(function ($query) {
-            return $query->customer->name;
-        })
-        ->map(function ($orders) {
-            $totalPrice = $orders->sum(function ($order) {
-                return $order->customerPayments->sum('price');
-            });
-    
-            return [
-                'customer_id' => $orders->first()->customer->id,
-                'customer_email' => $orders->first()->customer->email,
-                'customer_phone' => $orders->first()->customer->phone,
-                'orders_count' => $orders->count(),
-                'total_price' => $totalPrice,
-            ];
-        })
-        ->sortByDesc('orders_count')
-        ->take(5);
+            ->where('is_paid', 1)
+            ->with(['customer:id,name,email,phone', 'customerPayments:id,order_id,price'])
+            ->get()
+            ->groupBy(function ($query) {
+                return $query->customer->name;
+            })
+            ->map(function ($orders) {
+                $totalPrice = $orders->sum(function ($order) {
+                    return $order->customerPayments->sum('price');
+                });
+
+                return [
+                    'customer_id' => $orders->first()->customer->id,
+                    'customer_email' => $orders->first()->customer->email,
+                    'customer_phone' => $orders->first()->customer->phone,
+                    'orders_count' => $orders->count(),
+                    'total_price' => $totalPrice,
+                ];
+            })
+            ->sortByDesc('orders_count')
+            ->take(5)
+            ->toArray();
+
 
         return $customerCounts;
     }
+    public function orderSumByStatus()
+    {
+        $statusNames = config('statuses.order_statuses');
 
-    public function getData(){
+        $result = $this->orderQueryBuilder()
+            ->with(['customerPayments:id,order_id,price'])
+            ->get()
+            ->groupBy('status')
+            ->map(function ($orders) {
+                $sum = $orders->reduce(function ($carry, $order) {
+                    if ($order->customerPayments->isNotEmpty()) {
+                        $paymentSum = $order->customerPayments->sum('price');
+                        $carry += $paymentSum;
+                    } else {
+                        $carry += $order->total_sold_price;
+                    }
+                    return $carry;
+                }, 0);
+                return $sum;
+            })
+            ->mapWithKeys(function ($item, $status) use ($statusNames) {
+                return [$statusNames[$status] => $item];    
+            })->toArray();
+
+        return $result;
+    }
+    public function productSumByStatus(){
+        $result = $this->productQueryBuilder()
+        ->get()
+        ->groupBy('is_paid')
+        ->map(function ($products){
+            $sum = $products->reduce(function ($carry, $product) {
+                if ($product->is_paid) {
+                    $paymentSum = $product->total_price;
+                    $carry += $paymentSum;
+                } else {
+                    $carry += $product->total_price;
+                }
+                return $carry;
+            }, 0);
+            return $sum;
+        })
+        ->mapWithKeys(function ($item, $status){
+            $name = $status ? 'paid' : 'not_paid';        
+            return [
+                $name => $item,
+            ];    
+        })->toArray();
+
+        
+        $result['total'] = array_sum($result);
+
+        return $result;
+    }
+
+    public function getData()
+    {
         $result = new stdClass();
         $result->orders = $this->orders();
         $result->packages = $this->packages();
         $result->products = $this->products();
         $result->top_five_customers = $this->topFiveCustomers();
-
+        $result->grouped_orders_sum = $this->orderSumByStatus();
+        $result->grouped_products_sum = $this->productSumByStatus();
         return (array) $result;
     }
-
 }

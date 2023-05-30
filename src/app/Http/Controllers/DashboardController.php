@@ -6,8 +6,7 @@ use App\Services\DashboardService;
 class DashboardController extends Controller
 {
     public function index(){
-        // dd($this->dashboard());
-
+        //dd($this->dashboard());
         return view('dashboard.home',[
             'dashboard_data' => $this->dashboard()
         ]);

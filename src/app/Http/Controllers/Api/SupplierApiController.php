@@ -13,25 +13,37 @@ class SupplierApiController extends Controller {
         $country = $request->country;
         $state = $request->state;
         $category = $request->category;
+        $search = $request->search;
 
         $supplierQuery = $this->buildSupplierQuery();
 
-        if ($country && $country !== '9999') {
-
+        if($search) {
+            $supplierQuery->where('name', 'LIKE', '%'.$search.'%');
+        }
+        if ($country) {
             $this->supplierByCountry($country, $supplierQuery);
-
             if ($state) {
-                $this->supplierByState($state, $supplierQuery);
+                $this->supplierByState($country, $state, $supplierQuery);
             }
         }
-
         if ($category) {
             $this->supplierByCategory($category, $supplierQuery);
         }
 
-        $result = $this->getSuppliers($supplierQuery);
+        $offset = $request->input('start', 0);  
+        $limit = $request->input('length', 10);
+        $totalRecords = Supplier::count();
+        $filteredRecords = $supplierQuery->count();
+        $result = $supplierQuery->skip($offset)->take($limit)->get();
 
-        return response()->json(['data' => $result]);
+        return response()->json(
+            [
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $filteredRecords,
+                'data' => $result
+            ]
+        );
     }
 
     private function buildSupplierQuery() {
@@ -60,8 +72,10 @@ class SupplierApiController extends Controller {
         $query->where('country_id', $country);
     }
 
-    private function supplierByState($state, $query) {
-        $query->where('state_id', $state);
+    private function supplierByState($country, $state, $query) {
+        $query
+        ->where('country_id',$country)
+        ->where('state_id', $state);
     }
 
     private function supplierByCategory($category, $query) {

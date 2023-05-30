@@ -12,17 +12,19 @@ class ProductApiController extends Controller
 
     public function getData(Request $request)
     {
+
         $supplier = $request->supplier;
         $category = $request->category;
         $sub_category = $request->sub_category;
         $brand = $request->brand;
-        $start_date = $request->start_date ? new DateTime($request->start_date) : false;
-        $end_date = $request->end_date ? new DateTime($request->end_date) : false;
-        $start_total_price = $request->start_total_price;
-        $end_total_price = $request->end_total_price;
+        $publishing = $request->publishing;
         $single_total_price = $request->single_total_price;
+        $total_price_range = $request->total_price_range;
         $search = $request->search;
         $out_of_stock = $request->out_of_stock;
+
+        $offset = $request->input('start', 0);  
+        $limit = $request->input('length', 10);
         
         $productQuery = $this->buildProductQuery();
 
@@ -31,33 +33,38 @@ class ProductApiController extends Controller
         }
         if ($category) {
             $this->fillterByCategories($productQuery, $category);
-
-            if ($sub_category) {
-                $this->fillterBySubCategories($productQuery,$category);
-            }
+        }
+        if ($sub_category) {
+            $this->fillterBySubCategories($productQuery,$sub_category);
         }
         if ($brand) {
             $productQuery->whereHas('brands', function ($query) use ($brand) {
                 $query->whereIn('brands.id', $brand);
             });
         }
-        if ($start_date && $end_date) {
+        if ($publishing) {
+            $date_pieces = explode(' - ',$publishing);
+
+            $start_date = new DateTime($date_pieces[0]);
+            $end_date = new DateTime($date_pieces[1]);
+            
             $this->fillterByCreatedAt(
                 $productQuery,
                 $start_date->format('Y-m-d H:i:s'),
                 $end_date->format('Y-m-d H:i:s')
             );
         }
-        if ($start_total_price && $end_total_price) {
+        if ($total_price_range) {
+            $pieces = explode('-',$total_price_range);
             $this->fillterTotalPrice(
                 $productQuery,
-                floatval($start_total_price),
-                floatval($end_total_price)
+                $pieces[0],
+                $pieces[1]
             );
         }
         if ($single_total_price) {
-            $productQuery->where('total_price', floatval($single_total_price));
-        }
+            $productQuery->where('total_price', 'LIKE', '%'.$single_total_price.'%');
+        }        
         if($search) {
             $productQuery->where('name', 'LIKE', '%'.$search.'%');
             if($out_of_stock) {
@@ -65,9 +72,19 @@ class ProductApiController extends Controller
             }
         }
 
-        $result = $this->getProducts($productQuery);
+        $filteredRecords = $productQuery->count();
+        $result = $productQuery->skip($offset)->take($limit)->get();
+        $totalRecords = Product::count(); 
 
-        return response()->json(['data' => $result]);
+        return response()->json( 
+             [
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $filteredRecords,
+                'data' => $result
+            ]
+        );
+
     }
 
     private function buildProductQuery()
@@ -100,15 +117,10 @@ class ProductApiController extends Controller
         ]);
     }
 
-    private function fillterTotalPrice($query,$start_price,$end_price) {
+    private function fillterTotalPrice($query, $total_price_start, $end_price_start) {   
         return $query->whereBetween('total_price', [
-            floatval($start_price),
-            floatval($end_price)
+            floatval($total_price_start),
+            floatval($end_price_start)
         ]);
-    }
-
-    private function getProducts($query)
-    {
-        return $query->get();
     }
 }

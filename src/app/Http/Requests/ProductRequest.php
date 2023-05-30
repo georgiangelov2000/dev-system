@@ -15,23 +15,14 @@ class ProductRequest extends FormRequest {
         return [
             "image" => "nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048",
             "name" => "required|string",
-            "quantity" => "required|integer",
-            "price" => ['required', function ($attribute, $value, $fail) {
-                    if (is_int($value)) {
-                        $value = number_format($value / 100, 2, '.', '');
-                    } else if (is_numeric($value) && strpos($value, '.') === false) {
-                        $value = number_format($value, 2, '.', '');
-                    }
-                    if (!preg_match('/^\d+(\.\d{1,2})?$/', $value)) {
-                        return $fail($attribute . ' is not a valid price format.');
-                    }
-                }],
+            "quantity" => "required|integer|min:0",
+            "price" => "required|numeric|min:0",
             "code" => "required|string",
             "supplier_id" => "required|integer|not_in:0",
             "category_id" => "required|integer|not_in:0",
             "subcategories" => "array",
             "notes" => 'nullable|string',
-            "brands" => "array"
+            "brands" => "array",
         ];
     }
 

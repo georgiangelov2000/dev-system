@@ -22,6 +22,12 @@ class CreateCustomerPaymentsTable extends Migration
             ->onUpdate('cascade')
             ->onDelete('cascade');
             $table->date('date_of_payment');
+            $table->unsignedDecimal('price',8,2)->default(0);
+            $table->unsignedInteger('paid_quantity')->default(0);
+            $table->foreignId('customer_id')
+            ->constrained('customers')
+            ->onUpdate('cascade')
+            ->onDelete('cascade');
         });
     }
 

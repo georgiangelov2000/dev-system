@@ -81,12 +81,12 @@ $(function(){
 
   $('#generateCode').on('click', function () {
     // Define the character set that you want to use
-    var charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var length = 20;
+    let charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let length = 20;
 
-    var randomString = '';
-    for (var i = 0; i < length; i++) {
-        var randomIndex = Math.floor(Math.random() * charset.length);
+    let randomString = '';
+    for (let i = 0; i < length; i++) {
+        let randomIndex = Math.floor(Math.random() * charset.length);
         randomString += charset[randomIndex];
     }
 

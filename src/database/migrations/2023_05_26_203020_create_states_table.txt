@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddStatusToProductsTable extends Migration
+class CreateStatesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class AddStatusToProductsTable extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->enum('status', ['enabled', 'disabled'])->after('code'); 
+        Schema::create('states', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('country_id');
+            $table->string('name');
         });
     }
 
@@ -25,8 +27,6 @@ class AddStatusToProductsTable extends Migration
      */
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->enum('status', ['enabled', 'disabled']);
-        });
+        Schema::dropIfExists('states');
     }
 }

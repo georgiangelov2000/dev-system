@@ -122,7 +122,7 @@ $(function(){
                 orderable: false,
                 name: "single_sold_price",
                 render: function(data,type,row) {
-                    return `<span>${row.single_sold_price} €</span>`
+                    return `<span>€${row.single_sold_price}</span>`
                 }
             },
             {
@@ -130,7 +130,7 @@ $(function(){
                 orderable: false,
                 name: "total_sold_price",
                 render: function(data,type,row) {
-                    return `<span>${row.total_sold_price} €</span>`
+                    return `<span>€${row.total_sold_price}</span>`
                 }
             },
             {

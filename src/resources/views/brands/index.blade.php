@@ -79,7 +79,6 @@
 
     <script type="text/javascript">
         let BRAND_ROUTE = "{{route('api.brands')}}";
-        console.log(BRAND_ROUTE);
         let REMOVE_BRAND_ROUTE = "{{route('brand.delete',':id')}}";
         let EDIT_BRAND_ROUTE = "{{route('brand.edit',':id')}}";
         let UPDATE_BRAND_ROUTE = "{{route('brand.update',':id')}}";

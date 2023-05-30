@@ -277,13 +277,13 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('order.index') }}" class="nav-link">
+                            <a href="{{ route('settings.company') }}" class="nav-link">
                                 <p>Company info</p>
                             </a>
-                            <a href="{{ route('order.index') }}" class="nav-link">
-                                <p>E-mails</p>
+                            <a href="{{ route('settings.email') }}" class="nav-link">
+                                <p>Send E-mails</p>
                             </a>
-                            <a href="{{ route('order.index') }}" class="nav-link">
+                            <a href="{{ route('settings.server') }}" class="nav-link">
                                 <p>Server information</p>
                             </a>
                         </li>

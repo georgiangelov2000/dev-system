@@ -11,13 +11,14 @@ use App\Models\ProductImage;
 use App\Models\Supplier;
 
 class Product extends Model {
+    use HasFactory;
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'products';
+    protected $table = 'purchases';
 
     /**
      * The primary key associated with the table.
@@ -42,7 +43,9 @@ class Product extends Model {
         'code',
         'notes',
         'brands',
-        'total_price'
+        'total_price',
+        'initial_quantity',
+        'is_paid'
     ];
 
     public function categories() {
@@ -58,7 +61,7 @@ class Product extends Model {
     }
 
     public function images() {
-        return $this->hasOne(ProductImage::class, 'product_id');
+        return $this->hasMany(ProductImage::class, 'product_id');
     }
     
     public function supplier() {

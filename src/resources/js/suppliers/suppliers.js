@@ -5,14 +5,31 @@ deleteSupplier,
         apiSuppliers
 } from './ajaxFunctions.js';
 
+import {
+    APICaller
+} from '../ajax/methods.js';
+
 $(document).ready(function () {
     let table = $('#suppliersTable');
 
     $('.selectCategory, .selectCountry, .selectState, .selectAction').selectpicker('refresh').val('').trigger('change');
 
-    let dataT = table.DataTable({
+    const selectCategory = $('.bootstrap-select .selectCategory');
+    const selectCountry = $('.bootstrap-select .selectCountry');
+    const selectState = $('.bootstrap-select .selectState');
+    
+    let dataTable = table.DataTable({
+        serverSide:true,
         ajax: {
-            url: SUPPLIER_ROUTE_API_ROUTE
+            url: SUPPLIER_ROUTE_API_ROUTE,
+            data: function(d) {
+                return $.extend({},d, {
+                    'country': selectCountry.val(),
+                    'category':selectCategory.val(),
+                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : '',
+                    'state':selectState.val()
+                });
+            }
         },
         columns: [
             {
@@ -136,81 +153,52 @@ $(document).ready(function () {
             }
 
         ],
-        lengthMenu: [[10], [10]],
-        pageLength: 10,
         order: [[1, 'asc']]
-
     });
+
+    const builtInDataTableSearch = $('#suppliersTable_filter input[type="search"]');
 
     //ACTIONS
 
-    $('.bootstrap-select .selectCategory').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let categoryId = $(this).val();
-        $('.selectCountry').val('9999').selectpicker('refresh');
-        apiSuppliers(SUPPLIER_ROUTE_API_ROUTE, {"category": categoryId}, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        });
-    });
+    builtInDataTableSearch.bind('keyup',function(){
+        dataTable.ajax.reload( null, false );
+    })
 
-
-    $('.bootstrap-select .selectCountry').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+    selectCountry.bind('changed.bs.select',function(){
         let countryId = $(this).val();
-        let selectState = $('.bootstrap-select .selectState');
+        dataTable.ajax.reload(null, false);
         selectState.empty();
-
-        $('.selectCategory').val('').selectpicker('refresh');
-
-        apiSuppliers(SUPPLIER_ROUTE_API_ROUTE, {"country": countryId}, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-
-                getStates(STATE_ROUTE.replace(":id", countryId), function (response) {
-                    if (response.length !== 0) {
-                        selectState.append('<option value="">All</option>');
-                        $.each(response, function (key, value) {
-                            selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
-                        });
-                    } else {
-                        selectState.append('<option value="" disabled>Nothing selected</option>');
-                    }
-                    selectState.selectpicker('refresh');
-                }, function (error) {
-                    console.log(error);
-                });
-            }
-            ;
-        }, function (error) {
-            console.log(error);
-        });
+    
+        if(countryId !== '0') {
+            APICaller(STATE_ROUTE.replace(':id', countryId), function(response){
+                if(response.length > 0) {
+                    selectState.append('<option value="">All</option>');
+                    $.each(response, function (key, value) {
+                        selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
+                    });
+                } else {
+                    selectState.append('<option value="0" disabled>Nothing selected</option>');
+                }
+                selectState.selectpicker('refresh');
+            }, function(error){
+                console.log(error);
+            });
+        } else {
+            selectState.selectpicker('refresh');
+        }
     });
 
-    $('.bootstrap-select .selectState').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let stateId = $(this).val();
-        $('.selectCategory').val('').selectpicker('refresh');
+    selectCategory.bind('changed.bs.select',function(){
+        dataTable.ajax.reload( null, false );
+    })
 
-        let countryId = $('select.selectCountry')
-                .find('option:checked')
-                .val();
-
-        apiSuppliers(SUPPLIER_ROUTE_API_ROUTE, {"country": countryId, 'state': stateId}, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        });
-    });
+    selectState.bind('changed.bs.select',function(){
+        dataTable.ajax.reload( null, false );
+    })
 
     $('tbody').on('click', '.showCategories', function () {
         var tr = $(this).closest('tr');
-        var row = dataT.row(tr);
+        var row = dataTable.row(tr);
 
         if (row.child.isShown()) {
             // This row is already open - close it
@@ -259,7 +247,7 @@ $(document).ready(function () {
         detachSupplierCategory(DETACH_CATEGORY.replace(':id', related_categoryId), function (response) {
             toastr['success'](response.message);
             currentTr.remove();
-            table.DataTable().ajax.reload();
+            dataTable.ajax.reload( null, false );
         }, function (error) {
             toastr['error']('Category has not been detached');
         });
@@ -283,7 +271,7 @@ $(document).ready(function () {
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
             deleteSupplier(url, function (response) {
                 toastr['success'](response.message);
-                table.DataTable().ajax.reload();
+                dataTable.ajax.reload( null, false );
             }, function (error) {
                 toastr['error']('Supplier has not been deleted');
             });
@@ -306,7 +294,7 @@ $(document).ready(function () {
             searchedIds.forEach(function(id,index){
                 deleteSupplier(REMOVE_SUPPLIER_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);
-                    table.DataTable().ajax.reload();
+                    dataTable.ajax.reload( null, false );
                 }, function (error) {
                     toastr['error']('Supplier has not been deleted');
                 });

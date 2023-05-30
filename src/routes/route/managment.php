@@ -14,6 +14,7 @@ use App\Http\Controllers\CustomerSummaryController;
 use App\Http\Controllers\SupplierSummaryController;
 use App\Http\Controllers\CustomerPaymentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -68,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [ProductController::class, 'store'])->name('store');
         Route::put('/update/{product}', [ProductController::class, 'update'])->name('update');
         Route::delete('/delete/{product}', [ProductController::class, 'delete'])->name('delete');
+        Route::delete('/delete/image/{product}', [ProductController::class, 'deleteGalleryImage'])->name('delete.image');
     });
 
     Route::prefix('customers')->name('customer.')->group(function () {
@@ -108,6 +110,15 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{package}', [PackageController::class, 'update'])->name('update');
         Route::get('/edit/{package}', [PackageController::class, 'edit'])->name('edit');
         Route::put('/status/{package}', [PackageController::class, 'status'])->name('status');
+    });
+
+    Route::prefix('settings')->name('settings.')->group(function(){
+        Route::get('/company', [SettingsController::class, 'companySettingsForm'])->name('company');
+        Route::get('/email', [SettingsController::class, 'emailForm'])->name('email');
+        Route::get('/server', [SettingsController::class, 'serverInformation'])->name('server');
+
+        Route::post('/send/email', [SettingsController::class, 'sendEmailForm'])->name('email.send');
+        Route::put('/comapny/update', [SettingsController::class, 'updateCompanySettings'])->name('company.update');
     });
     
     Route::prefix('payments')->name('payment.')->group(function(){

@@ -19,7 +19,7 @@ class CreateSuppliersTable extends Migration {
             $table->string('phone');
             $table->string('address');
             $table->string('zip');
-            $table->string('website');
+            $table->string('website')->nullable();
             $table->text('notes')->nullable();
 
             $table->foreignId('state_id')

@@ -94,69 +94,45 @@ class OrderController extends Controller
 
     public function update(Order $order, OrderRequest $request)
     {
-
         $validated = $request->validated();
-
         DB::beginTransaction();
-        
-        try {
-            
-            $order->customer_id = $validated['customer_id'];
-            $order->date_of_sale = date('Y-m-d', strtotime($validated['date_of_sale']));
-            $order->status = $validated['status'];
-
-            foreach ($validated['product_id'] as $index => $value) {
-                $quantity = $validated['sold_quantity'][$index];
-                $singleSoldPrice = $validated['single_sold_price'][$index];
-                $discount = $validated['discount_percent'][$index];
-
-                $finalSinglePrice = $this->calculatedDiscountPrice($singleSoldPrice,$discount);
-                $finalTotalPrice = $this->calculatedFinalPrice($finalSinglePrice,$quantity);
                 
-                $order->product->id = $validated['product_id'][$index];
-                $order->invoice_number = $validated['invoice_number'][$index];
-                $order->sold_quantity = $quantity; 
-                $order->single_sold_price = $finalSinglePrice;
-                $order->total_sold_price = $finalTotalPrice;
-                $order->discount_percent = $discount;
-                $order->tracking_number = $validated['tracking_number'];
-            }
+        try {
+            $currentQuantity = $order->sold_quantity;
+            $quantityDifference = $validated['sold_quantity'][0] - $currentQuantity;
+            $product = $order->product;
+            
+            if ($currentQuantity > $validated['sold_quantity'][0] && $currentQuantity !== $validated['sold_quantity'][0]) {
+                $product->quantity = ($product->initial_quantity - $validated['sold_quantity'][0] );
+            } elseif ($currentQuantity < $validated['sold_quantity'][0] && $currentQuantity !== $validated['sold_quantity'][0]) {
+                $product->quantity = ($product->quantity - $quantityDifference) ;
+            }   
+            $product->save();
 
-            $order->save();
+            $finalSinglePrice = $this->calculatedDiscountPrice($validated['single_sold_price'][0],$validated['discount_percent'][0]);
+            $finalTotalPrice = $this->calculatedFinalPrice($finalSinglePrice,$validated['sold_quantity'][0]);
+
+            $order->update([
+                'customer_id' => $validated['customer_id'],
+                'product_id' => $validated['product_id'][0],
+                'invoice_number' => $validated['invoice_number'][0],
+                'sold_quantity' => $validated['sold_quantity'][0],
+                'single_sold_price' => $finalSinglePrice,
+                'total_sold_price' => $finalTotalPrice,
+                'discount_percent' => $validated['discount_percent'][0],
+                'date_of_sale' => date('Y-m-d', strtotime($validated['date_of_sale'])),
+                'status' => $validated['status'],
+                'tracking_number' => $validated['tracking_number'],
+            ]);
             DB::commit();
             return redirect()->route('order.index')->with('success', 'Order has been updated');
         } catch (\Exception $e) {
+            dd($e->getMessage());
             DB::rollback();
             Log::error($e->getMessage());
             return back()->withInput()->with('error', 'Order has not been updated');
         }
     }
-
-    private function calculatedDiscountPrice($price,$discount){
-        $discountAmount = 0;
-        $finalPrice = 0;
-
-        if ( ($price && $discount) && (is_numeric($price) && is_numeric($discount)) ){
-            $discountAmount = (($price * $discount) / 100);
-            $finalPrice = ($price - $discountAmount);
-        } else {
-            $finalPrice = $price;
-        }
-
-        return $finalPrice;
-    }
-
-    private function calculatedFinalPrice($finalSingleSoldPrice, $quantity){
-        $finalPrice = 0;
-
-        if ( ($finalSingleSoldPrice && $quantity) && (is_numeric($finalSingleSoldPrice) && is_numeric($quantity)) ) 
-            {
-                $finalPrice = ($finalSingleSoldPrice * $quantity);
-            }
-
-        return $finalPrice;
-    }
-
     public function updateStatus(Order $order, Request $request)
     {
         $status = $request->status;
@@ -217,11 +193,13 @@ class OrderController extends Controller
     public function delete(Order $order)
     {
         $productId = $order->product_id;
+
         $quantity = $order->sold_quantity;
     
         DB::beginTransaction();
     
         try {
+    
             $product = Product::find($productId);
     
             if (!$product) {
@@ -242,5 +220,31 @@ class OrderController extends Controller
             return back()->with('error', 'Order has not been deleted');
         }
     }
+
+    private function calculatedDiscountPrice($price,$discount){
+        $discountAmount = 0;
+        $finalPrice = 0;
+
+        if ( ($price && $discount) && (is_numeric($price) && is_numeric($discount)) ){
+            $discountAmount = (($price * $discount) / 100);
+            $finalPrice = ($price - $discountAmount);
+        } else {
+            $finalPrice = $price;
+        }
+
+        return $finalPrice;
+    }
+
+    private function calculatedFinalPrice($finalSingleSoldPrice, $quantity){
+        $finalPrice = 0;
+
+        if ( ($finalSingleSoldPrice && $quantity) && (is_numeric($finalSingleSoldPrice) && is_numeric($quantity)) ) 
+            {
+                $finalPrice = ($finalSingleSoldPrice * $quantity);
+            }
+
+        return $finalPrice;
+    }
+
 
 }

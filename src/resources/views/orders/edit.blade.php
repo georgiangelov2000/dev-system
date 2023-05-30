@@ -112,7 +112,7 @@
                                         <input 
                                             name="sold_quantity[]" 
                                             type='number'
-                                            max='{{ $currentOrder->product->quantity }}'
+                                            {{-- max='{{ $currentOrder->product->quantity }}' --}}
                                             class='form-control form-control-sm orderQuantity'
                                             value="{{ $currentOrder->sold_quantity }}"
                                             onkeyup="handleOrderQuantity(this)" 

@@ -1,6 +1,9 @@
 FROM php:8.0-fpm
-    
+
+RUN usermod -u 1000 www-data
+
 WORKDIR /var/www/html
+RUN chown -R www-data:www-data /var/www/html
 COPY src .
 
 # Install dependencies for the operating system software
@@ -18,7 +21,13 @@ RUN apt-get update && apt-get install -y \
     git \
     libonig-dev \
     curl \
-    libxml2-dev
+    libxml2-dev \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    libmemcached-dev \
+    libmcrypt-dev \
+    libmagickwand-dev \
+    libpq-dev
     
 # Install extensions for php
 RUN docker-php-ext-install pdo pdo_mysql xmlwriter fileinfo calendar mbstring zip exif pcntl bcmath gettext

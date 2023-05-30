@@ -15,22 +15,22 @@ class DatabaseSeederSubcategory extends Seeder {
     public function run() {
         $data = [
             [
-                'name' => 'Computers',
+                "name" => "Computers",
             ],
             [
-                'name' => 'Tablets',
+                "name" => "Tablets",
             ],
             [
-                'name' => 'Smartphones',
+                "name" => "Smartphones",
             ],
             [
-                'name' => 'TVs',
+                "name" => "TVs",
             ],
             [
-                'name' => 'Audio equipment',
+                "name" => "Audio equipment",
             ],
             [
-                'name' => 'Cameras',
+                "name" => "Cameras",
             ],
             [
                 "name" => "Gaming consoles",
@@ -138,7 +138,20 @@ class DatabaseSeederSubcategory extends Seeder {
                 "name" => "Team sports equipment",
             ],
         ];
-        DB::table('subcategories')->insert($data);
+        
+        $categoryIds = DB::table('categories')->pluck('id')->all();
+        
+        $subcategoriesWithCategoryId = [];
+        
+        foreach ($data as $subcategory) {
+            $categoryId = $categoryIds[array_rand($categoryIds)];
+            $subcategory['category_id'] = $categoryId;
+            $subcategoriesWithCategoryId[] = $subcategory;
+        }
+        
+        DB::table('subcategories')->insert($subcategoriesWithCategoryId);
+
+        
 
     }
 

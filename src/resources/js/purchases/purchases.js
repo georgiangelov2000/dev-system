@@ -40,7 +40,16 @@ $(function () {
     let customTotalPrice = $('.customPrice');
     let applyBtn = $('.applyBtn');
 
+    let publishingValue = $('input[name="datetimes"]').val();
+
+    applyBtn.bind('click',function(){
+        let date = $('input[name="datetimes"]').val();
+        publishingValue = date;
+        dataTable.ajax.reload(null, false);
+    })
+
     let dataTable = table.DataTable({
+        serverSide: true,
         dom: 'Bfrtip',
         buttons: [
             {
@@ -80,7 +89,19 @@ $(function () {
             }
           ],
         ajax: {
-            url: PRODUCT_API_ROUTE
+            url: PRODUCT_API_ROUTE,  
+            data: function(d) {
+                return $.extend({},d, {
+                    'supplier': bootstrapSelectSupplier.val().toLowerCase(),
+                    "single_total_price": customTotalPrice.val().toLowerCase(),
+                    "total_price_range": bootstrapSelectTotalPrice.val().toLowerCase(),
+                    "category" : bootstrapSelectCategory.val().toLowerCase(),
+                    'publishing': publishingValue,
+                    'sub_category' : bootstrapSelectSubCategory.val(), //array of key => value
+                    'brand': bootstrapSelectBrands.val(), //array of key => value
+                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : ''
+                });
+            }
         },
         columns: [
             {
@@ -287,137 +308,56 @@ $(function () {
                     return `${deleteFormTemplate} ${editButton} ${previewLink} ${[payButton]}`;
                 }
             }
-
         ],
-        lengthMenu: [[10], [10]],
-        pageLength: 10,
         order: [[1, 'asc']]
-
     });
+
+    let builtInDataTableSearch = $('#purchasedProducts_filter input[type="search"]');
     
-    customTotalPrice.on('keyup', function () {
-        let price = $(this).val();
-        APICaller(PRODUCT_API_ROUTE, { "single_total_price": price }, function (response) {
-            console.log(response.data);
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        })
+    customTotalPrice.bind('keyup',function(){
+        dataTable.ajax.reload( null, false );
+    });
+
+    builtInDataTableSearch.bind('keyup',function(){
+        dataTable.ajax.reload( null, false );
     })
 
-    bootstrapSelectTotalPrice.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let total_price = $(this).val();
-        let priceParts = total_price.split("-");
+    bootstrapSelectTotalPrice.bind('changed.bs.select',function(){
+        dataTable.ajax.reload( null, false );
+    })
 
-        let start_price = priceParts[0];
-        let end_price = priceParts[1];
+    bootstrapSelectSupplier.bind('changed.bs.select',function(){
+        dataTable.ajax.reload( null, false );
+    })
 
-        APICaller(PRODUCT_API_ROUTE, {
-            "start_total_price": start_price,
-            'end_total_price': end_price
-        }, function (response) {
-            console.log(response.data);
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        })
-    });
-
-    bootstrapSelectSupplier.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let supplierId = $(this).val();
-        $('.selectCategory').selectpicker('val', '');
-
-        APICaller(PRODUCT_API_ROUTE, { "supplier": supplierId }, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        })
-    });
-
-    bootstrapSelectCategory.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let categoryId = $(this).val();
-        $('.selectSupplier').selectpicker('val', '');
+    bootstrapSelectCategory.bind('changed.bs.select',function(e, clickedIndex, isSelected, previousValue){
+        dataTable.ajax.reload( null, false );
         bootstrapSelectSubCategory.empty();
+        let category = $(this).val();
 
-        APICaller(PRODUCT_API_ROUTE, { "category": categoryId }, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
+        APICaller(CATEGORY_ROUTE, { "category": category }, function (response) {
+            let subCategories = response.data;
+            bootstrapSelectSubCategory.empty();
 
-                APICaller(CATEGORY_ROUTE, { "category": categoryId }, function (response) {
-                    let subCategories = response.data[0].sub_categories;
-                    if (subCategories.length > 0) {
-                        $.each(subCategories, function (key, subCategory) {
-                            bootstrapSelectSubCategory.append(`<option value="${subCategory.id}">${subCategory.name}</option>`);
-                        });
-                    } else {
-                        bootstrapSelectSubCategory.append('<option value="">Nothing selected</option>');
-                    }
-                    bootstrapSelectSubCategory.selectpicker('refresh');
-                }, function (error) {
-                    console.log(error);
+            if (subCategories.length > 0) {
+                $.each(subCategories, function (key, subCategory) {
+                    bootstrapSelectSubCategory.append(`<option value="${subCategory.id}">${subCategory.name}</option>`);
                 });
-            }
+            } 
+            bootstrapSelectSubCategory.selectpicker('refresh');
         }, function (error) {
             console.log(error);
-        })
-    });
+        });
 
-    bootstrapSelectSubCategory.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let sub_category = $(this).val();
-        let category = bootstrapSelectCategory.val()
-
-        $('.selectSupplier').selectpicker('refresh').val('');
-
-        APICaller(PRODUCT_API_ROUTE, { "category":category, "sub_category": sub_category }, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        })
-    });
-
-    bootstrapSelectBrands.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let brandId = $(this).val();
-        bootstrapSelectCategory.selectpicker('refresh').val('');
-        bootstrapSelectSupplier.selectpicker('refresh').val('');
-
-        APICaller(PRODUCT_API_ROUTE, { "brand": brandId }, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        })
-    });
-
-    applyBtn.on('click', function () {
-        let date = $('input[name="datetimes"]').val();
-        let dateParts = date.split(" - ");
-        let startDate = dateParts[0];
-        let endDate = dateParts[1];
-        APICaller(PRODUCT_API_ROUTE, { "start_date": startDate, 'end_date': endDate }, function (response) {
-            console.log(response.data);
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        })
     })
+
+    bootstrapSelectSubCategory.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue){
+        dataTable.ajax.reload( null, false );
+    })
+
+    bootstrapSelectBrands.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue){
+        dataTable.ajax.reload( null, false );
+    });
 
     $(document).on('change', ".selectAll", function () {
         if (this.checked) {

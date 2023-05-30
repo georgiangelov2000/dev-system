@@ -44,8 +44,11 @@
                         <div class="col-3">
                             <label for="order_status">Order status</label>
                             <select name="status" id="order_status" class="form-control selectType">
-                                @foreach ( config('statuses.order_statuses') as $key => $status  )
-                                    <option value="{{$key}}">{{$status}}</option>
+                                <option value="">Please select</option>
+                                @foreach ( config('statuses.order_statuses') as $key => $status)
+                                    @if($key !== 1 && $status !== 'Received')
+                                        <option value="{{$key}}">{{$status}}</option>
+                                    @endif
                                 @endforeach
                             </select>
                             @error('status')
@@ -56,7 +59,12 @@
                         <div class="col-3">
                             <label for="order_status">Tracking number</label>
                             <div class="input-group mb-3">
-                                <input type="text" name="tracking_number" class="form-control rounded-0">
+                                <input 
+                                    type="text" 
+                                    name="tracking_number" 
+                                    class="form-control rounded-0"
+                                    placeholder="Enter or generate tracking code"
+                                >
                                 <span class="input-group-append">
                                     <button type="button" id="generateCode" class="btn btn-info btn-flat">Generate</button>
                                 </span>
@@ -118,6 +126,7 @@
 @endsection
 
 @push('scripts')
+    <script type="text/javascript" src="{{ mix('js/helpers/render_helpers.js') }}"></script>
     <script type="text/javascript" src="{{ mix('js/orders/form.js') }}"></script>
     <script type="text/javascript">
         let CUSTOMER_API_ROUTE = "{{route('api.customers')}}"

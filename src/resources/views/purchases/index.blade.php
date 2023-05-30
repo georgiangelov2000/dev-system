@@ -51,6 +51,7 @@
                         <div class="form-group">
                             <label>Sub categories</label>
                             <select class="form-control selectSubCategory" multiple>
+                                <option value="0"></option>
                             </select>
                         </div>
                     </div>
@@ -58,7 +59,7 @@
                         <div class="form-group">
                             <label>Brands</label>
                             <select class="form-control selectBrands" multiple>
-                                <option value=''>All</option>
+                                <option value='0'>All</option>
                                 @foreach ($brands as $brand )
                                     <option value='{{$brand->id}}'>{{$brand->name}}</option>
                                 @endforeach
@@ -180,7 +181,7 @@
             let REMOVE_PRODUCT_ROUTE = "{{ route('purchase.delete', ':id') }}";
             let EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
             let EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
-            let CATEGORY_ROUTE = "{{ route('api.categories') }}";
+            let CATEGORY_ROUTE = "{{ route('api.subcategories') }}";
         </script>
     @endpush
 

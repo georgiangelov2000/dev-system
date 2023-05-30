@@ -13,10 +13,13 @@ class SubCategoryApiController extends Controller
         $category = $request->category;
         $subCategoryQ = SubCategory::query();
     
-        if ($category) {
+        if (empty($category)) {
             $subCategoryQ->where('category_id', $category);
         }
-    
+        if (!empty($category)) {
+            $subCategoryQ->where('category_id', $category);
+        }
+
         $result = $subCategoryQ->with('category')->get();
         
         return response()->json(['data' => $result]);

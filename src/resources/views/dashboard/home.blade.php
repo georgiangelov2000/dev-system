@@ -14,6 +14,9 @@
         $products_data_previous_month = $dashboard_data['products']['previous_month'];
         
         $top_five_customers = $dashboard_data['top_five_customers'];
+
+        $orders_sum_by_status = $dashboard_data['grouped_orders_sum'];
+        $products_sum_by_status = $dashboard_data['grouped_products_sum'];
     @endphp
 
     <div class="row">
@@ -94,7 +97,7 @@
                                     alt="Packages">
                             </div>
                             <div class="col-12 text-center bg-primary p-2">
-                                <a class="font-weight-bold" href="">More info</a>
+                                <a class="d-block" href="{{route('package.index')}}" class="font-weight-bold" href="">More info</a>
                             </div>
                         </div>
                     </div>
@@ -115,7 +118,7 @@
                                             </span>
                                         </div>
                                         <div>
-                                            <strong>Received (Paid): </strong>
+                                            <strong>Received: </strong>
                                             <span>
                                                 {{ $order_data_this_month['by_status']['Received']['count'] ?? 0 }}
                                             </span>
@@ -144,7 +147,7 @@
                                             </span>
                                         </div>
                                         <div>
-                                            <strong>Received (Paid): </strong>
+                                            <strong>Received: </strong>
                                             <span>
                                                 {{ $order_data_previous_month['by_status']['Received']['count'] ?? 0 }}
                                             </span>
@@ -170,7 +173,7 @@
                                     alt="Orders">
                             </div>
                             <div class="col-12 text-center bg-primary p-2">
-                                <a class="font-weight-bold" href="">More info</a>
+                                <a class="font-weight-bold d-block" href="{{route('order.index')}}">More info</a>
                             </div>
                         </div>
                     </div>
@@ -210,11 +213,21 @@
                                     title="Puchases" alt="Puchases">
                             </div>
                             <div class="col-12 text-center bg-primary p-2">
-                                <a class="font-weight-bold" href="">More info</a>
+                                <a class="font-weight-bold d-block" href="{{route('purchase.index')}}">More info</a>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                @php 
+                   $paidProducts = $products_sum_by_status['paid'] ?? 0;
+                   $notPaidProducts = $products_sum_by_status['not_paid'] ?? 0;
+                   $productSumByStatus = $products_sum_by_status['total'] ?? 0; 
+
+                   $paidOrders = $orders_sum_by_status['Received'] ?? 0;
+                   $orderedOrders = $orders_sum_by_status['Ordered'] ?? 0;
+                   $pendingOrders = $orders_sum_by_status['Pending'] ?? 0;
+                @endphp
 
                 <div class="row mt-4">
                     <div class="col-md-12">
@@ -223,38 +236,54 @@
                                 <div class="row">
                                     <div class="col-sm-3 col-6">
                                         <div class="description-block border-right">
-                                            <span class="description-percentage text-success"><i
-                                                    class="fas fa-caret-up"></i> 17%</span>
-                                            <h5 class="description-header">$35,210.43</h5>
-                                            <span class="description-text">TOTAL REVENUE</span>
+                                            <h5 class="description-header">
+                                                 @if(is_numeric($paidProducts) && is_numeric($paidOrders))
+                                                    @if($paidOrders > $paidProducts )
+                                                        @php
+                                                            $diff = ($paidOrders - $paidProducts);
+                                                            $formattedDiff = number_format($diff, 2, '.', '.');
+                                                        @endphp
+                                                        <span class="text-success">
+                                                           + €{{$formattedDiff}}
+                                                        </span>
+                                                    @elseif($paidOrders < $paidProducts)
+                                                        @php
+                                                            $diff = ($paidProducts - $paidOrders);
+                                                            $formattedDiff = number_format($diff, 2, '.', ',');
+                                                        @endphp
+                                                        {{$formattedDiff}}
+                                                    @elseif($paidProducts === $paidOrders)
+                                                        0
+                                                    @endif
+                                                 @endif
+                                            </h5>
+                                            <span class="description-text">TOTAL BALANCE</span>
                                         </div>
 
                                     </div>
 
                                     <div class="col-sm-3 col-6">
                                         <div class="description-block border-right">
-                                            <span class="description-percentage text-warning"><i
-                                                    class="fas fa-caret-left"></i> 0%</span>
-                                            <h5 class="description-header">$10,390.90</h5>
-                                            <span class="description-text">TOTAL COST</span>
+                                            <h5 class="description-header">
+                                                €{{$paidProducts ? number_format($paidProducts, 2, '.', '.') : 0}}
+                                            </h5>
+                                            <span class="description-text">STOCK PAID</span>
                                         </div>
 
                                     </div>
 
                                     <div class="col-sm-3 col-6">
                                         <div class="description-block border-right">
-                                            <span class="description-percentage text-success"><i
-                                                    class="fas fa-caret-up"></i> 20%</span>
-                                            <h5 class="description-header">$24,813.53</h5>
-                                            <span class="description-text">TOTAL PROFIT</span>
+                                            <h5 class="description-header">
+                                                €{{$paidOrders ? number_format($paidOrders, 2, '.', '.') : 0}}
+                                            </h5>
+                                            <span class="description-text">PAID ORDERS</span>
                                         </div>
 
                                     </div>
 
                                     <div class="col-sm-3 col-6">
                                         <div class="description-block">
-                                            <span class="description-percentage text-danger"><i
-                                                    class="fas fa-caret-down"></i> 18%</span>
                                             <h5 class="description-header">1200</h5>
                                             <span class="description-text">GOAL COMPLETIONS</span>
                                         </div>
@@ -287,26 +316,34 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($top_five_customers as $key => $data)
+                                        @if(count($top_five_customers))
+                                            @foreach ($top_five_customers as $key => $data)
+                                                <tr>
+                                                    <td>
+                                                        {{ $data['customer_id'] }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $key }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $data['customer_email'] }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $data['customer_phone'] }}
+                                                    </td>
+                                                    <td>{{ $data['orders_count'] }}</td>
+                                                    <td>
+                                                        €{{ number_format($data['total_price'], 2, '.', '.') }}
+                                                    </td>
+                                            </tr>
+                                            @endforeach
+                                        @else
                                             <tr>
-                                                <td>
-                                                    {{ $data['customer_id'] }}
-                                                </td>
-                                                <td>
-                                                    {{ $key }}
-                                                </td>
-                                                <td>
-                                                    {{ $data['customer_email'] }}
-                                                </td>
-                                                <td>
-                                                    {{ $data['customer_phone'] }}
-                                                </td>
-                                                <td>{{ $data['orders_count'] }}</td>
-                                                <td>
-                                                    €{{ number_format($data['total_price'], 2, '.', '.') }}
+                                                <td colspan="6" class="text-center">
+                                                    Data are not available
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -324,81 +361,47 @@
                                     </p>
                                     <p class="d-flex flex-column text-right">
                                         <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-up text-success"></i> €1233
-                                        </span>
-                                        <span class="text-muted">Total</span>
-                                    </p>
-                                    <p class="d-flex flex-column text-right">
-                                        <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-up text-success"></i> €1670
+                                            <i class="ion ion-android-arrow-up text-success"></i>€{{$paidOrders ? number_format($paidOrders, 2, '.', '.') : 0}}
                                         </span>
                                         <span class="text-muted">Received</span>
                                     </p>
                                     <p class="d-flex flex-column text-right">
                                         <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-up text-success"></i> €5424
+                                            <i class="ion ion-android-arrow-up text-success"></i>€{{$orderedOrders ? number_format($orderedOrders, 2, '.', '.') : 0}}
                                         </span>
                                         <span class="text-muted">Ordered</span>
                                     </p>
                                     <p class="d-flex flex-column text-right">
                                         <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-up text-success"></i> €6566
+                                            <i class="ion ion-android-arrow-up text-success"></i> €{{$pendingOrders ? number_format($pendingOrders, 2, '.', '.') : 0}} 
                                         </span>
                                         <span class="text-muted">Pending</span>
                                     </p>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center border-bottom mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
                                     <p class="text-lg">
                                         <i title="Purchase reviews" class="fa-light fa-cart-shopping"></i>
                                     </p>
-                                    <p class="d-flex flex-column text-right"></p>
                                     <p class="d-flex flex-column text-right">
                                         <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-down text-danger"></i> €1230
+                                            <i class="ion ion-android-arrow-down text-danger"></i> €{{$productSumByStatus ? number_format($productSumByStatus, 2, '.', '.') : 0}}
                                         </span>
                                         <span class="text-muted">Total</span>
                                     </p>
                                     <p class="d-flex flex-column text-right">
                                         <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-down text-danger"></i> €4344
+                                            <i class="ion ion-android-arrow-down text-danger"></i> €{{$paidProducts ? number_format($paidProducts, 2, '.', '.') : 0}}
                                         </span>
                                         <span class="text-muted">Paid</span>
                                     </p>
                                     <p class="d-flex flex-column text-right">
                                         <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-down text-danger"></i> €1221
+                                            <i class="ion ion-android-arrow-down text-danger"></i> €{{$notPaidProducts ? number_format($notPaidProducts, 2, '.', '.') : 0}}
                                         </span>
                                         <span class="text-muted">Not paid</span>
                                     </p>
                                 </div>
-
-                                <div class="d-flex justify-content-between align-items-center mb-0">
-                                    <p class="text-lg">
-                                        <i title="More details" class="fa-light fa-grid-2"></i>
-                                    </p>
-                                    <p class="d-flex flex-column text-right">
-                                    </p>
-                                    <p class="d-flex flex-column text-right">
-                                        <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-down text-danger"></i> 1232
-                                        </span>
-                                        <span class="text-muted">Customers</span>
-                                    </p>
-                                    <p class="d-flex flex-column text-right">
-                                        <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-down text-danger"></i> 5435
-                                        </span>
-                                        <span class="text-muted">Suppliers</span>
-                                    </p>
-                                    <p class="d-flex flex-column text-right">
-                                        <span class="font-weight-bold">
-                                            <i class="ion ion-android-arrow-down text-danger"></i> 6546
-                                        </span>
-                                        <span class="text-muted">Categories</span>
-                                    </p>
-                                </div>
-
                             </div>
                         </div>
                     </div>

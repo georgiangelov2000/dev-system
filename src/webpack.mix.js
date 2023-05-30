@@ -8,6 +8,10 @@ mix.js('resources/js/subcategories/subcategories.js', 'public/js'),
 mix.js('resources/js/brands/brands.js', 'public/js'),
 
 mix.js('resources/js/helpers/action_helpers.js', 'public/helpers/js'),
+mix.js('resources/js/helpers/render_helpers.js', 'public/js/helpers'),
+
+mix.js('resources/js/settings/settings.js', 'public/js/settings'),
+mix.js('resources/js/settings/e-mail.js', 'public/js/settings'),
 
 mix.js('resources/js/suppliers/form.js', 'public/js/suppliers'),
 mix.js('resources/js/suppliers/suppliers.js', 'public/js/suppliers'),

@@ -14,25 +14,25 @@ class OrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'customer_id' => "required|integer",
-            "date_of_sale" => "required|date",
-            "status" => "required|integer",
-            "tracking_number" => "required|string",
+            'customer_id' => 'required|integer',
+            'date_of_sale' => 'required|date',
+            'status' => 'required|integer',
+            'tracking_number' => 'required|string',
             
-            'invoice_number' => 'required|array',
-            'invoice_number.*' => 'required|string',
+            'invoice_number' => 'required',
+            'invoice_number.*' => 'string',
             
-            'product_id' => 'required|array',
-            'product_id.*' => 'required|numeric',
-
-            'sold_quantity' => 'required|array',
-            'sold_quantity.*' => 'required|numeric',
-
-            'single_sold_price' => 'required|array',
-            'single_sold_price.*' => 'required|numeric',
-
-            "discount_percent" => 'required|array',
-            "discount_percent.*" => 'required|numeric',
+            'product_id' => 'required',
+            'product_id.*' => 'numeric',
+        
+            'sold_quantity' => 'required',
+            'sold_quantity.*' => 'numeric|min:0',
+        
+            'single_sold_price' => 'required',
+            'single_sold_price.*' => 'numeric|min:0',
+        
+            'discount_percent' => 'required',
+            'discount_percent.*' => 'numeric|min:0',        
         ];
     }
 

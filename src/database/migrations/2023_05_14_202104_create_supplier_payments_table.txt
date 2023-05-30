@@ -16,7 +16,7 @@ class CreateSupplierPaymentsTable extends Migration
         Schema::create('supplier_payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('purchase_id');
-            $table->integer('quantity');
+            $table->unsignedInteger('quantity')->default(0);
             $table->foreign('purchase_id')
             ->references('id')
             ->on('products')

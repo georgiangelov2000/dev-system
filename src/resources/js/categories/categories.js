@@ -32,8 +32,14 @@ $(function(){
     .trigger('change');
 
     var dataT = table.DataTable({
+        serverSide: true,
         ajax: {
-            url: CATEGORY_ROUTE
+            url: CATEGORY_ROUTE,
+            data: function(d) {
+                return $.extend({},d, {
+                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : ''
+                });
+            }
         },
         columns: [
             {
@@ -116,6 +122,12 @@ $(function(){
         order: [[1, 'asc']]
     });
 
+    let builtInDataTableSearch = $('#categoriesTable_filter input[type="search"]');
+
+    builtInDataTableSearch.bind('keyup',function(){
+        dataT.ajax.reload( null, false );
+    })
+
     $('tbody').on('click', '.showSubCategories', function () {
         var tr = $(this).closest('tr');
         var row = dataT.row(tr);
@@ -183,7 +195,6 @@ $(function(){
     }
 
     //ACTIONS
-
     submitForm.on("click", function (e) {
         e.preventDefault();
 
@@ -225,7 +236,7 @@ $(function(){
                     toastr['success'](response.message);
                     editForm.trigger('reset');
                     editModal.modal('toggle');
-                    table.DataTable().ajax.reload();
+                    dataT.ajax.reload( null, false );
                 } else {
                     toastr['error'](response.message);
                     ajaxResponse(response.responseJSON, editModal);
@@ -277,7 +288,7 @@ $(function(){
 
         APIDELETECALLER(url, function (response) {
             toastr['success'](response.message);
-            table.DataTable().ajax.reload();
+            dataT.ajax.reload( null, false );
         }, function (error) {
             toastr['error'](error.message);
         });
@@ -293,7 +304,7 @@ $(function(){
         showConfirmationDialog('Selected items!', template, function () {
             APIDELETECALLER(url, function (response) {
                 toastr['success'](response.message);
-                table.DataTable().ajax.reload();
+                dataT.ajax.reload( null, false );
             }, function (error) {
                 toastr['error'](error.message);
             });
@@ -356,7 +367,7 @@ $(function(){
             searchedIds.forEach(function(id,index){
                 APIDELETECALLER(REMOVE_CATEGORY_ROUTE.replace(':id',id),function(response){
                     toastr['success'](response.message);
-                    table.DataTable().ajax.reload();
+                    dataT.ajax.reload( null, false );
                 },function(error){
                     toastr['error'](error.message);
                 });
