@@ -29,7 +29,7 @@
                         <div class="form-group">
                             <label>Country</label>
                             <select class="form-control selectCountry">
-                                <option value='9999'>All</option>
+                                <option value='0'>All</option>
                                 @foreach ($countries as $country)
                                     <option value="{{ $country->id }}">{{ $country->name }}</option>
                                 @endforeach

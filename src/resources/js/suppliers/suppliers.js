@@ -1,13 +1,9 @@
 import {
-deleteSupplier,
-        getStates,
-        detachSupplierCategory,
-        apiSuppliers
-} from './ajaxFunctions.js';
-
-import {
-    APICaller
+    APICaller,
+    APIDELETECALLER
 } from '../ajax/methods.js';
+
+import {swalText,showConfirmationDialog} from '../helpers/action_helpers.js';
 
 $(document).ready(function () {
     let table = $('#suppliersTable');
@@ -126,7 +122,7 @@ $(document).ready(function () {
                         var categoryNames = row.categories.map(function (category) {
                             return "<span> " + category.name + " </span>";
                         });
-                        return '<div class="notes">' + categoryNames.join(', ') + '</div>'
+                        return '<div class="notes p-0">' + categoryNames.join(', ') + '</div>'
                     } else {
                         return '';
                     }
@@ -219,7 +215,7 @@ $(document).ready(function () {
 
                 tableRows += '<tr>' +
                         '<td>' + category.name + '</td>' +
-                        '<td><button category-id=' + category.id + ' onclick=detachCategory(this) class="btn"><i class="fa-solid fa-trash text-danger"></i></button></td>' +
+                        '<td><button category-id=' + category.id + ' onclick=detachCategory(this) class="btn"><i class="fa-light fa-trash text-danger"></i></button></td>' +
                         '</tr>';
             });
 
@@ -241,16 +237,16 @@ $(document).ready(function () {
     }
 
     window.detachCategory = function (e) {
-        let related_categoryId = $(e).attr('category-id');
-        let currentTr = $(e).closest('tr');
+        let category = $(e).attr('category-id');
+        let tr = $(e).closest('tr');
         
-        detachSupplierCategory(DETACH_CATEGORY.replace(':id', related_categoryId), function (response) {
+        APICaller(DETACH_CATEGORY.replace(':id', category),function(response){
+            tr.remove();
             toastr['success'](response.message);
-            currentTr.remove();
             dataTable.ajax.reload( null, false );
-        }, function (error) {
-            toastr['error']('Category has not been detached');
-        });
+        },function(error){
+            toastr['error'](error.message);
+        })
     };
 
     window.selectSupplier = function (e) {
@@ -262,45 +258,44 @@ $(document).ready(function () {
     };
 
     window.deleteCurrentSupplier = function (e) {
-        let id = $(e).attr('data-id');
-        let name = $(e).attr('data-name');
-        let url = REMOVE_SUPPLIER_ROUTE.replace(':id', id);
+        const id = $(e).attr('data-id');
+        const name = $(e).attr('data-name');
+        const url = REMOVE_SUPPLIER_ROUTE.replace(':id', id);
 
-        let template = swalText(name);
+        const template = swalText(name);
 
-        confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
-            deleteSupplier(url, function (response) {
+        showConfirmationDialog('Selected suppliers!',template,function(){
+            APIDELETECALLER(url,function(response){
                 toastr['success'](response.message);
                 dataTable.ajax.reload( null, false );
-            }, function (error) {
-                toastr['error']('Supplier has not been deleted');
-            });
-        });
+            },function(error){
+                toastr['error'](error.message);
+            })
+        })
     };
 
     window.deleteMultipleSupplier = function (e) {
 
-        let searchedIds = [];
-        let searchedNames = [];
+        const searchedIds = [];
+        const searchedNames = [];
 
         $('tbody input[type="checkbox"]:checked').map(function () {
             searchedIds.push($(this).attr('data-id'));
             searchedNames.push($(this).attr('data-name'));
         });
 
-        let template = swalText(searchedNames);
+        const template = swalText(searchedNames);
 
-        confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
+        showConfirmationDialog('Selected suppliers',template,function(){
             searchedIds.forEach(function(id,index){
-                deleteSupplier(REMOVE_SUPPLIER_ROUTE.replace(':id', id), function (response) {
+                APIDELETECALLER(REMOVE_SUPPLIER_ROUTE,replace(":id",id),function(response){
                     toastr['success'](response.message);
                     dataTable.ajax.reload( null, false );
-                }, function (error) {
-                    toastr['error']('Supplier has not been deleted');
-                });
-            });
-        });
-        
+                },function(error){
+                    toastr['error'](error.message);
+                })
+            })
+        })
     };
 
     $(document).on('change', ".selectAll", function () {
@@ -326,39 +321,4 @@ $(document).ready(function () {
             default:
         }
     });
-
-    let swalText = function (params) {
-        let text = '<div class="col-12 d-flex flex-wrap justify-content-center">';
-
-        if (Array.isArray(params)) {
-            params.forEach(function (name, index) {
-                text += `<p class="font-weight-bold m-0">${index !== params.length - 1 ? name + ', ' : name }</p>`;
-            });
-        } else {
-            text += `<p class="font-weight-bold m-0">${params}</p>`;
-        }
-
-        text += '</div>';
-
-        return text;
-    };
-
-    let confirmAction = function (title, message, confirmButtonText, cancelButtonText, callback) {
-        Swal.fire({
-            title: title,
-            html: message,
-            icon: 'warning',
-            background: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: confirmButtonText,
-            cancelButtonText: cancelButtonText
-        }).then((result) => {
-            if (result.isConfirmed) {
-                callback();
-            }
-        });
-    };
-
 });

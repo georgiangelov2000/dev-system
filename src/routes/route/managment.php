@@ -92,7 +92,6 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{order}', [OrderController::class, 'update'])->name('update');
         Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
         Route::post('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
-        Route::post('/pay/{order}', [OrderController::class, 'markAsPaid'])->name('pay');
     });
 
     Route::prefix('summary')->name('summary.')->group(function () {

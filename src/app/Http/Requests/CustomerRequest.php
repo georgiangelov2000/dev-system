@@ -24,7 +24,7 @@ class CustomerRequest extends FormRequest
             "zip" => "required|string",
             'country_id' => "required|integer",
             'state_id' => "required|integer",
-            "notes" => "required|string"
+            "notes" => "string"
         ];
     }
 }

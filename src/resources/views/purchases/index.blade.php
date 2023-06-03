@@ -113,7 +113,7 @@
                         <th>Subcategories</th>
                         <th>Brands</th>
                         <th>Code</th>
-                        <th>Created at</th>
+                        <th>Created</th>
                         <th>Paid</th>
                         <th>Actions</th>
                     </thead>

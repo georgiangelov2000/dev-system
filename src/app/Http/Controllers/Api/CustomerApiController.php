@@ -15,20 +15,31 @@ class CustomerApiController extends Controller
 
         $customerQuery = $this->buildCustomerQuery();
 
-        if($country && $country !== '9999') {
+        if($country) {
             $this->customerByCountry($country, $customerQuery);
-
             if ($state) {
-                $this->customerByState($state, $customerQuery);
+                $this->customerByState($country, $state, $customerQuery);
             }
         }
         if($search) {
             $customerQuery->where('name', 'LIKE', '%'.$search.'%');
         }
 
-        $result = $this->getCustomers($customerQuery);
+        $offset = $request->input('start', 0);  
+        $limit = $request->input('length', 10);
+        $totalRecords = Customer::count();
+        $filteredRecords = $customerQuery->count();
+        $result = $customerQuery->skip($offset)->take($limit)->get();
 
-        return response()->json(['data' => $result]);
+        return response()->json(
+            [
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $filteredRecords,
+                'data' => $result
+            ]
+        );
+
     }
 
     private function buildCustomerQuery(){
@@ -48,14 +59,13 @@ class CustomerApiController extends Controller
     }
 
     private function customerByCountry($country, $query) {
-        $query->where('country_id', $country);
+        $query
+        ->where('country_id', $country);
     }
 
-    private function customerByState($state, $query) {
-        $query->where('state_id', $state);
-    }
-
-    private function getCustomers($query) {
-        return $query->get();
+    private function customerByState($country, $state, $query) {
+        $query
+        ->where('country_id', $country)
+        ->where('state_id',$state);
     }
 }

@@ -20,7 +20,7 @@ class OrderRequest extends FormRequest
             'tracking_number' => 'required|string',
             
             'invoice_number' => 'required',
-            'invoice_number.*' => 'string',
+            'invoice_number.*' => 'required|string',
             
             'product_id' => 'required',
             'product_id.*' => 'numeric',
@@ -34,6 +34,11 @@ class OrderRequest extends FormRequest
             'discount_percent' => 'required',
             'discount_percent.*' => 'numeric|min:0',        
         ];
+    }
+
+    public function __get($key)
+    {
+        return $this->validated()[$key] ?? null;
     }
 
     public function messages()

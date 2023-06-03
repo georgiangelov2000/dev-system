@@ -153,14 +153,10 @@ class SupplierController extends Controller {
             }   
                      
             $supplier->delete();
-
             DB::commit();
-
-            Log::info('Succesfully deleted supplier');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error deleting supplier: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to delete supplier',$e->getMessage()], 500);
+            return response()->json(['message' => 'Supplier has not been deleted'],500);
         }
 
         return response()->json(['message' => 'Supplier has been deleted'], 200);
@@ -171,15 +167,11 @@ class SupplierController extends Controller {
 
         try {
             $related_category = SupplierCategory::findOrFail($id);
-            
             $related_category->delete();
-            
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback(); 
-            dd($e->getMessage());
-            Log::info($e->getMessage());
-            return response()->json(['message' => 'Failed to detach category'], 500);
+            return response()->json(['message' => 'Category has not been detached'], 500);
         }
         return response()->json(['message' => 'Category has been detached'], 200);
     }

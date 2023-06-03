@@ -42,6 +42,7 @@ class Order extends Model
         "sold_quantity",
         "single_sold_price",
         "total_sold_price",
+        "original_sold_price",
         "discount_percent",
         "package_id",
         "tracking_number"

@@ -1,7 +1,7 @@
 const mix = require('laravel-mix');
 
 mix.js('resources/js/ajax/methods.js', 'public/js/ajax/'),
-
+mix.js('resources/js/ajax/leaflet.js','public/js/ajax');
 
 mix.js('resources/js/categories/categories.js', 'public/js'),
 mix.js('resources/js/subcategories/subcategories.js', 'public/js'),

@@ -26,12 +26,14 @@ class CreateOrdersTable extends Migration
             $table->foreignId('package_id')
                 ->constrained('packages')
                 ->onUpdate('cascade')
-                ->onDelete('cascade');    
+                ->onDelete('cascade')
+                ->nullable();
 
             $table->string('invoice_number');
             $table->unsignedInteger('sold_quantity')->default(0);
             $table->unsignedDecimal('single_sold_price', 8, 2)->default(0);
             $table->unsignedDecimal('total_sold_price', 8, 2)->default(0);
+            $table->unsignedDecimal('original_sold_price', 8, 2)->default(0);
             $table->unsignedInteger('discount_percent')->default(0);
             $table->date('date_of_sale');
             $table->string('tracking_number');

@@ -33,8 +33,7 @@ $(function () {
 
     searchAddress.on('click', function () {
         var url = 'https://nominatim.openstreetmap.org/search';
-        var query = $('input[name="address"]').val();
-
+        var query = $('input[name="address"]').val();        
         $.ajax({
             url: url,
             method: 'GET',
@@ -48,21 +47,17 @@ $(function () {
                 console.log(response);
                 if (response.length > 0) {
                     var template = '<ul class="pl-3">';
-
                     response.forEach(function(currentElement) { 
                         template += '<li title="Apply" onclick="applyAddress(this)" class="list-unstyled"><a class="text-primary" type="button">' + currentElement.display_name + '<a/></li>';
                     });
-            
                     template += '</ul>';
-            
                     addresses.html(template);
                 } else {
                     addresses.html('<p class="text-danger pl-3"> No results found. </p>');
                 }
             },
             error: function (error) {
-                // Handle the error
-                // ...
+                console.log(error);
             }
         });
     })

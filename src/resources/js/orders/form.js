@@ -1,16 +1,10 @@
 import { APICaller } from '../ajax/methods';
 
-$(function(){
+$(function () {
+
   $('.selectCustomer').selectpicker();
   $('.selectType').selectpicker();
   $('.productFilter').selectpicker();
-
-  let totalPriceAllProducts = 0;
-  let availableQuantity = 0;
-
-  let TFOOTquantity = $('.TFOOTquantity');
-  let TFOOTtotalPrice = $('.TFOOTtotalPrice');
-
 
   if (typeof DATE_OF_SALE !== 'undefined' && DATE_OF_SALE) {
     $('.datepicker').datepicker({
@@ -22,10 +16,29 @@ $(function(){
     }).datepicker('setDate', new Date());
   }
 
+  let totalPriceAllProducts = 0;
+  let availableQuantity = 0;
 
   let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
   let bootstrapProduct = $('.bootstrap-select .productFilter');
   let table = $('.productOrderTable');
+  let submitBtn = $('#orderForm button[type="submit"]');
+  console.log(submitBtn);
+
+  table.DataTable({
+    columns: [
+      { width: '5%', orderable: false, orderData: false },
+      { width: '6%', orderable: false, class: 'text-center' },
+      { width: '5%', orderable: false, class: 'text-center' },
+      { width: '5%', orderable: false },
+      { width: '5%', orderable: false, class: 'text-center' },
+      { width: '6%', orderable: false, class: 'text-center' },
+      { width: '5%', orderable: false, class: 'text-center' },
+      { width: '3%', orderable: false },
+      { width: '2%', orderable: false },
+      { width: '2%', orderable: false },
+    ]
+  });
 
   $('.selectCustomer input[type="text"]').on('keyup', function () {
     let text = $(this).val();
@@ -58,7 +71,7 @@ $(function(){
       return;
     }
 
-    APICaller(PRODUCT_API_ROUTE, { 'search': text, 'out_of_stock':true }, function (response) {
+    APICaller(PRODUCT_API_ROUTE, { 'search': text, 'out_of_stock': true }, function (response) {
       let products = response.data;
 
       if (products.length > 0) {
@@ -86,74 +99,62 @@ $(function(){
 
     let randomString = '';
     for (let i = 0; i < length; i++) {
-        let randomIndex = Math.floor(Math.random() * charset.length);
-        randomString += charset[randomIndex];
+      let randomIndex = Math.floor(Math.random() * charset.length);
+      randomString += charset[randomIndex];
     }
 
     $('input[name="tracking_number"]').val(randomString);
 
-});
+  });
 
+  let counter = 0;
   bootstrapProduct.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
     let selectedOption = $(this).find('option').eq(clickedIndex);
     let { name, quantity, singlePrice, totalPrice } = selectedOption.data();
 
-    if (table.find('#initalTr').remove());
-    
-    if (!table.find(`tr[data-id="${$(this).val()}"]`).length) {
+    let existingRow = table.find(`tr[data-id="${$(this).val()}"]`);
+    if (!existingRow.length) {
       totalPriceAllProducts += parseFloat(totalPrice);
       availableQuantity += parseInt(quantity);
-      TFOOTtotalPrice.html(totalPriceAllProducts.toFixed(2));
-      TFOOTquantity.html(availableQuantity);
+      counter++;
       renderData($(this).val(), name, quantity, singlePrice, totalPrice);
     }
 
+    updateOrderSummary();
   });
+
+  function updateOrderSummary() {
+    // console.log(totalPriceAllProducts)
+    $('#totalOrdersPrice').html(totalPriceAllProducts.toFixed(2));
+    $('#totalOrdersQuantity').html(availableQuantity);
+  }
+
+  function updateTotalOrderPrice(row) {
+    const orderQuantity = parseInt(row.find('.orderQuantity').val()) || 0;
+    const orderPrice = parseFloat(row.find('.orderSinglePrice').val()) || 0;
+    const orderTotal = (orderQuantity * orderPrice).toLocaleString('en-US', { minimumFractionDigits: 2 }).replace(",", ".");
+    row.find('.totalOrderPrice').html(orderTotal);
+  }
 
   window.removeRow = function (button) {
     let tr = $(button).closest('tr');
 
-    let rowTotalPrice = tr.find('.totalPrice').text()
+    let rowTotalPrice = tr.find('.totalPrice').text();
     let rowQuantity = tr.find('.purchaseQuantity').text();
 
-    totalPriceAllProducts = totalPriceAllProducts - parseFloat(rowTotalPrice).toFixed(2)
-    availableQuantity = availableQuantity - parseInt(rowQuantity);
-
-    TFOOTtotalPrice.html(totalPriceAllProducts.toFixed(2));
-    TFOOTquantity.html(availableQuantity);
-
-    tr.remove();
-  }
-
-  function updateTotalOrderPrice(row) {
-    const orderQuantity = parseFloat(row.find('.orderQuantity').val()) || 0;
-    const orderPrice = parseFloat(row.find('.orderSinglePrice').val()) || 0;
-    const purchaseTotal = parseFloat(row.find('.totalPrice').text()).toFixed(2);
-    const orderTotal = (orderQuantity * orderPrice).toFixed(2);
-    console.log(purchaseTotal);
-
-    if (parseFloat(orderTotal) > parseFloat(purchaseTotal)) {
-      row.find('.totalOrderPrice').removeClass('text-danger').addClass('text-success');
-    } else if (parseFloat(orderTotal) < parseFloat(purchaseTotal)) {
-      row.find('.totalOrderPrice').removeClass('text-success').addClass('text-danger');
-    } else {
-      row.find('.totalOrderPrice').removeClass('text-success text-danger');
-    }
-
-    row.find('.totalOrderPrice').html(orderTotal);
-    row.find('input[name="total_sold_price[]"]').val(orderTotal);
+    totalPriceAllProducts -= parseFloat(rowTotalPrice);
+    availableQuantity -= parseInt(rowQuantity);
+    table.DataTable().row(tr).remove().draw();
+    updateOrderSummary();
   }
 
   window.handleSinglePrice = function (e) {
     const row = $(e).closest('tr');
-    const targetPrice = parseFloat($(e).val()) || 0;
-
     updateTotalOrderPrice(row);
   };
 
   window.handleOrderQuantity = function (e) {
     const row = $(e).closest('tr');
-
     updateTotalOrderPrice(row);
   };
 
@@ -165,31 +166,31 @@ $(function(){
 
     let discountPrice = 0;
 
-    if (isNaN(quantity) || isNaN(singlePrice)) {
+    if (isNaN(quantity) || isNaN(singlePrice) || isNaN(discount)) {
       console.error('Invalid quantity or single price value');
     } else {
       if (discount === '') {
-        discountPrice = quantity * singlePrice;
+        discountPrice = (quantity * singlePrice);
       } else {
-        const orderPrice = quantity * singlePrice;
+        const orderPrice = (quantity * singlePrice);
         discountPrice = orderPrice - (orderPrice * discount) / 100;
       }
-
       row.find('.totalOrderPrice').html(discountPrice.toFixed(2));
     }
   };
 
   function renderData(id, name, quantity, singlePrice, totalPrice) {
+
     if (table.find(`tr[data-id="${id}"]`).length) {
-      return; // skip adding the row
+      return;
     }
-    table.find('tbody ')
+
     const template = `
           <tr data-id="${id}">
               <input type="hidden" value='${id}' name="product_id[]" />
             <td>
               <button class="text-danger btn p-0" onclick="removeRow(this)" type="button">
-                <i class="fa-solid fa-trash"></i>
+                <i class="fa-light fa-trash text-danger"></i>
               </button>
             </td>
             <td>
@@ -198,6 +199,7 @@ $(function(){
                 class="form-control form-control-sm" 
                 name="invoice_number[]" 
               />
+              <span name="invoice_number.${counter -1}" class="text-danger"></span>
             </td>
             <td>${name}</td>
             <td>
@@ -210,6 +212,7 @@ $(function(){
                   value="0" 
                   onkeyup="handleOrderQuantity(this)" 
                 />
+                <span class="sold_quantity.${counter -1}" class="text-danger"></span>
               </div>
             </td>
             <td>
@@ -221,14 +224,10 @@ $(function(){
                   value="0" 
                   onkeyup="handleSinglePrice(this)" 
                 />
+                <span name="single_sold_price.${counter -1}" class="text-danger"></span>
               </div>
             </td>
             <td>
-              <input 
-                type='hidden'
-                name="total_sold_price[]" 
-                value="0" 
-              />
               <span class="totalOrderPrice"> </span>
             </td>
             <td> 
@@ -240,6 +239,7 @@ $(function(){
                   name="discount_percent[]"
                   onkeyup="handleDiscountChange(this)" 
                 />
+                <span name="discount_percent.${counter -1}" class="text-danger"></span>
               </div>
             </td>
             <td class="purchaseQuantity">${quantity}</td>
@@ -248,7 +248,35 @@ $(function(){
           </tr>
         `;
 
-    table.find('tbody').append(template);
+    table.DataTable().row.add($(template)).draw();
   }
+
+  //Send HTTP POST
+  submitBtn.click(function (event) {
+    event.preventDefault();
+    let form = $('#orderForm');
+    let url = form.attr('action');
+    let formData = form.serialize();
+
+    $.ajax({
+      type: 'POST',
+      url: url,
+      data: formData,
+      success: function (response) {
+        toastr['success'](response.message);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 422) {
+          toastr['error'](xhr.responseJSON.message);
+          var errors = xhr.responseJSON.errors;
+          $.each(errors, function(field, fieldErrors) {
+              var errorSpan = $('span[name="' + field + '"]');
+              errorSpan.text(fieldErrors[0]);
+          });
+        }
+      },
+    });
+  })
+
 
 })

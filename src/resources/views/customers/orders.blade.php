@@ -1,5 +1,5 @@
 @extends('app')
-@section('title', 'Brands')
+@section('title', 'Customer orders')
 
 @section('content')
 
@@ -14,9 +14,6 @@
             </div>
             <div class="card-body">
                 @if (isset($orders['data']) && count($orders['data']) )
-                    <div class="col-12">
-                        <p class="font-weight-bold">The "Total sold price" is calculated by multiplying the "Single sold price" with the "Sold quantity".</p>
-                    </div>
                     <form method="POST" action="{{route('customer.update.orders')}}">
                         @csrf
                         @method('PUT')

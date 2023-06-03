@@ -77,32 +77,30 @@
 
                     <table class="table table-hover productOrderTable ">
                         <thead>
-                            <th></th>
                             <th>Invoice number</th>
                             <th>Product</th>
                             <th>Quantity</th>
-                            <th>Single price (markup)</th>
-                            <th>Total order price (markup)</th>
+                            <th>Single price</th>
+                            <th>Total order price</th>
+                            <th>Original order price</th>
                             <th>Discount %</th>
-                            <th>Available quantity</th>
-                            <th>Single purchase price</th>
+                            <th>Avail. quantity</th>
+                            <th>Single price</th>
                             <th>Total price</th>
                         </thead>
                         <tbody>
                             <tr>
-                                <td data-id="{{ $currentOrder->product->id }}">
-                                    <input type="hidden" value="{{ $currentOrder->product->id }}" name="product_id[]" />
-                                </td>
                                 <td>
+                                    <input type="hidden" value="{{ $currentOrder->product->id }}" name="product_id" />
                                     <input 
                                         type="text" 
                                         class="form-control form-control-sm"
                                         value="{{ $currentOrder->invoice_number }}" 
-                                        name="invoice_number[]" 
+                                        name="invoice_number" 
                                     />
-                                    @foreach ($errors->get('invoice_number.*') as $error)
-                                        <span class="text-danger">{{ $error[0] }}</span>
-                                    @endforeach
+                                    @error('invoice_number')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </td>
                                 <td>
                                     {{ $currentOrder->product->name }}
@@ -110,34 +108,36 @@
                                 <td>
                                     <div class="form-group col-12">
                                         <input 
-                                            name="sold_quantity[]" 
+                                            name="sold_quantity" 
                                             type='number'
-                                            {{-- max='{{ $currentOrder->product->quantity }}' --}}
                                             class='form-control form-control-sm orderQuantity'
                                             value="{{ $currentOrder->sold_quantity }}"
                                             onkeyup="handleOrderQuantity(this)" 
                                         />
-                                        @foreach ($errors->get('sold_quantity.*') as $error)
-                                            <span class="text-danger">{{ $error[0] }}</span>
-                                        @endforeach
+                                        @error('sold_quantity')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </td>
                                 <td>
                                     <div class="form-group col-12">
                                         <input 
                                             type='text' 
-                                            name="single_sold_price[]"
+                                            name="single_sold_price"
                                             class='form-control form-control-sm orderSinglePrice'
                                             value="{{ $currentOrder->single_sold_price }}"
                                             onkeyup="handleSinglePrice(this)" 
                                         />
-                                        @foreach ($errors->get('single_sold_price.*') as $error)
-                                            <span class="text-danger">{{ $error[0] }}</span>
-                                        @endforeach
+                                        @error('single_sold_price')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </td>
                                 <td>
                                     <span class="totalOrderPrice">{{ $currentOrder->total_sold_price }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ $currentOrder->original_sold_price }}</span>
                                 </td>
                                 <td>
                                     <div class="form-group col-12">
@@ -145,16 +145,16 @@
                                             type='text' 
                                             value="{{ $currentOrder->discount_percent }}"
                                             class='form-control form-control-sm' 
-                                            name="discount_percent[]"
+                                            name="discount_percent"
                                             onkeyup="handleDiscountChange(this)" 
                                         />
-                                        @foreach ($errors->get('discount_percent.*') as $error)
-                                            <span class="text-danger">{{ $error[0] }}</span>
-                                        @endforeach
+                                        @error('discount_percent')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </td>
                                 <td class="purchaseQuantity">
-                                    {{ $currentOrder->product->quantity }}
+                                    {{ $currentOrder->product->initial_quantity }}
                                 </td>
                                 <td>
                                     {{ $currentOrder->product->price }}

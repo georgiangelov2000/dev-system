@@ -32,7 +32,6 @@ class SettingsController extends Controller
         if($company) {
             $states = $this->staticDataHelper->callStatesAndCountries($company->country_id,'states');
         }
-
         return view('settings.comapny_settings_form', [
             'countries' => $countries,
             'company' => $company,

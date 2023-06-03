@@ -10,36 +10,54 @@ use DateTime;
 class OrderApiController extends Controller
 {
     public function getData(Request $request)
-    {
-        $orderQuery = $this->buildOrderQuery();
-        $customer = $request->customer;
-        $start_date = $request->start_date ? new DateTime($request->start_date) : false;
-        $end_date = $request->end_date ? new DateTime($request->end_date) : false;
+    {   $customer = $request->customer;
         $status = $request->status;
+        $search = $request->search;
+        $date_range = $request->date_range;
+
+        $offset = $request->input('start', 0);  
+        $limit = $request->input('length', 10);
+
+        $orderQuery = $this->buildOrderQuery();
 
         if ($customer) {
             $orderQuery->where('customer_id', $customer);
         }
-        if ($start_date && $end_date) {
-            $this->filterByDateOfSale(
-                $orderQuery,
-                $start_date->format('Y-m-d'),
-                $end_date->format('Y-m-d')
-            );
+        if($search) {
+            $orderQuery->where('invoice_number', 'LIKE', '%'.$search.'%');
         }
         if($status) {
             $orderQuery->where('status', $status);
         }
 
+        if ($date_range) {
+            $date_pieces = explode(' - ',$date_range);
+            $start_date = new DateTime($date_pieces[0]);
+            $end_date = new DateTime($date_pieces[1]);
 
-        $result = $this->getOrders($orderQuery);
+            $this->filterByDateOfSale(
+                $orderQuery,
+                $start_date,
+                $end_date
+            );
+        }
 
+        $filteredRecords = $orderQuery->count();
+        $result = $orderQuery->skip($offset)->take($limit)->get();
         foreach ($result as $key => $order) {
             $order->status = array_key_exists($order->status, config('statuses.order_statuses')) ? config('statuses.order_statuses.' . $order->status) : $order->status;
             $order->is_paid = array_key_exists($order->is_paid, config('statuses.is_paid_statuses')) ? config('statuses.is_paid_statuses.' . $order->is_paid) : $order->is_paid;
         }
+        $totalRecords = Order::count();
 
-        return response()->json(['data' => $result]);
+        return response()->json(
+            [
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $filteredRecords,
+                'data' => $result
+            ]
+        );
     }
 
     private function filterByDateOfSale($query, $start_date, $end_date)
@@ -60,14 +78,13 @@ class OrderApiController extends Controller
             'sold_quantity',
             'single_sold_price',
             'total_sold_price',
+            'original_sold_price',
             'discount_percent',
             'date_of_sale',
             'status',
-            'is_paid'
+            'is_paid',
+            'created_at',
+            'updated_at',
         )->with('customer:id,name', 'product:id,name');
-    }
-    private function getOrders($query)
-    {
-        return $query->get();
     }
 }

@@ -1,17 +1,5 @@
 import { APIDELETECALLER , APICaller } from '../ajax/methods';
 
-// import { 
-//     APIPOSTCALLER, 
-//     APICallerWithoutData, 
-//     APIDELETECALLER 
-// } from '../ajax/methods';
-// import {
-//     swalText,
-//     ajaxResponse,
-//     showConfirmationDialog,
-
-// } from '../helpers/action_helpers';
-
 $(function () {
     let table = $('table#purchasedProducts');
     let paymentModal = $('#purchases_modal');
@@ -155,8 +143,8 @@ $(function () {
                         let stockStatus = row.quantity ? 'In stock' : 'Out of stock';
                         let stockColor = row.quantity ? 'success' : 'danger';
                     
-                        return `<div class="position-relative">
-                                    <img id="preview-image" alt="Preview" class="img-fluid card card-widget widget-user w-100 m-0" src="${imagePath}" />
+                        return `<div class="position-relative previewImageWrapper">
+                                    <img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${imagePath}" />
                                     <div class="ribbon-wrapper ribbon-lg">
                                         <div class="ribbon bg-${stockColor}">${stockStatus}</div>
                                     </div>

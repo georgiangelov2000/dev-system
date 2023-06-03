@@ -4,10 +4,11 @@ $(function(){
     let table = $('#customersTable');
     $('.selectAction, .selectCountry, .selectState').selectpicker('refresh').val('').trigger('change');
 
-    let selectCountry = $('.bootstrap-select .selectCountry');
-    let selectState = $('.bootstrap-select .selectState');
+    const selectCountry = $('.bootstrap-select .selectCountry');
+    const selectState = $('.bootstrap-select .selectState');
 
-    let dataT = table.DataTable({
+    let dataTable = table.DataTable({
+        serverSide:true,
         dom: 'Bfrtip',
         buttons: [
             {
@@ -47,7 +48,14 @@ $(function(){
             }
           ],
         ajax: {
-            url: CUSTOMER_API_ROUTE
+            url: CUSTOMER_API_ROUTE,
+            data: function(d) {
+                return $.extend({},d, {
+                    'country': selectCountry.val(),
+                    'state':selectState.val(),
+                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : '',
+                });
+            }
         },
         columns: [
             {
@@ -108,7 +116,9 @@ $(function(){
                 width: '7%',
                 orderable: false,
                 name: "website",
-                data: "website"
+                render:function(data,type,row){
+                    return `<a target="_blank" href="${row.website}">${row.website}<a>`
+                }
             },
             {
                 width: '6%',
@@ -156,59 +166,43 @@ $(function(){
             }
 
         ],
-        lengthMenu: [[10], [10]],
-        pageLength: 10,
         order: [[1, 'asc']]
     });
-    
+
+    const builtInDataTableSearch = $('#customersTable_filter input[type="search"]');
+
     //ACTIONS
 
-    selectCountry.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+    builtInDataTableSearch.bind('keyup',function(){
+        dataTable.ajax.reload( null, false );
+    })
+
+    selectCountry.bind('changed.bs.select',function(){
         let countryId = $(this).val();
-        let selectState = $('.bootstrap-select .selectState');
+        dataTable.ajax.reload(null, false);
         selectState.empty();
-
-        APICaller(CUSTOMER_API_ROUTE, { "country": countryId }, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-
-                APICaller(STATE_ROUTE.replace(":id", countryId), function (response) {
-                    if (response.length !== 0) {
-                        selectState.append('<option value="">All</option>');
-                        $.each(response, function (key, value) {
-                            selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
-                        });
-                    } else {
-                        selectState.append('<option value="" disabled>Nothing selected</option>');
-                    }
-                    selectState.selectpicker('refresh');
-                }, function (error) {
-                    console.log(error);
-                });
-            };
-        }, function (error) {
-            console.log(error);
-        });
+    
+        if(countryId !== '0') {
+            APICaller(STATE_ROUTE.replace(':id', countryId), function(response){
+                if(response.length > 0) {
+                    selectState.append('<option value="">All</option>');
+                    $.each(response, function (key, value) {
+                        selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
+                    });
+                } else {
+                    selectState.append('<option value="0" disabled>Nothing selected</option>');
+                }
+                selectState.selectpicker('refresh');
+            }, function(error){
+                console.log(error);
+            });
+        } else {
+            selectState.selectpicker('refresh');
+        }
     });
 
-
-    selectState.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let stateId = $(this).val();
-        $('.selectCategory').val('').selectpicker('refresh');
-
-        let countryId = $('select.selectCountry')
-            .find('option:checked')
-            .val();
-
-        APICaller(CUSTOMER_API_ROUTE, { "country": countryId, 'state': stateId }, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        });
+    selectState.bind('changed.bs.select',function(){
+        dataTable.ajax.reload( null, false );
     });
 
     window.selectCustomer = function (e) {
@@ -229,7 +223,7 @@ $(function(){
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
             APICallerWithoutData(url, function (response) {
                 toastr['success'](response.message);
-                table.DataTable().ajax.reload();
+                dataTable.ajax.reload( null, false );
             }, function (error) {
                 toastr['error']('Customer has not been deleted');
             });
@@ -237,7 +231,6 @@ $(function(){
     };
 
     window.deleteMultipleCustomers = function (e) {
-
         let searchedIds = [];
         let searchedNames = [];
 
@@ -252,7 +245,7 @@ $(function(){
             searchedIds.forEach(function(id,index){
                 APICallerWithoutData(CUSTOMER_DELETE_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);
-                    table.DataTable().ajax.reload();
+                    dataTable.ajax.reload( null, false );
                 }, function (error) {
                     console.log(error);
                     toastr['error']('Customer has not been deleted');
