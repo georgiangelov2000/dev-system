@@ -6,6 +6,7 @@ use App\Models\CustomerImage;
 use App\Models\Order;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use stdClass;
 
 class CustomerService{
     private $customer;
@@ -63,7 +64,7 @@ class CustomerService{
             'tracking_number',
             'invoice_number'
         ])
-            ->with(['product:id,name,total_price', 'package:id,package_name'])
+            ->with(['product:id,name,total_price,price', 'package:id,package_name'])
             ->where('customer_id', $this->customer->id);
     
         return $order;
@@ -71,43 +72,22 @@ class CustomerService{
 
     public function getOrders()
     {
-        $statusNames = config('statuses.order_statuses');
-        $orderQ = $this->orderQueryBuilder();
-        $orders = $orderQ->get();
-        $products = [];
-        $products['customer_name'] = $this->customer->name;
-        $products['customer_id'] = $this->customer->id;
-
-        foreach ($orders as $key => $order) {
-
-            $product = $order->product;
-            $singlePrice = $order->single_sold_price;
-            $totalSoldPrice = $order->total_sold_price;
-            $soldQuantity = $order->sold_quantity;
-            $totalMarkup = $totalSoldPrice - $product->total_price;
-            $singleMarkup = $singlePrice - $product->price;
-            $regularPrice = $totalSoldPrice / (1 - ($order->discount_percent / 100));
-    
-            $products['data'][] = [
-                'id' => $order->id,
-                'name' => $product->name,
-                'product_price' => $product->total_price,
-                'single_sold_price' => $singlePrice,
-                'total_sold_price' => $totalSoldPrice,
-                'sold_quantity' => $soldQuantity,
-                'total_markup' => number_format($totalMarkup, 2, '.', ''),
-                'single_markup' => number_format($singleMarkup, 2, '.', ''),
-                'discount' => $order->discount_percent,
-                'status' => array_key_exists($order->status, $statusNames) ? $statusNames[$order->status] : $order->status,
-                'regular_price' => $regularPrice ? number_format($regularPrice, 2, '.', '') : 0,
-                'date_of_sale' => $order->date_of_sale,
-                'is_paid' => $order->is_paid,
-                'tracking_number' => $order->tracking_number,
-                'invoice_number' => $order->invoice_number
-            ];
-        }
-    
-        return $products;
+            $statusNames = config('statuses.order_statuses');
+            $orderQ = $this->orderQueryBuilder()
+                ->get()
+                ->map(function ($item) use ($statusNames) {
+                    $singleMarkUp = abs($item->single_sold_price - $item->product->price);
+                    $item->status =  array_key_exists($item->status, $statusNames) ? $statusNames[$item->status] : $item->status;
+                    $item->single_mark_up = number_format($singleMarkUp, 2, '.', '');
+                    $item->product = $item->product->name;
+                    return $item;
+                })
+                ->toArray();
+        $result = new stdClass();
+        $result->customer_name=$this->customer->name;
+        $result->customer_id=$this->customer->id;
+        $result->orders = $orderQ;
+        return $result;
     }
 
 }

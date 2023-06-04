@@ -54,7 +54,7 @@ $(document).ready(function () {
                     if (row.image) {
                         return "<img class='rounded mx-auto w-100' src=" + row.image.path + row.image.name + " />"
                     } else {
-                        return "<img class='rounded mx-auto w-100' src='https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg'/>";
+                        return "<img class='rounded mx-auto w-100' src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png'/>";
                     }
                 }
             },

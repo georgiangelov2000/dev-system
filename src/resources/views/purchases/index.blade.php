@@ -107,7 +107,7 @@
                         <th>Total price</th>
                         <th>Quantity</th>
                         <th>Initial quantity</th>
-                        <th>Notes</th>
+                        <th>Stock</th>
                         <th>Supplier</th>
                         <th>Category</th>
                         <th>Subcategories</th>

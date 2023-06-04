@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FunctionsHelper;
 use Illuminate\Http\Request;
 use App\Http\Requests\OrderRequest;
 use Illuminate\Support\Facades\DB;
@@ -56,9 +57,9 @@ class OrderController extends Controller
                 $foundProduct->quantity -= $orderQuantity;
                 $foundProduct->save();
 
-                $finalSinglePrice = $this->calculatedDiscountPrice($orderSinglePrice, $orderDiscount);
-                $finalPrice = $this->calculatedFinalPrice($finalSinglePrice, $orderQuantity);
-                $originalPrice = $this->calculatedFinalPrice($orderSinglePrice, $orderQuantity);
+                $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($orderSinglePrice, $orderDiscount);
+                $finalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $orderQuantity);
+                $originalPrice = FunctionsHelper::calculatedFinalPrice($orderSinglePrice, $orderQuantity);
 
                 $order = [
                     'customer_id' => $customer,
@@ -127,8 +128,8 @@ class OrderController extends Controller
 
             $product->save();
 
-            $finalSinglePrice = $this->calculatedDiscountPrice($single_sold_price, $discount_percent);
-            $finalTotalPrice = $this->calculatedFinalPrice($finalSinglePrice, $sold_quantity);
+            $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($single_sold_price, $discount_percent);
+            $finalTotalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $sold_quantity);
 
             $order->update([
                 'customer_id' => $customer_id,
@@ -137,7 +138,7 @@ class OrderController extends Controller
                 'sold_quantity' => $sold_quantity,
                 'single_sold_price' => $finalSinglePrice,
                 'total_sold_price' => $finalTotalPrice,
-                'original_sold_price' => $this->calculatedFinalPrice($single_sold_price, $sold_quantity),
+                'original_sold_price' => FunctionsHelper::calculatedFinalPrice($single_sold_price, $sold_quantity),
                 'discount_percent' => $discount_percent,
                 'date_of_sale' => $date_of_sale,
                 'status' => $status,
@@ -152,6 +153,7 @@ class OrderController extends Controller
             return back()->withInput()->with('error', 'Order has not been updated');
         }
     }
+
     public function updateStatus(Order $order, Request $request)
     {
         $status = $request->status;
@@ -161,7 +163,6 @@ class OrderController extends Controller
             $order->save();
             DB::commit();
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
             Log::error($e->getMessage());
         }
@@ -194,31 +195,5 @@ class OrderController extends Controller
             return back()->with('error', 'Order has not been deleted');
         }
         return response()->json(['message' => 'Order has been deleted'], 200);
-    }
-    
-    private function calculatedDiscountPrice($price, $discount)
-    {
-        $discountAmount = 0;
-        $finalPrice = 0;
-
-        if (($price && $discount) && (is_numeric($price) && is_numeric($discount))) {
-            $discountAmount = (($price * $discount) / 100);
-            $finalPrice = ($price - $discountAmount);
-        } else {
-            $finalPrice = $price;
-        }
-
-        return $finalPrice;
-    }
-
-    private function calculatedFinalPrice($finalSingleSoldPrice, $quantity)
-    {
-        $finalPrice = 0;
-
-        if (($finalSingleSoldPrice && $quantity) && (is_numeric($finalSingleSoldPrice) && is_numeric($quantity))) {
-            $finalPrice = ($finalSingleSoldPrice * $quantity);
-        }
-
-        return $finalPrice;
     }
 }

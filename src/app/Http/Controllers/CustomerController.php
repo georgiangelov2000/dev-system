@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Helpers\LoadStaticData;
 use App\Http\Requests\CustomerRequest;
+use Illuminate\Support\Facades\DB;
+use App\Helpers\FunctionsHelper;
+use App\Helpers\LoadStaticData;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
@@ -118,72 +120,7 @@ class CustomerController extends Controller
             Log::error($e->getMessage());
         }
 
-
         return redirect()->route('customer.index')->with('success', 'Customer has been updated');
-    }
-
-    public function customerOrders(Customer $customer)
-    {
-        $customerService = new CustomerService($customer);
-        $orders = $customerService->getOrders();
-
-        return view('customers.orders', compact('orders'));
-    }
-
-    public function updateOrders(Request $request)
-    {
-        $data = $request->validate([
-            'order_ids' => 'required|array',
-            'order_ids.*' => 'required|numeric',
-            'single_sold_price' => 'required|array',
-            'single_sold_price.*' => 'required|numeric',
-            'sold_quantity' => 'required|array',
-            'sold_quantity.*' => 'required|numeric',
-            'discount' => 'required|array',
-            'discount.*' => 'required|numeric',
-        ], [
-            'single_sold_price.*.required' => 'The single sold price is required.',
-            'single_sold_price.*.numeric' => 'The single sold price must be a numeric value.',
-            'sold_quantity.*.required' => 'The sold quantity is required.',
-            'sold_quantity.*.numeric' => 'The sold quantity must be a numeric value.',
-        ]);
-
-        $orderIds = $data['order_ids'];
-        $singleSoldPrices = $data['single_sold_price'];
-        $soldQuantities = $data['sold_quantity'];
-        $discounts = $data['discount'];
-
-        DB::beginTransaction();
-
-        try {
-            foreach ($orderIds as $key => $orderId) {
-
-                $newTotalPrice  = ($singleSoldPrices[$key] * $soldQuantities[$key]);
-
-                $order = [
-                    'id' => $orderId,
-                    'single_sold_price' => $singleSoldPrices[$key],
-                    'total_sold_price' => $newTotalPrice - ($newTotalPrice * ($discounts[$key] / 100)),
-                    'sold_quantity' => $soldQuantities[$key],
-                ];
-                // Update the order in the database using the update query or Eloquent model
-
-                // Example using Eloquent model:
-                Order::where('id', $order['id'])->update([
-                    'single_sold_price' => $order['single_sold_price'],
-                    'total_sold_price' => $order['total_sold_price'],
-                    'sold_quantity' => $order['sold_quantity'],
-                ]);
-            }
-
-            DB::commit();
-
-            return redirect()->route('customer.index')->with('success', 'Orders has been updated');
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e->getMessage());
-            return back()->withInput()->with('error', 'Orders has not been updated');
-        }
     }
 
     public function delete(Customer $customer)
@@ -215,5 +152,79 @@ class CustomerController extends Controller
             return response()->json(['message' => 'Customer has not been deleted', 'error' => $e->getMessage()], 500);
         }
     }
+
+    public function customerOrders(Customer $customer)
+    {
+        $customerService = new CustomerService($customer);
+        $result = $customerService->getOrders();
+        return view('customers.orders', compact('result'));
+    }
+
+    public function updateCustomerOrders(Request $request)
+    {
+        $data = $request->validate([
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'required|numeric',
+            'single_sold_price' => 'required|array',
+            'single_sold_price.*' => 'required|numeric',
+            'sold_quantity' => 'required|array',
+            'sold_quantity.*' => 'required|numeric',
+            'discount_percent' => 'required|array',
+            'discount_percent.*' => 'required|numeric',
+        ], [
+            'single_sold_price.*.required' => 'The single sold price is required.',
+            'single_sold_price.*.numeric' => 'The single sold price must be a numeric value.',
+            'sold_quantity.*.required' => 'The sold quantity is required.',
+            'sold_quantity.*.numeric' => 'The sold quantity must be a numeric value.',
+        ]);
+
+        $orderIds = $data['order_ids'];
+        DB::beginTransaction();
+
+        try {
+            foreach ($orderIds as $key => $orderId) {
+
+                $singlePrice = (float) $data['single_sold_price'][$key];
+                $soldQuantity = (int) $data['sold_quantity'][$key];
+                $discount = (int) $data['discount_percent'][$key];
+
+                $order = Order::where('id',$orderId);
+                $product = Product::with('orders')->findOrFail($order->first()->product_id);
+
+                $totalSoldQuantity = $product->orders->sum('sold_quantity');
+                $remainingQuantity = ($totalSoldQuantity - $order->first()->sold_quantity);
+
+                $updatedQuantity = ($remainingQuantity + $soldQuantity);
+                
+                if($updatedQuantity > $product->initial_quantity) {
+                    return back()->with('error', 'Product quantity is not enough'.$product->name);
+                }
+
+                $finalQuantity = ($product->initial_quantity - $updatedQuantity);
+                $product->quantity = $finalQuantity;
+                
+                $product->save();
+
+                $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($singlePrice, $discount);
+                $finalTotalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $soldQuantity);    
+                
+                Order::where('id',$order->first()->id)->update([
+                    'single_sold_price' => $finalSinglePrice,
+                    'total_sold_price' => $finalTotalPrice,
+                    'sold_quantity' => $soldQuantity,
+                    'discount_percent' => $discount,
+
+                ]);
+            }
+            
+            DB::commit();
+            return redirect()->route('customer.index')->with('success', 'Orders has been updated');
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            DB::rollback();
+            return back()->withInput()->with('error', 'Orders has not been updated');
+        }
+    }
+
 
 }

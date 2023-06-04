@@ -9,7 +9,6 @@ use App\Services\SupplierService;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use App\Helpers\LoadStaticData;
-use App\Models\Category;
 use Illuminate\Support\Facades\Log;
 
 class SupplierController extends Controller {

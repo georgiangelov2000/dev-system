@@ -138,20 +138,11 @@ $(function () {
                                     </a>
                                 </div>`;
                     } else if (row.images && row.images.length === 1) {
-                        // Generate HTML with a single image
                         let imagePath = row.images[0].path + row.images[0].name;
-                        let stockStatus = row.quantity ? 'In stock' : 'Out of stock';
-                        let stockColor = row.quantity ? 'success' : 'danger';
-                    
-                        return `<div class="position-relative previewImageWrapper">
-                                    <img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${imagePath}" />
-                                    <div class="ribbon-wrapper ribbon-lg">
-                                        <div class="ribbon bg-${stockColor}">${stockStatus}</div>
-                                    </div>
-                                </div>`;
+                        return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${imagePath}" />`;
+
                     } else {
-                        // Generate HTML for a placeholder image
-                        return `<img class="rounded mx-auto w-100" src="https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg"/>`;
+                        return `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;
                     }
                 }
             },
@@ -186,18 +177,17 @@ $(function () {
                 data: 'initial_quantity'
             },
             {
-                width: '10%',
+                width: '5%',
                 orderable: false,
                 render: function (data, type, row) {
-                    if (row.notes) {
-                        return '<div class="notes">' + row.notes + '</div>';
-                    } else {
-                        return "";
-                    }
+                    let stockStatus = row.quantity ? 'In stock' : 'Out of stock';
+                    let stockColor = row.quantity ? 'text-success' : 'text-danger';
+
+                    return `<pan class="${stockColor}">${stockStatus}</span>`
                 }
             },
             {
-                width: '5%',
+                width: '7%',
                 orderable: false,
                 render: function (data, type, row) {
                     if (row.supplier) {
@@ -208,7 +198,7 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '7%',
                 orderable: false,
                 render: function (data, type, row) {
                     if (row.categories.length > 0) {

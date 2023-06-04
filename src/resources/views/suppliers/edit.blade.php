@@ -150,12 +150,12 @@
                     <div class="col-2 p-2">
                         <div class="row w-100 mb-2">
                             @if ($supplier->image)
-                                <div class="col-3">
-                                    <img class="card card-widget widget-user w-100 h-100 m-0"
+                                <div class="col-12">
+                                    <img class="cardWidgetImage w-100 m-0"
                                         src="{{ $supplier->image->path . $supplier->image->name }}" />
                                 </div>
                             @endif
-                            <div class="col-3 d-none imagePreview">
+                            <div class="col-12 d-none imagePreview">
                                 <div class="position-relative">
                                     <img id="preview-image" alt="Preview"
                                         class="img-fluid card card-widget widget-user w-100 h-100 m-0">

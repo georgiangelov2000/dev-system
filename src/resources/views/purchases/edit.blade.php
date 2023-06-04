@@ -60,13 +60,13 @@
                                     </div>
                                 @elseif ($product->images && count($product->images) === 1)
                                     <div class="col-3">
-                                        <img class="img-fluid cardWidgetImage card card-widget w-100  m-0"
+                                        <img class="cardWidgetImage w-100 m-0"
                                             src="{{ $product->images[0]->path . $product->images[0]->name }}" />
                                     </div>
                                 @else
                                     <div class="col-3">
-                                        <img class="img-fluid cardWidgetImage card card-widget w-100"
-                                            src="https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg" />
+                                        <img class="cardWidgetImage w-100 m-0"
+                                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png" />
                                     </div>
                                 @endif
                                 <div class="col-3 d-none imagePreview">
