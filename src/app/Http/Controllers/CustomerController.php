@@ -62,25 +62,22 @@ class CustomerController extends Controller
             }
 
             DB::commit();
-
-            Log::info('Successfully created customer');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
-            Log::error($e->getMessage());
+            return back()->withInput()->with('error', 'Customer has not been created');
         }
 
         return redirect()->route('customer.index')->with('success', 'Customer has been created');
     }
 
-    public function edit(Customer $customer,Request $request)
+    public function edit(Customer $customer)
     {
-        $paymentOption = $request->option;
+        // $paymentOption = $request->option;
 
-        if($request->option === 'payment') {
-            $customer->load('orders');
-            dd($customer->orders);
-        } else {
+        // if($request->option === 'payment') {
+        //     $customer->load('orders');
+        //     dd($customer);
+        // } else {
             $customer->load('image');
             $country = $customer->country_id;
             $states = $this->staticDataHelper->callStatesAndCountries($country,'states');
@@ -90,7 +87,7 @@ class CustomerController extends Controller
                 'countries' => $countries,
                 'states' => $states,
             ]);
-        }
+        // }
     }
 
     public function update(Customer $customer, CustomerRequest $request)
@@ -119,12 +116,9 @@ class CustomerController extends Controller
             ]);
 
             DB::commit();
-
-            Log::info('Succesfully updated cusotmer');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
-            Log::error($e->getMessage());
+            return back()->withInput()->with('error', 'Customer has not been updated');
         }
 
         return redirect()->route('customer.index')->with('success', 'Customer has been updated');
@@ -155,7 +149,6 @@ class CustomerController extends Controller
             return response()->json(['message' => 'Customer has been deleted'], 200);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error deleting customer: ' . $e->getMessage());
             return response()->json(['message' => 'Customer has not been deleted', 'error' => $e->getMessage()], 500);
         }
     }
@@ -218,6 +211,7 @@ class CustomerController extends Controller
                 Order::where('id',$order->first()->id)->update([
                     'single_sold_price' => $finalSinglePrice,
                     'total_sold_price' => $finalTotalPrice,
+                    'original_sold_price' => FunctionsHelper::calculatedFinalPrice($singlePrice, $soldQuantity),
                     'sold_quantity' => $soldQuantity,
                     'discount_percent' => $discount,
 
@@ -227,7 +221,6 @@ class CustomerController extends Controller
             DB::commit();
             return redirect()->route('customer.index')->with('success', 'Orders has been updated');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
             return back()->withInput()->with('error', 'Orders has not been updated');
         }
