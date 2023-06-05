@@ -73,17 +73,24 @@ class CustomerController extends Controller
         return redirect()->route('customer.index')->with('success', 'Customer has been created');
     }
 
-    public function edit(Customer $customer)
+    public function edit(Customer $customer,Request $request)
     {
-        $customer->load('image');
-        $country = $customer->country_id;
-        $states = $this->staticDataHelper->callStatesAndCountries($country,'states');
-        $countries = $this->staticDataHelper->callStatesAndCountries();
+        $paymentOption = $request->option;
 
-        return view('customers.edit', compact('customer'), [
-            'countries' => $countries,
-            'states' => $states,
-        ]);
+        if($request->option === 'payment') {
+            $customer->load('orders');
+            dd($customer->orders);
+        } else {
+            $customer->load('image');
+            $country = $customer->country_id;
+            $states = $this->staticDataHelper->callStatesAndCountries($country,'states');
+            $countries = $this->staticDataHelper->callStatesAndCountries();
+    
+            return view('customers.edit', compact('customer'), [
+                'countries' => $countries,
+                'states' => $states,
+            ]);
+        }
     }
 
     public function update(Customer $customer, CustomerRequest $request)
@@ -226,5 +233,8 @@ class CustomerController extends Controller
         }
     }
 
+    public function createCustomerPayment(){
+        return view('payments.create_customer_payments');
+    }
 
 }

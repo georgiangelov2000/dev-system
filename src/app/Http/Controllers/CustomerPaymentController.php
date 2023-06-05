@@ -35,10 +35,7 @@ class CustomerPaymentController extends Controller
             'data' => $paymentData
         ];
 
-        //dd($customer_payments);
-
         $html = View::make('templates.payments',$customer_payments)->render();
-
         return response()->json(['html' => $html]);
     }
 
@@ -47,10 +44,7 @@ class CustomerPaymentController extends Controller
             $this->customer,
             $this->date
         );
-
         $result = $customerPaymentService->getData();
-
         return $result;
     }
-
 }

@@ -82,6 +82,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/delete/{customer}', [CustomerController::class, 'delete'])->name('delete');
         Route::get('/state/{countryId}', [CustomerController::class, 'getState'])->name('state');
         Route::get('/orders/{customer}', [CustomerController::class, 'customerOrders'])->name('orders');
+        Route::get('/create/payment', [CustomerController::class, 'createCustomerPayment'])->name('create.payment');
     });
     
     Route::prefix('orders')->name('order.')->group(function () {
