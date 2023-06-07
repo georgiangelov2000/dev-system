@@ -121,6 +121,7 @@ $(function () {
             for (let i = 0; i < dataTables.length; i++) {
                 new DataTable(dataTables[i], {
                     dom: 'Bfrtip',
+                    ordering: false,
                     buttons: [
                         {
                           extend: 'copy',
@@ -158,17 +159,6 @@ $(function () {
                           }
                         }
                       ],
-                    columns: [
-                        { orderable: false },
-                        { orderable: false },
-                        { orderable: false }, 
-                        { orderable: false },
-                        { orderable: false },
-                        { orderable: false },
-                        { orderable: false },
-                        { orderable: false },
-                        { orderable: false },
-                    ]
                 });
             }
         } else {

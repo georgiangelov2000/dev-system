@@ -89,3 +89,10 @@ export function showConfirmationDialog(title, template,callback) {
         }
     });
 };
+
+export function handleErrors(errors){
+    $.each(errors, function(field, fieldErrors) {
+        var errorSpan = $('span[name="' + field + '"]');
+        errorSpan.text(fieldErrors[0]);
+    });
+}

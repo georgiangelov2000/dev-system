@@ -37,11 +37,9 @@ class CustomerSummaryService
     
         if (!empty($this->date)) {
             $dates = explode(" - ", $this->date);
-            $date1 = new DateTime($dates[0]);
-            $date2 = new DateTime($dates[1]);
-            $date1_formatted = $date1->format('Y-m-d');
-            $date2_formatted = $date2->format('Y-m-d');
-    
+            $date1_formatted = date('Y-m-d', strtotime($dates[0]));
+            $date2_formatted = date('Y-m-d', strtotime($dates[1]));
+
             $order->when(!empty($this->date), function ($query) use ($date1_formatted, $date2_formatted) {
                 return $query->whereBetween('date_of_sale', [
                     $date1_formatted,
@@ -50,11 +48,13 @@ class CustomerSummaryService
             });
         }
         if( intval($this->order_filter) === 1) {
-            $order->where('is_paid',1);
+            $order->where('is_paid',1)
+            ->whereIn('status',[1]);
         }
         if( intval($this->order_filter) === 2) {
             $order
-            ->where('is_paid', 0);
+            ->where('is_paid', 0)
+            ->whereIn('status',[3,4]);
         }
     
         return $order;

@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Helpers\FunctionsHelper;
 use Illuminate\Http\Request;
 use App\Http\Requests\OrderRequest;
+use App\Http\Requests\PaymentRequest;
+use App\Models\CustomerPayment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Order;
 use App\Models\Product;
 use App\Helpers\LoadStaticData;
+use Datetime;
 
 class OrderController extends Controller
 {
@@ -195,5 +198,34 @@ class OrderController extends Controller
             return back()->with('error', 'Order has not been deleted');
         }
         return response()->json(['message' => 'Order has been deleted'], 200);
+    }
+
+    public function createPayment(){
+        return view('payments.create_customer_payments');
+    }
+
+    public function storePayment(Order $order, PaymentRequest $request){
+
+        DB::beginTransaction();
+
+        try {
+            $order->status = 1;
+            $order->is_paid = 1;
+            $order->save();
+
+            CustomerPayment::create([
+                'order_id' => $order->id,
+                'date_of_payment' => date('Y-m-d', strtotime($request->date_of_payment)),
+                'price' => $request->price,
+                'quantity' => $request->quantity
+            ]);
+            DB::commit();
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return response()->json(['message' => "Payment record has not been created"],500);
+        }
+        return response()->json(['message' => "Payment record has been created"],200);
     }
 }

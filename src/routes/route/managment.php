@@ -82,7 +82,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/delete/{customer}', [CustomerController::class, 'delete'])->name('delete');
         Route::get('/state/{countryId}', [CustomerController::class, 'getState'])->name('state');
         Route::get('/orders/{customer}', [CustomerController::class, 'customerOrders'])->name('orders');
-        Route::get('/create/payment', [CustomerController::class, 'createCustomerPayment'])->name('create.payment');
     });
     
     Route::prefix('orders')->name('order.')->group(function () {
@@ -93,6 +92,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{order}', [OrderController::class, 'update'])->name('update');
         Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
         Route::post('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
+        Route::get('/create/payment', [OrderController::class, 'createPayment'])->name('create.payment');
+        Route::post('/store/payment/{order}', [OrderController::class, 'storePayment'])->name('store.payment');
     });
 
     Route::prefix('summary')->name('summary.')->group(function () {

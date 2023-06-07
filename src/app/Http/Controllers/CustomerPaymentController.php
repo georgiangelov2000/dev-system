@@ -30,12 +30,8 @@ class CustomerPaymentController extends Controller
         $this->customer = $request->customer;
 
         $paymentData = $this->getPayment();
-        
-        $customer_payments = [
-            'data' => $paymentData
-        ];
 
-        $html = View::make('templates.payments',$customer_payments)->render();
+        $html = View::make('templates.payments',['data' => $paymentData])->render();
         return response()->json(['html' => $html]);
     }
 

@@ -234,7 +234,7 @@
                         <div class="cardTemplate rounded mb-0">
                             <div class="card-footer rounded bg-white">
                                 <div class="row">
-                                    <div class="col-sm-3 col-6">
+                                    <div class="col-sm-4 col-6">
                                         <div class="description-block border-right">
                                             <h5 class="description-header">
                                                  @if(is_numeric($paidProducts) && is_numeric($paidOrders))
@@ -262,30 +262,22 @@
 
                                     </div>
 
-                                    <div class="col-sm-3 col-6">
+                                    <div class="col-sm-4 col-6">
                                         <div class="description-block border-right">
                                             <h5 class="description-header">
                                                 €{{$paidProducts ? number_format($paidProducts, 2, '.', '.') : 0}}
                                             </h5>
-                                            <span class="description-text">STOCK PAID</span>
+                                            <span class="description-text">PAID PURCHASES</span>
                                         </div>
 
                                     </div>
 
-                                    <div class="col-sm-3 col-6">
+                                    <div class="col-sm-4 col-6">
                                         <div class="description-block border-right">
                                             <h5 class="description-header">
                                                 €{{$paidOrders ? number_format($paidOrders, 2, '.', '.') : 0}}
                                             </h5>
                                             <span class="description-text">PAID ORDERS</span>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-sm-3 col-6">
-                                        <div class="description-block">
-                                            <h5 class="description-header">1200</h5>
-                                            <span class="description-text">GOAL COMPLETIONS</span>
                                         </div>
 
                                     </div>

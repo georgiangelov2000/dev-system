@@ -40,7 +40,7 @@
                             <th>Discount</th>
                             <th>Date of sale</th>
                             <th>Payment date</th>
-                            <th>Delayed payment</th>
+                            <th>Delayed</th>
                         </tr>
                     </thead>
                     @php
@@ -53,13 +53,13 @@
                                     <td>{{ $product['order']['tracking_number'] }}</td>
                                     <td>{{ $product['order']['invoice_number'] }}</td>
                                     <td>{{ $product['order']['product']['name'] }}</td>
-                                    <td>€{{ $product['order']['total_sold_price'] }}</td>
-                                    <td>€{{ $product['order']['single_sold_price'] }}</td>
-                                    <td>{{ $product['order']['sold_quantity'] }}</td>
+                                    <td>€{{$product['price']}}</td>
+                                    <td>€{{$product['order']['single_sold_price'] }}</td>
+                                    <td>{{ $product['quantity'] }}</td>
                                     <td>{{ $product['order']['discount_percent'] }}%</td>
                                     <td>{{ $product['order']['date_of_sale'] }}</td>
                                     <td>{{ $product['date_of_payment'] }}</td>
-                                    <td>{{ $product['order']['delayed_payment'] ?? ''}}</td>
+                                    <td>{{ $product['delayed_payment'] ?? ''}} days</td>
                                 </tr>
                             @endforeach
                         @endif
@@ -69,15 +69,7 @@
 
         </div>
 
-        <div class="row">
-
-            <div class="col-6">
-                <p class="lead">Notes:</p>
-                <p class="text-muted well well-sm shadow-none" style="margin-top: 10px;">
-                    {{ $data->customer->notes }}
-                </p>
-            </div>
-
+        <div class="row justify-content-end">
             <div class="col-6">
                 <p class="lead">Amount Due: {{ $data->date_range ? $data->date_range : "Date range is not available" }}</p>
                 <div class="table-responsive">

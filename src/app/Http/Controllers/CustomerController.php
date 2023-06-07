@@ -226,8 +226,4 @@ class CustomerController extends Controller
         }
     }
 
-    public function createCustomerPayment(){
-        return view('payments.create_customer_payments');
-    }
-
 }

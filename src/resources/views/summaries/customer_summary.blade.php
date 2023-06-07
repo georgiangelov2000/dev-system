@@ -2,22 +2,17 @@
 @section('title', 'Customer summary')
 
 @section('content')
-    <div class="row justify-content-between mb-3">
-        <div class="col-12 d-flex justify-content-between">
-            <h3 class="mb-0">Customer Summary</h3>
-        </div>
-    </div>
     <div class="row">
         <div class="card col-12 cardTemplate">
-            <div class="card-body">
-                <div class="mb-2 card col-6">
-                    <div class="col-12 p-2">
-                        <strong>Information:</strong>
-                        <span>This section can give you more information about your customers, for a specific time period or
-                            in general.</span>
-                    </div>
+            <div class="card-header">
+                <div class="col-12">
+                    <h3 class="card-title">
+                       Summary
+                    </h3>
                 </div>
-                <div class="col-12 mb-3 pl-0">
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
                     <div class="col-12">
                         <h6 class="font-weight-bold">Legend:</h6>
                     </div>

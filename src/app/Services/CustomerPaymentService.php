@@ -35,18 +35,15 @@ class CustomerPaymentService
 
     public function orderQueryBuilder()
     {
-        $customer_payments = CustomerPayment::query()
-
+        $customer_payments = CustomerPayment::select('order_id','date_of_payment','price','quantity')
         ->with(['order' => function ($query) {
             $query
                   ->select([
                     'id',
                     'customer_id',
                     'product_id',
-                    'sold_quantity',
-                    'single_sold_price',
-                    'total_sold_price',
                     'discount_percent',
+                    'single_sold_price',
                     'tracking_number',
                     'invoice_number',
                     'date_of_sale'
@@ -60,51 +57,42 @@ class CustomerPaymentService
             $query->where('customer_id', $this->customer);
         });
 
-        $formated_dates = $this->dateFormat('query_format');
+        $formated_dates = $this->dateFormat();
 
         if($formated_dates) {
             $customer_payments->whereBetween('date_of_payment', [
-                $formated_dates['start'],
-                $formated_dates['end']
+                $formated_dates[0],
+                $formated_dates[1]
             ]);
         }
 
         return $customer_payments;
     }
 
-    public function dateFormat($option = null){
+    public function dateFormat(){
         
         if(!empty($this->date)) {
             $dates = explode(" - ", $this->date);
-            $date1 = new DateTime($dates[0]);
-            $date2 = new DateTime($dates[1]);
-            $date1_formatted = $date1->format('Y-m-d');
-            $date2_formatted = $date2->format('Y-m-d');
-        }
-        
-        if($option === 'string_format') {
-            return isset($date1_formatted) && isset($date1_formatted) ? 
-            date('F j, Y', strtotime($date1_formatted)) . ' - ' . date('F j, Y', strtotime($date2_formatted)) 
-            : '';
-        } 
-        elseif($option === 'query_format') {
-            return isset($date1_formatted) && isset($date1_formatted) ? [
-                'start' => $date1_formatted,
-                'end' => $date2_formatted
-            ] : false;
-        }
+            $date1_formatted = date('Y-m-d', strtotime($dates[0]));
+            $date2_formatted = date('Y-m-d', strtotime($dates[1]));
 
+            return [
+                $date1_formatted,
+                $date2_formatted
+            ];
+        }
     }
 
     public function getData(){
         $result = new stdClass();
 
-        $formated_dates = $this->dateFormat('string_format');
+        $formated_dates = $this->dateFormat();
+        $dateToString = $formated_dates ? date('F j, Y', strtotime($formated_dates[0])) . ' - ' . date('F j, Y', strtotime($formated_dates[1])) : '';
         
-        $result->date_range = $formated_dates;
+        $result->date_range = $dateToString;
         $result->customer = $this->getCustomer();
         $result->products = $this->orderQueryBuilder()->get()->toArray();
-        $result->sum = $this->orderQueryBuilder()->sum('price');
+        $result->sum = number_format($this->orderQueryBuilder()->sum('price'),2,'.','');
 
         $totalDiscount = 0;
         $regularPrice = 0;
@@ -116,7 +104,7 @@ class CustomerPaymentService
             $dateOfPayment = strtotime($product['date_of_payment']);
             $daysDelayed = floor(($dateOfPayment - $dateOfSale) / (60 * 60 * 24));
             
-            $product['order']['delayed_payment'] = $daysDelayed;
+            $product['delayed_payment'] = $daysDelayed;
         }
 
         $regularPrice = ($result->sum / (1-($totalDiscount/100)));

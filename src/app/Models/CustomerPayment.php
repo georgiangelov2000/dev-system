@@ -29,6 +29,7 @@ class CustomerPayment extends Model
         'id',
         'order_id',
         'price',
+        'quantity',
         'date_of_payment'
     ];
 

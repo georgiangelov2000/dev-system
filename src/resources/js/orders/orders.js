@@ -180,8 +180,8 @@ $(function () {
                     if (currentDate.isAfter(dateOfSale, 'day') && (row.status === 'Pending' || row.status === 'Ordered')) {
                         return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
                     } else if (row.status === 'Received') {
-                        return `<span class="badge badge-success p-2">Congratulations! Order received</span>`;
-                    }  
+                        return `<span class="badge badge-success p-2">Order received</span>`;
+                    }
                     else {
                         var badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
                         return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
@@ -191,18 +191,18 @@ $(function () {
                 }
             },
             {
-                width:'2%',
-                orderable:false,
-                name:'created_at',
-                render: function(data,type,row) {
+                width: '2%',
+                orderable: false,
+                name: 'created_at',
+                render: function (data, type, row) {
                     return `<span>${moment(row.created_at).format('YYYY-MM-DD')}<span>`
                 }
             },
             {
-                width:'2%',
-                orderable:false,
-                name:'updated_at',
-                render: function(data,type,row) {
+                width: '2%',
+                orderable: false,
+                name: 'updated_at',
+                render: function (data, type, row) {
                     return `<span>${moment(row.updated_at).format('YYYY-MM-DD')}<span>`
                 }
             },
@@ -238,31 +238,33 @@ $(function () {
             {
                 width: '15%',
                 orderable: false,
-                class:'text-center',
+                class: 'text-center',
                 render: function (data, type, row) {
+                    let editButton = '';
+                    let dropdown = '';
+
                     let deleteFormTemplate = "\
                     <form style='display:inline-block;' id='delete-form' action=" + ORDER_DELETE_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.invoice_number + ">\
                         <input type='hidden' name='_method' value='DELETE'>\
                         <input type='hidden' name='id' value='" + row.id + "'>\
                         <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'><i class='fa-light fa-trash text-danger'></i></button>\
-                    <form/>\
-                    ";
+                    <form/>\ ";
 
-                    let editButton = '<a href=' + ORDER_EDIT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+                    if (!row.is_paid && row.status !== 'Received') {
+                        editButton = '<a href=' + ORDER_EDIT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+                        dropdown = `
+                        <div class="dropdown d-inline">
+                            <button class="btn text-info p-0" title="Change status" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa-light fa-rotate-right"></i>
+                            </button>
+                            <div id="changeStatus" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <button type="button" order-id=${row.id} value="3" onclick="changeStatus(this)" class="dropdown-item">Pending</button>
+                                <button type="button" order-id=${row.id} value="4" onclick="changeStatus(this)" class="dropdown-item">Ordered</button>
+                            </div>
+                        </div>`
+                    }
 
                     let previewButton = '<a title="Review" class="btn p-1"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
-
-                    let dropdown = `
-                    <div class="dropdown d-inline">
-                        <button class="btn text-info p-0" title="Change status" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa-light fa-rotate-right"></i>
-                        </button>
-                        <div id="changeStatus" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <button type="button" order-id=${row.id} value="3" onclick="changeStatus(this)" class="dropdown-item">Pending</button>
-                            <button type="button" order-id=${row.id} value="4" onclick="changeStatus(this)" class="dropdown-item">Ordered</button>
-                        </div>
-                    </div>
-                    `;
 
                     return `${deleteFormTemplate} ${editButton} ${dropdown} ${previewButton}`;
                 }

@@ -29,7 +29,7 @@ class OrderApiController extends Controller
             if($select_json) {
                 $orderQuery->select('id','customer_id','product_id','invoice_number',)
                 ->where('is_paid',0)
-                ->whereIn('status',[2,3]);
+                ->whereIn('status',[3,4]);
                 return response()->json(
                     $orderQuery->get()
                 );
