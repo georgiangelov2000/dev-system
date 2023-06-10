@@ -22,119 +22,91 @@ class ProductApiController extends Controller
         $total_price_range = $request->total_price_range;
         $search = $request->search;
         $out_of_stock = $request->out_of_stock;
-
-        $offset = $request->input('start', 0);  
-        $limit = $request->input('length', 10);
         
+        $offset = $request->input('start', 0);
+        $limit = $request->input('length', 10);
+
         $productQuery = $this->buildProductQuery();
 
+        if ($search) {
+            $productQuery->where('name', 'LIKE', '%' . $search . '%');
+        }
         if ($supplier) {
             $productQuery->where('supplier_id', $supplier);
         }
         if ($category) {
-            $this->fillterByCategories($productQuery, $category);
+            $productQuery->whereHas('categories', function ($query) use ($category) {
+                $query->where('category_id', $category);
+            });
         }
         if ($sub_category) {
-            $this->fillterBySubCategories($productQuery,$sub_category);
+            $productQuery->whereHas('subcategories', function ($query) use ($sub_category) {
+                $query->whereIn('subcategories.id', $sub_category);
+            });
         }
         if ($brand) {
             $productQuery->whereHas('brands', function ($query) use ($brand) {
                 $query->whereIn('brands.id', $brand);
             });
-        } 
+        }
         if ($publishing) {
-            $date_pieces = explode(' - ',$publishing);
+            $dates = explode(" - ", $publishing);
+            $date1_formatted = date('Y-m-d 23:59:59', strtotime($dates[0]));
+            $date2_formatted = date('Y-m-d 23:59:59', strtotime($dates[1]));
 
-            $start_date = new DateTime($date_pieces[0]);
-            $end_date = new DateTime($date_pieces[1]);
-            
-            $this->fillterByCreatedAt(
-                $productQuery,
-                $start_date->format('Y-m-d H:i:s'),
-                $end_date->format('Y-m-d H:i:s')
-            );
+            $productQuery
+            ->where('created_at', '>=', $date1_formatted)
+            ->where('created_at', '<=', $date2_formatted);
         }
         if ($total_price_range) {
-            $pieces = explode('-',$total_price_range);
-            $this->fillterTotalPrice(
-                $productQuery,
-                $pieces[0],
-                $pieces[1]
-            );
+            $pieces = explode('-', $total_price_range);
+
+            $productQuery
+            ->where('total_price', '>=', (int)$pieces[0])
+            ->where('total_price', '<=', (int)$pieces[1]);
         }
+
         if ($single_total_price) {
-            $productQuery->where('total_price', 'LIKE', '%'.$single_total_price.'%');
-        }        
-        if($search) {
-            $productQuery->where('name', 'LIKE', '%'.$search.'%');
-            if($out_of_stock) {
-                $productQuery->where('quantity','>',0);
-            }
+            $productQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
         }
+        if ($out_of_stock) {
+            $productQuery->where('quantity', '>', 0)->where('status', 'enabled');
+        } else {
+            $productQuery->where('quantity', '<=', 0)->where('status', 'disabled');
+        }
+
 
         $filteredRecords = $productQuery->count();
         $result = $productQuery->skip($offset)->take($limit)->get();
-        $totalRecords = Product::count(); 
-        
-        return response()->json( 
-             [
+        $totalRecords = Product::count();
+
+        return response()->json(
+            [
                 'draw' => intval($request->input('draw')),
                 'recordsTotal' => $totalRecords,
                 'recordsFiltered' => $filteredRecords,
                 'data' => $result
             ]
         );
-
     }
 
     private function buildProductQuery()
     {
         return Product::query()->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name'])
             ->select(
-                'id', 
-                'name', 
-                'supplier_id', 
-                'quantity', 
-                'notes', 
-                'price', 
-                'total_price', 
-                'code', 
-                'status', 
+                'id',
+                'name',
+                'supplier_id',
+                'quantity',
+                'notes',
+                'price',
+                'total_price',
+                'code',
+                'status',
                 'created_at',
                 'is_paid',
                 'initial_quantity'
             )
-            ->where('status', 'enabled')
-            ->where('initial_quantity', '>', 0)
-            ->where('quantity', '>', 0)
             ->orderBy('id', 'desc');
-    }
-
-    private function fillterByCategories($query, $category)
-    {
-        $query->whereHas('categories', function ($query) use ($category) {
-            $query->where('category_id', $category);
-        });
-    }
-
-    private function fillterBySubCategories($query, $sub_category) {
-        $query->whereHas('subcategories', function ($query) use ($sub_category) {
-            $query->whereIn('subcategories.id', $sub_category);
-        });
-    }
-
-    private function fillterByCreatedAt($query, $start_date, $end_date)
-    {
-        return $query->whereBetween('created_at', [
-            $start_date,
-            $end_date
-        ]);
-    }
-
-    private function fillterTotalPrice($query, $total_price_start, $end_price_start) {   
-        return $query->whereBetween('total_price', [
-            floatval($total_price_start),
-            floatval($end_price_start)
-        ]);
     }
 }

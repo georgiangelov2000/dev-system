@@ -12,7 +12,7 @@ class SubCategoryApiController extends Controller
     {
         $category = $request->category;
         $subCategoryQ = SubCategory::query();
-    
+
         if (empty($category)) {
             $subCategoryQ->where('category_id', $category);
         }

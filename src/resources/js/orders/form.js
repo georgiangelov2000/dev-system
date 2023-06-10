@@ -75,7 +75,7 @@ $(function () {
       let products = response.data;
 
       if (products.length > 0) {
-        bootstrapProduct.append('<option value=""></option>')
+        bootstrapProduct.append('<option value="" style="display:none;"></option>');
         $.each(products, function ($key, product) {
           bootstrapProduct.append(`<option
                      value="${product.id}"

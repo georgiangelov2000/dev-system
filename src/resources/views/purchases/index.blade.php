@@ -28,47 +28,31 @@
                     <div class="col-3">
                         <div class="form-group">
                             <label>Suppliers</label>
-                            <select class="form-control selectSupplier">
-                                <option value=''>All</option>
-                                @foreach ($suppliers as $supplier )
-                                    <option value='{{$supplier->id}}'>{{$supplier->name}}</option>
-                                @endforeach
+                            <select name="supplier_id" class="form-control selectSupplier" data-live-search="true">
                             </select>
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="form-group">
                             <label>Categories</label>
-                            <select class="form-control selectCategory">
-                                <option value=''>All</option>
-                                @foreach ($categories as $category )
-                                    <option value='{{$category->id}}'>{{$category->name}}</option>
-                                @endforeach
-                            </select>
+                            <select class="form-control selectCategory" data-live-search="true"></select>
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="form-group">
                             <label>Sub categories</label>
-                            <select class="form-control selectSubCategory" multiple>
-                                <option value="0"></option>
-                            </select>
+                            <select class="form-control selectSubCategory" multiple></select>
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="form-group">
                             <label>Brands</label>
-                            <select class="form-control selectBrands" multiple>
-                                <option value='0'>All</option>
-                                @foreach ($brands as $brand )
-                                    <option value='{{$brand->id}}'>{{$brand->name}}</option>
-                                @endforeach
-                            </select>
+                            <select class="form-control selectBrands" multiple data-live-search="true"></select>
                         </div>
                     </div>
                     <div class="col-3">
                         <div class="form-group">
-                            <label>Select total price range</label>
+                            <label>Total price range</label>
                             <select class="form-control selectPrice">
                                 <option value="">All</option>
                                 <option value="0-1000">0-1000</option>
@@ -91,9 +75,21 @@
                         <label for="customRange1">Publishing</label>
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label for="stock">Stock</label>
+                            <select class="form-control selectStock" name="" id="stock">
+                                <option selected value="1">In stock</option>
+                                <option value="0">Out of stock</option>
+                            </select>
+                        </div>
+                    </div>                    
                 </div>  
                 <table id="purchasedProducts" class="table table-hover table-sm dataTable no-footer">
                     <thead>
+                        <th>
+                            Status
+                        </th>
                         <th>
                             <div class="form-check">
                                 <input class="form-check-input selectAll" type="checkbox">
@@ -122,66 +118,19 @@
         </div>
     </div>
 
-    <div id="purchases_modal" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Marked paid purchase to supplier</h5>
-              <button type="button" class="close modalCloseBtn" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-                <div>
-                    <div>
-                        <b>Calculation 1:</b><span>triggers a calculation based on the quantity and single price.</span>
-                    </div>
-                    <div>
-                        <b>Calculation 2:</b> <span>triggers a calculation based on the initial quantity and single price.</span>
-                    </div>
-                </div>
-                <hr class="w-100">
-                <form action="" method="POST" id="payOrderForm">
-                    @csrf
-                    <div class="form-group">
-                        <label>Payment date</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    <i class="far fa-calendar-alt"></i>
-                                </span>
-                            </div>
-                            <input type="text" class="form-control datepicker" name="date_of_payment">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Price</label>
-                        <input type="text" name="price" class="form-control" value="" >
-                    </div>
-                    <input type="hidden" name="purchase_id" value="">
-                </form>
-                <button type="button" class="btn btn-sm btn-outline-primary firstCalculation" data-dismiss="modal">Calculation 1</button>
-                <button type="button" class="btn btn-sm btn-outline-primary secondCalculation" data-dismiss="modal">Calculation 2</button>
-            </div>
-            <div class="modal-footer">
-                <div class="col-6">
-                    <button type="submit" class="btn btn-primary" id="savePayOrder">Save changes</button>
-                    <button type="button" class="btn btn-secondary modalCloseBtn" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-          </div>
-        </div>
-      </div>  
-
-    @push('scripts')
+      @push('scripts')
         <script type="text/javascript" src="{{ mix('js/purchases/purchases.js') }}"></script>
         <script type='text/javascript'>
             let PRODUCT_API_ROUTE = "{{ route('api.products') }}";
+            let CATEGORY_API_ROUTE = "{{ route('api.categories') }}";
+            let SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
+            let BRAND_API_ROUTE = "{{ route('api.brands') }}";
             let PREVIEW_ROUTE = "{{ route('purchase.preview',':id') }}";
             let REMOVE_PRODUCT_ROUTE = "{{ route('purchase.delete', ':id') }}";
             let EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
             let EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
             let CATEGORY_ROUTE = "{{ route('api.subcategories') }}";
+            let CONFIG_URL = "{{config('app.url')}}"
         </script>
     @endpush
 

@@ -33,7 +33,7 @@ $(function () {
     .val('')
     .trigger('change');
 
-
+    console.log(SUB_CATEGORY_API_ROUTE);
     let dataTable = table.DataTable({
         ajax: {
             url: SUB_CATEGORY_API_ROUTE

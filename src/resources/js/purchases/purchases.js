@@ -1,14 +1,12 @@
-import { APIDELETECALLER , APICaller } from '../ajax/methods';
+import { APIDELETECALLER, APICaller } from '../ajax/methods';
+import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 
 $(function () {
     let table = $('table#purchasedProducts');
-    let paymentModal = $('#purchases_modal');
-    let closeModal = $('.modalCloseBtn');
 
-    $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice')
-    .selectpicker('refresh')
-    .val('')
-    .trigger('change');
+    $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice, .selectStock')
+        .selectpicker('refresh')
+        .trigger('change');
 
     $('input[name="datetimes"]').daterangepicker({
         timePicker: false,
@@ -25,73 +23,55 @@ $(function () {
     let bootstrapSelectSubCategory = $('.bootstrap-select .selectSubCategory');
     let bootstrapSelectBrands = $('.bootstrap-select .selectBrands');
     let bootstrapSelectTotalPrice = $('.bootstrap-select .selectPrice');
+    let bootstrapSelectStock = $('.bootstrap-select .selectStock')
     let customTotalPrice = $('.customPrice');
     let applyBtn = $('.applyBtn');
 
     let publishingValue = $('input[name="datetimes"]').val();
 
-    applyBtn.bind('click',function(){
+    applyBtn.bind('click', function () {
         let date = $('input[name="datetimes"]').val();
         publishingValue = date;
         dataTable.ajax.reload(null, false);
     })
 
+    let buttons = mapButtons([2, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14]);
+
     let dataTable = table.DataTable({
         serverSide: true,
         dom: 'Bfrtip',
-        buttons: [
-            {
-              extend: 'copy',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [2,4,5,6,7,9,10,11,12,13,14]
-              }
-            },
-            {
-              extend: 'csv',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [2,4,5,6,7,9,10,11,12,13,14]
-              }
-            },
-            {
-              extend: 'excel',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [2,4,5,6,7,9,10,11,12,13,14] 
-              }
-            },
-            {
-              extend: 'pdf',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [2,4,5,6,7,9,10,11,12,13,14]
-              }
-            },
-            {
-              extend: 'print',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [2,4,5,6,7,9,10,11,12,13,14]
-              }
-            }
-          ],
+        buttons,
         ajax: {
-            url: PRODUCT_API_ROUTE,  
-            data: function(d) {
-                return $.extend({},d, {
-                    'supplier': bootstrapSelectSupplier.val().toLowerCase(),
+            url: PRODUCT_API_ROUTE,
+            data: function (d) {
+                return $.extend({}, d, {
+                    //  bootstrapSelectSupplier.val().toLowerCase(),
+                    'supplier': bootstrapSelectSupplier.val() === null ? '' : bootstrapSelectSupplier.val().toLowerCase(),
                     "single_total_price": customTotalPrice.val().toLowerCase(),
                     "total_price_range": bootstrapSelectTotalPrice.val().toLowerCase(),
-                    "category" : bootstrapSelectCategory.val().toLowerCase(),
+                    "category": bootstrapSelectCategory.val() === null ? '' : bootstrapSelectCategory.val().toLowerCase(),
                     'publishing': publishingValue,
-                    'sub_category' : bootstrapSelectSubCategory.val(), //array of key => value
+                    'sub_category': bootstrapSelectSubCategory.val(), //array of key => value
                     'brand': bootstrapSelectBrands.val(), //array of key => value
-                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : ''
+                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : '',
+                    'out_of_stock': bootstrapSelectStock.val()
                 });
             }
         },
         columns: [
+            {
+                orderable: false,
+                width: '1%',
+                render: function (data, type, row) {
+                    let statusStr = ''
+                    if (row.status === 'enabled') {
+                        statusStr = '<i title="Enabled" class="fa-solid fa-circle text-success"></i>'
+                    } else {
+                        statusStr = '<i title="Disabled" class="fa-solid fa-circle text-danger"></i>'
+                    }
+                    return statusStr;
+                }
+            },
             {
                 orderable: false,
                 width: "1%",
@@ -120,10 +100,10 @@ $(function () {
                         let carouselItems = row.images.map((image, index) => {
                             let isActive = index === 0 ? 'active' : ''; // Set first image as active
                             return `<div class="carousel-item ${isActive}">
-                                        <img class="d-block w-100" src="${image.path + image.name}" alt="Slide ${index + 1}">
+                                        <img class="d-block w-100" src="${ CONFIG_URL +  image.path  + "/" + image.name}" alt="Slide ${index + 1}">
                                     </div>`;
                         }).join('');
-                    
+
                         return `<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                                     <div class="carousel-inner">
                                         ${carouselItems}
@@ -138,7 +118,7 @@ $(function () {
                                     </a>
                                 </div>`;
                     } else if (row.images && row.images.length === 1) {
-                        let imagePath = row.images[0].path + row.images[0].name;
+                        let imagePath = CONFIG_URL + row.images[0].path + "/" + row.images[0].name;
                         return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${imagePath}" />`;
 
                     } else {
@@ -155,14 +135,16 @@ $(function () {
             {
                 width: '6%',
                 orderable: true,
-                name: "price",
-                data: "price"
+                render: function (data, type, row) {
+                    return `<span>€${row.price}</span>`
+                }
             },
             {
                 width: '6%',
                 orderable: true,
-                name: "total_price",
-                data: "total_price"
+                render: function (data, type, row) {
+                    return `<span>€${row.total_price}</span>`
+                }
             },
             {
                 width: '5%',
@@ -191,7 +173,7 @@ $(function () {
                 orderable: false,
                 render: function (data, type, row) {
                     if (row.supplier) {
-                        return "<a href="+EDIT_SUPPLIER_ROUTE.replace(":id",row.supplier.id)+">" + row.supplier.name + "</a>"
+                        return "<a href=" + EDIT_SUPPLIER_ROUTE.replace(":id", row.supplier.id) + ">" + row.supplier.name + "</a>"
                     } else {
                         return "";
                     }
@@ -258,7 +240,7 @@ $(function () {
                 orderable: false,
                 name: "is_paid",
                 render: function (data, type, row) {
-                    if(row.is_paid) {
+                    if (row.is_paid) {
                         return '<span class="text-success">Yes</span>';
                     } else {
                         return '<span class="text-danger">No</span>';
@@ -269,21 +251,35 @@ $(function () {
                 orderable: false,
                 width: '6%',
                 render: function (data, type, row) {
-                    let deleteFormTemplate = "\
-                        <form style='display:inline-block;' id='delete-form' action=" + REMOVE_PRODUCT_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.name + ">\
-                            <input type='hidden' name='_method' value='DELETE'>\
-                            <input type='hidden' name='id' value='" + row.id + "'>\
-                            <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'><i class='fa-light fa-trash text-danger'></i></button>\
-                        <form>\
-                    ";
-
-                    let previewLink = "<a title='Preview' href="+PREVIEW_ROUTE.replace(':id', row.id)+" class='btn p-0'><i class='fa fa-light fa-eye text-info' aria-hidden='true'></i></a>"
-
-                    let editButton = '<a href=' + EDIT_PRODUCT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + ' class="btn p-0" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
-
-                    let payButton = `<a  onclick="openPaymentModal(this)" purchase-price=${row.price} purchase-id=${row.id} class='btn p-0' title="Payment"><i class="fa-thin fa-cash-register"></i></a>`;
-
-                    return `${deleteFormTemplate} ${editButton} ${previewLink} ${[payButton]}`;
+                        let deleteFormTemplate = `
+                        <form style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
+                            <input type='hidden' name='_method' value='DELETE'>
+                            <input type='hidden' name='id' value='${row.id}'>
+                            <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'>
+                                <i class='fa-light fa-trash text-danger'></i>
+                            </button>
+                        </form>
+                    `;
+                
+                    let previewLink = `
+                        <a title='Preview' href="${PREVIEW_ROUTE.replace(':id', row.id)}" class='btn p-0'>
+                            <i class='fa-light fa-magnifying-glass text-info' aria-hidden='true'></i>
+                        </a>
+                    `;
+                    
+                    let orderCart = `
+                        <a title='Orders' href="${PREVIEW_ROUTE.replace(':id', row.id)}" class='btn p-0'>
+                            <i class='text-success fa-light fa-basket-shopping' aria-hidden='true'></i>
+                        </a>
+                    `;
+                    
+                    let editButton = `
+                        <a href=${EDIT_PRODUCT_ROUTE.replace(':id', row.id)} data-id=${row.id} class="btn p-0" title="Edit">
+                            <i class="fa-light fa-pencil text-warning"></i>
+                        </a>
+                    `;
+                    
+                    return `${deleteFormTemplate} ${editButton} ${previewLink} ${orderCart}`;                
                 }
             }
         ],
@@ -291,25 +287,106 @@ $(function () {
     });
 
     let builtInDataTableSearch = $('#purchasedProducts_filter input[type="search"]');
-    
-    customTotalPrice.bind('keyup',function(){
-        dataTable.ajax.reload( null, false );
+
+    // Searchable
+
+    $('.selectSupplier input[type="text"]').on('keyup', _.debounce(function () {
+        let text = $(this).val();
+        bootstrapSelectSupplier.empty();
+        
+        bootstrapSelectSupplier.append('<option value="" class="d-none"></option>');
+
+        if (text === '') {
+            bootstrapSelectSupplier.append('<option value="">All</option>');
+            bootstrapSelectSupplier.selectpicker('refresh');
+            return;
+        }
+
+        APICaller(SUPPLIER_API_ROUTE, { "search": text }, function (response) {
+            let suppliers = response.data;
+            if (suppliers.length > 0) {
+                $.each(suppliers, function ($key, supplier) {
+                    bootstrapSelectSupplier.append(`<option value="${supplier.id}"> ${supplier.name} </option>`)
+                })
+            }
+            bootstrapSelectSupplier.selectpicker('refresh');
+        }, function (error) {
+            console.log(error);
+        })
+    }, 300));
+
+    $('.selectCategory input[type="text"]').on('keyup', _.debounce(function () {
+        let text = $(this).val();
+        bootstrapSelectCategory.empty();
+
+        bootstrapSelectCategory.append('<option value="" class="d-none"></option>');
+        
+        if (text === '') {
+            bootstrapSelectCategory.append('<option value="">All</option>');
+            bootstrapSelectCategory.selectpicker('refresh');
+            return;
+        }
+
+        APICaller(CATEGORY_API_ROUTE, { "search": text }, function (response) {
+            let categories = response.data;
+            if (categories.length > 0) {
+                $.each(categories, function ($key, category) {
+                    bootstrapSelectCategory.append(`<option value="${category.id}"> ${category.name} </option>`)
+                })
+            }
+            bootstrapSelectCategory.selectpicker('refresh');
+        }, function (error) {
+            console.log(error);
+        })
+    }, 300));
+
+    $('.selectBrands input[type="text"]').on('keyup', _.debounce(function () {
+        let text = $(this).val();
+        bootstrapSelectBrands.empty();
+
+        if (text === '') {
+            bootstrapSelectBrands.selectpicker('refresh');
+            return;
+        }
+
+        APICaller(BRAND_API_ROUTE, { "search": text }, function (response) {
+            let brands = response.data;
+            if (brands.length > 0) {
+                bootstrapSelectCategory.append('<option value="" class="d-none"></option>');
+                $.each(brands, function ($key, brand) {
+                    bootstrapSelectBrands.append(`<option value="${brand.id}"> ${brand.name} </option>`)
+                })
+            }
+            bootstrapSelectBrands.selectpicker('refresh');
+        }, function (error) {
+            console.log(error);
+        })
+    }, 300))
+
+    // Actions
+
+    customTotalPrice.bind('keyup', function () {
+        dataTable.ajax.reload(null, false);
     });
 
-    builtInDataTableSearch.bind('keyup',function(){
-        dataTable.ajax.reload( null, false );
+    bootstrapSelectStock.bind('changed.bs.select', function () {
+        dataTable.ajax.reload(null, false);
     })
 
-    bootstrapSelectTotalPrice.bind('changed.bs.select',function(){
-        dataTable.ajax.reload( null, false );
+    builtInDataTableSearch.bind('keyup', function () {
+        dataTable.ajax.reload(null, false);
     })
 
-    bootstrapSelectSupplier.bind('changed.bs.select',function(){
-        dataTable.ajax.reload( null, false );
+    bootstrapSelectTotalPrice.bind('changed.bs.select', function () {
+        dataTable.ajax.reload(null, false);
     })
 
-    bootstrapSelectCategory.bind('changed.bs.select',function(e, clickedIndex, isSelected, previousValue){
-        dataTable.ajax.reload( null, false );
+    bootstrapSelectSupplier.bind('changed.bs.select', function () {
+        dataTable.ajax.reload(null, false);
+    })
+
+    bootstrapSelectCategory.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        dataTable.ajax.reload(null, false);
         bootstrapSelectSubCategory.empty();
         let category = $(this).val();
 
@@ -321,7 +398,7 @@ $(function () {
                 $.each(subCategories, function (key, subCategory) {
                     bootstrapSelectSubCategory.append(`<option value="${subCategory.id}">${subCategory.name}</option>`);
                 });
-            } 
+            }
             bootstrapSelectSubCategory.selectpicker('refresh');
         }, function (error) {
             console.log(error);
@@ -329,12 +406,12 @@ $(function () {
 
     })
 
-    bootstrapSelectSubCategory.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue){
-        dataTable.ajax.reload( null, false );
+    bootstrapSelectSubCategory.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        dataTable.ajax.reload(null, false);
     })
 
-    bootstrapSelectBrands.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue){
-        dataTable.ajax.reload( null, false );
+    bootstrapSelectBrands.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        dataTable.ajax.reload(null, false);
     });
 
     $(document).on('change', ".selectAll", function () {
@@ -361,6 +438,8 @@ $(function () {
         }
     });
 
+    // Window actions
+
     window.selectProduct = function (e) {
         if ($('tbody input[type="checkbox"]:checked').length === 0) {
             $('.actions').addClass('d-none');
@@ -375,16 +454,16 @@ $(function () {
         let name = form.attr('data-name');
         let url = form.attr('action');
 
-        let template = swalText(name);
+        const template = swalText(name);
 
-        confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
+        showConfirmationDialog('Selected purchases!', template, function () {
             APIDELETECALLER(url, function (response) {
                 toastr['success'](response.message);
                 table.DataTable().ajax.reload();
             }, function (error) {
                 toastr['error']('Product has not been deleted');
             });
-        });
+        })
     };
 
     window.deleteMultipleProducts = function (e) {
@@ -397,9 +476,9 @@ $(function () {
             searchedNames.push($(this).attr('data-name'));
         });
 
-        let template = swalText(searchedNames);
+        const template = swalText(searchedNames);
 
-        confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
+        showConfirmationDialog('Selected purchases!', template, function () {
             searchedIds.forEach(function (id, index) {
                 APIDELETECALLER(REMOVE_PRODUCT_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);
@@ -408,57 +487,7 @@ $(function () {
                     toastr['error']('Supplier has not been deleted');
                 });
             });
-        });
-
-    };
-
-    window.openPaymentModal = function(e) {
-        paymentModal.modal('show');
-        let purchase =$(e).attr('purchase-id');
-        // let price = $(e).attr('order-price');
-        // let customer = $(e).attr('customer-id');
-
-        // modal.find('form input[name="price"]').val(price);
-        // modal.find('form input[name="order_id"]').val(order);
-        // modal.find('form input[name="customer_id"]').val(customer);
-    }
-
-    closeModal.on('click', function () {
-        closeModal(paymentModal);
-    });
-
-    let swalText = function (params) {
-        let text = '<div class="col-12 d-flex flex-wrap justify-content-center">';
-
-        if (Array.isArray(params)) {
-            params.forEach(function (name, index) {
-                text += `<p class="font-weight-bold m-0">${index !== params.length - 1 ? name + ', ' : name}</p>`;
-            });
-        } else {
-            text += `<p class="font-weight-bold m-0">${params}</p>`;
-        }
-
-        text += '</div>';
-
-        return text;
-    };
-
-    let confirmAction = function (title, message, confirmButtonText, cancelButtonText, callback) {
-        Swal.fire({
-            title: title,
-            html: message,
-            icon: 'warning',
-            background: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: confirmButtonText,
-            cancelButtonText: cancelButtonText
-        }).then((result) => {
-            if (result.isConfirmed) {
-                callback();
-            }
-        });
+        })
     };
 
 });

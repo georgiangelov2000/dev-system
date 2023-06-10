@@ -96,3 +96,17 @@ export function handleErrors(errors){
         errorSpan.text(fieldErrors[0]);
     });
 }
+
+var buttonNames = ['copy', 'csv', 'excel', 'pdf', 'print'];
+
+export function mapButtons (columns) {
+    buttonNames.map(function(name){
+        return {
+            extend:name,
+            class: 'btn btn-outline-secondary',
+            exportOptions: {
+                columns: columns
+            }
+        }
+    })
+}

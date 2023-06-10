@@ -62,9 +62,7 @@
                                 <label class="form-check-label" for="flexCheckDefault"></label>
                             </div>
                         </th>
-                        <th>
-                            ID
-                        </th>
+                        <th>ID</th>
                         <th>Image</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -93,6 +91,8 @@
         let STORE_SUPPLIER_ROUTE = "{{route('supplier.store')}}";
         let STATE_ROUTE = "{{route('state',':id')}}"; 
         let DETACH_CATEGORY =  "{{route('supplier.detach.category',':id')}}"
+        let CONFIG_URL = "{{config('app.url')}}"
+        let MASS_EDIT_PURCHASES = "{{route('supplier.mass.edit.purchases',':id')}}"
     </script>
 @endpush
 

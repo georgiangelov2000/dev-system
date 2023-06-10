@@ -15,6 +15,7 @@ mix.js('resources/js/settings/e-mail.js', 'public/js/settings'),
 
 mix.js('resources/js/suppliers/form.js', 'public/js/suppliers'),
 mix.js('resources/js/suppliers/suppliers.js', 'public/js/suppliers'),
+mix.js('resources/js/suppliers/mass_edit_purchases.js', 'public/js/suppliers'),
 
 mix.js('resources/js/purchases/form.js', 'public/js/purchases'),
 mix.js('resources/js/purchases/purchases.js', 'public/js/purchases'),

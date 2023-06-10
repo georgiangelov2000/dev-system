@@ -17,6 +17,7 @@ $(function () {
 
         APICaller(CATEGORY_ROUTE, { "supplier": supplier }, function (response) {
             if (response.data.length > 0) {
+                    selectCategory.append('<option>Select category</option>');
                 $.each(response.data, function (key, value) {
                     selectCategory.append('<option value=' + value.id + '>' + value.name + '</option>');
                 });

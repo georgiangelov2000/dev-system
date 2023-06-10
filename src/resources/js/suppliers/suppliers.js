@@ -52,7 +52,8 @@ $(document).ready(function () {
                 name: "image",
                 render: function (data, type, row) {
                     if (row.image) {
-                        return "<img class='rounded mx-auto w-100' src=" + row.image.path + row.image.name + " />"
+                        let pathBuilder  = CONFIG_URL + row.image.path + "/" + row.image.name;
+                        return "<img class='rounded mx-auto w-100' src=" + pathBuilder + " />"
                     } else {
                         return "<img class='rounded mx-auto w-100' src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png'/>";
                     }
@@ -140,11 +141,17 @@ $(document).ready(function () {
                 orderable: false,
                 width: '32%',
                 render: function (data, type, row) {
-                    let deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentSupplier(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
+                    let deleteFormTemplate = "\
+                    <form method='POST' onsubmit='deleteCurrentSupplier(event)' style='display:inline-block'; id='delete-form' action=" + REMOVE_SUPPLIER_ROUTE.replace(':id', row.id) + " data-name=" + row.name + ">\
+                        <input type='hidden' name='_method' value='DELETE'>\
+                        <input type='hidden' name='id' value='" + row.id + "'>\
+                        <button class='btn p-1' title='Delete'><i class='fa-light fa-trash text-danger'></i></button>\
+                    </form>\ ";
+
                     let editButton = '<a data-id=' + row.id + ' href=' + EDIT_SUPPLIER_ROUTE.replace(":id", row.id) + ' class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
-                    let productsButton = '<a data-id=' + row.id + ' class="btn p-1" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
+                    let massEdit = '<a data-id=' + row.id + ' href='+MASS_EDIT_PURCHASES.replace(":id",row.id)+' class="btn p-1" title="Mass edit"><i class="fa-light fa-pen-to-square text-primary"></i></a>';
                     let categories = "<button data-toggle='collapse' data-target='#categories_" + row.id + "' title='Categories' class='btn btn-outline-muted showCategories p-1'><i class='fa-light fa-list' aria-hidden='true'></i></button>";
-                    return `${categories} ${deleteButton} ${editButton} ${productsButton}`;
+                    return `${categories} ${deleteFormTemplate} ${editButton} ${massEdit}`;
                 }
             }
 
@@ -258,15 +265,21 @@ $(document).ready(function () {
     };
 
     window.deleteCurrentSupplier = function (e) {
-        const id = $(e).attr('data-id');
-        const name = $(e).attr('data-name');
-        const url = REMOVE_SUPPLIER_ROUTE.replace(':id', id);
+        e.preventDefault();
+        const action = e.target.getAttribute('action');
+        const name = e.target.getAttribute('data-name');
 
         const template = swalText(name);
 
         showConfirmationDialog('Selected suppliers!',template,function(){
-            APIDELETECALLER(url,function(response){
-                toastr['success'](response.message);
+            APIDELETECALLER(action,function(response){
+
+                if(response.status === 500) {
+                    toastr['error'](response.responseJSON.message);
+                } else {
+                    toastr['success'](response.message);
+                }
+                
                 dataTable.ajax.reload( null, false );
             },function(error){
                 toastr['error'](error.message);
@@ -288,8 +301,12 @@ $(document).ready(function () {
 
         showConfirmationDialog('Selected suppliers',template,function(){
             searchedIds.forEach(function(id,index){
-                APIDELETECALLER(REMOVE_SUPPLIER_ROUTE,replace(":id",id),function(response){
-                    toastr['success'](response.message);
+                APIDELETECALLER(REMOVE_SUPPLIER_ROUTE.replace(":id",id),function(response){
+                    if(response.status === 500) {
+                        toastr['error'](response.responseJSON.message);
+                    } else {
+                        toastr['success'](response.message);
+                    }
                     dataTable.ajax.reload( null, false );
                 },function(error){
                     toastr['error'](error.message);

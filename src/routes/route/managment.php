@@ -56,7 +56,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [SupplierController::class, 'store'])->name('store');
         Route::get('/edit/{supplier}', [SupplierController::class, 'edit'])->name('edit');
         Route::put('/update/{supplier}', [SupplierController::class, 'update'])->name('update');
-        Route::get('/delete/{supplier}', [SupplierController::class, 'delete'])->name('delete');
+        Route::get('/mass/edit/purchases/{supplier}', [SupplierController::class, 'massEdit'])->name('mass.edit.purchases');
+        Route::delete('/delete/{supplier}', [SupplierController::class, 'delete'])->name('delete');
         Route::get('/state/{countryId}', [SupplierController::class, 'getState'])->name('state');
         Route::get('/detach/category/{category}', [SupplierController::class, 'detachCategory'])->name('detach.category');
     });
@@ -68,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/preview/{product}', [ProductController::class, 'preview'])->name('preview');
         Route::post('/store', [ProductController::class, 'store'])->name('store');
         Route::put('/update/{product}', [ProductController::class, 'update'])->name('update');
+        Route::put('/mass/edit/', [ProductController::class, 'massEditUpdate'])->name('mass.update');
         Route::delete('/delete/{product}', [ProductController::class, 'delete'])->name('delete');
         Route::delete('/delete/image/{product}', [ProductController::class, 'deleteGalleryImage'])->name('delete.image');
     });
