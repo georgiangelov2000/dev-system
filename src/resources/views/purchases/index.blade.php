@@ -99,11 +99,12 @@
                         <th>ID</th>
                         <th class='text-center'>Image</th>
                         <th>Name</th>
-                        <th>Single price</th>
-                        <th>Total price</th>
+                        <th>Price</th>
+                        <th>Tot.price</th>
                         <th>Quantity</th>
-                        <th>Initial quantity</th>
+                        <th>Init.quantity</th>
                         <th>Stock</th>
+                        <th>Balance</th>
                         <th>Supplier</th>
                         <th>Category</th>
                         <th>Subcategories</th>
@@ -131,6 +132,7 @@
             let EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
             let CATEGORY_ROUTE = "{{ route('api.subcategories') }}";
             let CONFIG_URL = "{{config('app.url')}}"
+            let ORDERS = "{{route('purchase.orders',':id')}}"
         </script>
     @endpush
 

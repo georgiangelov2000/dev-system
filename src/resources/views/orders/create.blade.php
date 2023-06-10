@@ -17,7 +17,7 @@
 
                     <div class="row flex-wrap">
 
-                        <div class="col-3">
+                        <div class="form-group col-3">
                             <label for="">Customer</label>
                             <select name="customer_id" class="form-control selectCustomer"
                                 data-live-search="true">
@@ -25,7 +25,7 @@
                             <span name="customer_id" class="text-danger"></span>
                         </div>
 
-                        <div class="col-3">
+                        <div class="form-group col-3">
                             <label>Date order:</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -38,7 +38,7 @@
                             <span name="date_of_sale" class="text-danger"></span>
                         </div>
 
-                        <div class="col-3">
+                        <div class="form-group col-3">
                             <label for="order_status">Order status</label>
                             <select name="status" id="order_status" class="form-control selectType">
                                 <option value="">Please select</option>
@@ -51,7 +51,7 @@
                             <span name="status" class="text-danger"></span>
                         </div>
 
-                        <div class="col-3">
+                        <div class="form-group col-3">
                             <label for="order_status">Tracking number</label>
                             <div class="input-group">
                                 <input type="text" name="tracking_number" class="form-control rounded-0"

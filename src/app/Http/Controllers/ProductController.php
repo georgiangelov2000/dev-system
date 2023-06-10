@@ -8,7 +8,6 @@ use App\Models\Product;
 use App\Http\Requests\ProductRequest;
 use App\Models\SubCategory;
 use App\Helpers\FunctionsHelper;
-use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -73,10 +72,6 @@ class ProductController extends Controller
             ]);
 
             if($category) {
-                $product->categories()->sync([$category]);
-            }
-            
-            if($subcategories) {
                 $product->categories()->sync([$category]);
             }
 
@@ -306,5 +301,9 @@ class ProductController extends Controller
         }
 
         return response()->json(['message' => 'Image has been deleted'], 200);
+    }
+
+    public function orders(Product $product) {
+        return view('purchases.orders',compact('product'));
     }
 }

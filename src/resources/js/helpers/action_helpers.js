@@ -99,13 +99,13 @@ export function handleErrors(errors){
 
 var buttonNames = ['copy', 'csv', 'excel', 'pdf', 'print'];
 
-export function mapButtons (columns) {
-    buttonNames.map(function(name){
+export function mapButtons (columnNumbers) {
+   return buttonNames.map(function(name){
         return {
             extend:name,
             class: 'btn btn-outline-secondary',
             exportOptions: {
-                columns: columns
+                columns: columnNumbers
             }
         }
     })

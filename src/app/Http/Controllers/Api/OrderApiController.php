@@ -10,17 +10,19 @@ use DateTime;
 class OrderApiController extends Controller
 {
     public function getData(Request $request)
-    {   $customer = $request->customer;
-        $status = $request->status;
-        $search = $request->search;
-        $date_range = $request->date_range;
-        $select_json = $request->select_json;
-        $order = $request->order_id;
-        
+    {   $customer = isset($request->customer) && $request->customer ? $request->customer : null;
+        $status = isset($request->status) && $request->status ? $request->status : null;
+        $search = isset($request->search) && $request->search ? $request->search : null;
+        $date_of_sale = isset($request->date_range) && $request->date_range ? $request->date_range :null;
+        $date_of_payment = isset($request->date_of_payment) && $request->date_of_payment ? $request->date_of_payment :null;
+        $select_json = isset($request->select_json) && $request->select_json ? $request->select_json : null;
+        $order = isset($request->order_id) && $request->order_id ? $request->order_id : null;
+        $product = isset($request->product_id) && $request->product_id ? $request->product_id : null;
+                
         $offset = $request->input('start', 0);  
         $limit = $request->input('length', 10);
 
-        $orderQuery = Order::query()->with(['customer:id,name','product:id,name']);
+        $orderQuery = Order::query()->with(['customer:id,name','product:id,name','customerPayments']);
 
         if ($customer) {
             $orderQuery
@@ -36,6 +38,9 @@ class OrderApiController extends Controller
             }
 
         }
+        if($product) {
+            $orderQuery->where('product_id',$product);
+        }
         if($order) {
             $orderQuery->where('id',$order);
         }
@@ -43,16 +48,28 @@ class OrderApiController extends Controller
             $orderQuery->where('invoice_number', 'LIKE', '%'.$search.'%');
         }
         if($status) {
-            $orderQuery->where('status', $status);
+            $orderQuery->whereIn('status', $status);
         }
-        if ($date_range) {
-            $date_pieces = explode(' - ',$date_range);
-            $start_date = new DateTime($date_pieces[0]);
-            $end_date = new DateTime($date_pieces[1]);
-
+        if ($date_of_sale) {
+            $date_pieces = explode(' - ',$date_of_sale);
+            $date1_formatted = date('Y-m-d 00:00:00', strtotime($date_pieces[0]));
+            $date2_formatted = date('Y-m-d 23:59:59', strtotime($date_pieces[1]));
+            
+            //dd($date1_formatted);
             $orderQuery
-            ->where('date_of_sale','>=',$start_date)
-            ->where('date_of_sale','<=',$end_date);
+            ->where('date_of_sale','>=',$date1_formatted)
+            ->where('date_of_sale','<=',$date2_formatted);
+        }
+        if($date_of_payment) {
+            $date_pieces = explode(' - ',$date_of_payment);
+            $date1_formatted = date('Y-m-d 00:00:00', strtotime($date_pieces[0]));
+            $date2_formatted = date('Y-m-d 23:59:59', strtotime($date_pieces[1]));            
+
+            $orderQuery->whereHas('customerPayments', function ($query) use ($date1_formatted,$date2_formatted) {
+                $query
+                ->where('date_of_payment', '>=', $date1_formatted)
+                ->where('date_of_payment', '<=', $date2_formatted);
+            });
         }
 
 

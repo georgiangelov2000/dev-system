@@ -35,8 +35,8 @@ $(function () {
         dataTable.ajax.reload(null, false);
     })
 
-    let buttons = mapButtons([2, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14]);
-
+    let buttons = mapButtons([6, 7, 9, 10, 11, 12, 13, 14, 15, 16]);
+    
     let dataTable = table.DataTable({
         serverSide: true,
         dom: 'Bfrtip',
@@ -44,8 +44,10 @@ $(function () {
         ajax: {
             url: PRODUCT_API_ROUTE,
             data: function (d) {
+                var orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
+                var orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
+                
                 return $.extend({}, d, {
-                    //  bootstrapSelectSupplier.val().toLowerCase(),
                     'supplier': bootstrapSelectSupplier.val() === null ? '' : bootstrapSelectSupplier.val().toLowerCase(),
                     "single_total_price": customTotalPrice.val().toLowerCase(),
                     "total_price_range": bootstrapSelectTotalPrice.val().toLowerCase(),
@@ -53,8 +55,10 @@ $(function () {
                     'publishing': publishingValue,
                     'sub_category': bootstrapSelectSubCategory.val(), //array of key => value
                     'brand': bootstrapSelectBrands.val(), //array of key => value
-                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : '',
-                    'out_of_stock': bootstrapSelectStock.val()
+                    "search": d.search.value,
+                    'out_of_stock': bootstrapSelectStock.val(),
+                    'order_column': orderColumnName, // send the column name being sorted
+                    'order_dir': d.order[0].dir // send the sorting direction (asc or desc)
                 });
             }
         },
@@ -86,6 +90,7 @@ $(function () {
             {
                 width: '1%',
                 orderable: true,
+                name:'id',
                 render: function (data, type, row) {
                     return '<span class="font-weight-bold">' + row.id + '</span>';
                 }
@@ -134,6 +139,7 @@ $(function () {
             },
             {
                 width: '6%',
+                name: "price",
                 orderable: true,
                 render: function (data, type, row) {
                     return `<span>€${row.price}</span>`
@@ -159,13 +165,25 @@ $(function () {
                 data: 'initial_quantity'
             },
             {
-                width: '5%',
+                width: '7%',
                 orderable: false,
                 render: function (data, type, row) {
                     let stockStatus = row.quantity ? 'In stock' : 'Out of stock';
                     let stockColor = row.quantity ? 'text-success' : 'text-danger';
 
-                    return `<pan class="${stockColor}">${stockStatus}</span>`
+                    return `<span class="${stockColor}">${stockStatus}</span>`
+                }
+            },
+            {
+                width: '10%',
+                orderable: false,
+                render: function (data, type, row) {
+                    let paidOrdersCount = row.paid_orders_count;
+                    let unpaidOrdersCount = row.unpaid_orders_count;
+            
+                    let displayText = `<a class='text-success' ">${paidOrdersCount} paid</a> / <a class='text-danger'>${unpaidOrdersCount} unpaid</a>`;
+            
+                    return displayText;
                 }
             },
             {
@@ -222,14 +240,14 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '3%',
                 orderable: false,
                 render: function (data, type, row) {
                     return '<span class="font-weight-bold">' + row.code + '</span>';
                 }
             },
             {
-                width: '5%',
+                width: '2%',
                 orderable: false,
                 render: function (data, type, row) {
                     return '<span>' + moment(row.created_at).format('YYYY-MM-DD') + '</span>';
@@ -249,44 +267,42 @@ $(function () {
             },
             {
                 orderable: false,
-                width: '6%',
+                width: '8%',
                 render: function (data, type, row) {
-                        let deleteFormTemplate = `
-                        <form style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
-                            <input type='hidden' name='_method' value='DELETE'>
-                            <input type='hidden' name='id' value='${row.id}'>
-                            <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'>
-                                <i class='fa-light fa-trash text-danger'></i>
-                            </button>
-                        </form>
-                    `;
+                    let deleteFormTemplate = `
+                    <form style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
+                        <input type='hidden' name='_method' value='DELETE'>
+                        <input type='hidden' name='id' value='${row.id}'>
+                        <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'>
+                            <i class='fa-light fa-trash text-danger'></i>
+                        </button>
+                    </form>
+                `;
                 
-                    let previewLink = `
-                        <a title='Preview' href="${PREVIEW_ROUTE.replace(':id', row.id)}" class='btn p-0'>
-                            <i class='fa-light fa-magnifying-glass text-info' aria-hidden='true'></i>
-                        </a>
-                    `;
-                    
-                    let orderCart = `
-                        <a title='Orders' href="${PREVIEW_ROUTE.replace(':id', row.id)}" class='btn p-0'>
-                            <i class='text-success fa-light fa-basket-shopping' aria-hidden='true'></i>
-                        </a>
-                    `;
-                    
-                    let editButton = `
-                        <a href=${EDIT_PRODUCT_ROUTE.replace(':id', row.id)} data-id=${row.id} class="btn p-0" title="Edit">
-                            <i class="fa-light fa-pencil text-warning"></i>
-                        </a>
-                    `;
-                    
-                    return `${deleteFormTemplate} ${editButton} ${previewLink} ${orderCart}`;                
+                let previewLink = `
+                    <a title='Preview' href="${PREVIEW_ROUTE.replace(':id', row.id)}" class='btn p-0'>
+                        <i class='fa-light fa-magnifying-glass text-info' aria-hidden='true'></i>
+                    </a>
+                `;
+                
+                let orderCart = `
+                    <a title='Orders' href="${ORDERS.replace(':id', row.id)}" class='btn p-0'>
+                        <i class='text-success fa-light fa-basket-shopping' aria-hidden='true'></i>
+                    </a>
+                `;
+                
+                let editButton = `
+                    <a href=${EDIT_PRODUCT_ROUTE.replace(':id', row.id)} data-id=${row.id} class="btn p-0" title="Edit">
+                        <i class="fa-light fa-pencil text-warning"></i>
+                    </a>
+                `;
+                
+                return `${deleteFormTemplate} ${editButton} ${previewLink} ${orderCart}`;                
                 }
             }
         ],
-        order: [[1, 'asc']]
+        order: [[2, 'asc']]
     });
-
-    let builtInDataTableSearch = $('#purchasedProducts_filter input[type="search"]');
 
     // Searchable
 
@@ -372,11 +388,7 @@ $(function () {
     bootstrapSelectStock.bind('changed.bs.select', function () {
         dataTable.ajax.reload(null, false);
     })
-
-    builtInDataTableSearch.bind('keyup', function () {
-        dataTable.ajax.reload(null, false);
-    })
-
+    
     bootstrapSelectTotalPrice.bind('changed.bs.select', function () {
         dataTable.ajax.reload(null, false);
     })

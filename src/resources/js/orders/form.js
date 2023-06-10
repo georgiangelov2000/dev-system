@@ -71,8 +71,8 @@ $(function () {
       return;
     }
 
-    APICaller(PRODUCT_API_ROUTE, { 'search': text, 'out_of_stock': true }, function (response) {
-      let products = response.data;
+    APICaller(PRODUCT_API_ROUTE, { 'search': text, 'out_of_stock': true, 'select_json':true }, function (response) {
+      let products = response;
 
       if (products.length > 0) {
         bootstrapProduct.append('<option value="" style="display:none;"></option>');
