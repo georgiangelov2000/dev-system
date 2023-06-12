@@ -26,8 +26,19 @@ $(function(){
 
 
     table.DataTable({
+        serverSide:true,
         ajax: {
-            url: BRAND_ROUTE
+            url: BRAND_ROUTE,
+            data: function(d) {
+                let orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
+                let orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
+
+                return $.extend({},d,{
+                    "search": d.search.value,
+                    'order_column': orderColumnName, // send the column name being sorted
+                    'order_dir': d.order[0].dir // send the sorting direction (asc or desc)
+                });
+            }
         },
         columns: [
             {
@@ -44,6 +55,7 @@ $(function(){
             {
                 width: '5%',
                 name: "id",
+                ordering: true,
                 render: function (data, type, row) {
                     return '<span class="font-weight-bold">' + row.id + '</span>';
                 }
@@ -63,7 +75,13 @@ $(function(){
             {
                 orderable: false,
                 name: "description",
-                data: "description"
+                render: function(data,type,row) {
+                    if(row.description !== null) {
+                        return `<span>${row.description}</span>`
+                    } else {
+                        return ''
+                    }
+                }
             },
             {
                 orderable: false,
@@ -78,9 +96,9 @@ $(function(){
                     </form>
                   `;
 
-                    const editButton = '<a data-id=' + row.id + ' class="btn" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
-                    const productsButton = '<a data-id=' + row.id + ' class="btn" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>';
-                    return `${deleteFormTemplate} ${editButton} ${productsButton}`;
+                    const editButton = '<a data-id=' + row.id + ' class="btn p-1" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
+                    const purchasesButton = '<a href=' + BRAND_PURCHASES.replace(':id',row.id) + ' data-id=' + row.id + ' class="btn p-1" title="Products"><i class="fa-light fa-cart-shopping text-primary"></i></a>';
+                    return `${deleteFormTemplate} ${editButton} ${purchasesButton}`;
                 }
             }
         ],

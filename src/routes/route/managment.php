@@ -48,6 +48,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update/{brand}', [BrandController::class, 'update'])->name('update');
         Route::post('/store', [BrandController::class, 'store'])->name('store');
         Route::delete('/delete/{brand}', [BrandController::class, 'delete'])->name('delete');
+        Route::delete('/detach/purchase/{brand}', [BrandController::class, 'detachPurchase'])->name('detach.purchase');
+        Route::get('/purchases/{brand}',[BrandController::class, 'purchases'])->name('purchases');
     });
 
     Route::prefix('suppliers')->name('supplier.')->group(function () {

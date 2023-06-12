@@ -58,7 +58,8 @@ $(function () {
                     "search": d.search.value,
                     'out_of_stock': bootstrapSelectStock.val(),
                     'order_column': orderColumnName, // send the column name being sorted
-                    'order_dir': d.order[0].dir // send the sorting direction (asc or desc)
+                    'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
+                    'limit': d.custom_length = d.length, 
                 });
             }
         },

@@ -13,21 +13,21 @@ class ProductApiController extends Controller
     public function getData(Request $request)
     {
 
-        $supplier = $request->supplier;
-        $category = $request->category;
-        $sub_category = $request->sub_category;
-        $brand = $request->brand;
-        $publishing = $request->publishing;
-        $single_total_price = $request->single_total_price;
-        $total_price_range = $request->total_price_range;
-        $search = $request->search;
-        $out_of_stock = $request->out_of_stock;
+        $supplier = isset($request->supplier) ? $request->supplier : null;
+        $category = isset($request->category) ? $request->category : null;
+        $sub_category = isset($request->sub_category) ? $request->sub_category : null;
+        $brand = isset($request->brand) ? $request->brand : null;
+        $publishing = isset($request->publishing) ? $request->publishing : null;
+        $single_total_price = isset($request->single_total_price) ? $request->single_total_price : null;
+        $total_price_range = isset($request->total_price_range) ? $request->total_price_range : null;
+        $search = isset($request->search) ? $request->search : null;
+        $out_of_stock = isset($request->out_of_stock) ? $request->out_of_stock : null;
         $select_json = isset($request->select_json) && $request->select_json ? $request->select_json : null;
-        $order_dir = $request->order_dir;
-        $column_name = $request->order_column;
+        $order_dir = isset($request->order_dir) ? $request->order_dir : null;
+        $column_name = isset($request->order_column) ? $request->order_column : null;
+        $limit  = isset($request->limit) ? $request->limit : null;
 
         $offset = $request->input('start', 0);
-        $limit = $request->input('length', 10);
 
         $productQuery = Product::query()->select(
             'id',
@@ -43,7 +43,9 @@ class ProductApiController extends Controller
             'is_paid',
             'initial_quantity'
         );
-        
+        if($limit) {
+            $productQuery->skip($offset)->take($limit);
+        }
         if ($column_name && $order_dir) {
             $productQuery->orderBy($column_name, $order_dir);
         }
@@ -64,9 +66,15 @@ class ProductApiController extends Controller
             });
         }
         if ($brand) {
-            $productQuery->whereHas('brands', function ($query) use ($brand) {
-                $query->whereIn('brands.id', $brand);
-            });
+            if(is_array($brand)) {
+                $productQuery->whereHas('brands', function ($query) use ($brand) {
+                    $query->whereIn('brands.id', $brand);
+                });
+            } else {
+                $productQuery->whereHas('brands', function ($query) use ($brand) {
+                    $query->where('brands.id', $brand);
+                });
+            }
         }
         if ($publishing) {
             $dates = explode(" - ", $publishing);
@@ -100,31 +108,30 @@ class ProductApiController extends Controller
                 $productQuery->get()
             );
         } else {
-            $productQuery->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name',"orders:id,status,is_paid"]);
+            $productQuery->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name', "orders:id,status,is_paid"]);
 
             $productQuery
-            ->withCount([
-                'orders as paid_orders_count' => function($query) {
-                    $query->where('status',1)->where('is_paid',1);
-                },
-                'orders as unpaid_orders_count' => function ($query) {
-                    $query->whereIn('status',[3,4])->where('is_paid', false);
-                }
-            ]);
-
-            $filteredRecords = $productQuery->count();
-            $result = $productQuery->skip($offset)->take($limit)->get();
-            $totalRecords = Product::count();
-
-            return response()->json(
-                [
-                    'draw' => intval($request->input('draw')),
-                    'recordsTotal' => $totalRecords,
-                    'recordsFiltered' => $filteredRecords,
-                    'data' => $result
-                ]
-            );
+                ->withCount([
+                    'orders as paid_orders_count' => function ($query) {
+                        $query->where('status', 1)->where('is_paid', 1);
+                    },
+                    'orders as unpaid_orders_count' => function ($query) {
+                        $query->whereIn('status', [3, 4])->where('is_paid', false);
+                    }
+                ]);
         }
 
+        $filteredRecords = $productQuery->count();
+        $result = $productQuery->get();
+        $totalRecords = Product::count();
+
+        return response()->json(
+            [
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $filteredRecords,
+                'data' => $result
+            ]
+        );
     }
 }
