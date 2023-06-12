@@ -58,6 +58,11 @@ class OrderController extends Controller
                 };
 
                 $foundProduct->quantity -= $orderQuantity;
+                
+                if($foundProduct->quantity === 0) {
+                    $foundProduct->status = 'disabled';
+                }
+
                 $foundProduct->save();
 
                 $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($orderSinglePrice, $orderDiscount);
@@ -128,6 +133,12 @@ class OrderController extends Controller
 
             $finalQuantity = ($product->initial_quantity - $updatedQuantity);
             $product->quantity = $finalQuantity;
+            
+            if($product->quantity === 0) {
+                $product->status = 'disabled';
+            } else {
+                $product->status = 'enabled';
+            }
 
             $product->save();
 

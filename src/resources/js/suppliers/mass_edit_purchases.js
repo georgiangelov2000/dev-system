@@ -1,7 +1,5 @@
 $(function () {
     let table = $("#massEditPurchases");
-    let submit = $('#massEditSubmit');
-    let form = $('#massEditPurchases');
 
     $('select[name="category_id"],select[name="brand_id"] ').selectpicker();
 
@@ -13,7 +11,8 @@ $(function () {
             data: function (d) {
                 return $.extend({}, d, {
                     'supplier': SUPPLIER_ID,
-                    'search': ''
+                    'search': d.search.value,
+                    'out_of_stock':1
                 });
             }
         },

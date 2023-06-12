@@ -212,7 +212,7 @@ $(function () {
                   value="0" 
                   onkeyup="handleOrderQuantity(this)" 
                 />
-                <span class="sold_quantity.${counter -1}" class="text-danger"></span>
+                <span name="sold_quantity.${counter -1}" class="text-danger"></span>
               </div>
             </td>
             <td>
@@ -264,13 +264,20 @@ $(function () {
       data: formData,
       success: function (response) {
         toastr['success'](response.message);
+
+        setTimeout(() => {
+          location.reload();
+        }, 1500);
+
       },
       error: function (xhr, status, error) {
         if (xhr.status === 422) {
           toastr['error'](xhr.responseJSON.message);
           var errors = xhr.responseJSON.errors;
           $.each(errors, function(field, fieldErrors) {
+            console.log(field);
               var errorSpan = $('span[name="' + field + '"]');
+              console.log(errorSpan);
               errorSpan.text(fieldErrors[0]);
           });
         }

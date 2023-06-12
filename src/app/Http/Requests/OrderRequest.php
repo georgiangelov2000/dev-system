@@ -26,7 +26,7 @@ class OrderRequest extends FormRequest
             'product_id.*' => 'numeric',
         
             'sold_quantity' => 'required',
-            'sold_quantity.*' => 'numeric|min:0',
+            'sold_quantity.*' => 'numeric|min:1',
         
             'single_sold_price' => 'required',
             'single_sold_price.*' => 'numeric|min:0',

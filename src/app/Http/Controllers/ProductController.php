@@ -205,7 +205,7 @@ class ProductController extends Controller
         try {
             foreach ($productIds as $productId) {
                 $product = Product::find($productId);
-
+            
                 if ($product) {
                     if ($req_quantity !== null && $req_price !== null) {
                         $product->quantity = $req_quantity;
@@ -226,6 +226,11 @@ class ProductController extends Controller
                     if (!empty($brandIds)) {
                         $product->brands()->sync($brandIds);
                     }
+
+                    $orders_quantity = $product->orders->sum('sold_quantity');
+                    $final_product_quantity = ($product->initial_quantity - $orders_quantity);
+                    $product->quantity = $final_product_quantity;
+                    
                     $product->save();
                 }
             }
