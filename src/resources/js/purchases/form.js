@@ -8,6 +8,7 @@ $(function () {
     const selectCategory = $('.bootstrap-select .selectCategory')
     const selectSubCategory = $('.bootstrap-select .selectSubCategory')
     const deleteImage = $('#deletePurchaseImage');
+    const form = $('#deleteImageForm');
 
     selectSupplier.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 
@@ -82,30 +83,31 @@ $(function () {
         }
     }
 
+    window.deleteImage = function(event) {
+        event.preventDefault();
 
-    deleteImage.on('click', function (e) {
-        e.preventDefault();
+        let form = event.target;
+        let data = $(form).serialize();
+        let formData = Object.fromEntries(new URLSearchParams(data));
+        let url = form.getAttribute('action');
+        let method = form.getAttribute('method');
 
-        var form = $(this).closest('form');
-        var imageId = form.data('image-id');
-        var url = form.attr('action');
-    
         $.ajax({
-            url: url,
-            method: 'POST',
-            dataType: 'json',
+            url:url,
+            method:method,
             data: {
                 _method: 'DELETE',
-                image_id: JSON.stringify(imageId)
+                id: parseInt(formData.id),
             },
-            success: function(response) {
+            success:function(response){
                 form.closest('.productImage').remove();
-                toastr['success'](response.message);    
+                toastr['success'](response.message);
             },
-            error: function(error) {
+            error:function(error){
                 toastr['error'](error.message);
             }
-        });
-    })
+        })
+
+    }
 
 });

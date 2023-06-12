@@ -11,7 +11,7 @@
         </div>
 
         <div class="card cardTemplate card-tabs mb-0 border-0">
-            <div class="card-header cardHeaderTemplate">
+            <div class="card-header cardHeaderTemplate pb-0">
                 <ul class="nav nav-pills" id="custom-tabs-one-tab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" id="custom-tabs-one-home-tab" data-toggle="pill"
@@ -172,13 +172,13 @@
                                 <div class="col-2 p-2">
                                     <div class="row w-100">
                                         @if ($product->images && count($product->images) > 1)
-                                            <div id="carouselExampleControls" class="col-3 carousel slide"
+                                            <div id="carouselExampleControls" class="col-12 carousel slide"
                                                 data-ride="carousel">
                                                 <div class="carousel-inner rounded">
                                                     @foreach ($product->images as $index => $image)
                                                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                                                             <img class="img-fluid cardWidgetImage d-block card card-widget w-100"
-                                                                src="{{ $image->path . $image->name }}"
+                                                                src="{{ $image->path . '/' . $image->name }}"
                                                                 alt="Slide {{ $index + 1 }}">
                                                         </div>
                                                     @endforeach
@@ -197,10 +197,10 @@
                                         @elseif ($product->images && count($product->images) === 1)
                                             <div class="col-12 mb-3">
                                                 <img class="cardWidgetImage w-100 m-0"
-                                                    src="{{ config('app.url') . $product->images[0]->path .'/' . $product->images[0]->name }}" />
+                                                    src="{{ $product->images[0]->path .'/' . $product->images[0]->name }}" />
                                             </div>
                                         @else
-                                            <div class="col-12">
+                                            <div class="col-12 mb-3">
                                                 <img class="cardWidgetImage w-100 m-0"
                                                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png" />
                                             </div>
@@ -231,12 +231,23 @@
                                         <img style="height: 200px; object-fit: contain;"
                                             class="d-block card card-widget widget-user w-100"
                                             src="{{ config('app.url') . $image->path  .'/' . $image->name }}">
-                                        <form id="deleteImageForm" data-image-id="{{ $image->id }}"
-                                            action="{{ route('purchase.delete.image', $product->id) }}" method="POST">
+                                        <form   
+                                            id="deleteImageForm" 
+                                            data-image-id="{{ $image->id }}"
+                                            action="{{ route('purchase.delete.image', $product->id) }}" 
+                                            method="POST"
+                                            onsubmit="deleteImage(event)"
+                                        >
                                             @csrf
                                             @method('DELETE')
-                                            <button id="deletePurchaseImage" title="Delete" class="btn btn-dark"
-                                                style="position: absolute; opacity: 0.8; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                            <button 
+                                                type="submit"
+                                                id="deletePurchaseImage" 
+                                                title="Delete" 
+                                                class="btn btn-dark"
+                                                style="position: absolute; opacity: 0.8; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+                                            >   
+                                                <input type="hidden" value="{{$image->id}}" name="id">
                                                 <i class="fa-light fa-trash"></i>
                                             </button>
                                         </form>
@@ -244,6 +255,9 @@
                                 @endforeach
                             </div>
                         @else
+                            <div class="col-6">
+                                <span class="text-danger">The gallery is empty, please upload images for the current purchase</span>
+                            </div>
                         @endif
                     </div>
                 </div>

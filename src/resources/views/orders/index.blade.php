@@ -38,10 +38,9 @@
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div>
                     <div class="form-group col-3">
-                        <label for="">Order status</label>
-                        <select name="status" id="" class="form-control selectType">
-                            <option value="">All</option>
-                            @foreach (config('statuses.order_statuses') as $key => $status)
+                        <label for="">Status</label>
+                        <select name="status" id="" class="form-control selectType" multiple>
+=                            @foreach (config('statuses.order_statuses') as $key => $status)
                                 <option value="{{ $key }}">{{ $status }}</option>
                             @endforeach
                         </select>

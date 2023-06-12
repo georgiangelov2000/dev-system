@@ -152,7 +152,7 @@
                             @if ($supplier->image)
                                 <div class="col-12">
                                     <img class="cardWidgetImage w-100 m-0 mb-2"
-                                        src="{{ config('app.url') . $supplier->image->path . "/". $supplier->image->name }}" />
+                                        src="{{ $supplier->image->path.'/'.$supplier->image->name }}" />
                                 </div>
                             @endif
                             <div class="col-12 d-none imagePreview">

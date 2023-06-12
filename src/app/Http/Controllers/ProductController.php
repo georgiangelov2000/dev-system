@@ -129,8 +129,7 @@ class ProductController extends Controller
 
             if($file) {
                 $hashed_image = Str::random(10).'.'.$file->getClientOriginalExtension();
-
-                Storage::putFileAs($imagePath,$file,$hashed_image);
+                Storage::putFileAs($this->dir,$file,$hashed_image);
 
                 $product->images()->create([
                     'path'=> $imagePath,
@@ -286,15 +285,13 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            $imageId = $request->image_id;
-            $image = $product->images()->find($imageId);
+            $image = $product->images()->find($request->id);
             if ($image) {
-                unlink(storage_path('app/public/images/products/' . $image->name));
+                Storage::delete($this->dir.DIRECTORY_SEPARATOR.$image->name);
                 $image->delete();
             }
             DB::commit();
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
             Log::error($e->getMessage());
             return response()->json(['message' => 'Image has not been deleted'], 500);
