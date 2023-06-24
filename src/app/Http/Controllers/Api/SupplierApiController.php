@@ -10,12 +10,16 @@ class SupplierApiController extends Controller {
 
     public function getData(Request $request) {
 
-        $country = $request->country;
-        $state = $request->state;
-        $category = $request->category;
-        $search = $request->search;
+        $country = isset($request->country) ? $request->country : null;
+        $state = isset($request->state)  ? $request->state : null;
+        $category = isset($request->category) ? $request->category : null;
+        $search = isset($request->search) ? $request->$request : null;
+        $select_json = isset($request->select_json) && $request->select_json ? $request->select_json : null;
 
-        $supplierQuery = $this->buildSupplierQuery();
+        $offset = $request->input('start', 0);  
+        $limit = $request->input('length', 10);
+
+        $supplierQuery = Supplier::query();
 
         if($search) {
             $supplierQuery->where('name', 'LIKE', '%'.$search.'%');
@@ -29,9 +33,31 @@ class SupplierApiController extends Controller {
         if ($category) {
             $this->supplierByCategory($category, $supplierQuery);
         }
+        if($select_json) {
+            return response()->json(
+                $supplierQuery->select('id','name')->get()
+            );
+        }
 
-        $offset = $request->input('start', 0);  
-        $limit = $request->input('length', 10);
+        $supplierQuery ->with([
+            'states:id,name',
+            'image:id,supplier_id,path,name',
+            'country:id,name,short_name',
+            'categories:id,name'
+        ])
+        ->select([
+            'id',
+            'name',
+            'email',
+            'phone',
+            'address',
+            'zip',
+            'website',
+            'notes',
+            'state_id',
+            'country_id'
+        ]);
+
         $totalRecords = Supplier::count();
         $filteredRecords = $supplierQuery->count();
         $result = $supplierQuery->skip($offset)->take($limit)->get();

@@ -1,7 +1,12 @@
+import { APICaller } from '../ajax/methods';
+
 $(function () {
     let table = $("#massEditPurchases");
 
-    $('select[name="category_id"],select[name="brand_id"] ').selectpicker();
+    $('select[name="category_id"],select[name="brand_id"], select[name="sub_category_ids"]').selectpicker().val('').trigger('change');
+
+    const bootstrapSubCategory = $('select[name="sub_category_ids"]');
+    const bootstrapCategory = $('select[name="category_id"]');
 
     let dataTable = table.DataTable({
         serverSide: true,
@@ -12,7 +17,7 @@ $(function () {
                 return $.extend({}, d, {
                     'supplier': SUPPLIER_ID,
                     'search': d.search.value,
-                    'out_of_stock':1
+                    'out_of_stock': 1
                 });
             }
         },
@@ -112,6 +117,28 @@ $(function () {
         ]
     });
 
+    // Actions
+    bootstrapCategory.on('changed.bs.select', function () {
+        const selectedCategory = $(this).val();
+        
+        bootstrapSubCategory.empty();
+
+        APICaller(SUB_CATEGORY_API_ROUTE, { 'category': selectedCategory,'select_json':true }, function (response) {
+            let sub_categories = response;
+            console.log(sub_categories);
+            
+            if (sub_categories.length > 0) {
+                $.each(sub_categories, function ($key, sub_category) {
+                    bootstrapSubCategory.append(`<option value="${sub_category.id}"> ${sub_category.name} </option>`)
+                })
+            }
+            bootstrapSubCategory.selectpicker('refresh');
+        },(function (error) {
+            console.log(error);
+        }))
+    })
+
+    // Window actions
     window.selectPurchase = function (e) {
         if ($('tbody input[type="checkbox"]:checked').length === 0) {
             $('.actions').addClass('d-none');
@@ -147,6 +174,7 @@ $(function () {
         let quantity = formData.quantity;
         let brandIds = formData.brand_id;
         let category = formData.category_id;
+        let subCategoryIds = Array.isArray(formData.sub_category_ids) ? formData.sub_category_ids : [];
 
         let searchedIds = [];
 
@@ -161,11 +189,12 @@ $(function () {
                 url: action,
                 method: method,
                 data: {
-                    'purchase_ids':searchedIds,
+                    'purchase_ids': searchedIds,
                     'price': price,
                     'quantity': quantity,
                     'category_id': category,
-                    'brand_ids': brandIds
+                    'brand_ids': brandIds,
+                    'sub_category_ids':subCategoryIds
                 },
                 success: function (response) {
                     toastr['success'](response.message);

@@ -21,8 +21,8 @@ class PackageRequest extends FormRequest
             "package_type" => "required|string",
             "delievery_method" => "required|string",
             "delievery_date" => "required|date",
-            "package_notes" => "string",
-            "customer_notes" => "string",
+            "package_notes" => "nullable|string",
+            "customer_notes" => "nullable|string",
             "order_id" => "required|array",
             "total_order_price" => "required|array"
         ];

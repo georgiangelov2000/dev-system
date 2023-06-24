@@ -38,42 +38,40 @@ class PackageController extends Controller
         DB::beginTransaction();
 
         try {
-
-            $packagePrice = array_sum($data['total_order_price']);
             $orderIds = $data['order_id'];
+            $delieveryDate = date('Y-m-d', strtotime($data['delievery_date']));
 
             $package = Package::create([
                 'package_name' => $data['package_name'],
                 'tracking_number' => $data['tracking_number'],
                 'package_type' => $data['package_type'],
                 'delievery_method' => $data['delievery_method'],
-                'package_price' => $packagePrice,
-                'delievery_date' => date('Y-m-d', strtotime($data['delievery_date'])),
+                'delievery_date' => $delieveryDate,
                 'package_notes' => $data['package_notes'] ?? '',
                 'customer_notes' => $data['customer_notes'] ?? '',
-                'customer_id' => $data['customer_id']
+                'is_it_delivered' => 0,
             ]);
 
             $package->orders()->attach($orderIds);
+
             Order::whereIn('id', $orderIds)->update([
-                'date_of_sale' => date('Y-m-d', strtotime($data['delievery_date'])),
+                'package_extension_date' => $delieveryDate,
                 'package_id' => $package->id
             ]);
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             Log::error($e->getMessage());
-            return back()->withInput()->with('error', 'Failed to create package');
+            return back()->withInput()->with('error', 'Package has not been created');
         }
 
-        return redirect()->route('package.index')->with('success', 'Package created successfully');
+        return redirect()->route('package.index')->with('success', 'Package has been created');
     }
 
     public function edit(Package $package)
     {
-        $package->load('orders', 'customer:id,name');
+        $package->load('orders');
         return view('packages.edit', compact('package'));
     }
 
@@ -84,32 +82,29 @@ class PackageController extends Controller
         DB::beginTransaction();
 
         try {
-            $packagePrice = array_sum($data['total_order_price']);
             $orderIds = $data['order_id'];
+            $delieveryDate = date('Y-m-d', strtotime($data['delievery_date']));
 
             $package->update([
                 'package_name' => $data['package_name'],
                 'tracking_number' => $data['tracking_number'],
                 'package_type' => $data['package_type'],
                 'delievery_method' => $data['delievery_method'],
-                'package_price' => $packagePrice,
-                'delievery_date' => date('Y-m-d', strtotime($data['delievery_date'])),
+                'delievery_date' => $delieveryDate,
                 'package_notes' => $data['package_notes'] ?? '',
                 'customer_notes' => $data['customer_notes'] ?? '',
-                'customer_id' => $data['customer_id']
             ]);
 
             $package->orders()->sync($orderIds);
 
             Order::whereIn('id', $orderIds)->update([
-                'date_of_sale' => date('Y-m-d', strtotime($data['delievery_date'])),
+                'date_of_sale' => $delieveryDate,
                 'package_id' => $package->id
             ]);
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             Log::error($e->getMessage());
             return back()->withInput()->with('error', 'Failed to update package');
         }
@@ -141,7 +136,6 @@ class PackageController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             Log::error($e->getMessage());
             return response()->json(['message' => 'Package has not beed updated'], 500);
         }

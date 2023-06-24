@@ -1,58 +1,32 @@
 import { APICaller } from '../ajax/methods';
 
 $(function () {
-  $('.purchaseFilter, .selectCustomer, .packageType, .delieveryMethod').selectpicker();
+  $('.purchaseFilter, .selectCustomer, .packageType, .delieveryMethod, .selectSupplier').selectpicker();
 
-  if (typeof PACKAGE_DATE !== 'undefined' && PACKAGE_DATE) {
-    $('.datepicker').datepicker({
-      format: 'mm/dd/yyyy'
-    }).datepicker('setDate', new Date(PACKAGE_DATE));
-  } else {
-    $('.datepicker').datepicker({
-      format: 'mm/dd/yyyy'
-    }).datepicker('setDate', new Date());
-  }
+  let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
+  let bootstrapOrders = $('.bootstrap-select .purchaseFilter');
 
-  if (typeof CUSTOMER !== "undefined" && CUSTOMER !== null) {
-    APICaller(ORDER_API_ROUTE, { 'customer': CUSTOMER }, function (response) {
-      let orders = response.data;
-      if (orders.length > 0) {
-        $.each(orders, function ($key, order) {
-          bootstrapPurchase.append(`<option 
-            value="${order.id}"
-            data-id="${order.id}"
-            data-name="${order.product.name}"
-            data-single-sold-price="${order.single_sold_price}"
-            data-total-sold-price="${order.total_sold_price}"
-            data-quantity="${order.sold_quantity}"
-            data-invoice="${order.invoice_number}"
-            value="${order.id}"
-          > 
-          ${order.product.name} </option>`)
-        })
-      }
-      bootstrapPurchase.selectpicker('refresh');
-    }, function (error) {
-      console.log(error);
-    })
-  }
+    $('.datepicker').datepicker({
+      format: 'yyyy-mm-dd'
+    });
 
   var table = $('.productOrderTable').DataTable({
     ordering: false,
     columnDefs: [
-      { width: "5%", targets: 0 },
-      { width: "5%", targets: 1 },
-      { width: "10%", targets: 2 },
-      { width: "10%", targets: 3 },
-      { width: "10%", targets: 4 },
-      { width: "10%", targets: 5 },
+      { width: "1%", targets: 0 },
+      { width: "1%", targets: 1, class:"text-center" },
+      { width: "5%", targets: 2, class:"text-center" },
+      { width: "5%", targets: 3, class:"text-center"},
+      { width: "5%", targets: 4, class:"text-center" },
+      { width: "5%", targets: 5, class:"text-center" },
+      { width: "5%", targets: 6, class:"text-center" },
+      { width: "5%", targets: 7, class:"text-center" },
+      { width: "5%", targets: 8, class:"text-center" },
       // add more targets and widths as needed
     ]
   });
 
-  let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
-  let bootstrapPurchase = $('.bootstrap-select .purchaseFilter');
-
+  // Action filters
   $('.selectCustomer input[type="text"]').on('keyup', function () {
     let text = $(this).val();
     bootstrapCustomer.empty();
@@ -64,7 +38,9 @@ $(function () {
 
     APICaller(CUSTOMER_API_ROUTE, { 'search': text }, function (response) {
       let customers = response.data;
+      console.log(customers);
       if (customers.length > 0) {
+        bootstrapCustomer.append('<option value="" style="display:none;"></option>');
         $.each(customers, function ($key, customer) {
           bootstrapCustomer.append(`
           <option 
@@ -81,33 +57,32 @@ $(function () {
     })
 
   })
-
+  
   bootstrapCustomer.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-    let selectedOption = $(this).find('option').eq(clickedIndex);
-    let { name } = selectedOption.data();
-    let customer = $(this).val();
-    $('.customerName').html(name);
+    bootstrapOrders.empty();
 
-    bootstrapPurchase.empty();
+    APICaller(ORDER_API_ROUTE, { 'customer': customer, 'select_json':true, 'withoutPackage':true }, function (response) {
+      let orders = response;
 
-    APICaller(ORDER_API_ROUTE, { 'customer': customer }, function (response) {
-      let orders = response.data;
       if (orders.length > 0) {
+        bootstrapOrders.append('<option value="" style="display:none;"></option>');
         $.each(orders, function ($key, order) {
-          bootstrapPurchase.append(`<option 
+          bootstrapOrders.append(`<option 
             value="${order.id}"
             data-id="${order.id}"
             data-name="${order.product.name}"
             data-single-sold-price="${order.single_sold_price}"
             data-total-sold-price="${order.total_sold_price}"
+            data-tracking_number = "${order.tracking_number}"
             data-quantity="${order.sold_quantity}"
+            data-date_of_sale="${order.date_of_sale}"
             data-invoice="${order.invoice_number}"
             value="${order.id}"
           > 
           ${order.product.name} </option>`)
         })
       }
-      bootstrapPurchase.selectpicker('refresh');
+      bootstrapOrders.selectpicker('refresh');
     }, function (error) {
       console.log(error);
     })
@@ -118,11 +93,14 @@ $(function () {
     let packageRowsCount = table.rows().nodes().to$().filter('tr[name="package"]').length;
 
     table.cells('tbody tr[name="package"] td[name="total-sold-price"]').every(function () {
-      total += parseFloat($(this.node()).text());
+      let text = $(this.node()).text();
+      let number = parseFloat(text.match(/\d+(\.\d+)?/)[0]);
+      total += number;
     });
+    console.log(total);
 
     total = parseFloat(total.toFixed(2));
-
+    
     $('.packagePrice').html(total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
     $('.ordersCount').html(packageRowsCount);
@@ -131,21 +109,30 @@ $(function () {
   overview();
 
   window.removeRow = function (button) {
-    console.log('yes');
     let row = $(button).closest('tr');
     table.row(row).remove().draw();
     overview();
   };
 
-  bootstrapPurchase.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+  bootstrapOrders.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
     let selectedOption = $(this).find('option').eq(clickedIndex);
-    let { id, invoice, quantity, totalSoldPrice, singleSoldPrice, name } = selectedOption.data();
+    let { 
+      id, 
+      invoice, 
+      quantity, 
+      totalSoldPrice, 
+      singleSoldPrice, 
+      tracking_number,
+      date_of_sale,
+      name 
+    } = selectedOption.data();
 
     let duplicate = false;
 
     table.rows().data().each(function (row) {
       if (row[2] == invoice) {
         duplicate = true;
+        toastr['error']('You have already the current product in the table');
         return false; // break out of the loop
       }
     }); 
@@ -159,9 +146,11 @@ $(function () {
         $('<td>').append($("<button type='button' onclick='removeRow(this)' class='btn p-0'><i class='fa-light fa-trash text-danger'></i></button>")),
         $('<td>').text(id).append($("<input>").attr("type", "hidden").attr('name', 'order_id[]').val(id)),
         $('<td>').text(invoice),
+        $('<td>').text(tracking_number),
         $('<td>').text(name),
-        $('<td name="single-sold-price">').text(singleSoldPrice),
-        $('<td name="total-sold-price">').text(totalSoldPrice).append($("<input>").attr("type", "hidden").attr('name', 'total_order_price[]').val(totalSoldPrice)),
+        $('<td>').text(date_of_sale),
+        $('<td name="single-sold-price">').text('€' +  singleSoldPrice),
+        $('<td name="total-sold-price">').text('€' + totalSoldPrice).append($("<input>").attr("type", "hidden").attr('name', 'total_order_price[]').val(totalSoldPrice)),
         $('<td>').text(quantity)
       );
       tbody.append(newRow);
@@ -169,7 +158,6 @@ $(function () {
       table.row.add(newRow).draw();
 
       overview();
-
     };
 
   });

@@ -403,7 +403,7 @@ $(function () {
         bootstrapSelectSubCategory.empty();
         let category = $(this).val();
 
-        APICaller(CATEGORY_ROUTE, { "category": category }, function (response) {
+        APICaller(CATEGORY_ROUTE, { "category": category,'select_json': true }, function (response) {
             let subCategories = response.data;
             bootstrapSelectSubCategory.empty();
 

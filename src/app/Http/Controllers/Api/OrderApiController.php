@@ -18,7 +18,7 @@ class OrderApiController extends Controller
         $select_json = isset($request->select_json) && $request->select_json ? $request->select_json : null;
         $order = isset($request->order_id) && $request->order_id ? $request->order_id : null;
         $product = isset($request->product_id) && $request->product_id ? $request->product_id : null;
-                
+        $withoutPackage = isset($request->withoutPackage) && $request->withoutPackage ? $request->withoutPackage : null;
         $offset = $request->input('start', 0);  
         $limit = $request->input('length', 10);
 
@@ -27,16 +27,6 @@ class OrderApiController extends Controller
         if ($customer) {
             $orderQuery
             ->where('customer_id', $customer);
-
-            if($select_json) {
-                $orderQuery->select('id','customer_id','product_id','invoice_number',)
-                ->where('is_paid',0)
-                ->whereIn('status',[3,4]);
-                return response()->json(
-                    $orderQuery->get()
-                );
-            }
-
         }
         if($product) {
             $orderQuery->where('product_id',$product);
@@ -71,7 +61,27 @@ class OrderApiController extends Controller
                 ->where('date_of_payment', '<=', $date2_formatted);
             });
         }
-
+        if($withoutPackage) {
+            $orderQuery->whereNull('package_id');
+        }
+        if($select_json) {
+            $orderQuery->select('id',
+                'customer_id',
+                'product_id',
+                'invoice_number',
+                'single_sold_price',
+                'total_sold_price',
+                'original_sold_price',
+                'sold_quantity',
+                'tracking_number',
+                'date_of_sale',
+            )
+            ->where('is_paid',0)
+            ->whereIn('status',[3,4]);
+            return response()->json(
+                $orderQuery->get()
+            );
+        }
 
         $orderQuery->select(
             'id',

@@ -151,7 +151,7 @@ $(function(){
                 orderable: false,
                 name: "notes",
                 render: function (data, type, row) {
-                    return "<div class='notes'>" + row.notes + "</div>"
+                    return "<div class='notes p-0'>" + row.notes + "</div>"
                 }
             },
             {

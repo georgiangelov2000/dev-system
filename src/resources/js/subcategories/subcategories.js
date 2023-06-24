@@ -3,10 +3,7 @@ import {
     closeModal,
     swalText,
     submit,
-    update,
-    ajaxResponse,
     showConfirmationDialog,
-
 } from '../helpers/action_helpers';
 
 import {
@@ -15,6 +12,7 @@ import {
 } from '../ajax/methods';
 
 $(function () {
+
     const table = $('#subCategoriesTable');
     
     const editModal = $('#editModal');
@@ -35,8 +33,20 @@ $(function () {
 
     console.log(SUB_CATEGORY_API_ROUTE);
     let dataTable = table.DataTable({
+        serverSide: true,
         ajax: {
-            url: SUB_CATEGORY_API_ROUTE
+            url: SUB_CATEGORY_API_ROUTE,
+            data: function(d) {
+                var orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
+                var orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
+
+                return $.extend({},d, {
+                    "search":d.search.value,
+                    'order_column': orderColumnName, // send the column name being sorted
+                    'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
+                    'limit': d.custom_length = d.length, 
+                })
+            }
         },
         columns: [
             {
@@ -61,6 +71,7 @@ $(function () {
             {
                 width: '1%',
                 name: "id",
+                ordering:true,
                 render: function (data, type, row) {
                     return `<span class='font-weight-bold'>${row.id}</span>`;
                 }
@@ -119,7 +130,7 @@ $(function () {
             showConfirmationDialog('Selected items!', template, function () {
                 APIDELETECALLER(url, function (response) {
                     toastr['success'](response.message);
-                    table.DataTable().ajax.reload();
+                    dataTable.ajax.reload();
                 }, function (error) {
                     toastr['error'](error.message);
                 });
@@ -165,7 +176,7 @@ $(function () {
                 searchedIds.forEach(function(id,index){
                     APIDELETECALLER(DELETE_SUB_CATEGORY_ROUTE.replace(':id',id),function(response){
                         toastr['success'](response.message);
-                        table.DataTable().ajax.reload();
+                        dataTable.ajax.reload();
                     },function(error){
                         toastr['error'](error.message);
                     });

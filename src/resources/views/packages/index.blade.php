@@ -64,6 +64,10 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-3">
+                        <label for="customRange1">Delivery date</label>
+                        <input type="text" class="form-control pull-right" name="datetimes" />
+                    </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-12">
@@ -97,13 +101,15 @@
                             <th>ID</th>
                             <th>Package name</th>
                             <th>Tracking number</th>
-                            <th>Package type</th>
-                            <th>Delievery method</th>
-                            <th>Package price</th>
-                            <th>Delievery Date</th>
+                            <th>Type</th>
+                            <th>Method</th>
+                            <th>Balance</th>
                             <th>Orders</th>
-                            <th>Customer notes</th>
-                            <th>Package notes</th>
+                            <th>Delivery Date</th>
+                            <th>Created</th>
+                            <th>Updated</th>
+                            <th>Expired</th>
+                            <th>Delivered</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -119,7 +125,6 @@
             let PACKAGE_UPDATE_STATUS_ROUTE = "{{route('package.status',':id')}}"
             let PACKAGE_DELETE_ROUTE = "{{route('package.delete',':id')}}"
             let PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
-            console.log(PACKAGE_UPDATE_STATUS_ROUTE);
         </script>
     @endpush
 

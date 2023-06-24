@@ -33,14 +33,13 @@ class Package extends Model
         "tracking_number",
         "customer_id",
         "package_name",
-        "package_price",
         "package_type",
         "delievery_method",
         "delievery_date",
         "package_notes",
         "customer_notes",
         "order_id",
-        "customer_id"
+        "is_it_delivered"
     ];
 
     public function orders()

@@ -1,4 +1,5 @@
 import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
+import {showConfirmationDialog,mapButtons,swalText} from '../helpers/action_helpers';
 
 $(function () {
     let table = $('#packagesTable');
@@ -9,12 +10,43 @@ $(function () {
         .trigger('change');
 
     let bootstrapPackageType = $('.bootstrap-select .selectPackageType');
+    
     let bootstrapDelieveryMethod = $('.bootstrap-select .selectDelieveryMethod');
     let bootstrapSelectCustomer = $('.bootstrap-select .selectCustomer');
 
-    let dataTable = table.dataTable({
+    let startDate = moment().startOf('month').format('YYYY-MM-DD')
+    let endDate = moment().endOf('month').format('YYYY-MM-DD')
+    let deliveryRange = startDate + ' - ' + endDate;
+
+    $('input[name="datetimes"]').daterangepicker({
+        timePicker: false,
+        startDate: startDate,
+        endDate: endDate,
+        locale: {
+            format: 'YYYY-MM-DD'
+        }
+    });
+
+    let dataTable = table.DataTable({
+        serverSide: true,
         ajax: {
-            url: PACKAGE_API_ROUTE
+            url: PACKAGE_API_ROUTE,
+            data: function (d){
+                let orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
+                let orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
+                
+                return $.extend({},d,{
+                    "search": d.search.value,
+                    'package': bootstrapPackageType.val(),
+                    'delievery': bootstrapDelieveryMethod.val(),
+                    'customer' : bootstrapSelectCustomer.val(),
+                    'delivery_date': deliveryRange,
+                    'order_column': orderColumnName, // send the column name being sorted
+                    'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
+                    'limit': d.custom_length = d.length, 
+                })
+
+            }
         },
         columns: [
             {
@@ -29,7 +61,7 @@ $(function () {
                 }
             },
             {
-                orderable: false,
+                orderable: true,
                 width: "1%",
                 name: "id",
                 render: function (data, type, row) {
@@ -44,20 +76,21 @@ $(function () {
             },
             {
                 orderable: false,
-                width: "5%",
+                width: "15%",
                 name: 'tracking_number',
                 data: 'tracking_number',
             },
             {
                 orderable: false,
-                width: "10%",
+                width: "1%",
                 name: 'package_type',
                 data: 'package_type',
             },
             {
                 orderable: false,
-                width: "10%",
+                width: "5%",
                 name: 'delievery_method',
+                class: 'text-center',
                 render: function (data, type, row) {
                     if (row.delievery_method === 'Air') {
                         return '<i title="Air" class="fa-light fa-plane"></i>';
@@ -69,11 +102,38 @@ $(function () {
                 },
             },
             {
+                width: '10%',
                 orderable: false,
-                width: "10%",
-                name: 'package_price',
                 render: function (data, type, row) {
-                    return `${row.package_price} <i class="fa-light fa-euro-sign"></i>`
+                    let paidPercentage = row.paid_percentage;
+            
+                    let progressHTML = `
+                        <div class="progress" title=${paidPercentage}>
+                            <div 
+                                class="bg-success progress-bar progress-bar-striped progress-bar-animated" 
+                                role="progressbar" 
+                                aria-valuenow="${paidPercentage}" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100" 
+                                style="width: ${paidPercentage}%"
+                            >
+                                <span class="sr-only">${paidPercentage}% Complete (success)</span>
+                            </div>
+                    `;
+            
+                    return progressHTML;
+                }
+            },
+            {
+                width: '10%',
+                orderable: false,
+                render: function (data, type, row) {
+                    let paidOrdersCount = row.paid_orders_count;
+                    let unpaidOrdersCount = row.unpaid_orders_count;
+            
+                    let displayText = `<a class='text-success' ">${paidOrdersCount} paid</a> / <a class='text-danger'>${unpaidOrdersCount} unpaid</a>`;
+            
+                    return displayText;
                 }
             },
             {
@@ -83,32 +143,61 @@ $(function () {
                 data: 'delievery_date',
             },
             {
-                orderable: false,
+                orderable:false,
+                width: "8%",
+                name:'created_at',
+                render: function (data, type, row) {
+                    return `<span>${moment(row.created_at).format('YYYY-MM-DD')}<span>`
+                }
+            },
+            {
+                orderable:false,
+                width: "8%",
+                name: 'updated_at',
+                render: function (data, type, row) {
+                    return `<span>${moment(row.updated_at).format('YYYY-MM-DD')}<span>`
+                }
+            },
+            {
+                orderable:false,
                 width: "5%",
-                name: 'orders_count',
-                data: 'orders_count',
-            },
-            {
-                orderable:false,
-                width: "15%",
-                name:'customer_notes',
+                name: 'expired',
+                class:'text-center',
                 render: function (data, type, row) {
-                    return `<div class="notes">${row.customer_notes}</div>`
+                    var dateOfDelivery = moment(row.delievery_date);
+                    var currentDate = moment();
+                    var daysRemaining = dateOfDelivery.diff(currentDate, 'days');
+
+                    if (currentDate.isAfter(dateOfDelivery, 'day') && !row.is_it_delivered) {
+                        return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
+                    } else if (row.status === 'Received') {
+                        return `<span class="badge badge-success p-2">Package delievered</span>`;
+                    }
+                    else {
+                        var badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
+                        return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
+                    }
+
                 }
             },
             {
                 orderable:false,
-                width: "15%",
-                name:'package_notes',
-                render: function (data, type, row) {
-                    return `<div class="notes">${row.package_notes}</div>`
+                width:'5%',
+                name:'is_it_delivered',
+                class: 'text-center',
+                render:function(data,type,row) {
+                    if(row.is_it_delivered){
+                        return `<span class="text-success">Yes</span>`
+                    } else {
+                        return `<span class="text-danger">No</span>`
+                    }
                 }
             },
             {
                 orderable: false,
-                width: '20%',
+                width: '45%',
                 name: 'actions',
-
+                class:'text-center',
                 render: function (data, type, row) {
 
                     let deleteFormTemplate = "\
@@ -137,6 +226,8 @@ $(function () {
                     </div>
                 `;
 
+                let massDelete = `<a" href="http://localhost/suppliers/mass/edit/purchases/2" class="btn p-1" title="Mass delete"><i class="fa-light fa-pen-to-square text-info"></i></a>`
+
                     let packageDropdown = `
                     <div class="dropdown d-inline">
                         <button class="btn text-primary p-0" title="Change package" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -153,46 +244,35 @@ $(function () {
                     </div>
                     `;
 
-                    return ` ${deleteFormTemplate} ${editButton} ${packageDropdown} ${delieveryDropdown}`;
+                    return ` ${deleteFormTemplate} ${editButton} ${massDelete} ${packageDropdown}${delieveryDropdown}`;
                 }
             }
-        ]
+        ],
+        order: [[1, 'asc']]
     })
 
-    bootstrapPackageType.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let packageVal = $(this).val();
-        APICaller(PACKAGE_API_ROUTE, { "package": packageVal }, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        })
+    $('input[name="datetimes"]').on('apply.daterangepicker', function (ev, picker) {
+        let startDate = picker.startDate.format('YYYY-MM-DD');
+        let endDate = picker.endDate.format('YYYY-MM-DD');
+
+        deliveryRange = startDate + ' - ' + endDate;
+        $(this).val(deliveryRange);
+
+        dataTable.ajax.reload();
     });
 
-    bootstrapDelieveryMethod.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let delieveryVal = $(this).val();
-        APICaller(PACKAGE_API_ROUTE, { "delievery": delieveryVal }, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        })
+    // Actions
+
+    bootstrapPackageType.bind('changed.bs.select',function(e, clickedIndex, isSelected, previousValue){
+        dataTable.ajax.reload(null, false);
+    })
+
+    bootstrapDelieveryMethod.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        dataTable.ajax.reload(null, false);
     });
 
-    bootstrapSelectCustomer.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-        let customerVal = $(this).val();
-        APICaller(PACKAGE_API_ROUTE, { "customer": customerVal }, function (response) {
-            if (response && response.data) {
-                table.DataTable().rows().remove();
-                table.DataTable().rows.add(response.data).draw();
-            }
-        }, function (error) {
-            console.log(error);
-        })
+    bootstrapSelectCustomer.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        dataTable.ajax.reload(null, false);
     });
 
     $(document).on('click', '.change-delivery-method-btn', function (e) {
@@ -211,7 +291,7 @@ $(function () {
             success: function (response) {
                 if (response) {
                     toastr['success'](response.message);
-                    table.DataTable().ajax.reload();
+                    dataTable.ajax.reload(null, false);
                 }
             },
             error: function (error) {
@@ -236,7 +316,7 @@ $(function () {
             success: function (response) {
                 if (response) {
                     toastr['success'](response.message);
-                    table.DataTable().ajax.reload();
+                    dataTable.ajax.reload(null, false);
                 }
             },
             error: function (error) {
@@ -245,6 +325,8 @@ $(function () {
         });
     });
 
+
+    // Window actions
     window.selectPackage = function (e) {
         if ($('tbody input[type="checkbox"]:checked').length === 0) {
             $('.actions').addClass('d-none');
@@ -264,9 +346,9 @@ $(function () {
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
             APIDELETECALLER(url, function (response) {
                 toastr['success'](response.message);
-                table.DataTable().ajax.reload();
+                dataTable.ajax.reload(null, false);
             }, function (error) {
-                toastr['error']('Package has not been deleted');
+                toastr['error'](error.message);
             });
         });
     };
@@ -283,17 +365,16 @@ $(function () {
 
         let template = swalText(searchedNames);
 
-        confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
-            searchedIds.forEach(function (id, index) {
-                APIDELETECALLER(PACKAGE_DELETE_ROUTE.replace(':id', id), function (response) {
-                    toastr['success'](response.message);
-                    table.DataTable().ajax.reload();
-                }, function (error) {
-                    toastr['error'](response.message);
-                });
+        showConfirmationDialog('Selected packages',template,function(){
+            APIDELETECALLER(PACKAGE_DELETE_ROUTE.replace(':id', id), function (response) {
+                toastr['success'](response.message);
+                dataTable.ajax.reload(null, false);
+            }, function (error) {
+                toastr['error'](error.message);
             });
-        });
-
+        },function(error){
+            console.log(error);
+        })
     };
 
     $(document).on('change', ".selectAll", function () {
@@ -310,39 +391,4 @@ $(function () {
             });
         }
     });
-
-    let swalText = function (params) {
-        let text = '<div class="col-12 d-flex flex-wrap justify-content-center">';
-
-        if (Array.isArray(params)) {
-            params.forEach(function (name, index) {
-                text += `<p class="font-weight-bold m-0">${index !== params.length - 1 ? name + ', ' : name}</p>`;
-            });
-        } else {
-            text += `<p class="font-weight-bold m-0">${params}</p>`;
-        }
-
-        text += '</div>';
-
-        return text;
-    };
-
-    let confirmAction = function (title, message, confirmButtonText, cancelButtonText, callback) {
-        Swal.fire({
-            title: title,
-            html: message,
-            icon: 'warning',
-            background: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: confirmButtonText,
-            cancelButtonText: cancelButtonText
-        }).then((result) => {
-            if (result.isConfirmed) {
-                callback();
-            }
-        });
-    };
-
 })

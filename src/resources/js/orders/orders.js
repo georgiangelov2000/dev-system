@@ -185,8 +185,6 @@ $(function () {
                     else {
                         var badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
                         return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
-                    } {
-
                     }
                 }
             },

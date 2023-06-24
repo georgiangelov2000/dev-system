@@ -45,7 +45,8 @@ class Order extends Model
         "original_sold_price",
         "discount_percent",
         "package_id",
-        "tracking_number"
+        "tracking_number",
+        'package_extension_date'
     ];
 
     public function customer()

@@ -38,19 +38,19 @@
                         <hr class="mt-2 mb-2">
                     </div>
                     <div class="col-12 d-flex flex-wrap p-0">
-                        <div class="form-group col-3">
+                        <div class="form-group col-2">
                             <label for="price">Single price</label>
                             <input type="text" placeholder="Price" class="form-control" name="price" id="price">
                         </div>
-                        <div class="form-group col-3">
+                        <div class="form-group col-2">
                             <label for="quantity">Quantity</label>
                             <input type="number" placeholder="Quantity" class="form-control" name="quantity"
                                 id="quantity">
                         </div>
-                        <div class="form-group col-3">
+                        <div class="form-group col-2">
                             <label for="category_id">Categories</label>
                             <select class="form-control" name="category_id" id="category_id">
-                                <option value="">Please select</option>
+                                <option value="9999">Please select</option>
                                 @foreach ($categories as $category)
                                     <option name="category_id" value="{{$category->id}}">
                                         {{$category->name}}
@@ -58,9 +58,13 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group col-3">
+                        <div class="form-group col-2">
+                            <label for="sub_category_ids">Sub categories</label>
+                            <select name="sub_category_ids" id="sub_category_ids" class="form-control" multiple data-selected-text-format="count > 1"></select>
+                        </div>
+                        <div class="form-group col-2">
                             <label for="category_id">Brands</label>
-                            <select class="form-control" name="brand_id" id="brand_id" multiple>
+                            <select class="form-control" name="brand_id" id="brand_id" multiple data-selected-text-format="count > 1">
                                 <option value="">Please select</option>
                                 @foreach ($brands as $brand)
                                     <option value="{{$brand->id}}">
@@ -69,8 +73,9 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group col-3">
-                            <button id="massEditSubmit" class="btn btn-primary">Submit</button>
+                        <div class="form-group col-2">
+                            <label for="" class="mb-4"></label>
+                            <button id="massEditSubmit" class="btn btn-primary w-100">Submit</button>
                         </div>
                     </div>
                 </div>
@@ -86,5 +91,6 @@
         const PURCHASE_API = "{{ route('api.products') }}";
         const PURCHASE_EDIT = "{{ route('purchase.edit', ':id') }}";
         const PURCHASE_UPDATE = "{{route('purchase.mass.update')}}"
+        const SUB_CATEGORY_API_ROUTE = "{{route('api.subcategories')}}"
     </script>
 @endpush

@@ -57,7 +57,7 @@ class ProductController extends Controller
             $category = $data['category_id'];
             $imagePath = Storage::url($this->dir);
 
-            $totalPrice = FunctionsHelper::calculatedFinalPrice($price,$quantity);
+            $totalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
 
             $product = Product::create([
                 "name" => $data['name'],
@@ -71,22 +71,22 @@ class ProductController extends Controller
                 "total_price" => $totalPrice
             ]);
 
-            if($category) {
+            if ($category) {
                 $product->categories()->sync([$category]);
             }
 
-            if($subcategories !== null) {
+            if ($subcategories !== null) {
                 $product->subcategories()->sync($subcategories);
             }
 
-            if($brands !== null) {
+            if ($brands !== null) {
                 $product->brands()->sync($brands);
             }
 
-            if($file) {
-                $hashed_image = Str::random(10).'.'.$file->getClientOriginalExtension();
-                Storage::putFileAs($this->dir,$file,$hashed_image);
-                
+            if ($file) {
+                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
+                Storage::putFileAs($this->dir, $file, $hashed_image);
+
                 $product->images()->create([
                     'path' => $imagePath,
                     'name' => $hashed_image
@@ -115,29 +115,29 @@ class ProductController extends Controller
             $category = $data['category_id'];
             $imagePath = Storage::url($this->dir);
 
-            if($category) {
+            if ($category) {
                 $product->categories()->sync([$category]);
             }
 
-            if($subcategories !== null) {
+            if ($subcategories !== null) {
                 $product->subcategories()->sync($subcategories);
             }
 
-            if($brands !== null) {
+            if ($brands !== null) {
                 $product->brands()->sync($brands);
             }
 
-            if($file) {
-                $hashed_image = Str::random(10).'.'.$file->getClientOriginalExtension();
-                Storage::putFileAs($this->dir,$file,$hashed_image);
+            if ($file) {
+                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
+                Storage::putFileAs($this->dir, $file, $hashed_image);
 
                 $product->images()->create([
-                    'path'=> $imagePath,
+                    'path' => $imagePath,
                     'name' => $hashed_image
                 ]);
             }
 
-            $totalPrice = FunctionsHelper::calculatedFinalPrice($price,$quantity);
+            $totalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
 
             $product->update([
                 "name" => $data['name'],
@@ -191,46 +191,53 @@ class ProductController extends Controller
             'quantity' => 'nullable|integer',
             'price' => 'nullable|integer',
             'category_id' => 'nullable|integer',
-            'brand_ids' => 'nullable|array'
+            'brand_ids' => 'nullable|array',
+            'sub_category_ids' => 'nullable|array'
         ]);
 
         $productIds = $validated['purchase_ids'];
-        $req_quantity = $validated['quantity'] ?? null;
-        $req_price = $validated['price'] ?? null;
-        $req_categoryid = $validated['category_id'] ?? null;
+        $requestedQuantity = $validated['quantity'] ?? null;
+        $requestedPrice = $validated['price'] ?? null;
+        $requestedCategoryId = $validated['category_id'] ?? null;
         $brandIds = $validated['brand_ids'] ?? [];
+        $subCategoryIds = $validated['sub_category_ids'] ?? [];
 
         DB::beginTransaction();
 
         try {
             foreach ($productIds as $productId) {
                 $product = Product::find($productId);
-            
+
                 if ($product) {
-                    if ($req_quantity !== null && $req_price !== null) {
-                        $product->quantity = $req_quantity;
-                        $product->initial_quantity = $req_quantity;
-                        $product->price = $req_price;
-                        $product->total_price = FunctionsHelper::calculatedFinalPrice($product->quantity, $product->price);
-                    } elseif ($req_quantity !== null) {
-                        $product->quantity = $req_quantity;
-                        $product->initial_quantity = $req_quantity;
-                        $product->total_price = FunctionsHelper::calculatedFinalPrice($product->price, $product->quantity);
-                    } elseif ($req_price !== null) {
-                        $product->price = $req_price;
-                        $product->total_price = FunctionsHelper::calculatedFinalPrice($product->price, $product->quantity);
+                    if ($requestedQuantity !== null && $requestedQuantity !== null) {
+                        $product->quantity = $requestedQuantity;
+                        $product->initial_quantity = $requestedQuantity;
+                        $product->price = $requestedPrice;
+                    } elseif ($requestedQuantity !== null) {
+                        $product->quantity = $requestedQuantity;
+                        $product->initial_quantity = $requestedQuantity;
+                    } elseif ($requestedPrice !== null) {
+                        $product->price = $requestedPrice;
                     }
-                    if ($req_categoryid !== null) {
-                        $product->categories()->sync([$req_categoryid]);
+
+                    if ($requestedCategoryId !== null) {
+                        $product->categories()->sync([$requestedCategoryId]);
+                    }
+                    if (!empty($subCategoryIds)) {
+                        $product->subcategories()->sync($subCategoryIds);
                     }
                     if (!empty($brandIds)) {
                         $product->brands()->sync($brandIds);
                     }
 
+                    $product->total_price = FunctionsHelper::calculatedFinalPrice($product->price, $product->quantity);
+
                     $orders_quantity = $product->orders->sum('sold_quantity');
+
                     $final_product_quantity = ($product->initial_quantity - $orders_quantity);
-                    $product->quantity = $final_product_quantity;
                     
+                    $product->quantity = $final_product_quantity;
+
                     $product->save();
                 }
             }
@@ -265,12 +272,12 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            
-            if(!empty($product->images)) {
+
+            if (!empty($product->images)) {
                 $image_names = $product->images()->pluck('name');
-                
+
                 foreach ($image_names as $key => $images) {
-                    Storage::delete($this->dir.DIRECTORY_SEPARATOR.$images);
+                    Storage::delete($this->dir . DIRECTORY_SEPARATOR . $images);
                 }
             }
 
@@ -292,7 +299,7 @@ class ProductController extends Controller
         try {
             $image = $product->images()->find($request->id);
             if ($image) {
-                Storage::delete($this->dir.DIRECTORY_SEPARATOR.$image->name);
+                Storage::delete($this->dir . DIRECTORY_SEPARATOR . $image->name);
                 $image->delete();
             }
             DB::commit();
@@ -305,7 +312,8 @@ class ProductController extends Controller
         return response()->json(['message' => 'Image has been deleted'], 200);
     }
 
-    public function orders(Product $product) {
-        return view('purchases.orders',compact('product'));
+    public function orders(Product $product)
+    {
+        return view('purchases.orders', compact('product'));
     }
 }
