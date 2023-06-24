@@ -73,12 +73,7 @@ $(function () {
         ajax: {
             url: ORDER_API_ROUTE,
             data: function (d) {
-                return $.extend({}, d, {
-                    'customer': bootstrapCustomer.val(),
-                    'status': bootstrapOrderStatus.val(),
-                    'search': builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : '',
-                    'date_range': dateRange
-                });
+                return $.extend({}, d, packageData(d));
             }
         },
         columns: [
@@ -131,7 +126,7 @@ $(function () {
                 data: "sold_quantity"
             },
             {
-                width: '10%',
+                width: '7%',
                 orderable: false,
                 name: "single_sold_price",
                 render: function (data, type, row) {
@@ -155,7 +150,7 @@ $(function () {
                 }
             },
             {
-                width: '7%',
+                width: '5%',
                 orderable: false,
                 name: "discount_percent",
                 render: function (data, type, row) {
@@ -207,6 +202,14 @@ $(function () {
             {
                 width: '5%',
                 orderable: false,
+                name: 'package',
+                render: function (data, type, row) {
+                   return `<span>${row.package}</span>`;
+                }
+            },
+            {
+                width: '5%',
+                orderable: false,
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
@@ -241,12 +244,16 @@ $(function () {
                     let editButton = '';
                     let dropdown = '';
 
-                    let deleteFormTemplate = "\
-                    <form style='display:inline-block;' id='delete-form' action=" + ORDER_DELETE_ROUTE.replace(':id', row.id) + " method='POST' data-name=" + row.invoice_number + ">\
-                        <input type='hidden' name='_method' value='DELETE'>\
-                        <input type='hidden' name='id' value='" + row.id + "'>\
-                        <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'><i class='fa-light fa-trash text-danger'></i></button>\
-                    <form/>\ ";
+                    let detachPackage = `<i title="Detach package" class="fal fa-unlink text-danger"></i>`;
+
+                    let deleteFormTemplate = `
+                    <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST' data-name="${row.invoice_number}">
+                        <input type='hidden' name='_method' value='DELETE'>
+                        <input type='hidden' name='id' value='${row.id}'>
+                        <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
+                            <i class='fa-light fa-trash text-danger'></i>
+                        </button>
+                    </form>`;
 
                     if (!row.is_paid && row.status !== 'Received') {
                         editButton = '<a href=' + ORDER_EDIT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
@@ -264,19 +271,28 @@ $(function () {
 
                     let previewButton = '<a title="Review" class="btn p-1"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
 
-                    return `${deleteFormTemplate} ${editButton} ${dropdown} ${previewButton}`;
+                    return `${deleteFormTemplate} ${detachPackage} ${editButton} ${dropdown} ${previewButton}`;
                 }
             },
         ],
         order: [[1, 'asc']]
     });
 
-    const builtInDataTableSearch = $('#ordersTable_filter input[type="search"]');
-
-    //ACTIONS
-    builtInDataTableSearch.bind('keyup', function () {
-        dataTable.ajax.reload(null, false);
-    })
+    function packageData(d) {
+        var data = {
+            'customer': bootstrapCustomer.val(),
+            'status': bootstrapOrderStatus.val(),
+            "search": d.search.value,
+            'date_range': dateRange
+        };
+    
+        if (typeof PACKAGE !== 'undefined') {
+            data.package = PACKAGE;
+        }
+    
+        return data;
+    }
+    
 
     bootstrapCustomer.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         dataTable.ajax.reload(null, false);

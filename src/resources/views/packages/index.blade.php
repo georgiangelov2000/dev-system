@@ -27,7 +27,7 @@
                     </div>
                     <div class="col-3">
                         <div class="form-group">
-                            <label for="delievery_type">Package</label>
+                            <label for="delievery_type">Type</label>
                             <select class="form-control selectPackageType" name="" id="delievery_type">
                                 <option value="">All</option>
                                 @foreach (config('statuses.package_types') as $key => $package)
@@ -40,7 +40,7 @@
                     </div>
                     <div class="col-3">
                         <div class="form-group">
-                            <label for="delievery_method">Delievery</label>
+                            <label for="delievery_method">Method</label>
                             <select class="form-control selectDelieveryMethod" name="" id="delievery_method">
                                 <option value="">All</option>
                                 @foreach (config('statuses.delievery_methods') as $key => $delievery)
@@ -121,10 +121,11 @@
     @push('scripts')
         <script type="text/javascript" src="{{mix('js/packages/packages.js')}}"></script>
         <script type="text/javascript">
-            let PACKAGE_API_ROUTE = "{{route('api.packages')}}"
-            let PACKAGE_UPDATE_STATUS_ROUTE = "{{route('package.status',':id')}}"
-            let PACKAGE_DELETE_ROUTE = "{{route('package.delete',':id')}}"
-            let PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
+            const PACKAGE_API_ROUTE = "{{route('api.packages')}}"
+            const PACKAGE_UPDATE_STATUS_ROUTE = "{{route('package.status',':id')}}"
+            const PACKAGE_DELETE_ROUTE = "{{route('package.delete',':id')}}"
+            const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
+            const PACKGE_MASS_DELETE_ORDERS = "{{route('package.orders',':id')}}"
         </script>
     @endpush
 

@@ -226,9 +226,9 @@ $(function () {
                     </div>
                 `;
 
-                let massDelete = `<a" href="http://localhost/suppliers/mass/edit/purchases/2" class="btn p-1" title="Mass delete"><i class="fa-light fa-pen-to-square text-info"></i></a>`
+                let massDelete = `<a href="${PACKGE_MASS_DELETE_ORDERS.replace(":id",row.id)}" class="btn p-1" title="Orders"><i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
 
-                    let packageDropdown = `
+                let packageDropdown = `
                     <div class="dropdown d-inline">
                         <button class="btn text-primary p-0" title="Change package" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa-light fa-cube"></i>

@@ -143,6 +143,11 @@ class PackageController extends Controller
         return response()->json(['message' => 'Package has been updated'], 200);
     }
 
+    public function orders(Package $package) {
+        $package->load('orders');
+        return view('packages.orders',compact('package'));
+    }
+
     public function delete(Package $package)
     {
 

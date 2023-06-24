@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
-use DateTime;
 
 class OrderApiController extends Controller
 {
     public function getData(Request $request)
     {   $customer = isset($request->customer) && $request->customer ? $request->customer : null;
+        $package = isset($request->package) && $request->package ? $request->package : null;
         $status = isset($request->status) && $request->status ? $request->status : null;
         $search = isset($request->search) && $request->search ? $request->search : null;
         $date_of_sale = isset($request->date_range) && $request->date_range ? $request->date_range :null;
@@ -23,10 +23,31 @@ class OrderApiController extends Controller
         $limit = $request->input('length', 10);
 
         $orderQuery = Order::query()->with(['customer:id,name','product:id,name','customerPayments']);
+        
+        $orderQuery->select(
+            'id',
+            'customer_id',
+            'product_id',
+            'invoice_number',
+            'sold_quantity',
+            'single_sold_price',
+            'total_sold_price',
+            'original_sold_price',
+            'discount_percent',
+            'date_of_sale',
+            'status',
+            'is_paid',
+            'created_at',
+            'updated_at',
+        );
 
         if ($customer) {
-            $orderQuery
-            ->where('customer_id', $customer);
+            $orderQuery->where('customer_id', $customer);
+        }
+        if($package) {
+            $orderQuery->whereHas('package', function ($query) use ($package) {
+                $query->where('package_id', $package);
+            });
         }
         if($product) {
             $orderQuery->where('product_id',$product);
@@ -65,47 +86,21 @@ class OrderApiController extends Controller
             $orderQuery->whereNull('package_id');
         }
         if($select_json) {
-            $orderQuery->select('id',
-                'customer_id',
-                'product_id',
-                'invoice_number',
-                'single_sold_price',
-                'total_sold_price',
-                'original_sold_price',
-                'sold_quantity',
-                'tracking_number',
-                'date_of_sale',
-            )
-            ->where('is_paid',0)
-            ->whereIn('status',[3,4]);
+            $orderQuery->where('is_paid',0) ->whereIn('status',[3,4]);
             return response()->json(
                 $orderQuery->get()
             );
         }
 
-        $orderQuery->select(
-            'id',
-            'customer_id',
-            'product_id',
-            'invoice_number',
-            'sold_quantity',
-            'single_sold_price',
-            'total_sold_price',
-            'original_sold_price',
-            'discount_percent',
-            'date_of_sale',
-            'status',
-            'is_paid',
-            'created_at',
-            'updated_at',
-        );
-
         $filteredRecords = $orderQuery->count();
         $result = $orderQuery->skip($offset)->take($limit)->get();
+        
         foreach ($result as $key => $order) {
             $order->status = array_key_exists($order->status, config('statuses.order_statuses')) ? config('statuses.order_statuses.' . $order->status) : $order->status;
             $order->is_paid = array_key_exists($order->is_paid, config('statuses.is_paid_statuses')) ? config('statuses.is_paid_statuses.' . $order->is_paid) : $order->is_paid;
+            $order->package = $order->packages->first() ? $order->packages->first()->package_name : '';
         }
+
         $totalRecords = Order::count();
 
         return response()->json(

@@ -40,7 +40,7 @@
                     <div class="form-group col-3">
                         <label for="">Status</label>
                         <select name="status" id="" class="form-control selectType" multiple>
-=                            @foreach (config('statuses.order_statuses') as $key => $status)
+                            @foreach (config('statuses.order_statuses') as $key => $status)
                                 <option value="{{ $key }}">{{ $status }}</option>
                             @endforeach
                         </select>
@@ -86,13 +86,14 @@
                             <th>Product</th>
                             <th>Quantity</th>
                             <th>Single price</th>
-                            <th>Official Price</th>
+                            <th>Official price</th>
                             <th>Original price</th>
                             <th>Discount</th>
                             <th>Date of sale</th>
                             <th>Expired</th>
                             <th>Created</th>
                             <th>Updated</th>
+                            <th>Package</th>
                             <th class="text-center">Status</th>
                             <th>Paid</th>
                             <th>Actions</th>
@@ -106,13 +107,13 @@
     @push('scripts')
         <script type="text/javascript" src="{{ mix('js/orders/orders.js') }}"></script>
         <script type="text/javascript">
-            let ORDER_API_ROUTE = "{{ route('api.orders') }}";
-            let CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
-            let ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";
-            let ORDER_DELETE_ROUTE = "{{route('order.delete',':id')}}";
-            let ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
-            let EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
-            let CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
+            const ORDER_API_ROUTE = "{{ route('api.orders') }}";
+            const CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
+            const ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";
+            const ORDER_DELETE_ROUTE = "{{route('order.delete',':id')}}";
+            const ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
+            const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
+            const CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
         </script>
     @endpush
 @endsection

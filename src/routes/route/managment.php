@@ -117,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{package}', [PackageController::class, 'update'])->name('update');
         Route::get('/edit/{package}', [PackageController::class, 'edit'])->name('edit');
         Route::put('/status/{package}', [PackageController::class, 'status'])->name('status');
+        Route::get('/orders/{package}', [PackageController::class, 'orders'])->name('orders');
     });
 
     Route::prefix('settings')->name('settings.')->group(function(){
