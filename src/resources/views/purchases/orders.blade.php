@@ -1,5 +1,5 @@
 @extends('app')
-@section('title', 'Product orders')
+@section('title', 'Orders'.' '.$product->name)
 
 @section('content')
     <div class="card card-default cardTemplate">
