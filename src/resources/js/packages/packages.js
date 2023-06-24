@@ -212,7 +212,7 @@ $(function () {
 
                     let delieveryDropdown = `
                     <div class="dropdown d-inline">
-                        <button class="btn text-info p-0" title="Change delievery" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn text-info p-0" title="Change method" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa-light fa-truck-ramp"></i>
                         </button>
                         <div id="changeDelieveryMethod" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -226,12 +226,12 @@ $(function () {
                     </div>
                 `;
 
-                let massDelete = `<a href="${PACKGE_MASS_DELETE_ORDERS.replace(":id",row.id)}" class="btn p-1" title="Orders"><i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
+                let orders = `<a href="${PACKGE_MASS_DELETE_ORDERS.replace(":id",row.id)}" class="btn p-1" title="Orders"><i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
 
                 let packageDropdown = `
                     <div class="dropdown d-inline">
-                        <button class="btn text-primary p-0" title="Change package" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa-light fa-cube"></i>
+                        <button class="btn text-primary p-0" title="Change type" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa-light fa-rotate-right"></i>
                         </button>
                         <div id="changePackageType" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <form method="POST" id="package-form">
@@ -244,7 +244,7 @@ $(function () {
                     </div>
                     `;
 
-                    return ` ${deleteFormTemplate} ${editButton} ${massDelete} ${packageDropdown}${delieveryDropdown}`;
+                    return ` ${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${delieveryDropdown}`;
                 }
             }
         ],
