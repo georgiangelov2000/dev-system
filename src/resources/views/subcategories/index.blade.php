@@ -58,6 +58,7 @@
             'labelOne' => 'name',
             'inputOne' => 'name',
             'formMethod' => 'POST',
+            'inputType' => 'text'
         ])
 
         @push('scripts')

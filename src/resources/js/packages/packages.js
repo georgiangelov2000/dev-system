@@ -1,7 +1,12 @@
 import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
-import {showConfirmationDialog,mapButtons,swalText} from '../helpers/action_helpers';
+import {showConfirmationDialog,openModal,swalText,closeModal} from '../helpers/action_helpers';
 
 $(function () {
+    
+    $('input[name="delievery_date"]').datepicker({
+        format: 'yyyy-mm-dd'
+      });
+
     let table = $('#packagesTable');
 
     $('.selectPackageType, .selectDelieveryMethod, .selectCustomer, .selectAction')
@@ -9,6 +14,9 @@ $(function () {
         .val('')
         .trigger('change');
 
+    let editModal = $('#editModal');
+    let closeModalBtn = $('.modalCloseBtn');
+    
     let bootstrapPackageType = $('.bootstrap-select .selectPackageType');
     
     let bootstrapDelieveryMethod = $('.bootstrap-select .selectDelieveryMethod');
@@ -252,7 +260,7 @@ $(function () {
                     `;
 
                     if(!row.is_it_delivered) {
-                        deliveredBtn = `<button class="btn p-0 text-success" type="button"><i class="fa-light fa-check"></i></button>`;
+                        deliveredBtn = `<button data-id=${row.id} title="Mark as delivered" class="btn p-0 text-success delivered-btn" type="button"><i class="fa-light fa-check"></i></button>`;
                     }
 
                     return ` ${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${delieveryDropdown} ${deliveredBtn}`;
@@ -285,6 +293,10 @@ $(function () {
     bootstrapSelectCustomer.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         dataTable.ajax.reload(null, false);
     });
+
+    closeModalBtn.on('click',function(){
+        closeModal(editModal);
+    })
 
     $(document).on('click', '.change-delivery-method-btn', function (e) {
         e.preventDefault();
@@ -338,6 +350,11 @@ $(function () {
 
 
     // Window actions
+
+    $(document).on('click', '.delivered-btn', function(e) {
+        openModal(editModal, PACKAGE_UPDATE_ROUTE.replace(':id',$(this).data('id')));
+    });
+
     window.selectPackage = function (e) {
         if ($('tbody input[type="checkbox"]:checked').length === 0) {
             $('.actions').addClass('d-none');

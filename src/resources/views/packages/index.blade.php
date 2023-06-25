@@ -120,21 +120,23 @@
     </div>  
 
     <!--create modal-->
-    @include('templates.single_modal_form', [
+    @include('templates.edit_single_modal_form', [
         'title' => 'Delivered package',
         'labelOne' => 'Official delivered date',
-        'inputOne' => 'delievered_date',
+        'inputOne' => 'delievery_date',
         'formMethod' => 'POST',
+        'inputType' => 'date'
     ])
 
     @push('scripts')
         <script type="text/javascript" src="{{mix('js/packages/packages.js')}}"></script>
         <script type="text/javascript">
-            const PACKAGE_API_ROUTE = "{{route('api.packages')}}"
-            const PACKAGE_UPDATE_STATUS_ROUTE = "{{route('package.status',':id')}}"
-            const PACKAGE_DELETE_ROUTE = "{{route('package.delete',':id')}}"
-            const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
-            const PACKGE_MASS_DELETE_ORDERS = "{{route('package.orders',':id')}}"
+            const PACKAGE_API_ROUTE = "{{route('api.packages')}}";
+            const PACKAGE_UPDATE_STATUS_ROUTE = "{{route('package.status',':id')}}";
+            const PACKAGE_DELETE_ROUTE = "{{route('package.delete',':id')}}";
+            const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}";
+            const PACKGE_MASS_DELETE_ORDERS = "{{route('package.orders',':id')}}";
+            const PACKAGE_UPDATE_ROUTE = "{{route('package.update',':id')}}"
         </script>
     @endpush
 

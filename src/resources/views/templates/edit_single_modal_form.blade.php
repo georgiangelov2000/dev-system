@@ -20,12 +20,19 @@
                     @csrf
                     <div class='modal-form'>
                         <label class="required">{{ucfirst($labelOne)}}</label>
-                        <div class="form-group">
+                        <div class={{$inputType === 'date' ? 'input-group' : 'form-group'}}>
+                            @if($inputType === 'date')
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="far fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            @endif
                             <input 
-                                type='text' 
+                                type='{{$inputType}}' 
                                 name='{{$inputOne}}'
                                 id='{{$inputOne}}'
-                                class='form-control' 
+                                class= {{$inputType === 'date' ?  'form-control datepicker' : 'form-control'}} 
                                 value=''
                                 required
                                 />
