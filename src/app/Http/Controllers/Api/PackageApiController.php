@@ -47,8 +47,8 @@ class PackageApiController extends Controller
             $date2_formatted = date('Y-m-d 23:59:59', strtotime($dates[1]));
 
             $packageQuery
-                ->where('delievery_date', '>=', $date1_formatted)
-                ->where('delievery_date', '<=', $date2_formatted);
+                ->where('expected_delivery_date', '>=', $date1_formatted)
+                ->where('expected_delivery_date', '<=', $date2_formatted);
         }
 
         $packageQuery->withCount([

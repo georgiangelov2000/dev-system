@@ -1,5 +1,5 @@
 import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
-import { swalText, showConfirmationDialog } from '../helpers/action_helpers';
+import { swalText, showConfirmationDialog,mapButtons } from '../helpers/action_helpers';
 
 $(function () {
     $('.selectAction, .selectType, .selectCustomer').selectpicker();
@@ -7,7 +7,7 @@ $(function () {
     const bootstrapCustomer = $('.bootstrap-select .selectCustomer');
     const bootstrapOrderStatus = $('.bootstrap-select .selectType');
     const bootstrapSelectAction = $('.bootstrap-select .selectAction');
-    const modal = $('#transaction_modal');
+
     $('input[name="datetimes"]').daterangepicker({
         timePicker: false,
         startDate: moment().subtract(1, 'year'),
@@ -18,58 +18,22 @@ $(function () {
     });
     let dateRange = $('input[name="datetimes"]').val();
 
-    $('.datepicker').datepicker({
-        format: 'mm/dd/yyyy'
-    }).datepicker('setDate', new Date());
+    $('.datepicker').datepicker({format: 'mm/dd/yyyy'}).datepicker('setDate', new Date());
 
     const applyBtn = $('.applyBtn');
+    
     applyBtn.bind('click', function () {
         dateRange = $('input[name="datetimes"]').val();
         dataTable.ajax.reload(null, false);
     })
 
     let table = $('#ordersTable');
+    let buttons = mapButtons([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
     let dataTable = table.DataTable({
         serverSide: true,
         dom: 'Bfrtip',
-        buttons: [
-            {
-                extend: 'copy',
-                class: 'btn btn-outline-secondary',
-                exportOptions: {
-                    columns: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-                }
-            },
-            {
-                extend: 'csv',
-                class: 'btn btn-outline-secondary',
-                exportOptions: {
-                    columns: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-                }
-            },
-            {
-                extend: 'excel',
-                class: 'btn btn-outline-secondary',
-                exportOptions: {
-                    columns: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-                }
-            },
-            {
-                extend: 'pdf',
-                class: 'btn btn-outline-secondary',
-                exportOptions: {
-                    columns: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-                }
-            },
-            {
-                extend: 'print',
-                class: 'btn btn-outline-secondary',
-                exportOptions: {
-                    columns: [1, 2, 3, 4, 5, 6, 7, 8, 9]
-                }
-            }
-        ],
+        buttons,
         ajax: {
             url: ORDER_API_ROUTE,
             data: function (d) {
@@ -160,25 +124,38 @@ $(function () {
             {
                 width: '6%',
                 orderable: false,
-                name: "date_of_sale",
-                data: "date_of_sale"
+                render: function (data, type, row) {
+                    if(row.package_extension_date) {
+                        return `<span>${moment(row.package_extension_date).format('YYYY-MM-DD')}</span>`
+                    } else {
+                        return `<span>${moment(row.date_of_sale).format('YYYY-MM-DD')}</span>`
+                    }
+
+                }
             },
             {
                 width: '5%',
                 orderable: false,
                 name: 'expired',
                 render: function (data, type, row) {
-                    var dateOfSale = moment(row.date_of_sale);
-                    var currentDate = moment();
-                    var daysRemaining = dateOfSale.diff(currentDate, 'days');
+                    let date;
+                    
+                    if(row.package_extension_date) {
+                        date = moment(row.package_extension_date);
+                    } else {
+                        date = moment(row.date_of_sale);
+                    }
 
-                    if (currentDate.isAfter(dateOfSale, 'day') && (row.status === 'Pending' || row.status === 'Ordered')) {
+                    let currentDate = moment();
+                    let daysRemaining = date.diff(currentDate, 'days');
+
+                    if (currentDate.isAfter(date, 'day') && (row.status === 'Pending' || row.status === 'Ordered')) {
                         return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
                     } else if (row.status === 'Received') {
                         return `<span class="badge badge-success p-2">Order received</span>`;
                     }
                     else {
-                        var badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
+                        let badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
                         return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
                     }
                 }
@@ -243,8 +220,7 @@ $(function () {
                 render: function (data, type, row) {
                     let editButton = '';
                     let dropdown = '';
-
-                    let detachPackage = `<i title="Detach package" class="fal fa-unlink text-danger"></i>`;
+                    let detachPackage = '';
 
                     let deleteFormTemplate = `
                     <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST' data-name="${row.invoice_number}">
@@ -254,6 +230,10 @@ $(function () {
                             <i class='fa-light fa-trash text-danger'></i>
                         </button>
                     </form>`;
+
+                    if(row.package) {
+                        detachPackage = `<i title="Detach package" class="fal fa-unlink text-danger"></i>`;
+                    }
 
                     if (!row.is_paid && row.status !== 'Received') {
                         editButton = '<a href=' + ORDER_EDIT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
@@ -275,15 +255,21 @@ $(function () {
                 }
             },
         ],
-        order: [[1, 'asc']]
+        order: [[1, 'asc']],
     });
 
     function packageData(d) {
+        var orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
+        var orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
+        
         var data = {
             'customer': bootstrapCustomer.val(),
             'status': bootstrapOrderStatus.val(),
             "search": d.search.value,
-            'date_range': dateRange
+            'date_range': dateRange,
+            'order_column': orderColumnName, // send the column name being sorted
+            'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
+            'limit': d.custom_length = d.length, 
         };
     
         if (typeof PACKAGE !== 'undefined') {
@@ -351,7 +337,7 @@ $(function () {
 
         APIPOSTCALLER(ORDER_UPDATE_STATUS.replace(':id', order), { 'status': status }, function (response) {
             toastr['success'](response.message);
-            table.DataTable().ajax.reload();
+            dataTable.ajax.reload();
         }, function (error) {
             toastr['error']('Order has not been updated');
         })
@@ -407,9 +393,4 @@ $(function () {
             $('.actions').removeClass('d-none');
         }
     };
-
-    $('.modalCloseBtn').on('click', function () {
-        modal.modal('hide');
-    });
-
 });

@@ -38,7 +38,7 @@ $(function () {
 
     APICaller(CUSTOMER_API_ROUTE, { 'search': text }, function (response) {
       let customers = response.data;
-      console.log(customers);
+
       if (customers.length > 0) {
         bootstrapCustomer.append('<option value="" style="display:none;"></option>');
         $.each(customers, function ($key, customer) {
@@ -61,7 +61,12 @@ $(function () {
   bootstrapCustomer.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
     bootstrapOrders.empty();
 
-    APICaller(ORDER_API_ROUTE, { 'customer': customer, 'select_json':true, 'withoutPackage':true }, function (response) {
+    APICaller(ORDER_API_ROUTE, { 
+      'customer': bootstrapCustomer.val(), 
+      'select_json':true, 
+      'withoutPackage':true,
+      'is_paid': 0
+    }, function (response) {
       let orders = response;
 
       if (orders.length > 0) {

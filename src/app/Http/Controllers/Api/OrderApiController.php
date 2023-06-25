@@ -19,6 +19,8 @@ class OrderApiController extends Controller
         $order = isset($request->order_id) && $request->order_id ? $request->order_id : null;
         $product = isset($request->product_id) && $request->product_id ? $request->product_id : null;
         $withoutPackage = isset($request->withoutPackage) && $request->withoutPackage ? $request->withoutPackage : null;
+        $isPaid = isset($request->is_paid) ? $request->is_paid : true;
+
         $offset = $request->input('start', 0);  
         $limit = $request->input('length', 10);
 
@@ -29,6 +31,7 @@ class OrderApiController extends Controller
             'customer_id',
             'product_id',
             'invoice_number',
+            'tracking_number',
             'sold_quantity',
             'single_sold_price',
             'total_sold_price',
@@ -37,12 +40,16 @@ class OrderApiController extends Controller
             'date_of_sale',
             'status',
             'is_paid',
+            'package_extension_date',
             'created_at',
             'updated_at',
         );
 
         if ($customer) {
             $orderQuery->where('customer_id', $customer);
+        }
+        if($isPaid == false){
+            $orderQuery->where('is_paid',0)->whereIn('status',[3,4]);
         }
         if($package) {
             $orderQuery->whereHas('package', function ($query) use ($package) {
@@ -86,7 +93,6 @@ class OrderApiController extends Controller
             $orderQuery->whereNull('package_id');
         }
         if($select_json) {
-            $orderQuery->where('is_paid',0) ->whereIn('status',[3,4]);
             return response()->json(
                 $orderQuery->get()
             );

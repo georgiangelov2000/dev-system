@@ -39,7 +39,8 @@ class Package extends Model
         "package_notes",
         "customer_notes",
         "order_id",
-        "is_it_delivered"
+        "is_it_delivered",
+        'expected_delivery_date'
     ];
 
     public function orders()

@@ -5,7 +5,7 @@
     <div class="card card-default cardTemplate">
         <div class="card-header">
             <div class="col-12">
-                <h3 class="card-title">Mass Edit orders for {{ $package->package_name }}</h3>
+                <h3 class="card-title">Orders for {{ $package->package_name }}</h3>
             </div>
         </div>
         <div class="card-body">
@@ -108,6 +108,7 @@
         const ORDER_API_ROUTE = "{{ route('api.orders') }}";
         const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
         const ORDER_DELETE_ROUTE = "{{ route('order.delete', ':id') }}";
+        const ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
         const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit', ':id') }}";
         const CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
         const PACKAGE = "{{ $package->id }}"

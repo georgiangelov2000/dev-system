@@ -46,7 +46,7 @@ class PackageController extends Controller
                 'tracking_number' => $data['tracking_number'],
                 'package_type' => $data['package_type'],
                 'delievery_method' => $data['delievery_method'],
-                'delievery_date' => $delieveryDate,
+                'expected_delivery_date' => $delieveryDate,
                 'package_notes' => $data['package_notes'] ?? '',
                 'customer_notes' => $data['customer_notes'] ?? '',
                 'is_it_delivered' => 0,
@@ -90,7 +90,7 @@ class PackageController extends Controller
                 'tracking_number' => $data['tracking_number'],
                 'package_type' => $data['package_type'],
                 'delievery_method' => $data['delievery_method'],
-                'delievery_date' => $delieveryDate,
+                'expected_delivery_date' => $delieveryDate,
                 'package_notes' => $data['package_notes'] ?? '',
                 'customer_notes' => $data['customer_notes'] ?? '',
             ]);
@@ -122,12 +122,12 @@ class PackageController extends Controller
 
         try {
 
-            if (!is_null($delivery_method)) {
+            if (isset($delivery_method)) {
                 $package->update([
                     'delievery_method' => $delivery_method
                 ]);
             }
-            if (!is_null($package_type)) {
+            if (isset($package_type)) {
                 $package->update([
                     'package_type' => $package_type
                 ]);

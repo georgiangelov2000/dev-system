@@ -139,12 +139,18 @@ $(function () {
             {
                 orderable: false,
                 width: "10%",
+                name: 'expected_delivery_date',
+                data: 'expected_delivery_date',
+            },
+            {
+                orderable: false,
+                width: "10%",
                 name: 'delievery_date',
                 data: 'delievery_date',
             },
             {
                 orderable:false,
-                width: "8%",
+                width: "5%",
                 name:'created_at',
                 render: function (data, type, row) {
                     return `<span>${moment(row.created_at).format('YYYY-MM-DD')}<span>`
@@ -152,7 +158,7 @@ $(function () {
             },
             {
                 orderable:false,
-                width: "8%",
+                width: "5%",
                 name: 'updated_at',
                 render: function (data, type, row) {
                     return `<span>${moment(row.updated_at).format('YYYY-MM-DD')}<span>`
@@ -164,7 +170,7 @@ $(function () {
                 name: 'expired',
                 class:'text-center',
                 render: function (data, type, row) {
-                    var dateOfDelivery = moment(row.delievery_date);
+                    var dateOfDelivery = moment(row.expected_delivery_date);
                     var currentDate = moment();
                     var daysRemaining = dateOfDelivery.diff(currentDate, 'days');
 
@@ -182,7 +188,7 @@ $(function () {
             },
             {
                 orderable:false,
-                width:'5%',
+                width:'1%',
                 name:'is_it_delivered',
                 class: 'text-center',
                 render:function(data,type,row) {
@@ -195,10 +201,11 @@ $(function () {
             },
             {
                 orderable: false,
-                width: '45%',
+                width: '50%',
                 name: 'actions',
                 class:'text-center',
                 render: function (data, type, row) {
+                    let deliveredBtn = '';
 
                     let deleteFormTemplate = "\
                     <form style='display:inline-block;' action=" + PACKAGE_DELETE_ROUTE.replace(':id', row.id) + " id='delete-form' method='POST' data-name='" + row.package_name + "' >\
@@ -206,7 +213,7 @@ $(function () {
                         <input type='hidden' name='id' value='" + row.id + "'>\
                         <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentPackage(this);'><i class='fa-light fa-trash text-danger'></i></button>\
                     </form>\
-                    ";
+                    ";                    
 
                     let editButton = '<a href='+PACKAGE_EDIT_ROUTE.replace(':id',row.id)+' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
 
@@ -244,7 +251,11 @@ $(function () {
                     </div>
                     `;
 
-                    return ` ${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${delieveryDropdown}`;
+                    if(!row.is_it_delivered) {
+                        deliveredBtn = `<button class="btn p-0 text-success" type="button"><i class="fa-light fa-check"></i></button>`;
+                    }
+
+                    return ` ${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${delieveryDropdown} ${deliveredBtn}`;
                 }
             }
         ],

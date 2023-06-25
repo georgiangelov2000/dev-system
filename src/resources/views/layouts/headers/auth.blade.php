@@ -239,12 +239,27 @@
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
                             <a href="{{ route('payment.customer') }}" class="nav-link">
-                                <p>Customer payments</p>
+                                <p>Order payments</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('payment.customer') }}" class="nav-link">
+                                <p>Package payments</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('order.create.payment') }}" class="nav-link">
-                                <p>Create customer payments</p>
+                                <p>Create order payments</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('order.create.payment') }}" class="nav-link">
+                                <p>Mass order payments</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('order.create.payment') }}" class="nav-link">
+                                <p>Create package payments</p>
                             </a>
                         </li>
                         <li class="nav-item">

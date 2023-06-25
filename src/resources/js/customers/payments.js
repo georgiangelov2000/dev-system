@@ -26,26 +26,6 @@ $(function () {
         }
     });
 
-    searchBtn.on('click', function (e) {
-        e.preventDefault();
-
-        const customer = bootstrapSelectCustomer.selectpicker('val');
-        const order = bootstrapSelectOrder.selectpicker('val');
-        const date = dateRange.val();
-
-        APICaller(SEARCH_ORDER, {
-            'customer': customer,
-            'order_id': order,
-            'date_date': date,
-        }, function (response) {
-            const order = response.data[0];
-            getOrderOverview(order);
-        }, function (error) {
-            console.log(error);
-        })
-
-    })
-
     $('.selectCustomer input[type="text"]').on('keyup', function () {
         const text = $(this).val();
         bootstrapSelectCustomer.empty();
@@ -73,10 +53,14 @@ $(function () {
 
     bootstrapSelectCustomer.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         const customer = $(this).val();
+        const date = dateRange.val();
 
         APICaller(SEARCH_ORDER, {
             'customer': customer,
+            'is_paid': 0,
+            'date_range': date,
             'select_json': true,
+            'withoutPackage': true
         }, function (response) {
             const orders = response;
 
@@ -89,6 +73,21 @@ $(function () {
                 })
             }
             bootstrapSelectOrder.selectpicker('refresh');
+        }, function (error) {
+            console.log(error);
+        })
+    })
+
+    searchBtn.on('click', function (e) {
+        e.preventDefault();
+        const order = bootstrapSelectOrder.selectpicker('val');
+
+        APICaller(SEARCH_ORDER, {
+            'order_id': order,
+            'select_json': true,
+        }, function (response) {
+            const order = response[0];
+            getOrderOverview(order);
         }, function (error) {
             console.log(error);
         })

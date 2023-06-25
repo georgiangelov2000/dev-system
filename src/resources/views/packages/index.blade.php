@@ -65,7 +65,7 @@
                         </div>
                     </div>
                     <div class="col-3">
-                        <label for="customRange1">Delivery date</label>
+                        <label for="customRange1">Expected delivery date</label>
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div>
                 </div>
@@ -105,7 +105,8 @@
                             <th>Method</th>
                             <th>Balance</th>
                             <th>Orders</th>
-                            <th>Delivery Date</th>
+                            <th>Exp.delivery date</th>
+                            <th>Off.delivery date</th>
                             <th>Created</th>
                             <th>Updated</th>
                             <th>Expired</th>
@@ -117,6 +118,14 @@
             </div>
         </div>
     </div>  
+
+    <!--create modal-->
+    @include('templates.single_modal_form', [
+        'title' => 'Delivered package',
+        'labelOne' => 'Official delivered date',
+        'inputOne' => 'delievered_date',
+        'formMethod' => 'POST',
+    ])
 
     @push('scripts')
         <script type="text/javascript" src="{{mix('js/packages/packages.js')}}"></script>
