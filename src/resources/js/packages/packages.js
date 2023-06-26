@@ -1,11 +1,11 @@
 import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
-import {showConfirmationDialog,openModal,swalText,closeModal} from '../helpers/action_helpers';
+import {showConfirmationDialog,openModal,swalText,closeModal,submit} from '../helpers/action_helpers';
 
 $(function () {
     
     $('input[name="delievery_date"]').datepicker({
         format: 'yyyy-mm-dd'
-      });
+    });
 
     let table = $('#packagesTable');
 
@@ -15,6 +15,7 @@ $(function () {
         .trigger('change');
 
     let editModal = $('#editModal');
+    let editSubmitButton = editModal.find('#submitForm');
     let closeModalBtn = $('.modalCloseBtn');
     
     let bootstrapPackageType = $('.bootstrap-select .selectPackageType');
@@ -173,27 +174,27 @@ $(function () {
                 }
             },
             {
-                orderable:false,
+                orderable: false,
                 width: "5%",
                 name: 'expired',
-                class:'text-center',
+                class: 'text-center',
                 render: function (data, type, row) {
                     var dateOfDelivery = moment(row.expected_delivery_date);
                     var currentDate = moment();
                     var daysRemaining = dateOfDelivery.diff(currentDate, 'days');
-
+            
                     if (currentDate.isAfter(dateOfDelivery, 'day') && !row.is_it_delivered) {
                         return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
                     } else if (row.status === 'Received') {
-                        return `<span class="badge badge-success p-2">Package delievered</span>`;
-                    }
-                    else {
+                        return `<span class="badge badge-success p-2">Package delivered</span>`;
+                    } else if (row.delievery_date) { // Check if delivery_date exists
+                        return `<span class="badge badge-info p-2">Package has been delivered</span>`;
+                    } else {
                         var badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
                         return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
                     }
-
                 }
-            },
+            },            
             {
                 orderable:false,
                 width:'1%',
@@ -296,6 +297,11 @@ $(function () {
 
     closeModalBtn.on('click',function(){
         closeModal(editModal);
+    })
+
+    editSubmitButton.on('click',function(e){
+        e.preventDefault();
+        submit(e,editModal,table);
     })
 
     $(document).on('click', '.change-delivery-method-btn', function (e) {

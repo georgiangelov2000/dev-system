@@ -20,8 +20,8 @@
                     @csrf
                     <div class='modal-form'>
                         <label class="required">{{ucfirst($labelOne)}}</label>
-                        <div class={{$inputType === 'date' ? 'input-group' : 'form-group'}}>
-                            @if($inputType === 'date')
+                        <div class={{$isDatePicker ? 'input-group' : 'form-group'}}>
+                            @if($isDatePicker)
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
                                         <i class="far fa-calendar-alt"></i>
@@ -29,13 +29,12 @@
                                 </div>
                             @endif
                             <input 
-                                type='{{$inputType}}' 
-                                name='{{$inputOne}}'
-                                id='{{$inputOne}}'
-                                class= {{$inputType === 'date' ?  'form-control datepicker' : 'form-control'}} 
-                                value=''
-                                required
-                                />
+                            type='{{ $inputType }}' 
+                            name='{{ $inputOne }}'
+                            id='{{ $inputOne }}'
+                            class='{{ $isDatePicker ? "form-control datepicker" : "form-control" }}' 
+                            value=''
+                            required/>                        
                             <span id="{{$labelOne}}" class="d-none text-danger"> </span>
                         </div>
                     </div>

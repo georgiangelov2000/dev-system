@@ -26,7 +26,7 @@
                         </div>
                     </div>
                 </div>
-                <table id="subCategoriesTable" class="table  table-hover table-sm dataTable no-footer">
+                <table id="subCategoriesTable" class="table table-hover table-sm dataTable no-footer">
                     <thead>
                         <tr>
                             <th>
@@ -58,7 +58,8 @@
             'labelOne' => 'name',
             'inputOne' => 'name',
             'formMethod' => 'POST',
-            'inputType' => 'text'
+            'inputType' => 'text',
+            'isDatePicker' => true
         ])
 
         @push('scripts')

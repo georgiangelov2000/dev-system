@@ -63,7 +63,6 @@ $(function () {
             'withoutPackage': true
         }, function (response) {
             const orders = response;
-
             if (orders.length > 0) {
                 bootstrapSelectOrder.append('<option>Please select</option>')
                 $.each(orders, function ($key, order) {
@@ -179,7 +178,7 @@ $(function () {
             `
         }
         $('#orderOverview').removeClass('d-none').html(template);
-        $('#orderOverview').find('.order-overview-table').DataTable();
+        // $('#orderOverview').find('.order-overview-table').DataTable();
 
         $('input[name="date_of_payment"]').datepicker({
             format: 'mm/dd/yyyy',

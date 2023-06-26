@@ -127,7 +127,7 @@
 
                     </div>
 
-                    <table class="table table-striped table-hover productOrderTable ">
+                    <table class="table table-striped table-hover productOrderTable">
                         <thead>
                             <tr>
                                 <th>Actions</th>

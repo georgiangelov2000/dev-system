@@ -253,12 +253,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('order.create.payment') }}" class="nav-link">
-                                <p>Mass order payments</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('order.create.payment') }}" class="nav-link">
+                            <a href="{{ route('package.create.customer.payment') }}" class="nav-link">
                                 <p>Create package payments</p>
                             </a>
                         </li>

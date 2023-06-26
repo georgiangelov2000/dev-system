@@ -125,7 +125,8 @@
         'labelOne' => 'Official delivered date',
         'inputOne' => 'delievery_date',
         'formMethod' => 'POST',
-        'inputType' => 'date'
+        'inputType' => 'text',
+        'isDatePicker' => true
     ])
 
     @push('scripts')
@@ -136,7 +137,7 @@
             const PACKAGE_DELETE_ROUTE = "{{route('package.delete',':id')}}";
             const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}";
             const PACKGE_MASS_DELETE_ORDERS = "{{route('package.orders',':id')}}";
-            const PACKAGE_UPDATE_ROUTE = "{{route('package.update',':id')}}"
+            const PACKAGE_UPDATE_ROUTE = "{{route('package.status',':id')}}"
         </script>
     @endpush
 

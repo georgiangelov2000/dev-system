@@ -39,6 +39,8 @@ mix.js('resources/js/summaries/supplier_summary.js', 'public/js/summaries'),
 mix.js('resources/js/payments/customer_payments.js', 'public/js/payments'),
 mix.js('resources/js/payments/supplier_payments.js', 'public/js/payments'),
 
+mix.js('resources/js/packages/customer_package_payment.js', 'public/js/packages'),
+
 // Javascript libraries
 mix.js('resources/js/adminlte.min.js', 'public/js'),
 mix.js('resources/js/app.js', 'public/js'),

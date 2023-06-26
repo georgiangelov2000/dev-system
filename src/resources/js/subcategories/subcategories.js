@@ -31,7 +31,6 @@ $(function () {
     .val('')
     .trigger('change');
 
-    console.log(SUB_CATEGORY_API_ROUTE);
     let dataTable = table.DataTable({
         serverSide: true,
         ajax: {

@@ -17,7 +17,9 @@ class PackageApiController extends Controller
         $order_dir = isset($request->order_dir) ? $request->order_dir : null;
         $column_name = isset($request->order_column) ? $request->order_column : null;
         $search = isset($request->search) ? $request->search : null;
-        
+        $select_json = isset($request->select_json) ? $request->select_json : null;
+        $no_paid_orders = isset($request->no_paid_orders) ? $request->no_paid_orders : null;
+
         $offset = $request->input('start', 0);
         $packageQuery = Package::query();
         
@@ -50,7 +52,14 @@ class PackageApiController extends Controller
                 ->where('expected_delivery_date', '>=', $date1_formatted)
                 ->where('expected_delivery_date', '<=', $date2_formatted);
         }
-
+        if($no_paid_orders) {
+            $packageQuery->whereHas('orders', function ($query) {
+                $query->whereIn('status',[3,4])->where('is_paid', false);
+            });
+        }
+        if($select_json) {
+            return response()->json($packageQuery->get());
+        }
         $packageQuery->withCount([
             'orders as paid_orders_count' => function ($query) {
                 $query->where('status', 1)->where('is_paid', 1);

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Package;
 use App\Models\Order;
 use App\Helpers\LoadStaticData;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 
 class PackageController extends Controller
@@ -112,35 +113,39 @@ class PackageController extends Controller
         return redirect()->route('package.index')->with('success', 'Package updated successfully');
     }
 
-    public function status(Package $package, Request $request)
+    public function updateSpecificColumns(Package $package,Request $request,)
     {
-
-        $delivery_method = $request->delivery_method;
-        $package_type = $request->package_type;
-
-        DB::beginTransaction();
+        $specificColumns = $request->only([
+            'delievery_method', 
+            'package_type',
+            'delievery_date'
+        ]);
 
         try {
 
-            if (isset($delivery_method)) {
-                $package->update([
-                    'delievery_method' => $delivery_method
-                ]);
-            }
-            if (isset($package_type)) {
-                $package->update([
-                    'package_type' => $package_type
-                ]);
+            if(isset($specificColumns['delievery_date'])) {
+                $specificColumns['delievery_date'] = date('Y-m-d', strtotime($specificColumns['delievery_date']));
             }
 
+            $package->update($specificColumns);
             DB::commit();
+
+            return response()->json(['message' => 'Package has been updated'],200);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
-            return response()->json(['message' => 'Package has not beed updated'], 500);
+            return response()->json(['message' => 'Package has not been updated'], 500);
         }
 
-        return response()->json(['message' => 'Package has been updated'], 200);
+    }
+
+    public function createPayment() {
+        $customers = Customer::select('id','name')
+        ->whereHas('orders.packages')
+        ->get();
+        
+        return view('packages.customer_package_payment',[
+            'customers' => $customers,
+        ]);
     }
 
     public function orders(Package $package) {
