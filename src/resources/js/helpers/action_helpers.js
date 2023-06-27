@@ -94,6 +94,10 @@ export function handleErrors(errors){
     $.each(errors, function(field, fieldErrors) {
         var errorSpan = $('span[name="' + field + '"]');
         errorSpan.text(fieldErrors[0]);
+
+        setTimeout(function() {
+            errorSpan.text(''); // Remove the error after a specific time (e.g., 3000 milliseconds = 3 seconds)
+        }, 3000);
     });
 }
 

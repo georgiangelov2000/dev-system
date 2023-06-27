@@ -99,7 +99,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
         Route::post('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
         Route::get('/create/payment', [OrderController::class, 'createPayment'])->name('create.payment');
-        Route::post('/store/payment/{order}', [OrderController::class, 'storePayment'])->name('store.payment');
+        Route::post('/store/payment', [OrderController::class, 'storePayment'])->name('store.payment');
     });
 
     Route::prefix('summary')->name('summary.')->group(function () {

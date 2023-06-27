@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="card-body">
-                
+
                 <div class="row">
                     <div class="col-12">
                         <p class="bg-dark p-2 font-weight-bold filters">
@@ -40,23 +40,38 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <table id="orders" class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Invoice number</th>
-                                    <th>Tracking number</th>
-                                    <th>Single price</th>
-                                    <th>Total price</th>
-                                    <th>Official price</th>
-                                    <th>Quantity</th>
-                                    <th>Status</th>
-                                    <th>Date of payment</th>
-                                    <th>Date of sale</th>
-                                </tr>
-                            </thead>
-                        </table>
+                        <form class="form-row" id="packagePayment" method="post" action="{{route('order.store.payment')}}">
+                            @csrf
+                            <div class="col-12">
+                                <table id="orders" class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <div class="form-check">
+                                                    <input class="form-check-input selectAll" type="checkbox">
+                                                    <label class="form-check-label" for="flexCheckDefault"></label>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                ID
+                                            </th>
+                                            <th>Name</th>
+                                            <th>Invoice number</th>
+                                            <th>Tracking number</th>
+                                            <th>Single price</th>
+                                            <th>Total price</th>
+                                            <th>Official price</th>
+                                            <th>Quantity</th>
+                                            <th>Status</th>
+                                            <th>Date of payment</th>
+                                            <th>Date of sale</th>
+                                            <th>Extension date</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div class="col-12 submitWrapper"></div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -67,7 +82,9 @@
         <script type="text/javascript" src="{{ mix('js/packages/customer_package_payment.js') }}"></script>
         <script>
             const PACKAGE_API_ROUTE = "{{ route('api.packages') }}";
-            const ORDER_API_ROUTE = "{{ route('api.orders') }}"
+            const ORDER_API_ROUTE = "{{ route('api.orders') }}";
+            const STORE_ORDER_PACKAGE_PAYMENT = "{{ route('order.store.payment') }}";
+            const PRODUCT_EDIT_ROUTE = "{{ route('order.edit',':id') }}"
         </script>
     @endpush
 @endsection

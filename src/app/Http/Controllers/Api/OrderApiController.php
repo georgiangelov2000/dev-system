@@ -92,13 +92,7 @@ class OrderApiController extends Controller
         if($withoutPackage) {
             $orderQuery->whereNull('package_id');
         }
-        if($select_json) {
-            return response()->json(
-                $orderQuery->get()
-            );
-        }
-
-        $filteredRecords = $orderQuery->count();
+       
         $result = $orderQuery->skip($offset)->take($limit)->get();
         
         foreach ($result as $key => $order) {
@@ -107,7 +101,12 @@ class OrderApiController extends Controller
             $order->package = $order->packages->first() ? $order->packages->first()->package_name : '';
         }
 
+        if($select_json) {
+            return response()->json($result);
+        }
+
         $totalRecords = Order::count();
+        $filteredRecords = $orderQuery->count();
 
         return response()->json(
             [

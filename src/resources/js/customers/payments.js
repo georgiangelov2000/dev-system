@@ -80,16 +80,19 @@ $(function () {
     searchBtn.on('click', function (e) {
         e.preventDefault();
         const order = bootstrapSelectOrder.selectpicker('val');
-
-        APICaller(SEARCH_ORDER, {
-            'order_id': order,
-            'select_json': true,
-        }, function (response) {
-            const order = response[0];
-            getOrderOverview(order);
-        }, function (error) {
-            console.log(error);
-        })
+        if(order){
+            APICaller(SEARCH_ORDER, {
+                'order_id': order,
+                'select_json': true,
+            }, function (response) {
+                const order = response[0];
+                getOrderOverview(order);
+            }, function (error) {
+                console.log(error);
+            })
+        } else {
+            toastr['error']('Please select order');
+        }
     })
 
     function getOrderOverview(order) {

@@ -58,8 +58,8 @@ class OrderController extends Controller
                 };
 
                 $foundProduct->quantity -= $orderQuantity;
-                
-                if($foundProduct->quantity === 0) {
+
+                if ($foundProduct->quantity === 0) {
                     $foundProduct->status = 'disabled';
                 }
 
@@ -127,14 +127,14 @@ class OrderController extends Controller
 
             $updatedQuantity = ($remainingQuantity + $sold_quantity);
 
-            if($updatedQuantity > $product->initial_quantity) {
+            if ($updatedQuantity > $product->initial_quantity) {
                 return back()->with('error', 'Product quantity is not enough');
             }
 
             $finalQuantity = ($product->initial_quantity - $updatedQuantity);
             $product->quantity = $finalQuantity;
-            
-            if($product->quantity === 0) {
+
+            if ($product->quantity === 0) {
                 $product->status = 'disabled';
             } else {
                 $product->status = 'enabled';
@@ -186,22 +186,22 @@ class OrderController extends Controller
         ], 200);
     }
     public function delete(Order $order)
-    {   
+    {
         DB::beginTransaction();
 
         try {
             $product = $order->product;
             $orderQuantity = $order->sold_quantity;
-            
+
             if (!$product) {
                 throw new \Exception("Product not found");
             }
-    
+
             $product->quantity += $orderQuantity;
             $product->save();
-    
+
             $order->delete();
-    
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -211,32 +211,43 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order has been deleted'], 200);
     }
 
-    public function createPayment(){
+    public function createPayment()
+    {
         return view('payments.create_customer_payments');
     }
 
-    public function storePayment(Order $order, PaymentRequest $request){
-
+    public function storePayment(PaymentRequest $request)
+    {
         DB::beginTransaction();
 
         try {
-            $order->status = 1;
-            $order->is_paid = 1;
-            $order->save();
+            $ids = $request->id;
+            
+            if (count($ids)) {
+                foreach ($ids as $key => $value) {
 
-            CustomerPayment::create([
-                'order_id' => $order->id,
-                'date_of_payment' => date('Y-m-d', strtotime($request->date_of_payment)),
-                'price' => $request->price,
-                'quantity' => $request->quantity
-            ]);
+                    $order = Order::where('id', $value)->update([
+                        'status' => 1,
+                        'is_paid' => 1
+                    ]);
+
+                    if ($order > 0) {
+                        CustomerPayment::create([
+                            'order_id' => $value,
+                            'date_of_payment' => date('Y-m-d', strtotime($request->date_of_payment[$key])),
+                            'price' => $request->price[$key],
+                            'quantity' => $request->quantity[$key],
+                        ]);
+                    }
+                }
+            }
+
             DB::commit();
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollBack();
-            Log::error($e->getMessage());
-            return response()->json(['message' => "Payment record has not been created"],500);
+            return response()->json(['message' => "Package payment has not been created"], 500);
         }
-        return response()->json(['message' => "Payment record has been created"],200);
+
+        return response()->json(['message' => "Package payment has been created"], 200);
     }
 }
