@@ -92,7 +92,7 @@
             const CUSTOMER_SEARCH_URL = "{{ route('customer.edit', ':id') }}";
             const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
             const SEARCH_ORDER = "{{ route('api.orders') }}";
-            const MAKE_PAYMENT = "{{route('order.store.payment',':id')}}"
+            const ORDER_PAYMENT = "{{route('order.store.payment')}}"
         </script>
     @endpush
 

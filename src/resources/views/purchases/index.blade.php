@@ -87,9 +87,7 @@
                 </div>  
                 <table id="purchasedProducts" class="table table-hover table-sm dataTable no-footer">
                     <thead>
-                        <th>
-                            Status
-                        </th>
+                        <th></th>
                         <th>
                             <div class="form-check">
                                 <input class="form-check-input selectAll" type="checkbox">

@@ -26,6 +26,32 @@ $(function () {
         }
     });
 
+    dateRange.on('apply.daterangepicker', function (ev, picker) {
+        let dateRangeValue = $(this).val();
+        let customer = bootstrapSelectCustomer.val();
+
+        APICaller(SEARCH_ORDER, {
+            'customer': customer,
+            'is_paid': 0,
+            'date_range': dateRangeValue,
+            'select_json': true,
+            'withoutPackage': true
+        }, function (response) {
+            const orders = response;
+            if (orders.length > 0) {
+                bootstrapSelectOrder.append('<option>Please select</option>')
+                $.each(orders, function ($key, order) {
+                    bootstrapSelectOrder.append(`<option value="${order.id}"> 
+                        ${order.invoice_number} - ${order.product.name}
+                    </option>`)
+                })
+            }
+            bootstrapSelectOrder.selectpicker('refresh');
+        }, function (error) {
+            console.log(error);
+        })
+    });
+
     $('.selectCustomer input[type="text"]').on('keyup', function () {
         const text = $(this).val();
         bootstrapSelectCustomer.empty();
@@ -80,7 +106,7 @@ $(function () {
     searchBtn.on('click', function (e) {
         e.preventDefault();
         const order = bootstrapSelectOrder.selectpicker('val');
-        if(order){
+        if (order) {
             APICaller(SEARCH_ORDER, {
                 'order_id': order,
                 'select_json': true,
@@ -148,17 +174,18 @@ $(function () {
                 </div>
             </div>
             <div id="paymentTemplateForm" class="col-12">
-                            <form method="POST" onsubmit="makePayment(event)" action="${MAKE_PAYMENT.replace(':id',order.id)}">
+                            <form method="POST" onsubmit="makePayment(event)" action="${ORDER_PAYMENT}">
+                                <input type="hidden" value="${order.id}" name="id" />
                                 <div class="form-row">
                                     <div class="form-group col-12">
                                         <label for="price">Price</label>
                                         <input id="price" type="text" name="price" class="form-control">
-                                        <span class="text-danger" name="price"> </span>
+                                        <span class="text-danger" name="price.0"> </span>
                                     </div>
                                     <div class="form-group col-12">
                                         <label for="price">Quantity</label>
                                         <input type="number" name="quantity" class="form-control">
-                                        <span class="text-danger" name="quantity"> </span>
+                                        <span class="text-danger" name="quantity.0"> </span>
                                     </div>
                                     <div class="form-group col-12">
                                         <label for="date_of_payment">Payment date</label>
@@ -170,7 +197,7 @@ $(function () {
                                             </div>
                                             <input type="text" id="date_of_payment" class="form-control datepicker" name="date_of_payment">
                                         </div>
-                                        <span class="text-danger" name="date_of_payment"> </span>
+                                        <span class="text-danger" name="date_of_payment.0"> </span>
                                     </div>
                                     <div class="col-3 mt-3">
                                         <button class="btn btn-primary">Save changes</button>
@@ -185,28 +212,39 @@ $(function () {
 
         $('input[name="date_of_payment"]').datepicker({
             format: 'mm/dd/yyyy',
-            onSelect: function(dateText, inst) {
-              $(this).val(dateText);
+            onSelect: function (dateText, inst) {
+                $(this).val(dateText);
             },
-            onClose: function(dateText, inst) {
-              if (dateText === '') {
-                $(this).val('');
-              }
+            onClose: function (dateText, inst) {
+                if (dateText === '') {
+                    $(this).val('');
+                }
             }
-          }).datepicker('setDate', new Date());  
+        });
     }
 
-    window.makePayment = function(e){
+    window.makePayment = function (e) {
         e.preventDefault();
         let action = e.target.getAttribute('action');
         let method = e.target.getAttribute('method');
         let form = e.target;
+        let formSerialize = $(form).serialize();
+        let formData = {};
 
+        formSerialize.split('&').forEach(function(val,index){
+            let pair = val.split('=');
+            let key = decodeURIComponent(pair[0]);
+            let value = decodeURIComponent(pair[1]);
+
+            formData[key] = [value];
+        })
+
+        console.log(formData);
         $.ajax({
             url: action,
             method: method,
-            data:$(form).serialize(),
-            success: function(response){
+            data:formData,
+            success: function (response) {
                 toastr['success'](response.message);
 
                 setTimeout(() => {
@@ -223,11 +261,11 @@ $(function () {
         })
     }
 
-    window.setPaymentInput = function(val,inputName){
-        
-        let input = $('input[name = "'+inputName+'"]');
+    window.setPaymentInput = function (val, inputName) {
 
-        if(input.attr('type') == 'text') {
+        let input = $('input[name = "' + inputName + '"]');
+
+        if (input.attr('type') == 'text') {
             input.val(parseFloat(val).toFixed(2));
         } else {
             input.val(parseInt(val));

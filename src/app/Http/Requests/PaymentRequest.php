@@ -15,15 +15,16 @@ class PaymentRequest extends FormRequest
     {
         return [
             "id" => "required|array",
-            "id.*" => "required|numeric|min:0",
+            "id.*" => "sometimes|numeric|min:0",
             "date_of_payment" => "required|array",
-            "date_of_payment.*" => "required|date",
+            "date_of_payment.*" => "sometimes|date",
             "price" => "required|array",
-            "price.*" => "required|numeric|min:0",
+            "price.*" => "sometimes|numeric|min:0",
             "quantity" => "required|array",
-            "quantity.*" => "required|integer|min:0"
+            "quantity.*" => "sometimes|integer|min:0"
         ];
     }
+    
 
     /**
      * Get the validation messages for the request.
