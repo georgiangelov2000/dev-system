@@ -23,9 +23,9 @@ class CreatePurchasesTable extends Migration {
             $table->unsignedDecimal('price', 8, 2)->default(0);
             $table->unsignedDecimal('total_price', 8, 2)->default(0);
             $table->unsignedInteger('initial_quantity')->default(0);
-            $table->text('notes')->nullable();
+            $table->string('notes')->nullable();
             $table->string('code',20);
-            $table->enum('status', ['enabled', 'disabled']);
+            $table->tinyInteger('status')->comment('0=disabled, 1=enabled');
             $table->tinyInteger('is_paid')->comment('1=is_paid,0=not paid')->default(0);
             $table->timestamps();
         });

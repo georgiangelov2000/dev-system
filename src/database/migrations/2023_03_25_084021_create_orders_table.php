@@ -32,7 +32,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedInteger('discount_percent')->default(0);
             $table->date('date_of_sale');
             $table->string('tracking_number');
-            $table->tinyInteger('status')->comment('1-received,2-partial,3-pending,4-ordered');
+            $table->tinyInteger('status')->comment('1=received,3=pending,4=ordered');
             $table->tinyInteger('is_paid')->comment('1=paid,0=not paid')->default(0);
             $table->timestamps();
         });

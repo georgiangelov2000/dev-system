@@ -111,7 +111,7 @@
                         <div class="addresses col-6"></div>
                         <div class="form-group col-12">
                             <label for="country">Notes</label>
-                            <textarea class="form-control @error('notes')  is-invalid @enderror" class="form-control" name="notes"
+                            <textarea maxlength="255" class="form-control @error('notes')  is-invalid @enderror" class="form-control" name="notes"
                                 value='{{ old('notes') ? e(old('notes')) : '' }}'></textarea>
                             @error('notes')
                                 <span class="text-danger">{{ $message }}</span>

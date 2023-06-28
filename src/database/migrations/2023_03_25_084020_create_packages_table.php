@@ -20,8 +20,8 @@ class CreatePackagesTable extends Migration
             $table->tinyInteger('package_type')->comment('1=Standart,2=Express,3=Overnight');
             $table->tinyInteger('delievery_method')->comment("1=Ground,2=Air,3=Sea");
             $table->date('delievery_date')->nullable();
-            $table->text('package_notes');
-            $table->text('customer_notes');
+            $table->string('package_notes')->nullable();
+            $table->string('customer_notes')->nullable();
             $table->timestamps();
         });
     }

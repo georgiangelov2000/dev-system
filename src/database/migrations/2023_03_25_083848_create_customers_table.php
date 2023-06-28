@@ -20,8 +20,8 @@ class CreateCustomersTable extends Migration
             $table->string('phone');
             $table->string('address');
             $table->string('zip');
-            $table->string('website');
-            $table->text('notes')->nullable();
+            $table->string('website')->nullable();
+            $table->string('notes')->nullable();
 
             $table->foreignId('state_id')
                     ->constrained('states')
