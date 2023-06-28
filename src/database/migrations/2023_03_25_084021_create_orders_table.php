@@ -23,11 +23,6 @@ class CreateOrdersTable extends Migration
                 ->constrained('purchases')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->foreignId('package_id')
-                ->constrained('packages')
-                ->onUpdate('cascade')
-                ->onDelete('cascade')
-                ->nullable();
 
             $table->string('invoice_number');
             $table->unsignedInteger('sold_quantity')->default(0);

@@ -170,21 +170,39 @@ class OrderController extends Controller
 
     public function updateStatus(Order $order, Request $request)
     {
-        $status = $request->status;
-
         try {
-            $order->status = $status;
+
+            $specificColumns = $request->only(['status','detach_package']);
+
+            $detachPackage = isset($specificColumns['detach_package'])
+            && $specificColumns['detach_package'] == true ? true : false;
+    
+            $status = isset($specificColumns['status']) && ($specificColumns['status'] == 3 || $specificColumns['status'] == 4) 
+            ? $specificColumns['status'] 
+            : false;
+                        
+            if($detachPackage) {
+                $package = $order->packages()->first();
+                if($package) {
+                    $order->packages()->detach($package->id);
+                    $order->package_extension_date = null;
+                }
+            }
+    
+            if($status) {
+                $order->status = $status;
+            }
+            
             $order->save();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
+            dd($e->getMessage());
+            return response()->json(['message' => 'Order has not been updated'], 500);
         }
-        return response()->json([
-            'data' => $status,
-            'message' => 'Order has been updated'
-        ], 200);
+        return response()->json(['message' => 'Order has been updated'], 200);
     }
+    
     public function delete(Order $order)
     {
         DB::beginTransaction();

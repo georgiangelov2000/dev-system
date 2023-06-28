@@ -97,7 +97,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/delete/{order}', [OrderController::class, 'delete'])->name('delete');
         Route::put('/update/{order}', [OrderController::class, 'update'])->name('update');
         Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
-        Route::post('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
+        Route::put('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
         Route::get('/create/payment', [OrderController::class, 'createPayment'])->name('create.payment');
         Route::post('/store/payment', [OrderController::class, 'storePayment'])->name('store.payment');
     });

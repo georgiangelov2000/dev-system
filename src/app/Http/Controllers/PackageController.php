@@ -57,7 +57,6 @@ class PackageController extends Controller
 
             Order::whereIn('id', $orderIds)->update([
                 'package_extension_date' => $delieveryDate,
-                'package_id' => $package->id
             ]);
 
             DB::commit();
@@ -99,8 +98,7 @@ class PackageController extends Controller
             $package->orders()->sync($orderIds);
 
             Order::whereIn('id', $orderIds)->update([
-                'date_of_sale' => $delieveryDate,
-                'package_id' => $package->id
+                'package_extension_date' => $delieveryDate,
             ]);
 
             DB::commit();
@@ -113,7 +111,7 @@ class PackageController extends Controller
         return redirect()->route('package.index')->with('success', 'Package updated successfully');
     }
 
-    public function updateSpecificColumns(Package $package,Request $request,)
+    public function updateSpecificColumns(Package $package,Request $request)
     {
         $specificColumns = $request->only([
             'delievery_method', 

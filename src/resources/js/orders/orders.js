@@ -226,30 +226,38 @@ $(function () {
                     <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST' data-name="${row.invoice_number}">
                         <input type='hidden' name='_method' value='DELETE'>
                         <input type='hidden' name='id' value='${row.id}'>
-                        <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
+                        <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
                             <i class='fa-light fa-trash text-danger'></i>
                         </button>
                     </form>`;
 
-                    if(row.package) {
-                        detachPackage = `<i title="Detach package" class="fal fa-unlink text-danger"></i>`;
+                    if(row.package && !row.is_paid && (row.status === 'Ordered' || row.status === 'Pending') ) {
+                        detachPackage = `
+                        <form onsubmit="detachOrder(event)" style='display:inline-block;' id='detach-form' action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method='PUT'>
+                            <input type='hidden' name='id' value='${row.id}'>
+                            <button type='submit' class='btn p-0' title='Delete'>
+                                <i title="Detach order" class="fal fa-unlink text-danger"></i>
+                            </button>
+                        </form>`;
                     }
 
                     if (!row.is_paid && row.status !== 'Received') {
-                        editButton = '<a href=' + ORDER_EDIT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+                        editButton = '<a href="' + ORDER_EDIT_ROUTE.replace(':id', row.id) + '" class="btn p-0" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
                         dropdown = `
                         <div class="dropdown d-inline">
                             <button class="btn text-info p-0" title="Change status" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fa-light fa-rotate-right"></i>
                             </button>
-                            <div id="changeStatus" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <button type="button" order-id=${row.id} value="3" onclick="changeStatus(this)" class="dropdown-item">Pending</button>
-                                <button type="button" order-id=${row.id} value="4" onclick="changeStatus(this)" class="dropdown-item">Ordered</button>
-                            </div>
-                        </div>`
+                            <form class="d-inline-block" action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method="PUT">
+                                <div id="changeStatus" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <button type="submit" order-id="${row.id}" value="3" onclick="event.preventDefault(); changeStatus(this)" class="dropdown-item">Pending</button>
+                                <button type="submit" order-id="${row.id}" value="4" onclick="event.preventDefault(); changeStatus(this)" class="dropdown-item">Ordered</button>
+                                </div>
+                            </form>
+                        </div>`;                    
                     }
 
-                    let previewButton = '<a title="Review" class="btn p-1"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
+                    let previewButton = '<a title="Review" class="btn p-0"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
 
                     return `${deleteFormTemplate} ${detachPackage} ${editButton} ${dropdown} ${previewButton}`;
                 }
@@ -331,15 +339,49 @@ $(function () {
     });
 
     // Window actions
-    window.changeStatus = function (e) {
-        let status = $(e).attr('value');
-        let order = $(e).attr('order-id');
 
-        APIPOSTCALLER(ORDER_UPDATE_STATUS.replace(':id', order), { 'status': status }, function (response) {
-            toastr['success'](response.message);
-            dataTable.ajax.reload();
-        }, function (error) {
-            toastr['error']('Order has not been updated');
+    window.detachOrder = function (event) {
+        event.preventDefault();
+        let form = event.target;
+        let url = form.getAttribute('action');
+        let method = form.getAttribute('method');
+        
+        $.ajax({
+            url:url,
+            method:method,
+            data: {
+                detach_package: true
+            },
+            success: function(response){
+                toastr['success'](response.message);
+                dataTable.ajax.reload(null,false);
+            },
+            error: function(error) {
+                toastr['error'](error.message);
+            }
+        })
+    }
+
+    window.changeStatus = function (e) {
+        let form = $(e).closest('form');
+        let status = $(e).attr('value');
+        let url = form.attr('action');
+        let method = form.attr('method');
+        
+
+        $.ajax({
+            url: url,
+            method: method,
+            data: {
+                status: status
+            },
+            success: function(response){
+                toastr['success'](response.message);
+                dataTable.ajax.reload(null,false);
+            },
+            error: function(error) {
+                toastr['error'](error.message);
+            }
         })
     }
 

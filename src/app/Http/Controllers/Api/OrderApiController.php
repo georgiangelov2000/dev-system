@@ -89,10 +89,11 @@ class OrderApiController extends Controller
                 ->where('date_of_payment', '<=', $date2_formatted);
             });
         }
+
         if($withoutPackage) {
-            $orderQuery->whereNull('package_id');
+            $orderQuery->whereDoesntHave('packages');
         }
-       
+
         $result = $orderQuery->skip($offset)->take($limit)->get();
         
         foreach ($result as $key => $order) {
