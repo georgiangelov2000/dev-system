@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Http\Requests\ProductRequest;
 use App\Models\SubCategory;
 use App\Helpers\FunctionsHelper;
+use App\Models\Supplier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -318,6 +319,9 @@ class ProductController extends Controller
     }
 
     public function createPayment(){
-        return view('purchases.create_payment');
+        $suppliers = Supplier::has('purchases')->select('id','name')->get();
+        return view('purchases.payment',[
+            'suppliers' => $suppliers
+        ]);
     }
 }

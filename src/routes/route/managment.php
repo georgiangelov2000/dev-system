@@ -60,7 +60,6 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{supplier}', [SupplierController::class, 'update'])->name('update');
         Route::get('/mass/edit/purchases/{supplier}', [SupplierController::class, 'massEdit'])->name('mass.edit.purchases');
         Route::delete('/delete/{supplier}', [SupplierController::class, 'delete'])->name('delete');
-        Route::get('/state/{countryId}', [SupplierController::class, 'getState'])->name('state');
         Route::get('/detach/category/{category}', [SupplierController::class, 'detachCategory'])->name('detach.category');
     });
     
@@ -89,7 +88,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/edit/{customer}', [CustomerController::class, 'edit'])->name('edit');
         Route::put('/update/{customer}', [CustomerController::class, 'update'])->name('update');
         Route::get('/delete/{customer}', [CustomerController::class, 'delete'])->name('delete');
-        Route::get('/state/{countryId}', [CustomerController::class, 'getState'])->name('state');
         Route::get('/orders/{customer}', [CustomerController::class, 'customerOrders'])->name('orders');
     });
     

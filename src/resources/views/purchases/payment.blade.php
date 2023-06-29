@@ -19,7 +19,11 @@
                     <div class="col-3">
                         <div class="form-group">
                             <label>Suppliers</label>
-                            <select name="supplier_id" class="form-control selectSupplier" data-live-search="true">
+                            <select name="supplier_id" class="form-control selectSupplier">
+                                <option value="">All</option>
+                                @foreach ($suppliers as $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -51,6 +55,7 @@
                             <th>Paid</th>
                         </thead>
                     </table>
+                    <div class="row submitWrapper"></div>
                 </form>
             </div>
         </div>
@@ -60,7 +65,6 @@
         <script type="text/javascript" src="{{ mix('js/purchases/payments.js') }}"></script>
         <script type="text/javascript">
             const PRODUCT_API_ROUTE = "{{ route('api.products') }}";
-            const SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
         </script>
     @endpush
 

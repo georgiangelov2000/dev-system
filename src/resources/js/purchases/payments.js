@@ -179,9 +179,15 @@ $(function () {
     });
 
     table.on('draw.dt', function () {
-        $('input[name="date_of_payment"]').datepicker({
-            format: 'yyyy-mm-dd'
-        });
+        let tableLength = dataTable.rows().data().length
+
+        if (tableLength > 0) {
+            $('.submitWrapper').html('<button type="submit" class="btn btn-primary">Save changes</button>');
+
+            $('input[name="date_of_payment"]').datepicker({
+                format: 'yyyy-mm-dd'
+            });
+        }
     });
 
     table.on('click', 'a[data-target]', function () {
@@ -246,34 +252,6 @@ $(function () {
     });
 
     // ACTIONS
-    $('.selectSupplier input[type="text"]').on('keyup', _.debounce(function () {
-        let text = $(this).val();
-        bootstrapSelectSupplier.empty();
-
-        bootstrapSelectSupplier.append('<option value="" class="d-none"></option>');
-
-        if (text === '') {
-            bootstrapSelectSupplier.append('<option value="">All</option>');
-            bootstrapSelectSupplier.selectpicker('refresh');
-            return;
-        }
-
-        APICaller(SUPPLIER_API_ROUTE, {
-            "search": text,
-            'with_orders':true
-        }, function (response) {
-            let suppliers = response.data;
-            if (suppliers.length > 0) {
-                $.each(suppliers, function ($key, supplier) {
-                    bootstrapSelectSupplier.append(`<option value="${supplier.id}"> ${supplier.name} </option>`)
-                })
-            }
-            bootstrapSelectSupplier.selectpicker('refresh');
-        }, function (error) {
-            console.log(error);
-        })
-    }, 300));
-
     bootstrapSelectSupplier.bind('changed.bs.select', function () {
         dataTable.ajax.reload(null, false);
     })

@@ -30,7 +30,11 @@ class SupplierPayment extends Model
         'purchase_id',
         'quantity',
         'price',
-        'date_of_payment'
+        'date_of_payment',
+        'payment_method',
+        'payment_reference',
+        'payment_status',
+        'notes'
     ];
 
     public function purchase()
