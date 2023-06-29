@@ -72,4 +72,8 @@ class Product extends Model {
         return $this->hasMany(Order::class);
     }
 
+    public function payments(){
+        return $this->hasMany(SupplierPayment::class);
+    }
+
 }

@@ -32,9 +32,11 @@ class CreateCompanySettingsTable extends Migration
             $table->string('tax_number');
             $table->string('address');
             $table->string('website');
-            $table->string('owner_name')->nullable();
-            $table->string('bussines_type')->nullable();
-            $table->string('image_path')->nullable();
+            $table->string('owner_name');
+            $table->string('tax_id');
+            $table->string('bussines_type');
+            $table->date('registration_date');
+            $table->string('image_path');
         });
     }
 

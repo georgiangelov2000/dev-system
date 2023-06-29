@@ -258,7 +258,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('payment.customer') }}" class="nav-link">
+                            <a href="{{ route('purchase.create.payment') }}" class="nav-link">
                                 <p>Create company payments</p>
                             </a>
                         </li>

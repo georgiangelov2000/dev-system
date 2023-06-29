@@ -61,6 +61,6 @@ class Supplier extends Model {
         return $this->belongsToMany(Category::class,'suppliers_categories');
     }
     public function purchases(){
-        return $this->hasOne(Product::class);
+        return $this->hasMany(Product::class,'supplier_id');
     }
 }

@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class SupplierPayment extends Model
+{
+    use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = "supplier_payments";
+    
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = "id";
+    
+    public $timestamps = false;
+
+    protected $fillable = [
+        'id',
+        'purchase_id',
+        'quantity',
+        'price',
+        'date_of_payment'
+    ];
+
+    public function purchase()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+}

@@ -33,6 +33,9 @@ class SupplierApiController extends Controller {
         if ($category) {
             $this->supplierByCategory($category, $supplierQuery);
         }
+        if(isset($request->with_orders) && $request->with_orders == true) {
+            $supplierQuery->has('purchases');
+        }
         if($select_json) {
             return response()->json(
                 $supplierQuery->select('id','name')->get()
@@ -72,28 +75,6 @@ class SupplierApiController extends Controller {
         );
     }
 
-    private function buildSupplierQuery() {
-        return Supplier::query()
-                        ->with([
-                            'states:id,name',
-                            'image:id,supplier_id,path,name',
-                            'country:id,name,short_name',
-                            'categories:id,name'
-                        ])
-                        ->select([
-                            'id',
-                            'name',
-                            'email',
-                            'phone',
-                            'address',
-                            'zip',
-                            'website',
-                            'notes',
-                            'state_id',
-                            'country_id'
-                        ]);
-    }
-
     private function supplierByCountry($country, $query) {
         $query->where('country_id', $country);
     }
@@ -109,9 +90,4 @@ class SupplierApiController extends Controller {
             $query->whereIn('categories.id', $category);
         });
     }
-
-    private function getSuppliers($query) {
-        return $query->get();
-    }
-
 }

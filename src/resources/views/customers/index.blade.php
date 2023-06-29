@@ -45,7 +45,7 @@
                         </div>
                     </div>
                 </div>               
-                <table id="customersTable" class="table  table-hover table-sm dataTable no-footer">
+                <table id="customersTable" class="table table-hover table-sm dataTable no-footer">
                     <thead>
                         <tr>
                             <th>

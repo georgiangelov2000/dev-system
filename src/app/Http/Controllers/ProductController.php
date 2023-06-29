@@ -101,6 +101,24 @@ class ProductController extends Controller
         return redirect()->route('purchase.index')->with('success', 'Product has been created');
     }
 
+    public function edit(Product $product)
+    {
+        $relatedProductData = $this->fetchRelatedProductData($product);
+
+        $brands = $this->staticDataHelper::callBrands();
+        $suppliers = $this->staticDataHelper::callSupliers();
+        $categories = $this->staticDataHelper::loadCallCategories();
+
+        return view('purchases.edit', compact(
+            'product',
+            'relatedProductData',
+            'suppliers',
+            'brands',
+            'suppliers',
+            'categories'
+        ));
+    }
+
     public function update(Product $product, ProductRequest $request)
     {
         $data = $request->validated();
@@ -166,24 +184,6 @@ class ProductController extends Controller
         return view('purchases.preview', ['product' => $product]);
     }
 
-    public function edit(Product $product)
-    {
-        $relatedProductData = $this->fetchRelatedProductData($product);
-
-        $brands = $this->staticDataHelper::callBrands();
-        $suppliers = $this->staticDataHelper::callSupliers();
-        $categories = $this->staticDataHelper::loadCallCategories();
-
-        return view('purchases.edit', compact(
-            'product',
-            'relatedProductData',
-            'suppliers',
-            'brands',
-            'suppliers',
-            'categories'
-        ));
-    }
-
     public function massEditUpdate(Request $request)
     {
         $validated = $request->validate([
@@ -235,7 +235,7 @@ class ProductController extends Controller
                     $orders_quantity = $product->orders->sum('sold_quantity');
 
                     $final_product_quantity = ($product->initial_quantity - $orders_quantity);
-                    
+
                     $product->quantity = $final_product_quantity;
 
                     $product->save();
@@ -315,5 +315,9 @@ class ProductController extends Controller
     public function orders(Product $product)
     {
         return view('purchases.orders', compact('product'));
+    }
+
+    public function createPayment(){
+        return view('purchases.create_payment');
     }
 }
