@@ -73,7 +73,7 @@ class Product extends Model {
     }
 
     public function payments(){
-        return $this->hasMany(SupplierPayment::class);
+        return $this->hasMany(SupplierPayment::class,'purchase_id');
     }
 
 }

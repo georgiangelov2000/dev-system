@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\FunctionsHelper;
 use Illuminate\Http\Request;
 use App\Http\Requests\OrderRequest;
-use App\Http\Requests\PaymentRequest;
+use App\Http\Requests\CustomerPaymentRequest;
 use App\Models\CustomerPayment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -234,7 +234,7 @@ class OrderController extends Controller
         return view('payments.create_customer_payments');
     }
 
-    public function storePayment(PaymentRequest $request)
+    public function storePayment(CustomerPaymentRequest $request)
     {
         DB::beginTransaction();
 

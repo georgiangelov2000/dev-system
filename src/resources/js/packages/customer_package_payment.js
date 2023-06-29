@@ -191,7 +191,7 @@ $(function () {
         let selectedData = table.find('tbody input[type="checkbox"]:checked').length;
 
         if(selectedData <= 0) {
-            toastr['error']('Please select order');
+            toastr['error']('Please select orders');
             return false;
         }
 

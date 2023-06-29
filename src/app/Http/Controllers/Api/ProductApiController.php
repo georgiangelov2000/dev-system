@@ -25,7 +25,7 @@ class ProductApiController extends Controller
         $order_dir = isset($request->order_dir) ? $request->order_dir : null;
         $column_name = isset($request->order_column) ? $request->order_column : null;
         $limit  = isset($request->limit) ? $request->limit : null;
-        
+        $is_paid = isset($request->is_paid) && !$request->is_paid ? false : true;
         $offset = $request->input('start', 0);
 
         $productQuery = Product::query()->select(
@@ -95,7 +95,7 @@ class ProductApiController extends Controller
         if ($single_total_price) {
             $productQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
         }
-        if(isset($request->is_paid) && $request->is_paid == false) {
+        if(!$is_paid) {
             $productQuery->where('is_paid',0)->whereDoesntHave('payments');
         }
         if ($out_of_stock) {

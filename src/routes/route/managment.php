@@ -77,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/delete/image/{product}', [ProductController::class, 'deleteGalleryImage'])->name('delete.image');
 
         Route::get('/create/payment', [ProductController::class, 'createPayment'])->name('create.payment');
-        // Route::store('/store/payment', [ProductController::class, 'storePayment'])->name('store.payment');
+        Route::post('/store/payment', [ProductController::class, 'storePayment'])->name('store.payment');
     });
 
     Route::prefix('customers')->name('customer.')->group(function () {

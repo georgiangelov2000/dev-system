@@ -1,5 +1,5 @@
 import { APICaller } from "../ajax/methods";
-
+import { handleErrors } from '../helpers/action_helpers';
 
 $(function () {
     $('select[name="supplier_id"]')
@@ -8,6 +8,7 @@ $(function () {
         .trigger('change');
 
     let table = $('table#purchases');
+    let form = $('#paymentPurchases')
 
     $('input[name="datetimes"]').daterangepicker({
         autoUpdateInput: false,
@@ -33,7 +34,7 @@ $(function () {
                     'order_column': orderColumnName, // send the column name being sorted
                     'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
                     'limit': d.custom_length = d.length,
-                    'is_paid': false,
+                    'is_paid': 0,
                     'publishing': createdRange,
                 });
             }
@@ -55,7 +56,10 @@ $(function () {
                 orderable: true,
                 name: 'id',
                 render: function (data, type, row) {
-                    return '<span class="font-weight-bold">' + row.id + '</span>';
+                    return `
+                    <span class="font-weight-bold">${row.id}</span>
+                    <input type="hidden" value="${row.id}" name="purchase_id" />
+                    `;
                 }
             },
             {
@@ -106,7 +110,7 @@ $(function () {
                 orderable: false,
                 render: function (data, type, row) {
                     return `
-                    <input type="number" name="quantity" class="form-control form-control-sm" />
+                    <input type="number" name="quantity" max="${row.initial_quantity}" class="form-control form-control-sm" />
                     <span data-active="true" class="text-danger" name="quantity"></span>
                     `
                 }
@@ -116,8 +120,8 @@ $(function () {
                 orderable: false,
                 render: function (data, type, row) {
                     return `
-                    <input type="text" name="price" class="form-control form-control-sm" />
-                    <span data-active="true" class="text-danger" name="quantity"></span>
+                    <input type="text" name="price" max="${row.total_price}" class="form-control form-control-sm" />
+                    <span data-active="true" class="text-danger" name="price"></span>
                     `
                 }
             },
@@ -134,7 +138,7 @@ $(function () {
                     </div>
                         <input type="text" name="date_of_payment" class="form-control form-control-sm" />                    
                     </div>
-                    <span data-active="true" class="text-danger" name="quantity"></span>
+                    <span data-active="true" class="text-danger" name="date_of_payment"></span>
                     `
                 }
             },
@@ -254,6 +258,61 @@ $(function () {
     // ACTIONS
     bootstrapSelectSupplier.bind('changed.bs.select', function () {
         dataTable.ajax.reload(null, false);
+    })
+
+    form.on('submit', function (e) {
+        e.preventDefault();
+        let selectedData = table.find('tbody input[type="checkbox"]:checked').length;
+
+        if (selectedData <= 0) {
+            toastr['error']('Please select purchases');
+            return false;
+        }
+
+        let url = $(this).attr('action');
+        let selectedRows = form.find('input[type="checkbox"]:checked').closest('tbody > tr');
+        let formData = {};
+
+        $.each(selectedRows, function (index, field) {
+            let row = $(this).find(':input[type="text"], :input[type="number"], :input[type="hidden"]').serialize();
+            row.split('&').forEach(function (val, index) {
+                let pair = val.split('=');
+                let key = decodeURIComponent(pair[0]);
+                let value = decodeURIComponent(pair[1]);
+
+                if (formData[key]) {
+                    if (Array.isArray(formData[key])) {
+                        formData[key].push(value);
+                    } else {
+                        formData[key] = [value];
+                    }
+                } else {
+                    formData[key] = [value];
+                }
+
+            })
+        })
+
+
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: formData,
+            success: function (response) {
+                console.log(response);
+                toastr['success'](response.message);
+                dataTable.clear().draw();
+            },
+            error: function (xhr, status, error) {
+                if (xhr.status === 422) {
+                    toastr['error'](xhr.responseJSON.message);
+                    var errors = xhr.responseJSON.errors;
+                    console.log(errors);
+                    handleErrors(errors);
+                }
+            }
+        })
+
     })
 
 })
