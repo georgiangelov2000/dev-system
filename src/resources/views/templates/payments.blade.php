@@ -28,7 +28,7 @@
 
         <div class="row">
             <div class="col-12 table-responsive">
-                <table id="paymentsTable" class="table table-striped">
+                <table id="paymentsTable" class="table table-hover table-sm">
                     <thead>
                         <tr>
                             <th>Tracking number</th>

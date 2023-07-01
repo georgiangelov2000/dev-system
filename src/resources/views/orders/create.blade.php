@@ -18,8 +18,8 @@
                     <div class="row flex-wrap">
 
                         <div class="form-group col-3">
-                            <label for="">Customer</label>
-                            <select name="customer_id" class="form-control selectCustomer"
+                            <label for="customer_id">Customer</label>
+                            <select id="customer_id" name="customer_id" class="form-control selectCustomer"
                                 data-live-search="true">
                             </select>
                             <span name="customer_id" class="text-danger"></span>

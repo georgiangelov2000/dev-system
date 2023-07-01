@@ -43,7 +43,7 @@ class SupplierApiController extends Controller {
         }
 
         $supplierQuery ->with([
-            'states:id,name',
+            'state:id,name',
             'image:id,supplier_id,path,name',
             'country:id,name,short_name',
             'categories:id,name'
@@ -64,7 +64,7 @@ class SupplierApiController extends Controller {
         $totalRecords = Supplier::count();
         $filteredRecords = $supplierQuery->count();
         $result = $supplierQuery->skip($offset)->take($limit)->get();
-
+        
         return response()->json(
             [
                 'draw' => intval($request->input('draw')),

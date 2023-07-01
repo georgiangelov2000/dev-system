@@ -10,7 +10,7 @@
     <div class="row">
         <div class="card col-12 cardTemplate">
             <div class="card-body">
-                <form action="{{route('payment.check')}}" method="POST" id="filterForm">
+                <form action="{{route('payment.check.customer')}}" method="POST" id="filterForm">
                     @csrf
                     <div class="form-row">
                         <div class="col-3">

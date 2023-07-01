@@ -12,7 +12,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\CustomerSummaryController;
 use App\Http\Controllers\SupplierSummaryController;
-use App\Http\Controllers\CustomerPaymentController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -75,9 +75,6 @@ Route::middleware(['auth'])->group(function () {
 
         Route::delete('/delete/{product}', [ProductController::class, 'delete'])->name('delete');
         Route::delete('/delete/image/{product}', [ProductController::class, 'deleteGalleryImage'])->name('delete.image');
-
-        Route::get('/create/payment', [ProductController::class, 'createPayment'])->name('create.payment');
-        Route::post('/store/payment', [ProductController::class, 'storePayment'])->name('store.payment');
     });
 
     Route::prefix('customers')->name('customer.')->group(function () {
@@ -132,8 +129,13 @@ Route::middleware(['auth'])->group(function () {
     });
     
     Route::prefix('payments')->name('payment.')->group(function(){
-        Route::get('/', [CustomerPaymentController::class, 'index'])->name('customer');
-        Route::post('/check', [CustomerPaymentController::class, 'payment'])->name('check');
+        Route::get('/customers', [PaymentController::class, 'customerPayments'])->name('customer');
+        Route::get('/suppliers', [PaymentController::class, 'supplierPayments'])->name('supplier');
+
+        Route::get('/create/comapny/payments', [PaymentController::class, 'createSupplierPayment'])->name('create.supplier.payment');
+        Route::post('/store/company/payments', [PaymentController::class, 'storeSupplierPayment'])->name('store.supplier.payment');
+
+        Route::get('/suppliers{payment}', [PaymentController::class, 'editSupplierPayment'])->name('supplier.edit');
     });
 
     Route::prefix('states')->name('state')->group(function(){

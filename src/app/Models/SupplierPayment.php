@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Product;
+use App\Models\InvoicePurchase;
 
 class SupplierPayment extends Model
 {
@@ -39,7 +41,10 @@ class SupplierPayment extends Model
 
     public function purchase()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Product::class);
     }
 
+    public function invoice(){
+        return $this->belongsTo(InvoicePurchase::class,'supplier_payment_id');
+    }
 }

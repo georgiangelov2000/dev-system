@@ -45,7 +45,7 @@ class Supplier extends Model {
         'country_id'
     ];
 
-    public function states() {
+    public function state() {
         return $this->belongsTo(State::class, 'state_id');
     }
     
