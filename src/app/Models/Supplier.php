@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\State;
 use App\Models\Country;
+use App\Models\Purchase;
 use App\Models\SupplierImage;
 use App\Models\Category;
 
@@ -61,6 +62,6 @@ class Supplier extends Model {
         return $this->belongsToMany(Category::class,'suppliers_categories');
     }
     public function purchases(){
-        return $this->hasMany(Product::class,'supplier_id');
+        return $this->hasMany(Purchase::class,'supplier_id');
     }
 }

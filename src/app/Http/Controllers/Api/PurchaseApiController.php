@@ -20,7 +20,6 @@ class PurchaseApiController extends Controller
         $single_total_price = isset($request->single_total_price) ? $request->single_total_price : null;
         $total_price_range = isset($request->total_price_range) ? $request->total_price_range : null;
         $search = isset($request->search) ? $request->search : null;
-        $out_of_stock = isset($request->out_of_stock) ? $request->out_of_stock : null;
         $select_json = isset($request->select_json) && $request->select_json ? $request->select_json : null;
         $order_dir = isset($request->order_dir) ? $request->order_dir : null;
         $column_name = isset($request->order_column) ? $request->order_column : null;
@@ -99,12 +98,13 @@ class PurchaseApiController extends Controller
         if(!$is_paid) {
             $purchaseQuery->where('is_paid',0)->whereDoesntHave('payments');
         }
-        if ($out_of_stock) {
-            $purchaseQuery->where('quantity', '>', 0)->where('status', 1);
-        } else {
-            $purchaseQuery->where('quantity', '<=', 0)->where('status', 0);
+        if (isset($request->out_of_stock)) {
+            if($request->out_of_stock) {
+                $purchaseQuery->where('quantity', '>', 0)->where('status', 1);
+            } else {
+                $purchaseQuery->where('quantity', '<=', 0)->where('status', 0);
+            }
         }
-
         if ($select_json !== null) {
             $purchaseQuery->with([]);
             return response()->json(

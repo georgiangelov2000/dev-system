@@ -1,12 +1,7 @@
 @extends('app')
-@section('title', 'Create company payments')
+@section('title', 'Create purchase payments')
 
 @section('content')
-    <div class="row justify-content-between mb-3">
-        <div class="col-12 d-flex justify-content-between">
-            <h3 class="mb-0">Create company payments</h3>
-        </div>
-    </div>
     <div class="row">
         <div class="card col-12 cardTemplate">
             <div class="card-body">

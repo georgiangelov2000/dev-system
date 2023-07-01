@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\CustomerApiController as CustomerApiController;
 use App\Http\Controllers\Api\OrderApiController as OrderApiController;
 use App\Http\Controllers\Api\PackageApiController as PackageApiController;
 use App\Http\Controllers\Api\SubCategoryApiController as SubCategoryApiController;
-use App\Http\Controllers\Api\SupplierPaymentApiController as SupplierPaymentApiController;
+use App\Http\Controllers\Api\PurchasePaymentApiController as PurchasePaymentApiController;
 
 
 Route::middleware(['auth'])->group(function () {
@@ -21,6 +21,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/orders', [OrderApiController::class, 'getData'])->name('api.orders');
     Route::get('/api/packages', [PackageApiController::class, 'getData'])->name('api.packages');
     Route::get('/api/subcategories', [SubCategoryApiController::class, 'getData'])->name('api.subcategories');
-    Route::get('/api/supplier/payments', [SupplierPaymentApiController::class, 'getData'])->name('api.supplier.payments');
+    Route::get('/api/supplier/payments', [PurchasePaymentApiController::class, 'getData'])->name('api.supplier.payments');
 });
 

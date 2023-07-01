@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Helpers\FunctionsHelper;
 use Illuminate\Http\Request;
 use App\Http\Requests\OrderRequest;
-use App\Http\Requests\CustomerPaymentRequest;
-use App\Models\CustomerPayment;
+use App\Models\OrderPayment;
+use App\Http\Requests\OrderPaymentRequest;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Models\Order;
 use App\Models\Purchase;
 use App\Helpers\LoadStaticData;
@@ -224,7 +223,7 @@ class OrderController extends Controller
         return view('payments.create_customer_payments');
     }
 
-    public function storePayment(CustomerPaymentRequest $request)
+    public function storePayment(OrderPaymentRequest $request)
     {
         DB::beginTransaction();
 
@@ -240,7 +239,7 @@ class OrderController extends Controller
                     ]);
 
                     if ($order > 0) {
-                        CustomerPayment::create([
+                        OrderPayment::create([
                             'order_id' => $value,
                             'date_of_payment' => date('Y-m-d', strtotime($request->date_of_payment[$key])),
                             'price' => $request->price[$key],

@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Product;
+use App\Models\Purchase;
 use App\Models\InvoicePurchase;
 
-class SupplierPayment extends Model
+class PurchasePayment extends Model
 {
     use HasFactory;
 
@@ -16,7 +16,7 @@ class SupplierPayment extends Model
      *
      * @var string
      */
-    protected $table = "supplier_payments";
+    protected $table = "purchase_payments";
 
     /**
      * The primary key associated with the table.
@@ -41,7 +41,7 @@ class SupplierPayment extends Model
 
     public function purchase()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Purchase::class);
     }
 
     public function invoice()

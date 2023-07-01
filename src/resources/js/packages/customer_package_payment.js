@@ -15,17 +15,16 @@ $(function () {
         columnDefs: [
             { width: "1%", targets: 0 },
             { width: "1%", targets: 1, class:"text-center" },
-            { width: "8%", targets: 2, class:"text-center" },
+            { width: "10%", targets: 2, class:"text-center" },
             { width: "10%", targets: 3, class:"text-center" },
-            { width: "10%", targets: 4, class:"text-center" },
-            { width: "7%", targets: 5, class:"text-center" },
-            { width: "12%", targets: 6, class:"text-center" },
-            { width: "8%", targets: 7, class:"text-center" },
-            { width: "12%", targets: 8, class:"text-center" },
-            { width: "1%", targets: 9, class:"text-center" },
-            { width: "14%", targets: 10, class:"text-center" },
-            { width: "8%", targets: 11, class:"text-center" },
-            { width: "10%", targets: 12, class:"text-center" },
+            { width: "7%", targets: 4, class:"text-center" },
+            { width: "12%", targets: 5, class:"text-center" },
+            { width: "8%", targets: 6, class:"text-center" },
+            { width: "12%", targets: 7, class:"text-center" },
+            { width: "1%", targets: 8, class:"text-center" },
+            { width: "14%", targets: 9, class:"text-center" },
+            { width: "8%", targets: 10, class:"text-center" },
+            { width: "10%", targets: 11, class:"text-center" },
             // add more targets and widths as needed
           ]
     });
@@ -88,10 +87,10 @@ $(function () {
 
                 return [
                     '<div div class="form-check">\n\
-                        <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + item.id + ' data-name= ' + item.product.name + ' type="checkbox"> \n\
+                        <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + item.id + ' data-name= ' + item.purchase.name + ' type="checkbox"> \n\
                     </div>',
                     item.id + `<input type="hidden" value="${item.id}" name="ids">`,
-                    `<a href='${PRODUCT_EDIT_ROUTE.replace(":id",item.product.id)}'>${item.product.name}</a>`,
+                    `<a href='${PRODUCT_EDIT_ROUTE.replace(":id",item.purchase.id)}'>${item.purchase.name}</a>`,
                     item.tracking_number,
                     item.single_sold_price,
                     `

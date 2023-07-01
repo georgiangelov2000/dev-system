@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SupplierPaymentRequest extends FormRequest
+class PurchasePaymentRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.

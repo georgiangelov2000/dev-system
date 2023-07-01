@@ -70,11 +70,11 @@ class Purchase extends Model {
     }
 
     public function orders(){
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class,'purchase_id');
     }
 
     public function payments(){
-        return $this->hasMany(SupplierPayment::class,'purchase_id');
+        return $this->hasMany(PurchasePayment::class,'purchase_id');
     }
 
 }

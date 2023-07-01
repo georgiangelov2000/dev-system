@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\SupplierPayment;
+use App\Models\PurchasePayment;
 use App\Models\Supplier;
 use stdClass;
 
-class SupplierPaymentApiController extends Controller
+class PurchasePaymentApiController extends Controller
 {
     public function getData(Request $request)
     {
@@ -22,7 +22,7 @@ class SupplierPaymentApiController extends Controller
         $offset = $request->input('start', 0);  
         $limit = $request->input('length', 10);
         
-        $paymentQ = SupplierPayment::query()
+        $paymentQ = PurchasePayment::query()
             ->with(['purchase' => function ($query) {
                 $query->select(
                     'id',

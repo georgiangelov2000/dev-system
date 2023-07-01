@@ -132,8 +132,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/customers', [PaymentController::class, 'customerPayments'])->name('customer');
         Route::get('/suppliers', [PaymentController::class, 'supplierPayments'])->name('supplier');
 
-        Route::get('/create/comapny/payments', [PaymentController::class, 'createSupplierPayment'])->name('create.supplier.payment');
-        Route::post('/store/company/payments', [PaymentController::class, 'storeSupplierPayment'])->name('store.supplier.payment');
+        Route::get('/purchases', [PaymentController::class, 'createSupplierPayment'])->name('create.supplier.payment');
+        Route::post('/store/purchase/payments', [PaymentController::class, 'storeSupplierPayment'])->name('store.supplier.payment');
 
         Route::get('/suppliers{payment}', [PaymentController::class, 'editSupplierPayment'])->name('supplier.edit');
     });

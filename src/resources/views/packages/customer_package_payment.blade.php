@@ -43,7 +43,7 @@
                         <form class="form-row" id="packagePayment" method="post" action="{{route('order.store.payment')}}">
                             @csrf
                             <div class="col-12">
-                                <table id="orders" class="table table-striped table-hover">
+                                <table id="orders" class="table table-hover table-sm">
                                     <thead>
                                         <tr>
                                             <th>
@@ -56,7 +56,6 @@
                                                 ID
                                             </th>
                                             <th>Name</th>
-                                            <th>Invoice number</th>
                                             <th>Tracking number</th>
                                             <th>Single price</th>
                                             <th>Total price</th>

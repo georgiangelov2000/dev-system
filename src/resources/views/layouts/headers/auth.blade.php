@@ -275,7 +275,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('payment.supplier') }}" class="nav-link">
-                                <p>Company payments</p>
+                                <p>Purchase payments</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -290,7 +290,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('payment.create.supplier.payment') }}" class="nav-link">
-                                <p>Create company payments</p>
+                                <p>Create purchase payments</p>
                             </a>
                         </li>
                     </ul>

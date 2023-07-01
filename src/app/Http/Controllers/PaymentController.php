@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use App\Helpers\LoadStaticData;
 use App\Models\Supplier;
 use App\Models\SupplierPayment;
-use App\Http\Requests\SupplierPaymentRequest;
+use App\Http\Requests\PurchasePaymentRequest;
 use App\Models\InvoicePurchase;
-use App\Models\Product;
-
+use App\Models\Purchase;
+use App\Models\PurchasePayment;
 use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
@@ -32,13 +32,13 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function editSupplierPayment(SupplierPayment $payment)
+    public function editSupplierPayment(PurchasePayment $payment)
     {
         $payment->load('purchase.supplier');
         return view('payments.edit_supplier_payment', compact('payment'));
     }
 
-    public function storeSupplierPayment(SupplierPaymentRequest $request)
+    public function storeSupplierPayment(PurchasePaymentRequest $request)
     {
         DB::beginTransaction();
 
@@ -49,7 +49,7 @@ class PaymentController extends Controller
                 $purchases = $data['purchase_id'];
 
                 foreach ($purchases as $key => $id) {
-                    $purchase = Product::find($id);
+                    $purchase = Purchase::find($id);
 
                     if ($purchase) {
                         $purchase->is_paid = 1;
@@ -62,7 +62,7 @@ class PaymentController extends Controller
                             'date_of_payment' => date('Y-m-d', strtotime($data['date_of_payment'][$key]))
                         ];
 
-                        $supplierPaymentRecord = SupplierPayment::create($paymentData);
+                        $supplierPaymentRecord = PurchasePayment::create($paymentData);
 
                         $supplierPaymentRecord->invoice()->create([
                             'price' => $purchase->total_price,
@@ -77,7 +77,6 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Payment has been created'], 200);
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             return response()->json(['message' => 'Payment has not been created'], 200);
         }
     }

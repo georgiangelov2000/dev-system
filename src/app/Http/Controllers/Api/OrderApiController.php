@@ -51,7 +51,7 @@ class OrderApiController extends Controller
             $orderQuery->where('is_paid',0)->whereIn('status',[3,4]);
         }
         if($package) {
-            $orderQuery->whereHas('package', function ($query) use ($package) {
+            $orderQuery->whereHas('packages', function ($query) use ($package) {
                 $query->where('package_id', $package);
             });
         }
@@ -92,7 +92,7 @@ class OrderApiController extends Controller
         if($withoutPackage) {
             $orderQuery->whereDoesntHave('packages');
         }
-
+        
         $result = $orderQuery->skip($offset)->take($limit)->get();
         
         foreach ($result as $key => $order) {
