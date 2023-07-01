@@ -62,11 +62,11 @@
                         </div>
 
                         <div class="form-group col-3 mb-0">
-                            <label for="delievery_method">Delievery method</label>
-                            <select id="delievery_method" class="form-control delieveryMethod" name="delievery_method"
+                            <label for="delivery_method">Delivery method</label>
+                            <select id="delivery_method" class="form-control deliveryMethod" name="delivery_method"
                                 title="Choose one of the following...">
-                                @foreach (config('statuses.delievery_methods') as $key => $item)
-                                    <option {{ $package->delievery_method === $key ? 'selected' : '' }}
+                                @foreach (config('statuses.delivery_methods') as $key => $item)
+                                    <option {{ $package->delivery_method === $key ? 'selected' : '' }}
                                         value="{{ $key }}">{{ $item }}</option>
                                 @endforeach
                             </select>
@@ -76,7 +76,7 @@
                         </div>
 
                         <div class="form-group col-3 mb-0">
-                            <label>Expected delievery date</label>
+                            <label>Expected delivery date</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
@@ -86,15 +86,15 @@
                                 <input 
                                     type="text"
                                     class="form-control datepicker" 
-                                    name="delievery_date"
-                                    value="{{$package->delievery_date}}"
+                                    name="expected_delivery_date"
+                                    value="{{$package->expected_delivery_date}}"
                                 >
                                 <small id="emailHelp" class="form-text text-muted">
                                     When the delivery date for a package is interited, the purchase date will be
                                     automatically adjusted to reflect the new delivery date
                                 </small>
                             </div>
-                            @error('delievery_date')
+                            @error('delivery_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -127,7 +127,6 @@
                             <tr>
                                 <th>Actions</th>
                                 <th>ID</th>
-                                <th>Invoice number</th>
                                 <th>Tracking number</th>
                                 <th>Name</th>
                                 <th>Date of sale</th>
@@ -148,13 +147,10 @@
                                         <input type="hidden" name="order_id[]" value="{{ $order->id }}">
                                     </td>
                                     <td>
-                                        {{ $order->invoice_number }}
-                                    </td>
-                                    <td>
                                         {{ $order->tracking_number }}
                                     </td>
                                     <td>
-                                        {{ $order->product->name }}
+                                        {{ $order->purchase->name }}
                                     </td>
                                     <td>
                                         {{ $order->date_of_sale }}

@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Product;
+use App\Models\Purchase;
 
-class ProductApiController extends Controller
+class PurchaseApiController extends Controller
 {
 
     public function getData(Request $request)
@@ -28,7 +28,7 @@ class ProductApiController extends Controller
         $is_paid = isset($request->is_paid) && !$request->is_paid ? false : true;
         $offset = $request->input('start', 0);
 
-        $productQuery = Product::query()->select(
+        $purchaseQuery = Purchase::query()->select(
             'id',
             'name',
             'supplier_id',
@@ -42,35 +42,36 @@ class ProductApiController extends Controller
             'is_paid',
             'initial_quantity'
         );
+
         if($limit) {
-            $productQuery->skip($offset)->take($limit);
+            $purchaseQuery->skip($offset)->take($limit);
         }
         if ($column_name && $order_dir) {
-            $productQuery->orderBy($column_name, $order_dir);
+            $purchaseQuery->orderBy($column_name, $order_dir);
         }
         if ($search) {
-            $productQuery->where('name', 'LIKE', '%' . $search . '%');
+            $purchaseQuery->where('name', 'LIKE', '%' . $search . '%');
         }
         if ($supplier) {
-            $productQuery->where('supplier_id', $supplier);
+            $purchaseQuery->where('supplier_id', $supplier);
         }
         if ($category) {
-            $productQuery->whereHas('categories', function ($query) use ($category) {
+            $purchaseQuery->whereHas('categories', function ($query) use ($category) {
                 $query->where('category_id', $category);
             });
         }
         if ($sub_category) {
-            $productQuery->whereHas('subcategories', function ($query) use ($sub_category) {
+            $purchaseQuery->whereHas('subcategories', function ($query) use ($sub_category) {
                 $query->whereIn('subcategories.id', $sub_category);
             });
         }
         if ($brand) {
             if(is_array($brand)) {
-                $productQuery->whereHas('brands', function ($query) use ($brand) {
+                $purchaseQuery->whereHas('brands', function ($query) use ($brand) {
                     $query->whereIn('brands.id', $brand);
                 });
             } else {
-                $productQuery->whereHas('brands', function ($query) use ($brand) {
+                $purchaseQuery->whereHas('brands', function ($query) use ($brand) {
                     $query->where('brands.id', $brand);
                 });
             }
@@ -80,39 +81,39 @@ class ProductApiController extends Controller
             $date1_formatted = date('Y-m-d 23:59:59', strtotime($dates[0]));
             $date2_formatted = date('Y-m-d 23:59:59', strtotime($dates[1]));
 
-            $productQuery
+            $purchaseQuery
                 ->where('created_at', '>=', $date1_formatted)
                 ->where('created_at', '<=', $date2_formatted);
         }
         if ($total_price_range) {
             $pieces = explode('-', $total_price_range);
 
-            $productQuery
+            $purchaseQuery
                 ->where('total_price', '>=', (int)$pieces[0])
                 ->where('total_price', '<=', (int)$pieces[1]);
         }
 
         if ($single_total_price) {
-            $productQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
+            $purchaseQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
         }
         if(!$is_paid) {
-            $productQuery->where('is_paid',0)->whereDoesntHave('payments');
+            $purchaseQuery->where('is_paid',0)->whereDoesntHave('payments');
         }
         if ($out_of_stock) {
-            $productQuery->where('quantity', '>', 0)->where('status', 'enabled');
+            $purchaseQuery->where('quantity', '>', 0)->where('status', 1);
         } else {
-            $productQuery->where('quantity', '<=', 0)->where('status', 'disabled');
+            $purchaseQuery->where('quantity', '<=', 0)->where('status', 0);
         }
 
         if ($select_json !== null) {
-            $productQuery->with([]);
+            $purchaseQuery->with([]);
             return response()->json(
-                $productQuery->get()
+                $purchaseQuery->get()
             );
         } else {
-            $productQuery->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name', "orders:id,status,is_paid"]);
+            $purchaseQuery->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name', "orders:id,status,is_paid"]);
 
-            $productQuery
+            $purchaseQuery
                 ->withCount([
                     'orders as paid_orders_count' => function ($query) {
                         $query->where('status', 1)->where('is_paid', 1);
@@ -123,9 +124,9 @@ class ProductApiController extends Controller
                 ]);
         }
 
-        $filteredRecords = $productQuery->count();
-        $result = $productQuery->get();
-        $totalRecords = Product::count();
+        $filteredRecords = $purchaseQuery->count();
+        $result = $purchaseQuery->get();
+        $totalRecords = Purchase::count();
 
         return response()->json(
             [

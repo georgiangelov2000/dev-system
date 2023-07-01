@@ -43,7 +43,6 @@ class OrderController extends Controller
             $orderStatus = (int) $request->status;
 
             $orders = [];
-
             foreach ($purchaseIds as $key => $purchaseId) {
                 $purchaseId = (int) $purchaseId;
                 $orderQuantity = (int) $request['sold_quantity'][$key];
@@ -71,7 +70,6 @@ class OrderController extends Controller
                 $order = [
                     'customer_id' => $customer,
                     'purchase_id' => $purchaseId,
-                    'invoice_number' => (string) $request['invoice_number'][$key],
                     'sold_quantity' => $orderQuantity,
                     'single_sold_price' => $finalSinglePrice,
                     'total_sold_price' => $finalPrice,
@@ -89,18 +87,17 @@ class OrderController extends Controller
 
             Order::insert($orders);
             DB::commit();
-            return response()->json(['message' => 'Order has been created']);
+
+            return response()->json(['message' => 'Order has been created'],200);
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
-            Log::error($e->getMessage());
-            return back()->withInput()->with('error', 'Order has not been created');
+            return response()->json(['message' => 'Order has not been created'],200);
         }
     }
 
     public function edit(Order $order)
     {
-        $currentOrder = $order->load('customer:id,name', 'product');
+        $currentOrder = $order->load('customer:id,name', 'purchase');
 
         return view('orders.edit', compact('currentOrder'));
     }
@@ -114,7 +111,6 @@ class OrderController extends Controller
             $date_of_sale = date('Y-m-d', strtotime($request->date_of_sale));
             $status = $request->status;
             $tracking_number = (string) $request->tracking_number;
-            $invoice_number = (string) $request->invoice_number;
             $purchase_id = (int) $request->product_id;
             $sold_quantity = (int) $request->sold_quantity;
             $single_sold_price = (float) $request->single_sold_price;
@@ -147,7 +143,6 @@ class OrderController extends Controller
             $order->update([
                 'customer_id' => $customer_id,
                 'purchase_id' => $purchase_id,
-                'invoice_number' => $invoice_number,
                 'sold_quantity' => $sold_quantity,
                 'single_sold_price' => $finalSinglePrice,
                 'total_sold_price' => $finalTotalPrice,
@@ -160,9 +155,7 @@ class OrderController extends Controller
             DB::commit();
             return redirect()->route('order.index')->with('success', 'Order has been updated');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
-            Log::error($e->getMessage());
             return back()->withInput()->with('error', 'Order has not been updated');
         }
     }

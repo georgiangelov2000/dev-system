@@ -21,7 +21,6 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Invoice number</th>
                                     <th>Tracking number</th>
                                     <th>Name</th>
                                     <th>Single price</th>
@@ -42,17 +41,12 @@
                                         </td>
                                         <td>
                                             <span>
-                                                {{ $order['invoice_number'] }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span>
                                                 {{ $order['tracking_number'] }}
                                             </span>
                                         </td>
                                         <td>
                                             <span>
-                                                {{ $order['product']['name'] }}
+                                                {{ $order['purchase']['name'] }}
                                             </span>
                                         </td>
                                         <td>

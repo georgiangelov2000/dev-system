@@ -166,7 +166,7 @@ $(function () {
                 data: 'initial_quantity'
             },
             {
-                width: '7%',
+                width: '4%',
                 orderable: false,
                 render: function (data, type, row) {
                     let stockStatus = row.quantity ? 'In stock' : 'Out of stock';
@@ -248,7 +248,7 @@ $(function () {
                 }
             },
             {
-                width: '2%',
+                width: '6%',
                 orderable: false,
                 render: function (data, type, row) {
                     return '<span>' + moment(row.created_at).format('YYYY-MM-DD') + '</span>';
@@ -269,6 +269,7 @@ $(function () {
             {
                 orderable: false,
                 width: '8%',
+                class: 'text-center',
                 render: function (data, type, row) {
                     let deleteFormTemplate = `
                     <form style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>

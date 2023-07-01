@@ -141,7 +141,7 @@
                             @if ($customer->image)
                                 <div class="col-12">
                                     <img class="cardWidgetImage w-100 m-0"
-                                        src="{{ $customer->image ? $customer->image->path . $customer->image->name : 'https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg' }}" />
+                                        src="{{ $customer->image ? $customer->image->path . '/' . $customer->image->name : 'https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg' }}" />
                                 </div>
                             @endif
                             <div class="col-12 mt-3 d-none imagePreview">

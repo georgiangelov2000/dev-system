@@ -11,11 +11,15 @@ use App\Helpers\LoadStaticData;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Purchase;
+use App\Models\CustomerImage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class CustomerController extends Controller
 {
     private $staticDataHelper;
+    private $dir = 'public/images/customers';
 
     public function __construct(LoadStaticData $staticDataHelper)
     {
@@ -51,14 +55,28 @@ class CustomerController extends Controller
         DB::beginTransaction();
 
         try {
+            $file = isset($data['image']) ? $data['image'] : false;
+
+            if (!isset($data['notes'])) {
+                $data['notes'] = "";
+            }
+            if (!isset($data['website'])) {
+                $data['website'] = "";
+            }
+
             $customer = Customer::create($data);
 
-            if ($customer) {
-                $customerService = new CustomerService($customer);
+            if ($file) {
+                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $imagePath = Storage::url($this->dir);
+                Storage::putFileAs($this->dir, $file, $hashed_image);
 
-                if ($request->file('image')) {
-                    $customerService->imageUploader($request->file('image'));
-                }
+                $image = new CustomerImage([
+                    'path' => $imagePath,
+                    'name' => $hashed_image
+                ]);
+
+                $customer->image()->save($image);
             }
 
             DB::commit();
@@ -72,51 +90,67 @@ class CustomerController extends Controller
 
     public function edit(Customer $customer)
     {
-        // $paymentOption = $request->option;
+        $customer->load('image');
+        $country = $customer->country_id;
+        $states = $this->staticDataHelper->callStatesAndCountries($country, 'states');
+        $countries = $this->staticDataHelper->callStatesAndCountries();
 
-        // if($request->option === 'payment') {
-        //     $customer->load('orders');
-        //     dd($customer);
-        // } else {
-            $customer->load('image');
-            $country = $customer->country_id;
-            $states = $this->staticDataHelper->callStatesAndCountries($country,'states');
-            $countries = $this->staticDataHelper->callStatesAndCountries();
-    
-            return view('customers.edit', compact('customer'), [
-                'countries' => $countries,
-                'states' => $states,
-            ]);
-        // }
+        return view('customers.edit', compact('customer'), [
+            'countries' => $countries,
+            'states' => $states,
+        ]);
     }
 
     public function update(Customer $customer, CustomerRequest $request)
     {
-
-        $customerService = new CustomerService($customer);
+        $data = $request->validated();
 
         DB::beginTransaction();
 
         try {
+            $file = isset($data['image']) ? $data['image'] : false;
+            $imagePath = Storage::url($this->dir);
 
-            if ($request->hasFile('image')) {
-                $customerService->imageUploader($request->file('image'));
+            if (!isset($data['notes'])) {
+                $data['notes'] = "";
+            }
+            if (!isset($data['website'])) {
+                $data['website'] = "";
             }
 
-            $customer->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'zip' => $request->zip,
-                'website' => $request->website,
-                'state_id' => $request->state_id,
-                'country_id' => $request->country_id,
-                'notes' => $request->notes,
-            ]);
+            if ($file) {
+                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $current_image = null;
+                
+                if ($customer->image) {
+                    $current_image = $this->dir . DIRECTORY_SEPARATOR . $customer->image->name;
+                    
+                    if (Storage::exists($current_image)) {
+                        Storage::delete($current_image);
+                    }
+
+                    Storage::putFileAs($this->dir, $file, $hashed_image);
+
+                    $customer->image->name = $hashed_image;
+                    $customer->image->path = $imagePath;
+                    $customer->image->save();
+                } else {
+                    Storage::putFileAs($this->dir, $file, $hashed_image);
+
+                    $image = new CustomerImage([
+                        'path' => $imagePath,
+                        'name' => $hashed_image
+                    ]);
+
+                    $customer->image()->save($image);
+                }
+            }
+
+            $customer->update($data);
 
             DB::commit();
         } catch (\Exception $e) {
+            dd($e->getMessage());
             DB::rollback();
             return back()->withInput()->with('error', 'Customer has not been updated');
         }
@@ -145,7 +179,6 @@ class CustomerController extends Controller
 
             $customer->delete();
             DB::commit();
-            Log::info('Successfully deleted customer');
             return response()->json(['message' => 'Customer has been deleted'], 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -188,27 +221,27 @@ class CustomerController extends Controller
                 $soldQuantity = (int) $data['sold_quantity'][$key];
                 $discount = (int) $data['discount_percent'][$key];
 
-                $order = Order::where('id',$orderId);
+                $order = Order::where('id', $orderId);
                 $purchase = Purchase::with('orders')->findOrFail($order->first()->purchase_id);
 
                 $totalSoldQuantity = $purchase->orders->sum('sold_quantity');
                 $remainingQuantity = ($totalSoldQuantity - $order->first()->sold_quantity);
 
                 $updatedQuantity = ($remainingQuantity + $soldQuantity);
-                
-                if($updatedQuantity > $purchase->initial_quantity) {
-                    return back()->with('error', 'Purchase quantity is not enough'.$purchase->name);
+
+                if ($updatedQuantity > $purchase->initial_quantity) {
+                    return back()->with('error', 'Purchase quantity is not enough' . $purchase->name);
                 }
 
                 $finalQuantity = ($purchase->initial_quantity - $updatedQuantity);
                 $purchase->quantity = $finalQuantity;
-                
+
                 $purchase->save();
 
                 $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($singlePrice, $discount);
-                $finalTotalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $soldQuantity);    
-                
-                Order::where('id',$order->first()->id)->update([
+                $finalTotalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $soldQuantity);
+
+                Order::where('id', $order->first()->id)->update([
                     'single_sold_price' => $finalSinglePrice,
                     'total_sold_price' => $finalTotalPrice,
                     'original_sold_price' => FunctionsHelper::calculatedFinalPrice($singlePrice, $soldQuantity),
@@ -217,7 +250,7 @@ class CustomerController extends Controller
 
                 ]);
             }
-            
+
             DB::commit();
             return redirect()->route('customer.index')->with('success', 'Orders has been updated');
         } catch (\Exception $e) {
@@ -225,5 +258,4 @@ class CustomerController extends Controller
             return back()->withInput()->with('error', 'Orders has not been updated');
         }
     }
-
 }

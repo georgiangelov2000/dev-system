@@ -42,7 +42,7 @@ $(function () {
                 bootstrapSelectOrder.append('<option>Please select</option>')
                 $.each(orders, function ($key, order) {
                     bootstrapSelectOrder.append(`<option value="${order.id}"> 
-                        ${order.invoice_number} - ${order.product.name}
+                        ${order.tracking_number} - ${order.product.name}
                     </option>`)
                 })
             }
@@ -93,7 +93,7 @@ $(function () {
                 bootstrapSelectOrder.append('<option>Please select</option>')
                 $.each(orders, function ($key, order) {
                     bootstrapSelectOrder.append(`<option value="${order.id}"> 
-                        ${order.invoice_number} - ${order.product.name}
+                        ${order.tracking_number} - ${order.product.name}
                     </option>`)
                 })
             }
@@ -133,10 +133,6 @@ $(function () {
                 <div class="table-responsive">
                     <table class="table">
                         <tbody>
-                            <tr>
-                                <th style="width:50%">Invoice number:</th>
-                                <td>${order.invoice_number}</td>
-                            </tr>
                             <tr>
                                 <th>Total price:</th>
                                 <td class="d-flex justify-content-between">$${order.total_sold_price} <a type="button" onclick="setPaymentInput(${order.total_sold_price},'price')" class="text-primary"><i class="fa-light fa-copy"></i></a></td>

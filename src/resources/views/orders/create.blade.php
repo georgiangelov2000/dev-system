@@ -55,7 +55,7 @@
                             <label for="order_status">Tracking number</label>
                             <div class="input-group">
                                 <input type="text" name="tracking_number" class="form-control rounded-0"
-                                    placeholder="Enter or generate tracking code">
+                                    placeholder="Enter or generate tracking number">
                                 <span class="input-group-append">
                                     <button type="button" id="generateCode" class="btn btn-info btn-flat">Generate</button>
                                 </span>
@@ -65,16 +65,15 @@
 
                         <div class="form-group col-12">
                             <label for="">Search product</label>
-                            <select name="" id="" class="productFilter" data-live-search="true">
+                            <select name="" id="" class="productFilter form-control" data-live-search="true">
                             </select>
                         </div>
 
                     </div>
 
-                    <table class="table table-striped table-hover productOrderTable ">
+                    <table class="table table-hover table-sm productOrderTable ">
                         <thead>
                             <th>Action</th>
-                            <th>Invoice number</th>
                             <th>Product</th>
                             <th>Quantity</th>
                             <th>Single price</th>
@@ -139,8 +138,8 @@
     <script type="text/javascript" src="{{ mix('js/helpers/render_helpers.js') }}"></script>
     <script type="text/javascript" src="{{ mix('js/orders/form.js') }}"></script>
     <script type="text/javascript">
-        const ORDER_INDEX_ROUTE = "{{route('order.index')}}" ;
-        const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
-        const PRODUCT_API_ROUTE = "{{ route('api.products') }}"
+        const ORDER_INDEX_ROUTE = "{{route('order.index')}}";
+        const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
+        const PRODUCT_API_ROUTE = "{{ route('api.products') }}";
     </script>
 @endpush

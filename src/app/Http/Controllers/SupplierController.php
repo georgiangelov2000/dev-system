@@ -60,8 +60,15 @@ class SupplierController extends Controller
 
         try {
             $file = isset($data['image']) ? $data['image'] : false;
-            $categories = isset($data['categories']) ? $data['categories'] : false ;
+            $categories = isset($data['categories']) ? $data['categories'] : false;
             $imagePath = Storage::url($this->dir);
+
+            if (!isset($data['notes'])) {
+                $data['notes'] = "";
+            }
+            if (!isset($data['website'])) {
+                $data['website'] = "";
+            }
 
             $supplier = Supplier::create($data);
 
@@ -70,7 +77,7 @@ class SupplierController extends Controller
             }
 
             if ($file) {
-                $hashed_image = Str::random(10).'.'.$file->getClientOriginalExtension();
+                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
                 Storage::putFileAs($this->dir, $file, $hashed_image);
 
                 $image = new SupplierImage([
@@ -116,23 +123,30 @@ class SupplierController extends Controller
 
         try {
             $file = isset($data['image']) ? $data['image'] : false;
-            $categories = isset($data['categories']) ? $data['categories'] : false ;
+            $categories = isset($data['categories']) ? $data['categories'] : false;
             $imagePath = Storage::url($this->dir);
+
+            if (!isset($data['notes'])) {
+                $data['notes'] = "";
+            }
+            if (!isset($data['website'])) {
+                $data['website'] = "";
+            }
 
             if (isset($categories) && !empty($categories)) {
                 $supplier->categories()->sync($categories);
             }
 
-            if($file) {
-                $hashed_image = Str::random(10).'.'.$file->getClientOriginalExtension();
+            if ($file) {
+                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
                 $current_image = null;
 
-                if($supplier->image) {
-                    $current_image = $this->dir.DIRECTORY_SEPARATOR.$supplier->image->name;
-                 
-                    if(Storage::exists($current_image)) {
+                if ($supplier->image) {
+                    $current_image = $this->dir . DIRECTORY_SEPARATOR . $supplier->image->name;
+
+                    if (Storage::exists($current_image)) {
                         Storage::delete($current_image);
-                    } 
+                    }
 
                     Storage::putFileAs($this->dir, $file, $hashed_image);
 
@@ -141,14 +155,14 @@ class SupplierController extends Controller
                     $supplier->image->save();
                 } else {
                     Storage::putFileAs($this->dir, $file, $hashed_image);
-                    
+
                     $image = new SupplierImage([
                         'path' => $imagePath,
                         'name' => $hashed_image
                     ]);
 
                     $supplier->image()->save($image);
-                }            
+                }
             }
 
             $supplier->update($data);
@@ -156,7 +170,7 @@ class SupplierController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
+            return back()->withInput()->with('error', 'Supplier has not been updated');
         }
 
 
@@ -172,14 +186,14 @@ class SupplierController extends Controller
                 return response()->json(['message' => 'Supplier has related purchases'], 500);
             }
 
-            if($supplier->image) {
-                $current_image = $this->dir.DIRECTORY_SEPARATOR.$supplier->image->name;
-                
-                if(Storage::exists($current_image)) {
+            if ($supplier->image) {
+                $current_image = $this->dir . DIRECTORY_SEPARATOR . $supplier->image->name;
+
+                if (Storage::exists($current_image)) {
                     Storage::delete($current_image);
                 };
             }
-            
+
             $supplier->delete();
             DB::commit();
         } catch (\Exception $e) {
@@ -206,9 +220,10 @@ class SupplierController extends Controller
         return response()->json(['message' => 'Category has been detached'], 200);
     }
 
-    public function massEdit(Supplier $supplier){
+    public function massEdit(Supplier $supplier)
+    {
         $categories = $supplier->categories()->get();
         $brands = $this->staticDataHelper->callBrands();
-        return view('suppliers.mass_edit_purchases',['supplier' => $supplier,'categories' => $categories,'brands' => $brands]);
+        return view('suppliers.mass_edit_purchases', ['supplier' => $supplier, 'categories' => $categories, 'brands' => $brands]);
     }
 }

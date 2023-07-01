@@ -47,7 +47,7 @@ $(function () {
                 width: "1%",
                 render: function (data, type, row) {
                     let checkbox = '<div div class="form-check">\n\
-                       <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.invoice_number + ' type="checkbox"> \n\
+                       <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
                     </div>';
 
                     return `${checkbox}`;
@@ -65,7 +65,7 @@ $(function () {
                 orderable: false,
                 name: "invoice_number",
                 render: function (data, type, row) {
-                    return '<span class="font-weight-bold">' + row.invoice_number + '</span>';
+                    return '<span class="font-weight-bold">' + row.tracking_number + '</span>';
                 }
             },
             {

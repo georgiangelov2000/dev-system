@@ -10,7 +10,7 @@ return [
         2 => "Express",
         3 => "Overnight"
     ],
-    'delievery_methods' => [
+    'delivery_methods' => [
         1 => "Ground",
         2 => "Air",
         3 => "Sea"

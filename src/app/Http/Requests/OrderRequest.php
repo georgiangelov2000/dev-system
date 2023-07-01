@@ -19,9 +19,6 @@ class OrderRequest extends FormRequest
             'status' => 'required|integer',
             'tracking_number' => 'required|string',
             
-            'invoice_number' => 'required',
-            'invoice_number.*' => 'required|string',
-            
             'product_id' => 'required',
             'product_id.*' => 'numeric',
         
@@ -44,10 +41,6 @@ class OrderRequest extends FormRequest
     public function messages()
     {
         return [
-            'invoice_number.required' => 'The invoice number field is required.',
-            'invoice_number.array' => 'The invoice number must be an array.',
-            'invoice_number.*.required' => 'Invoice number field is required.',
-            'invoice_number.*.string' => 'invoice number must be a string.',
             'product_id.required' => 'The product ID field is required.',
             'product_id.array' => 'The product ID must be an array.',
             'product_id.*.required' => 'Product ID field is required.',

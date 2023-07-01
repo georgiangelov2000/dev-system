@@ -23,20 +23,19 @@ $(function () {
   let bootstrapProduct = $('.bootstrap-select .productFilter');
   let table = $('.productOrderTable');
   let submitBtn = $('#orderForm button[type="submit"]');
-  console.log(submitBtn);
 
   table.DataTable({
+    ordering:false,
     columns: [
-      { width: '5%', orderable: false, orderData: false },
-      { width: '6%', orderable: false, class: 'text-center' },
-      { width: '5%', orderable: false, class: 'text-center' },
-      { width: '5%', orderable: false },
-      { width: '5%', orderable: false, class: 'text-center' },
-      { width: '6%', orderable: false, class: 'text-center' },
-      { width: '5%', orderable: false, class: 'text-center' },
-      { width: '3%', orderable: false },
-      { width: '2%', orderable: false },
-      { width: '2%', orderable: false },
+      { width: '1%',},
+      { width: '5%', class: 'text-center' },
+      { width: '5%', class: 'text-center' },
+      { width: '5%', class: 'text-center' },
+      { width: '6%', class: 'text-center' },
+      { width: '5%', class: 'text-center' },
+      { width: '3%', class: 'text-center' },
+      { width: '2%', class: 'text-center' },
+      { width: '2%', class: 'text-center' },
     ]
   });
 
@@ -193,14 +192,7 @@ $(function () {
                 <i class="fa-light fa-trash text-danger"></i>
               </button>
             </td>
-            <td>
-              <input 
-                type="text" 
-                class="form-control form-control-sm" 
-                name="invoice_number[]" 
-              />
-              <span name="invoice_number.${counter -1}" class="text-danger"></span>
-            </td>
+
             <td>${name}</td>
             <td>
               <div class="form-group col-12">
@@ -264,11 +256,6 @@ $(function () {
       data: formData,
       success: function (response) {
         toastr['success'](response.message);
-
-        setTimeout(() => {
-          location.reload();
-        }, 1500);
-
       },
       error: function (xhr, status, error) {
         if (xhr.status === 422) {

@@ -88,11 +88,10 @@ $(function () {
 
                 return [
                     '<div div class="form-check">\n\
-                        <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + item.id + ' data-name= ' + item.invoice_number + ' type="checkbox"> \n\
+                        <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + item.id + ' data-name= ' + item.product.name + ' type="checkbox"> \n\
                     </div>',
                     item.id + `<input type="hidden" value="${item.id}" name="ids">`,
                     `<a href='${PRODUCT_EDIT_ROUTE.replace(":id",item.product.id)}'>${item.product.name}</a>`,
-                    item.invoice_number,
                     item.tracking_number,
                     item.single_sold_price,
                     `

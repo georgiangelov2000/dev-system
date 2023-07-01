@@ -96,7 +96,7 @@
                         <div class="form-group col-6">
                             <label for="country">Categories</label>
                             <select multiple="" class="form-control selectMultiple" name="categories[]"
-                                data-actions-box="true" data-dropup-auto="false">
+                                data-actions-box="true" data-dropup-auto="false" multiple data-selected-text-format="count > 3">
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                                 @endforeach
@@ -121,7 +121,7 @@
                             @enderror
                         </div>
                         <div class="form-group col-6">
-                            <label for="country">Notes</label>
+                            <label for="notes">Notes</label>
                             <textarea maxlength="255" class="form-control @error('notes')  is-invalid @enderror" class="form-control" name="notes"
                                 value='{{ old('notes') ? e(old('notes')) : '' }}'></textarea>
                             @error('notes')

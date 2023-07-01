@@ -19,8 +19,8 @@ class CreateSuppliersTable extends Migration {
             $table->string('phone');
             $table->string('address');
             $table->string('zip');
-            $table->string('website')->nullable();
-            $table->string('notes')->nullable();
+            $table->string('website')->default('');
+            $table->string('notes')->default('');
             $table->unsignedBigInteger('state_id');
             $table->unsignedBigInteger('country_id');
             $table->timestamps();

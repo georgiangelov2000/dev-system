@@ -40,14 +40,13 @@ class PackageController extends Controller
 
         try {
             $orderIds = $data['order_id'];
-            $delieveryDate = date('Y-m-d', strtotime($data['delievery_date']));
 
             $package = Package::create([
                 'package_name' => $data['package_name'],
                 'tracking_number' => $data['tracking_number'],
                 'package_type' => $data['package_type'],
-                'delievery_method' => $data['delievery_method'],
-                'expected_delivery_date' => $delieveryDate,
+                'delivery_method' => $data['delivery_method'],
+                'expected_delivery_date' => date('Y-m-d', strtotime($data['expected_delivery_date'])),
                 'package_notes' => $data['package_notes'] ?? '',
                 'customer_notes' => $data['customer_notes'] ?? '',
                 'is_it_delivered' => 0,
@@ -56,11 +55,12 @@ class PackageController extends Controller
             $package->orders()->attach($orderIds);
 
             Order::whereIn('id', $orderIds)->update([
-                'package_extension_date' => $delieveryDate,
+                'package_extension_date' => date('Y-m-d', strtotime($data['expected_delivery_date'])),
             ]);
 
             DB::commit();
         } catch (\Exception $e) {
+            dd($e->getMessage());
             DB::rollback();
             return back()->withInput()->with('error', 'Package has not been created');
         }
@@ -82,14 +82,13 @@ class PackageController extends Controller
 
         try {
             $orderIds = $data['order_id'];
-            $delieveryDate = date('Y-m-d', strtotime($data['delievery_date']));
 
             $package->update([
                 'package_name' => $data['package_name'],
                 'tracking_number' => $data['tracking_number'],
                 'package_type' => $data['package_type'],
-                'delievery_method' => $data['delievery_method'],
-                'expected_delivery_date' => $delieveryDate,
+                'delivery_method' => $data['delivery_method'],
+                'expected_delivery_date' => date('Y-m-d', strtotime($data['expected_delivery_date'])),
                 'package_notes' => $data['package_notes'] ?? '',
                 'customer_notes' => $data['customer_notes'] ?? '',
             ]);
@@ -97,7 +96,7 @@ class PackageController extends Controller
             $package->orders()->sync($orderIds);
 
             Order::whereIn('id', $orderIds)->update([
-                'package_extension_date' => $delieveryDate,
+                'package_extension_date' => date('Y-m-d', strtotime($data['expected_delivery_date'])),
             ]);
 
             DB::commit();
@@ -112,15 +111,15 @@ class PackageController extends Controller
     public function updateSpecificColumns(Package $package,Request $request)
     {
         $specificColumns = $request->only([
-            'delievery_method', 
+            'delivery_method', 
             'package_type',
-            'delievery_date'
+            'delivery_date'
         ]);
 
         try {
 
-            if(isset($specificColumns['delievery_date'])) {
-                $specificColumns['delievery_date'] = date('Y-m-d', strtotime($specificColumns['delievery_date']));
+            if(isset($specificColumns['delivery_date'])) {
+                $specificColumns['delivery_date'] = date('Y-m-d', strtotime($specificColumns['delivery_date']));
             }
 
             $package->update($specificColumns);

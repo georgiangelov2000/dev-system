@@ -60,7 +60,7 @@
                         </div>
 
                         <div class="col-3">
-                            <label for="order_status">Tracking code</label>
+                            <label for="order_status">Tracking number</label>
                             <div class="input-group mb-3">
                                 <input type="text" name="tracking_number" value="{{ $currentOrder->tracking_number }}"
                                     class="form-control rounded-0">
@@ -77,7 +77,6 @@
 
                     <table class="table table-hover productOrderTable ">
                         <thead>
-                            <th>Invoice number</th>
                             <th>Product</th>
                             <th>Quantity</th>
                             <th>Single price</th>
@@ -91,19 +90,8 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <input type="hidden" value="{{ $currentOrder->product->id }}" name="product_id" />
-                                    <input 
-                                        type="text" 
-                                        class="form-control form-control-sm"
-                                        value="{{ $currentOrder->invoice_number }}" 
-                                        name="invoice_number" 
-                                    />
-                                    @error('invoice_number')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </td>
-                                <td>
-                                    {{ $currentOrder->product->name }}
+                                    <input type="hidden" value="{{ $currentOrder->purchase->id }}" name="purchase_id" />
+                                    {{ $currentOrder->purchase->name }}
                                 </td>
                                 <td>
                                     <div class="form-group col-12">
@@ -154,13 +142,13 @@
                                     </div>
                                 </td>
                                 <td class="purchaseQuantity">
-                                    {{ $currentOrder->product->initial_quantity }}
+                                    {{ $currentOrder->purchase->initial_quantity }}
                                 </td>
                                 <td>
-                                    {{ $currentOrder->product->price }}
+                                    {{ $currentOrder->purchase->price }}
                                 </td>
                                 <td class="totalPrice">
-                                    {{ $currentOrder->product->total_price }}
+                                    {{ $currentOrder->purchase->total_price }}
                                 </td>
                             </tr>
                         </tbody>

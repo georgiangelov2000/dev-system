@@ -3,7 +3,7 @@ import {showConfirmationDialog,openModal,swalText,closeModal,submit} from '../he
 
 $(function () {
     
-    $('input[name="delievery_date"]').datepicker({
+    $('input[name="delivery_date"]').datepicker({
         format: 'yyyy-mm-dd'
     });
 
@@ -28,11 +28,9 @@ $(function () {
     let deliveryRange = startDate + ' - ' + endDate;
 
     $('input[name="datetimes"]').daterangepicker({
-        timePicker: false,
-        startDate: startDate,
-        endDate: endDate,
+        autoUpdateInput: false,
         locale: {
-            format: 'YYYY-MM-DD'
+            cancelLabel: 'Clear'
         }
     });
 
@@ -47,7 +45,7 @@ $(function () {
                 return $.extend({},d,{
                     "search": d.search.value,
                     'package': bootstrapPackageType.val(),
-                    'delievery': bootstrapDelieveryMethod.val(),
+                    'delivery': bootstrapDelieveryMethod.val(),
                     'customer' : bootstrapSelectCustomer.val(),
                     'delivery_date': deliveryRange,
                     'order_column': orderColumnName, // send the column name being sorted
@@ -63,7 +61,7 @@ $(function () {
                 width: "1%",
                 render: function (data, type, row) {
                     let checkbox = '<div div class="form-check">\n\
-                       <input name="checkbox" class="form-check-input" onclick="selectPackage(this)" data-id=' + row.id + ' data-name= ' + row.invoice_number + ' type="checkbox"> \n\
+                       <input name="checkbox" class="form-check-input" onclick="selectPackage(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
                     </div>';
 
                     return `${checkbox}`;
@@ -98,14 +96,14 @@ $(function () {
             {
                 orderable: false,
                 width: "5%",
-                name: 'delievery_method',
+                name: 'delivery_method',
                 class: 'text-center',
                 render: function (data, type, row) {
-                    if (row.delievery_method === 'Air') {
+                    if (row.delivery_method === 'Air') {
                         return '<i title="Air" class="fa-light fa-plane"></i>';
-                    } else if (row.delievery_method === 'Ground') {
+                    } else if (row.delivery_method === 'Ground') {
                         return '<i title="Ground" class="fa-light fa-truck"></i>'
-                    } else if (row.delievery_method === 'Sea') {
+                    } else if (row.delivery_method === 'Sea') {
                         return '<i title="Sea" class="fa-light fa-water"></i>';
                     }
                 },
@@ -154,8 +152,8 @@ $(function () {
             {
                 orderable: false,
                 width: "10%",
-                name: 'delievery_date',
-                data: 'delievery_date',
+                name: 'delivery_date',
+                data: 'delivery_date',
             },
             {
                 orderable:false,
@@ -187,7 +185,7 @@ $(function () {
                         return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
                     } else if (row.status === 'Received') {
                         return `<span class="badge badge-success p-2">Package delivered</span>`;
-                    } else if (row.delievery_date) { // Check if delivery_date exists
+                    } else if (row.delivery_date) { // Check if delivery_date exists
                         return `<span class="badge badge-info p-2">Package has been delivered</span>`;
                     } else {
                         var badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';

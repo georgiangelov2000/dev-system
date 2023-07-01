@@ -32,7 +32,6 @@
                     <thead>
                         <tr>
                             <th>Tracking number</th>
-                            <th>Invoice number</th>
                             <th>Name</th>
                             <th>Total price</th>
                             <th>Single price</th>
@@ -51,7 +50,6 @@
                             @foreach ($products as $key => $product)
                                 <tr>
                                     <td>{{ $product['order']['tracking_number'] }}</td>
-                                    <td>{{ $product['order']['invoice_number'] }}</td>
                                     <td>{{ $product['order']['product']['name'] }}</td>
                                     <td>€{{$product['price']}}</td>
                                     <td>€{{$product['order']['single_sold_price'] }}</td>

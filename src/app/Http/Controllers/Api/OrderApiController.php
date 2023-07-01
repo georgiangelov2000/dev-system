@@ -24,13 +24,12 @@ class OrderApiController extends Controller
         $offset = $request->input('start', 0);  
         $limit = $request->input('length', 10);
 
-        $orderQuery = Order::query()->with(['customer:id,name','product:id,name','customerPayments']);
+        $orderQuery = Order::query()->with(['customer:id,name','purchase:id,name','orderPayments']);
         
         $orderQuery->select(
             'id',
             'customer_id',
             'purchase_id',
-            'invoice_number',
             'tracking_number',
             'sold_quantity',
             'single_sold_price',
@@ -63,7 +62,7 @@ class OrderApiController extends Controller
             $orderQuery->where('id',$order);
         }
         if($search) {
-            $orderQuery->where('invoice_number', 'LIKE', '%'.$search.'%');
+            $orderQuery->where('tracking_number', 'LIKE', '%'.$search.'%');
         }
         if($status) {
             $orderQuery->whereIn('status', $status);
@@ -83,7 +82,7 @@ class OrderApiController extends Controller
             $date1_formatted = date('Y-m-d 00:00:00', strtotime($date_pieces[0]));
             $date2_formatted = date('Y-m-d 23:59:59', strtotime($date_pieces[1]));            
 
-            $orderQuery->whereHas('customerPayments', function ($query) use ($date1_formatted,$date2_formatted) {
+            $orderQuery->whereHas('orderPayments', function ($query) use ($date1_formatted,$date2_formatted) {
                 $query
                 ->where('date_of_payment', '>=', $date1_formatted)
                 ->where('date_of_payment', '<=', $date2_formatted);
@@ -100,6 +99,7 @@ class OrderApiController extends Controller
             $order->status = array_key_exists($order->status, config('statuses.order_statuses')) ? config('statuses.order_statuses.' . $order->status) : $order->status;
             $order->is_paid = array_key_exists($order->is_paid, config('statuses.is_paid_statuses')) ? config('statuses.is_paid_statuses.' . $order->is_paid) : $order->is_paid;
             $order->package = $order->packages->first() ? $order->packages->first()->package_name : '';
+            $order->package_id = $order->packages->first() ? $order->packages->first()->id : '';
         }
 
         if($select_json) {

@@ -14,6 +14,7 @@ class CreateCustomerImagesTable extends Migration
     public function up()
     {
         Schema::create('customer_images', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('customer_id');
             $table->string('path');
             $table->string('name');

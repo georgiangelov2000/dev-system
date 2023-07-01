@@ -46,7 +46,7 @@ $(function () {
                 width: "1%",
                 render: function (data, type, row) {
                     let checkbox = '<div div class="form-check">\n\
-                       <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.invoice_number + ' type="checkbox"> \n\
+                       <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
                     </div>';
 
                     return `${checkbox}`;
@@ -62,14 +62,6 @@ $(function () {
             {
                 width: '10%',
                 orderable: false,
-                name: "invoice_number",
-                render: function (data, type, row) {
-                    return '<span class="font-weight-bold">' + row.invoice_number + '</span>';
-                }
-            },
-            {
-                width: '10%',
-                orderable: false,
                 name: "customer",
                 render: function (data, type, row) {
                     return '<a target="_blank" href="' + CUSTOMER_EDIT_ROUTE.replace(':id', row.customer.id) + '" >' + row.customer.name + '</a>';
@@ -80,7 +72,7 @@ $(function () {
                 orderable: false,
                 name: "product",
                 render: function (data, type, row) {
-                    return '<a target="_blank" href="' + EDIT_PRODUCT_ROUTE.replace(':id', row.product.id) + '">' + row.product.name + '</a>';
+                    return '<a target="_blank" href="' + EDIT_PRODUCT_ROUTE.replace(':id', row.purchase.id) + '">' + row.purchase.name + '</a>';
                 }
             },
             {
@@ -161,7 +153,7 @@ $(function () {
                 }
             },
             {
-                width: '2%',
+                width: '5%',
                 orderable: false,
                 name: 'created_at',
                 render: function (data, type, row) {
@@ -169,7 +161,7 @@ $(function () {
                 }
             },
             {
-                width: '2%',
+                width: '5%',
                 orderable: false,
                 name: 'updated_at',
                 render: function (data, type, row) {
@@ -181,7 +173,7 @@ $(function () {
                 orderable: false,
                 name: 'package',
                 render: function (data, type, row) {
-                   return `<span>${row.package}</span>`;
+                   return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id',row.package_id)}>${row.package}</a>`;
                 }
             },
             {
@@ -223,7 +215,7 @@ $(function () {
                     let detachPackage = '';
 
                     let deleteFormTemplate = `
-                    <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST' data-name="${row.invoice_number}">
+                    <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
                         <input type='hidden' name='_method' value='DELETE'>
                         <input type='hidden' name='id' value='${row.id}'>
                         <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>

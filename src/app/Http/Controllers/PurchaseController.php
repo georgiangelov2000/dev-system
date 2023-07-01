@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\LoadStaticData;
 use App\Models\Purchase;
-use App\Http\Requests\ProductRequest;
+use App\Http\Requests\PurchaseRequest;
 use App\Models\SubCategory;
 use App\Helpers\FunctionsHelper;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +41,7 @@ class PurchaseController extends Controller
         ]);
     }
 
-    public function store(ProductRequest $request)
+    public function store(PurchaseRequest $request)
     {
         $data = $request->validated();
 
@@ -63,13 +63,13 @@ class PurchaseController extends Controller
                 "supplier_id" => $data['supplier_id'],
                 "quantity" => $quantity,
                 "initial_quantity" => $quantity,
-                "notes" => $data["notes"],
+                "notes" => $data["notes"] ?? "",
                 "price" => $price,
                 "code" => $data["code"],
-                "status" => 'enabled',
+                "status" => 1,
                 "total_price" => $totalPrice
             ]);
-
+            
             if ($category) {
                 $purchase->categories()->sync([$category]);
             }
@@ -94,6 +94,7 @@ class PurchaseController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
+            dd($e->getMessage());
             return redirect()->route('purchase.index')->with('error', 'Purchase has not been created');
         }
         return redirect()->route('purchase.index')->with('success', 'Purchase has been created');
@@ -117,7 +118,7 @@ class PurchaseController extends Controller
         ));
     }
 
-    public function update(Purchase $purchase, ProductRequest $request)
+    public function update(Purchase $purchase, PurchaseRequest $request)
     {
         $data = $request->validated();
 
@@ -160,7 +161,7 @@ class PurchaseController extends Controller
                 "supplier_id" => $data['supplier_id'],
                 "quantity" => $data['quantity'],
                 "initial_quantity" => $data['quantity'],
-                "notes" => $data["notes"],
+                "notes" => $data["notes"] ?? "",
                 "price" => $price,
                 "code" => $data["code"],
                 "status" => 'enabled',

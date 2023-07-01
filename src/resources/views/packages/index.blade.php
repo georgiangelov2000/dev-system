@@ -27,8 +27,8 @@
                     </div>
                     <div class="col-3">
                         <div class="form-group">
-                            <label for="delievery_type">Type</label>
-                            <select class="form-control selectPackageType" name="" id="delievery_type">
+                            <label for="delivery_type">Type</label>
+                            <select class="form-control selectPackageType" name="" id="delivery_type">
                                 <option value="">All</option>
                                 @foreach (config('statuses.package_types') as $key => $package)
                                     <option value="{{$key}}">
@@ -40,10 +40,10 @@
                     </div>
                     <div class="col-3">
                         <div class="form-group">
-                            <label for="delievery_method">Method</label>
-                            <select class="form-control selectDelieveryMethod" name="" id="delievery_method">
+                            <label for="delivery_method">Method</label>
+                            <select class="form-control selectDelieveryMethod" name="" id="delivery_method">
                                 <option value="">All</option>
-                                @foreach (config('statuses.delievery_methods') as $key => $delievery)
+                                @foreach (config('statuses.delivery_methods') as $key => $delievery)
                                     <option value="{{$key}}">
                                         {{$delievery}}
                                     </option>
@@ -53,7 +53,7 @@
                     </div>
                     <div class="col-3">
                         <div class="form-group">
-                            <label for="delievery_method">Customers</label>
+                            <label for="delivery_method">Customers</label>
                             <select class="form-control selectCustomer" name="" id="select_customer">
                                 <option value="">All</option>
                                 @foreach ($customers as $key => $customer)

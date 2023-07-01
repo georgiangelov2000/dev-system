@@ -10,7 +10,7 @@ class PackageApiController extends Controller
 {
     public function getData(Request $request) {
         $package = isset($request->package) ? $request->package : null;
-        $delievery = isset($request->delievery) ? $request->delievery : null;
+        $delivery = isset($request->delivery) ? $request->delivery : null;
         $customer = isset($request->customer) ? $request->customer : null;
         $delivery_date = isset($request->delivery_date) ? $request->delivery_date : null;
         $limit  = isset($request->limit) ? $request->limit : null;
@@ -35,8 +35,8 @@ class PackageApiController extends Controller
         if($package) {
             $packageQuery->where('package_type',$package);
         }
-        if($delievery) {
-            $packageQuery->where('delievery_method',$delievery);
+        if($delivery) {
+            $packageQuery->where('delivery_method',$delivery);
         }
         if($customer) {
             $packageQuery->whereHas('orders', function ($query) use ($customer) {
@@ -75,7 +75,7 @@ class PackageApiController extends Controller
         
         foreach ($result as $key => $package) {
             $package->package_type = array_key_exists($package->package_type, config('statuses.package_types')) ? config('statuses.package_types.' . $package->package_type) : $package->package_type;
-            $package->delievery_method = array_key_exists($package->delievery_method, config('statuses.delievery_methods')) ? config('statuses.delievery_methods.' . $package->delievery_method) : $package->delievery_method;
+            $package->delivery_method = array_key_exists($package->delivery_method, config('statuses.delivery_methods')) ? config('statuses.delivery_methods.' . $package->delivery_method) : $package->delivery_method;
             $package->is_it_delivered = array_key_exists($package->is_it_delivered, config('statuses.is_paid_statuses')) ? config('statuses.is_paid_statuses.' . $package->is_it_delivered) : $package->is_it_delivered;
 
             $ordersCount = $package->orders_count;

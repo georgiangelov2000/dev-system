@@ -17,7 +17,6 @@ class CreateOrdersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('purchase_id');
-            $table->string('invoice_number');
             $table->unsignedInteger('sold_quantity')->default(0);
             $table->unsignedDecimal('single_sold_price', 8, 2)->default(0);
             $table->unsignedDecimal('total_sold_price', 8, 2)->default(0);

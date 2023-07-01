@@ -57,36 +57,36 @@
                         </div>
 
                         <div class="form-group col-3 mb-0">
-                            <label for="delievery_method">Delievery method</label>
-                            <select id="delievery_method" class="form-control delieveryMethod" name="delievery_method"
+                            <label for="delivery_method">Delivery method</label>
+                            <select id="delivery_method" class="form-control deliveryMethod" name="delivery_method"
                                 title="Choose one of the following...">
-                                @foreach (config('statuses.delievery_methods') as $key => $item)
+                                @foreach (config('statuses.delivery_methods') as $key => $item)
                                     <option value="{{ $key }}">{{ $item }}</option>
                                 @endforeach
                             </select>
                             <small id="emailHelp" class="form-text text-muted">
                                 Field indicating the method of delivery (e.g. ground, air, sea, etc.)
                             </small>
-                            @error('delievery_method')
+                            @error('delivery_method')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <div class="form-group col-3 mb-0">
-                            <label>Expected delievery date</label>
+                            <label>Expected delivery date</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
                                         <i class="far fa-calendar-alt"></i>
                                     </span>
                                 </div>
-                                <input type="text" class="form-control datepicker" name="delievery_date">
+                                <input type="text" class="form-control datepicker" name="delivery_date">
                                 <small id="emailHelp" class="form-text text-muted">
                                     When the delivery date for a package is interited, the purchase date will be
                                     automatically adjusted to reflect the new delivery date
                                 </small>
                             </div>
-                            @error('delievery_date')
+                            @error('delivery_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -127,15 +127,14 @@
 
                     </div>
 
-                    <table class="table table-striped table-hover productOrderTable">
+                    <table class="table table-hover table-sm productOrderTable">
                         <thead>
                             <tr>
                                 <th>Actions</th>
                                 <th>ID</th>
-                                <th>Invoice number</th>
                                 <th>Tracking number</th>
-                                <th>Date of sale</th>
                                 <th>Name</th>
+                                <th>Date of sale</th>
                                 <th>Single price</th>
                                 <th>Total price</th>
                                 <th>Quantity</th>
@@ -155,17 +154,7 @@
                         <div class="cardTemplate mt-2 mb-2">
                             <div class="card-footer rounded bg-white p-0">
                                 <div class="row">
-                                    <div class="col-sm-4 col-6">
-                                        <div class="description-block border-right">
-                                            <h5 class="description-header customerName">
-                                                None
-                                            </h5>
-                                            <span class="description-text">Customer</span>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-sm-4 col-6">
+                                    <div class="col-sm-6 col-6">
                                         <div class="description-block border-right">
                                             <h5 class="description-header ordersCount">
                                                 0
@@ -174,7 +163,7 @@
                                         </div>
 
                                     </div>
-                                    <div class="col-sm-4 col-6">
+                                    <div class="col-sm-6 col-6">
                                         <div class="description-block">
                                             <h5 class="description-header packagePrice">0</h5>
                                             <span class="description-text">Price</span>

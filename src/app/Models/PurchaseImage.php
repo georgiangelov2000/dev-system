@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CustomerPayment extends Model
-{
+class PurchaseImage extends Model {
+
     use HasFactory;
 
     /**
@@ -14,28 +14,32 @@ class CustomerPayment extends Model
      *
      * @var string
      */
-    protected $table = "customer_payments";
+    protected $table = 'purchases_images';
 
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
-    protected $primaryKey = "id";
+    protected $primaryKey = 'id';
 
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
     public $timestamps = false;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'id',
-        'order_id',
-        'price',
-        'quantity',
-        'date_of_payment'
+        'purchase_id',
+        'path',
+        'name',
     ];
-
-    public function order()
-    {
-        return $this->belongsTo(Order::class);
-    }
 
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\SubCategory;
-use App\Models\ProductImage;
+use App\Models\PurchaseImage;
 use App\Models\Supplier;
 
 class Purchase extends Model {
@@ -45,7 +45,8 @@ class Purchase extends Model {
         'brands',
         'total_price',
         'initial_quantity',
-        'is_paid'
+        'is_paid',
+        'status'
     ];
 
     public function categories() {
@@ -61,7 +62,7 @@ class Purchase extends Model {
     }
 
     public function images() {
-        return $this->hasMany(ProductImage::class, 'purchase_id');
+        return $this->hasMany(PurchaseImage::class, 'purchase_id');
     }
     
     public function supplier() {

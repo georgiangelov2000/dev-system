@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Customer;
 use App\Models\Purchase;
-use App\Models\CustomerPayment;
+use App\Models\OrderPayment;
 
 class Order extends Model
 {
@@ -37,7 +37,6 @@ class Order extends Model
         "date_of_sale",
         "status",
         "purchase_id",
-        "invoice_number",
         "sold_quantity",
         "single_sold_price",
         "total_sold_price",
@@ -53,7 +52,7 @@ class Order extends Model
         return $this->belongsTo(Customer::class);
     }
 
-    public function product()
+    public function purchase()
     {
         return $this->belongsTo(Purchase::class);
     }
@@ -67,7 +66,7 @@ class Order extends Model
         return $this->belongsToMany(Package::class, 'packages_orders', 'order_id', 'package_id');
     }
 
-    public function customerPayments(){
-        return $this->hasMany(CustomerPayment::class);
+    public function orderPayments(){
+        return $this->hasMany(OrderPayment::class);
     }
 }

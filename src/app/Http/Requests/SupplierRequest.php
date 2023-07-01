@@ -19,11 +19,11 @@ class SupplierRequest extends FormRequest {
             "email" => "required|email",
             "phone" => "required|string",
             "address" => "required|string",
-            "website" => "required|string",
+            "website" => "nullable|string",
             "zip" => "required|string",
             'country_id' => "required|integer",
             'state_id' => "required|integer",
-            "notes" => "required|string",
+            "notes" => "nullable|string",
             "categories" => "array"
         ];
     }

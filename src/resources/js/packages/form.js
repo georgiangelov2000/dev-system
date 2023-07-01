@@ -1,7 +1,7 @@
 import { APICaller } from '../ajax/methods';
 
 $(function () {
-  $('.purchaseFilter, .selectCustomer, .packageType, .delieveryMethod, .selectSupplier').selectpicker();
+  $('.purchaseFilter, .selectCustomer, .packageType, .deliveryMethod, .selectSupplier').selectpicker();
 
   let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
   let bootstrapOrders = $('.bootstrap-select .purchaseFilter');
@@ -14,14 +14,13 @@ $(function () {
     ordering: false,
     columnDefs: [
       { width: "1%", targets: 0 },
-      { width: "1%", targets: 1, class:"text-center" },
-      { width: "5%", targets: 2, class:"text-center" },
-      { width: "5%", targets: 3, class:"text-center"},
+      { width: "5%", targets: 1, class:"text-center" },
+      { width: "5%", targets: 2, class:"text-center"},
+      { width: "5%", targets: 3, class:"text-center" },
       { width: "5%", targets: 4, class:"text-center" },
       { width: "5%", targets: 5, class:"text-center" },
       { width: "5%", targets: 6, class:"text-center" },
       { width: "5%", targets: 7, class:"text-center" },
-      { width: "5%", targets: 8, class:"text-center" },
       // add more targets and widths as needed
     ]
   });
@@ -75,16 +74,15 @@ $(function () {
           bootstrapOrders.append(`<option 
             value="${order.id}"
             data-id="${order.id}"
-            data-name="${order.product.name}"
+            data-name="${order.purchase.name}"
             data-single-sold-price="${order.single_sold_price}"
             data-total-sold-price="${order.total_sold_price}"
             data-tracking_number = "${order.tracking_number}"
             data-quantity="${order.sold_quantity}"
             data-date_of_sale="${order.date_of_sale}"
-            data-invoice="${order.invoice_number}"
             value="${order.id}"
           > 
-          ${order.product.name} </option>`)
+          ${order.purchase.name} </option>`)
         })
       }
       bootstrapOrders.selectpicker('refresh');
@@ -123,7 +121,6 @@ $(function () {
     let selectedOption = $(this).find('option').eq(clickedIndex);
     let { 
       id, 
-      invoice, 
       quantity, 
       totalSoldPrice, 
       singleSoldPrice, 
@@ -135,7 +132,7 @@ $(function () {
     let duplicate = false;
 
     table.rows().data().each(function (row) {
-      if (row[2] == invoice) {
+      if (row[1] == id) {
         duplicate = true;
         toastr['error']('You have already the current product in the table');
         return false; // break out of the loop
@@ -150,7 +147,6 @@ $(function () {
       let newRow = $('<tr name="package">').append(
         $('<td>').append($("<button type='button' onclick='removeRow(this)' class='btn p-0'><i class='fa-light fa-trash text-danger'></i></button>")),
         $('<td>').text(id).append($("<input>").attr("type", "hidden").attr('name', 'order_id[]').val(id)),
-        $('<td>').text(invoice),
         $('<td>').text(tracking_number),
         $('<td>').text(name),
         $('<td>').text(date_of_sale),
