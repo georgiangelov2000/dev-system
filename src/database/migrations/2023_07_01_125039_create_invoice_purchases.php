@@ -16,11 +16,11 @@ class CreateInvoicePurchases extends Migration
         Schema::create('invoice_purchases', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('supplier_payment_id');
-            $table->string('invoice_number')->unique();
-            $table->date('invoice_date');
-            $table->unsignedDecimal('price');
-            $table->unsignedInteger('quantity');
-            $table->tinyInteger('status')->comment('1: Projecting, 2: Paid,3: Not paid');
+            $table->string('invoice_number')->nullable()->unique();
+            $table->date('invoice_date')->nullable();
+            $table->unsignedDecimal('price')->default(0);
+            $table->unsignedInteger('quantity')->default(0);
+            $table->tinyInteger('status')->default(2)->comment('1: Paid,2: Not paid');
         });
     }
 

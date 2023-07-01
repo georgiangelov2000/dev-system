@@ -17,14 +17,14 @@ class SupplierPayment extends Model
      * @var string
      */
     protected $table = "supplier_payments";
-    
+
     /**
      * The primary key associated with the table.
      *
      * @var string
      */
     protected $primaryKey = "id";
-    
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -44,7 +44,8 @@ class SupplierPayment extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function invoice(){
-        return $this->belongsTo(InvoicePurchase::class,'supplier_payment_id');
+    public function invoice()
+    {
+        return $this->hasOne(InvoicePurchase::class, 'supplier_payment_id');
     }
 }

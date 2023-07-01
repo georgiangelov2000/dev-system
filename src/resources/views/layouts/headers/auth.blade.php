@@ -46,14 +46,11 @@
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
-                    <li  class="nav-item">
-                        <img 
-                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png" 
-                            alt="Company logo"
-                            id="company-logo"
-                            >
-                    </li>
-                    <li class="nav-item">
+                <li class="nav-item">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
+                        alt="Company logo" id="company-logo">
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa-light fa-house"></i>
                         <p>
@@ -208,6 +205,40 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
+                        <i class="fa-light fa-file-invoice"></i>
+                        <p>
+                            Invoices
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{{ route('order.index') }}" class="nav-link">
+                                <p>Orders</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('order.create') }}" class="nav-link">
+                                <p>Purchases</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa fa-light fa-users"></i>
+                        <p>Еmployees</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-light fa-file-signature"></i>
+                        <p>Contracts</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
                         <i class="fa-light fa-bar-chart" aria-hidden="true"></i>
                         <p>
                             Summaries
@@ -287,7 +318,7 @@
                         <i class="fa fa-light fa-cog" aria-hidden="true"></i>
                         <p>
                             Settings
-                             <i class="right fas fa-angle-left"></i>
+                            <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">

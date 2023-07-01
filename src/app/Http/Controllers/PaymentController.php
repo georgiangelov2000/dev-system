@@ -64,7 +64,10 @@ class PaymentController extends Controller
 
                         $supplierPaymentRecord = SupplierPayment::create($paymentData);
 
-
+                        $supplierPaymentRecord->invoice()->create([
+                            'price' => $purchase->total_price,
+                            'quantity' => $purchase->initial_quantity
+                        ]);                        
 
                     }
                 }
