@@ -29,7 +29,7 @@ class OrderApiController extends Controller
         $orderQuery->select(
             'id',
             'customer_id',
-            'product_id',
+            'purchase_id',
             'invoice_number',
             'tracking_number',
             'sold_quantity',
@@ -57,7 +57,7 @@ class OrderApiController extends Controller
             });
         }
         if($product) {
-            $orderQuery->where('product_id',$product);
+            $orderQuery->where('purchase_id',$product);
         }
         if($order) {
             $orderQuery->where('id',$order);

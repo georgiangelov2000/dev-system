@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\Brand;
-use App\Models\Product;
+use App\Models\Purchase;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\BrandRequest;
 use Illuminate\Http\Request;
@@ -29,18 +29,12 @@ class BrandController extends Controller
                 'description' => $data['description']
             ]);
             DB::commit();
-            Log::info('Brand has been created');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::info($e->getMessage());
             return response()->json(['error' => 'Category has not been created'], 500);
         }
 
         return response()->json(['message' => 'Brand has been created', 200]);
-    }
-
-    public function show($id)
-    {
     }
 
     public function edit(Brand $brand)
@@ -62,8 +56,6 @@ class BrandController extends Controller
                 ]);
 
             DB::commit();
-
-            Log::info('Brand has been updated');
         } catch (\Exception $e) {
             DB::rollback();
             Log::info($e->getMessage());
@@ -79,10 +71,7 @@ class BrandController extends Controller
 
         try {
             $brand->delete();
-
             DB::commit();
-
-            Log::info('Brand has been deleted');
         } catch (\Exception $e) {
             DB::rollback();
             Log::info($e->getMessage());
@@ -109,10 +98,10 @@ class BrandController extends Controller
         try {
             DB::beginTransaction();
     
-            $product = Product::find($purchase_id);
+            $product = Purchase::find($purchase_id);
     
             if (!$product) {
-                throw new \Exception('Product not found');
+                throw new \Exception('Purchase not found');
             }
     
             $brand->purchases()->detach($purchase_id);

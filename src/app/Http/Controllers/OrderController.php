@@ -10,9 +10,8 @@ use App\Models\CustomerPayment;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Order;
-use App\Models\Product;
+use App\Models\Purchase;
 use App\Helpers\LoadStaticData;
-use Datetime;
 
 class OrderController extends Controller
 {
@@ -37,7 +36,7 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
-            $productIds = $request->product_id;
+            $purchaseIds = $request->product_id;
             $trackingNumber = (string) $request->tracking_number;
             $customer = (int) $request->customer_id;
             $orderDateOfSale = date('Y-m-d', strtotime($request->date_of_sale));
@@ -45,25 +44,25 @@ class OrderController extends Controller
 
             $orders = [];
 
-            foreach ($productIds as $key => $productId) {
-                $productId = (int) $productId;
+            foreach ($purchaseIds as $key => $purchaseId) {
+                $purchaseId = (int) $purchaseId;
                 $orderQuantity = (int) $request['sold_quantity'][$key];
                 $orderSinglePrice = (float) $request['single_sold_price'][$key];
                 $orderDiscount = (int) $request['discount_percent'][$key];
 
-                $foundProduct = Product::find($productId);
+                $foundPurchase = Purchase::find($purchaseId);
 
-                if ($foundProduct->initial_quantity < $orderQuantity) {
-                    return back()->with('error', 'Product quantity is not enough' . $foundProduct->name);
+                if ($foundPurchase->initial_quantity < $orderQuantity) {
+                    return back()->with('error', 'Purchase quantity is not enough' . $foundPurchase->name);
                 };
 
-                $foundProduct->quantity -= $orderQuantity;
+                $foundPurchase->quantity -= $orderQuantity;
 
-                if ($foundProduct->quantity === 0) {
-                    $foundProduct->status = 'disabled';
+                if ($foundPurchase->quantity === 0) {
+                    $foundPurchase->status = 'disabled';
                 }
 
-                $foundProduct->save();
+                $foundPurchase->save();
 
                 $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($orderSinglePrice, $orderDiscount);
                 $finalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $orderQuantity);
@@ -71,7 +70,7 @@ class OrderController extends Controller
 
                 $order = [
                     'customer_id' => $customer,
-                    'product_id' => $productId,
+                    'purchase_id' => $purchaseId,
                     'invoice_number' => (string) $request['invoice_number'][$key],
                     'sold_quantity' => $orderQuantity,
                     'single_sold_price' => $finalSinglePrice,
@@ -116,38 +115,38 @@ class OrderController extends Controller
             $status = $request->status;
             $tracking_number = (string) $request->tracking_number;
             $invoice_number = (string) $request->invoice_number;
-            $product_id = (int) $request->product_id;
+            $purchase_id = (int) $request->product_id;
             $sold_quantity = (int) $request->sold_quantity;
             $single_sold_price = (float) $request->single_sold_price;
             $discount_percent = (int) $request->discount_percent;
 
-            $product = Product::with('orders')->findOrFail($order->product_id);
-            $totalSoldQuantity = $product->orders->sum('sold_quantity');
+            $purchase = Purchase::with('orders')->findOrFail($order->purchase_id);
+            $totalSoldQuantity = $purchase->orders->sum('sold_quantity');
             $remainingQuantity = $totalSoldQuantity - $order->sold_quantity;
 
             $updatedQuantity = ($remainingQuantity + $sold_quantity);
 
-            if ($updatedQuantity > $product->initial_quantity) {
-                return back()->with('error', 'Product quantity is not enough');
+            if ($updatedQuantity > $purchase->initial_quantity) {
+                return back()->with('error', 'Purchase quantity is not enough');
             }
 
-            $finalQuantity = ($product->initial_quantity - $updatedQuantity);
-            $product->quantity = $finalQuantity;
+            $finalQuantity = ($purchase->initial_quantity - $updatedQuantity);
+            $purchase->quantity = $finalQuantity;
 
-            if ($product->quantity === 0) {
-                $product->status = 'disabled';
+            if ($purchase->quantity === 0) {
+                $purchase->status = 'disabled';
             } else {
-                $product->status = 'enabled';
+                $purchase->status = 'enabled';
             }
 
-            $product->save();
+            $purchase->save();
 
             $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($single_sold_price, $discount_percent);
             $finalTotalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $sold_quantity);
 
             $order->update([
                 'customer_id' => $customer_id,
-                'product_id' => $product_id,
+                'purchase_id' => $purchase_id,
                 'invoice_number' => $invoice_number,
                 'sold_quantity' => $sold_quantity,
                 'single_sold_price' => $finalSinglePrice,
@@ -197,7 +196,6 @@ class OrderController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             return response()->json(['message' => 'Order has not been updated'], 500);
         }
         return response()->json(['message' => 'Order has been updated'], 200);
@@ -212,7 +210,7 @@ class OrderController extends Controller
             $orderQuantity = $order->sold_quantity;
 
             if (!$product) {
-                throw new \Exception("Product not found");
+                throw new \Exception("Purchase not found");
             }
 
             $product->quantity += $orderQuantity;
@@ -223,7 +221,6 @@ class OrderController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
             return back()->with('error', 'Order has not been deleted');
         }
         return response()->json(['message' => 'Order has been deleted'], 200);

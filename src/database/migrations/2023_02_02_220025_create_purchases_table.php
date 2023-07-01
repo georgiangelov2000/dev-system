@@ -15,10 +15,7 @@ class CreatePurchasesTable extends Migration {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('supplier_id')
-                    ->constrained('suppliers')
-                    ->onUpdate('cascade')
-                    ->onDelete('cascade');
+            $table->unsignedBigInteger('supplier_id');
             $table->unsignedInteger('quantity')->default(0);
             $table->unsignedDecimal('price', 8, 2)->default(0);
             $table->unsignedDecimal('total_price', 8, 2)->default(0);

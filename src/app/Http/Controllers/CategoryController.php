@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use App\Models\Category;
 use App\Models\SubCategory;
-use Illuminate\Support\Facades\Log;
 use App\Http\Requests\CategoryRequest;
 use App\Helpers\LoadStaticData;
 
@@ -37,7 +36,7 @@ class CategoryController extends Controller
                 'description' => $data['description']
             ]);
 
-            if( isset($data['sub_categories']) && count($data['sub_categories']) ) {
+            if (isset($data['sub_categories']) && count($data['sub_categories'])) {
                 foreach ($data['sub_categories'] as $subCategoryId) {
                     $subCategory = SubCategory::findOrFail($subCategoryId);
                     $subCategory->category_id = $category->id;
@@ -46,11 +45,8 @@ class CategoryController extends Controller
             }
 
             DB::commit();
-            Log::info('Category has been created');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
-            Log::info($e->getMessage());
             return response()->json(['error' => 'Category has not been created'], 500);
         }
 
@@ -64,11 +60,10 @@ class CategoryController extends Controller
         $relatedSubCategories = $category->subCategories()->pluck('id')->toArray();
 
         return response()->json([
-            "category" => $category, 
+            "category" => $category,
             'relatedSubCategory' => $relatedSubCategories,
             "allSubCategories" => $allSubCategories
         ]);
-
     }
 
     public function update(Category $category, CategoryRequest $request)
@@ -83,19 +78,17 @@ class CategoryController extends Controller
                 'description' => $data['description']
             ]);
 
-        if( isset($data['sub_categories']) && count($data['sub_categories']) ) {
-            foreach ($data['sub_categories'] as $subCategoryId) {
-                $subCategory = SubCategory::findOrFail($subCategoryId);
-                $subCategory->category_id = $category->id;
-                $subCategory->save();
+            if (isset($data['sub_categories']) && count($data['sub_categories'])) {
+                foreach ($data['sub_categories'] as $subCategoryId) {
+                    $subCategory = SubCategory::findOrFail($subCategoryId);
+                    $subCategory->category_id = $category->id;
+                    $subCategory->save();
+                }
             }
-        }
 
             DB::commit();
-            Log::info('Category has been updated');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::info($e->getMessage());
             return response()->json(['error' => 'Category has been deleted'], 500);
         }
 
@@ -111,7 +104,6 @@ class CategoryController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::info($e->getMessage());
             return response()->json(['message' => 'Category has not been deleted'], 500);
         }
 
@@ -130,7 +122,6 @@ class CategoryController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::info($e->getMessage());
             return response()->json(['message' => 'Sub category has not been detached'], 500);
         }
 

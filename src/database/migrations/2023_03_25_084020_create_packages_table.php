@@ -18,8 +18,10 @@ class CreatePackagesTable extends Migration
             $table->string('package_name');
             $table->string('tracking_number');
             $table->tinyInteger('package_type')->comment('1=Standart,2=Express,3=Overnight');
-            $table->tinyInteger('delievery_method')->comment("1=Ground,2=Air,3=Sea");
-            $table->date('delievery_date')->nullable();
+            $table->tinyInteger('delivery_method')->comment("1=Ground,2=Air,3=Sea");
+            $table->date('delivery_date')->nullable();
+            $table->date('expected_delivery_date')->nullable();
+            $table->tinyInteger('is_it_delivered')->comment('1=delivered,0=not delivered')->default(0);
             $table->string('package_notes')->nullable();
             $table->string('customer_notes')->nullable();
             $table->timestamps();

@@ -8,7 +8,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\CustomerSummaryController;
 use App\Http\Controllers\SupplierSummaryController;
@@ -64,17 +64,17 @@ Route::middleware(['auth'])->group(function () {
     });
     
     Route::prefix('purchases')->name('purchase.')->group(function () {
-        Route::get('/', [ProductController::class, 'index'])->name('index');
-        Route::get('/create', [ProductController::class, 'create'])->name('create');
-        Route::get('/edit/{product}', [ProductController::class, 'edit'])->name('edit');
-        Route::get('/orders/{product}', [ProductController::class, 'orders'])->name('orders');
-        Route::get('/preview/{product}', [ProductController::class, 'preview'])->name('preview');
-        Route::post('/store', [ProductController::class, 'store'])->name('store');
-        Route::put('/update/{product}', [ProductController::class, 'update'])->name('update');
-        Route::put('/mass/edit', [ProductController::class, 'massEditUpdate'])->name('mass.update');
+        Route::get('/', [PurchaseController::class, 'index'])->name('index');
+        Route::get('/create', [PurchaseController::class, 'create'])->name('create');
+        Route::get('/edit/{product}', [PurchaseController::class, 'edit'])->name('edit');
+        Route::get('/orders/{product}', [PurchaseController::class, 'orders'])->name('orders');
+        Route::get('/preview/{product}', [PurchaseController::class, 'preview'])->name('preview');
+        Route::post('/store', [PurchaseController::class, 'store'])->name('store');
+        Route::put('/update/{product}', [PurchaseController::class, 'update'])->name('update');
+        Route::put('/mass/edit', [PurchaseController::class, 'massEditUpdate'])->name('mass.update');
 
-        Route::delete('/delete/{product}', [ProductController::class, 'delete'])->name('delete');
-        Route::delete('/delete/image/{product}', [ProductController::class, 'deleteGalleryImage'])->name('delete.image');
+        Route::delete('/delete/{product}', [PurchaseController::class, 'delete'])->name('delete');
+        Route::delete('/delete/image/{product}', [PurchaseController::class, 'deleteGalleryImage'])->name('delete.image');
     });
 
     Route::prefix('customers')->name('customer.')->group(function () {

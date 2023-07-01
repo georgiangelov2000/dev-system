@@ -21,19 +21,8 @@ class CreateSuppliersTable extends Migration {
             $table->string('zip');
             $table->string('website')->nullable();
             $table->string('notes')->nullable();
-
-            $table->foreignId('state_id')
-                    ->constrained('states')
-                    ->onUpdate('cascade')
-                    ->onDelete('cascade')
-                    ->nullable();
-            
-            $table->foreignId('country_id')
-                    ->constrained('countries')
-                    ->onUpdate('cascade')
-                    ->onDelete('cascade')
-                    ->nullable();
-            
+            $table->unsignedBigInteger('state_id');
+            $table->unsignedBigInteger('country_id');
             $table->timestamps();
         });
     }

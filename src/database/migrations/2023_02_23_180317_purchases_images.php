@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class SupplierImages extends Migration {
+class PurchasesImages extends Migration {
 
     /**
      * Run the migrations.
@@ -12,14 +12,9 @@ class SupplierImages extends Migration {
      * @return void
      */
     public function up() {
-        Schema::create('supplier_images', function (Blueprint $table) {
-
+        Schema::create('purchases_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('supplier_id')
-                    ->constrained('suppliers')
-                    ->onUpdate('cascade')
-                    ->onDelete('cascade')
-                    ->nullable();
+            $table->unsignedBigInteger('purchase_id');
             $table->string('path');
             $table->string('name');
         });
@@ -31,7 +26,7 @@ class SupplierImages extends Migration {
      * @return void
      */
     public function down() {
-        Schema::dropIfExists('supplier_images');
+        Schema::dropIfExists('purchases_images');
     }
 
 }

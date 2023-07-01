@@ -15,21 +15,15 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id')
-                ->constrained('customers')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-            $table->foreignId('product_id')
-                ->constrained('purchases')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-
+            $table->unsignedBigInteger('customer_id');
+            $table->unsignedBigInteger('purchase_id');
             $table->string('invoice_number');
             $table->unsignedInteger('sold_quantity')->default(0);
             $table->unsignedDecimal('single_sold_price', 8, 2)->default(0);
             $table->unsignedDecimal('total_sold_price', 8, 2)->default(0);
             $table->unsignedDecimal('original_sold_price', 8, 2)->default(0);
             $table->unsignedInteger('discount_percent')->default(0);
+            $table->date('package_extension_date')->nullable();
             $table->date('date_of_sale');
             $table->string('tracking_number');
             $table->tinyInteger('status')->comment('1=received,3=pending,4=ordered');

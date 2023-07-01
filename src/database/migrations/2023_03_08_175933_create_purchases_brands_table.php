@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPriceToSupplierPaymentsTable extends Migration
+class CreatePurchasesBrandsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class AddPriceToSupplierPaymentsTable extends Migration
      */
     public function up()
     {
-        Schema::table('supplier_payments', function (Blueprint $table) {
-            $table->unsignedDecimal('price', 8, 2)->default(0);
+        Schema::create('purchases_brands', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('purchase_id');
+            $table->unsignedBigInteger('brand_id');
         });
     }
 
@@ -25,8 +27,6 @@ class AddPriceToSupplierPaymentsTable extends Migration
      */
     public function down()
     {
-        Schema::table('supplier_payments', function (Blueprint $table) {
-            $table->dropColumn('price');
-        });
+        Schema::dropIfExists('purchases_brands');
     }
 }

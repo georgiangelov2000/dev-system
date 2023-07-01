@@ -10,7 +10,7 @@ use App\Models\SubCategory;
 use App\Models\ProductImage;
 use App\Models\Supplier;
 
-class Product extends Model {
+class Purchase extends Model {
     use HasFactory;
 
     /**
@@ -49,19 +49,19 @@ class Product extends Model {
     ];
 
     public function categories() {
-        return $this->belongsToMany(Category::class, 'product_categories');
+        return $this->belongsToMany(Category::class, 'purchases_categories');
     }
 
     public function subcategories() {
-        return $this->belongsToMany(SubCategory::class, 'product_subcategories');
+        return $this->belongsToMany(SubCategory::class, 'purchases_subcategories');
     }
 
     public function brands() {
-        return $this->belongsToMany(Brand::class, 'product_brands');
+        return $this->belongsToMany(Brand::class, 'purchases_brands');
     }
 
     public function images() {
-        return $this->hasMany(ProductImage::class, 'product_id');
+        return $this->hasMany(ProductImage::class, 'purchase_id');
     }
     
     public function supplier() {

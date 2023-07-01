@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\SubCategory;
 use App\Models\Supplier;
-use App\Models\Product;
+use App\Models\Purchase;
 
 class Category extends Model {
 
@@ -50,6 +50,6 @@ class Category extends Model {
 
     public function products()
     {
-        return $this->belongsToMany(Product::class,'product_categories');
+        return $this->belongsToMany(Purchase::class,'purchases_categories');
     }
 }

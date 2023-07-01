@@ -4,16 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Helpers\LoadStaticData;
-use App\Models\Product;
+use App\Models\Purchase;
 use App\Http\Requests\ProductRequest;
 use App\Models\SubCategory;
 use App\Helpers\FunctionsHelper;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class ProductController extends Controller
+class PurchaseController extends Controller
 {
 
     private $staticDataHelper;
@@ -59,7 +58,7 @@ class ProductController extends Controller
 
             $totalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
 
-            $product = Product::create([
+            $purchase = Purchase::create([
                 "name" => $data['name'],
                 "supplier_id" => $data['supplier_id'],
                 "quantity" => $quantity,
@@ -72,22 +71,22 @@ class ProductController extends Controller
             ]);
 
             if ($category) {
-                $product->categories()->sync([$category]);
+                $purchase->categories()->sync([$category]);
             }
 
             if ($subcategories !== null) {
-                $product->subcategories()->sync($subcategories);
+                $purchase->subcategories()->sync($subcategories);
             }
 
             if ($brands !== null) {
-                $product->brands()->sync($brands);
+                $purchase->brands()->sync($brands);
             }
 
             if ($file) {
                 $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
                 Storage::putFileAs($this->dir, $file, $hashed_image);
 
-                $product->images()->create([
+                $purchase->images()->create([
                     'path' => $imagePath,
                     'name' => $hashed_image
                 ]);
@@ -95,22 +94,21 @@ class ProductController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
-            return redirect()->route('purchase.index')->with('error', 'Product has not been created');
+            return redirect()->route('purchase.index')->with('error', 'Purchase has not been created');
         }
-        return redirect()->route('purchase.index')->with('success', 'Product has been created');
+        return redirect()->route('purchase.index')->with('success', 'Purchase has been created');
     }
 
-    public function edit(Product $product)
+    public function edit(Purchase $purchase)
     {
-        $relatedProductData = $this->fetchRelatedProductData($product);
+        $relatedProductData = $this->fetchRelatedProductData($purchase);
 
         $brands = $this->staticDataHelper::callBrands();
         $suppliers = $this->staticDataHelper::callSupliers();
         $categories = $this->staticDataHelper::loadCallCategories();
 
         return view('purchases.edit', compact(
-            'product',
+            'purchase',
             'relatedProductData',
             'suppliers',
             'brands',
@@ -119,7 +117,7 @@ class ProductController extends Controller
         ));
     }
 
-    public function update(Product $product, ProductRequest $request)
+    public function update(Purchase $purchase, ProductRequest $request)
     {
         $data = $request->validated();
 
@@ -134,22 +132,22 @@ class ProductController extends Controller
             $imagePath = Storage::url($this->dir);
 
             if ($category) {
-                $product->categories()->sync([$category]);
+                $purchase->categories()->sync([$category]);
             }
 
             if ($subcategories !== null) {
-                $product->subcategories()->sync($subcategories);
+                $purchase->subcategories()->sync($subcategories);
             }
 
             if ($brands !== null) {
-                $product->brands()->sync($brands);
+                $purchase->brands()->sync($brands);
             }
 
             if ($file) {
                 $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
                 Storage::putFileAs($this->dir, $file, $hashed_image);
 
-                $product->images()->create([
+                $purchase->images()->create([
                     'path' => $imagePath,
                     'name' => $hashed_image
                 ]);
@@ -157,7 +155,7 @@ class ProductController extends Controller
 
             $totalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
 
-            $product->update([
+            $purchase->update([
                 "name" => $data['name'],
                 "supplier_id" => $data['supplier_id'],
                 "quantity" => $data['quantity'],
@@ -172,16 +170,15 @@ class ProductController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
             return redirect()->route('purchase.create')->with('error', 'Product has not updated');
         }
         return redirect()->route('purchase.index')->with('success', 'Product has been updated');
     }
 
-    public function preview(Product $product)
+    public function preview(Purchase $purchase)
     {
-        $product->load('brands', 'categories', 'supplier:id,name', 'subcategories', 'images');
-        return view('purchases.preview', ['product' => $product]);
+        $purchase->load('brands', 'categories', 'supplier:id,name', 'subcategories', 'images');
+        return view('purchases.preview', ['purchase' => $purchase]);
     }
 
     public function massEditUpdate(Request $request)
@@ -195,7 +192,7 @@ class ProductController extends Controller
             'sub_category_ids' => 'nullable|array'
         ]);
 
-        $productIds = $validated['purchase_ids'];
+        $purchaseIds = $validated['purchase_ids'];
         $requestedQuantity = $validated['quantity'] ?? null;
         $requestedPrice = $validated['price'] ?? null;
         $requestedCategoryId = $validated['category_id'] ?? null;
@@ -205,40 +202,40 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            foreach ($productIds as $productId) {
-                $product = Product::find($productId);
+            foreach ($purchaseIds as $purchaseId) {
+                $purchase = Purchase::find($purchaseId);
 
-                if ($product) {
+                if ($purchase) {
                     if ($requestedQuantity !== null && $requestedQuantity !== null) {
-                        $product->quantity = $requestedQuantity;
-                        $product->initial_quantity = $requestedQuantity;
-                        $product->price = $requestedPrice;
+                        $purchase->quantity = $requestedQuantity;
+                        $purchase->initial_quantity = $requestedQuantity;
+                        $purchase->price = $requestedPrice;
                     } elseif ($requestedQuantity !== null) {
-                        $product->quantity = $requestedQuantity;
-                        $product->initial_quantity = $requestedQuantity;
+                        $purchase->quantity = $requestedQuantity;
+                        $purchase->initial_quantity = $requestedQuantity;
                     } elseif ($requestedPrice !== null) {
-                        $product->price = $requestedPrice;
+                        $purchase->price = $requestedPrice;
                     }
 
                     if ($requestedCategoryId !== null) {
-                        $product->categories()->sync([$requestedCategoryId]);
+                        $purchase->categories()->sync([$requestedCategoryId]);
                     }
                     if (!empty($subCategoryIds)) {
-                        $product->subcategories()->sync($subCategoryIds);
+                        $purchase->subcategories()->sync($subCategoryIds);
                     }
                     if (!empty($brandIds)) {
-                        $product->brands()->sync($brandIds);
+                        $purchase->brands()->sync($brandIds);
                     }
 
-                    $product->total_price = FunctionsHelper::calculatedFinalPrice($product->price, $product->quantity);
+                    $purchase->total_price = FunctionsHelper::calculatedFinalPrice($purchase->price, $purchase->quantity);
 
-                    $orders_quantity = $product->orders->sum('sold_quantity');
+                    $orders_quantity = $purchase->orders->sum('sold_quantity');
 
-                    $final_product_quantity = ($product->initial_quantity - $orders_quantity);
+                    $final_purchase_quantity = ($purchase->initial_quantity - $orders_quantity);
 
-                    $product->quantity = $final_product_quantity;
+                    $purchase->quantity = $final_purchase_quantity;
 
-                    $product->save();
+                    $purchase->save();
                 }
             }
 
@@ -246,58 +243,55 @@ class ProductController extends Controller
             return response()->json(['message' => 'Purchases has been updated'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::info($e->getMessage());
             return response()->json(['message' => 'Purchases has not been updated'], 500);
         }
     }
-    public function fetchRelatedProductData($productModel)
+    public function fetchRelatedProductData($purchaseModel)
     {
-        $productModel->load('categories:id', 'subcategories:id', 'brands:id');
+        $purchaseModel->load('categories:id', 'subcategories:id', 'brands:id');
 
         $categorySubCategories = SubCategory::select('id', 'name')
-            ->whereIn('category_id', $productModel->categories->pluck('id'))
+            ->whereIn('category_id', $purchaseModel->categories->pluck('id'))
             ->get()
             ->toArray();
 
         return [
             'categorySubCategories' => $categorySubCategories,
-            'productCategory' => $productModel->categories->pluck('id')->first(),
-            'productSubCategories' => $productModel->subcategories->pluck('id')->toArray(),
-            'productBrands' => $productModel->brands->pluck('id')->toArray(),
+            'purchaseCategory' => $purchaseModel->categories->pluck('id')->first(),
+            'purchaseSubCategories' => $purchaseModel->subcategories->pluck('id')->toArray(),
+            'purchaseBrands' => $purchaseModel->brands->pluck('id')->toArray(),
         ];
     }
 
-    public function delete(Product $product)
+    public function delete(Purchase $purchase)
     {
         DB::beginTransaction();
 
         try {
 
-            if (!empty($product->images)) {
-                $image_names = $product->images()->pluck('name');
+            if (!empty($purchase->images)) {
+                $image_names = $purchase->images()->pluck('name');
 
                 foreach ($image_names as $key => $images) {
                     Storage::delete($this->dir . DIRECTORY_SEPARATOR . $images);
                 }
             }
 
-            $product->delete();
+            $purchase->delete();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
-            Log::info($e->getMessage());
-            return response()->json(['message' => 'Product has not been deleted'], 500);
+            return response()->json(['message' => 'Purchase has not been deleted'], 500);
         }
-        return response()->json(['message' => 'Product has been deleted'], 200);
+        return response()->json(['message' => 'Purchase has been deleted'], 200);
     }
 
-    public function deleteGalleryImage(Product $product, Request $request)
+    public function deleteGalleryImage(Purchase $purchase, Request $request)
     {
         DB::beginTransaction();
 
         try {
-            $image = $product->images()->find($request->id);
+            $image = $purchase->images()->find($request->id);
             if ($image) {
                 Storage::delete($this->dir . DIRECTORY_SEPARATOR . $image->name);
                 $image->delete();
@@ -305,15 +299,14 @@ class ProductController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
             return response()->json(['message' => 'Image has not been deleted'], 500);
         }
 
         return response()->json(['message' => 'Image has been deleted'], 200);
     }
 
-    public function orders(Product $product)
+    public function orders(Purchase $purchase)
     {
-        return view('purchases.orders', compact('product'));
+        return view('purchases.orders', compact('purchase'));
     }
 }

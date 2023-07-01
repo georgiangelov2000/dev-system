@@ -62,7 +62,6 @@ class PackageController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
             return back()->withInput()->with('error', 'Package has not been created');
         }
 
@@ -104,7 +103,6 @@ class PackageController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
             return back()->withInput()->with('error', 'Failed to update package');
         }
 
@@ -161,8 +159,6 @@ class PackageController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
-            Log::info($e->getMessage());
             return response()->json(['message' => 'Package has not beed deleted'], 500);
         }
         return response()->json(['message' => 'Package has been deleted'], 200);

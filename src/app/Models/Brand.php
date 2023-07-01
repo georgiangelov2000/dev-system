@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Product;
+use App\Models\Purchase;
 
 class Brand extends Model {
 
@@ -37,7 +37,7 @@ class Brand extends Model {
     protected $fillable = ['id', 'name','description'];
 
     public function purchases() {
-        return $this->belongsToMany(Product::class, 'product_brands');
+        return $this->belongsToMany(Purchase::class, 'purchases_brands');
     }
 
 }

@@ -10,7 +10,7 @@ use App\Helpers\FunctionsHelper;
 use App\Helpers\LoadStaticData;
 use App\Models\Customer;
 use App\Models\Order;
-use App\Models\Product;
+use App\Models\Purchase;
 use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
@@ -189,21 +189,21 @@ class CustomerController extends Controller
                 $discount = (int) $data['discount_percent'][$key];
 
                 $order = Order::where('id',$orderId);
-                $product = Product::with('orders')->findOrFail($order->first()->product_id);
+                $purchase = Purchase::with('orders')->findOrFail($order->first()->purchase_id);
 
-                $totalSoldQuantity = $product->orders->sum('sold_quantity');
+                $totalSoldQuantity = $purchase->orders->sum('sold_quantity');
                 $remainingQuantity = ($totalSoldQuantity - $order->first()->sold_quantity);
 
                 $updatedQuantity = ($remainingQuantity + $soldQuantity);
                 
-                if($updatedQuantity > $product->initial_quantity) {
-                    return back()->with('error', 'Product quantity is not enough'.$product->name);
+                if($updatedQuantity > $purchase->initial_quantity) {
+                    return back()->with('error', 'Purchase quantity is not enough'.$purchase->name);
                 }
 
-                $finalQuantity = ($product->initial_quantity - $updatedQuantity);
-                $product->quantity = $finalQuantity;
+                $finalQuantity = ($purchase->initial_quantity - $updatedQuantity);
+                $purchase->quantity = $finalQuantity;
                 
-                $product->save();
+                $purchase->save();
 
                 $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($singlePrice, $discount);
                 $finalTotalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $soldQuantity);    

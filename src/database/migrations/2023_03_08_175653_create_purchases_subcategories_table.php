@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddExpectedDeliveryDateColumnToPackages extends Migration
+class CreatePurchasesSubcategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class AddExpectedDeliveryDateColumnToPackages extends Migration
      */
     public function up()
     {
-        Schema::table('packages', function (Blueprint $table) {
-            $table->date('expected_delivery_date')->nullable();
+        Schema::create('purchases_subcategories', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('purchase_id');
+            $table->unsignedBigInteger('sub_category_id');
         });
     }
 
@@ -25,8 +27,6 @@ class AddExpectedDeliveryDateColumnToPackages extends Migration
      */
     public function down()
     {
-        Schema::table('packages', function (Blueprint $table) {
-            $table->date('expected_delivery_date')->dropColumn();
-        });
+        Schema::dropIfExists('purchases_subcategories');
     }
 }

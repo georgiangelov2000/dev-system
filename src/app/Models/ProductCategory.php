@@ -14,7 +14,7 @@ class ProductCategory extends Model {
      *
      * @var string
      */
-    protected $table = 'product_categories';
+    protected $table = 'purchases_categories';
 
     /**
      * The primary key associated with the table.
@@ -37,7 +37,7 @@ class ProductCategory extends Model {
      */
     protected $fillable = [
         'id',
-        'product_id',
+        'purchase_id',
         'category_id',
     ];
 

@@ -15,14 +15,8 @@ class CreatePackagesOrdersTable extends Migration
     {
         Schema::create('packages_orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('package_id')
-            ->constrained('packages')
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
-            $table->foreignId('order_id')
-            ->constrained('orders')
-            ->onUpdate('cascade')
-            ->onDelete('cascade');
+            $table->unsignedBigInteger('package_id');
+            $table->unsignedBigInteger('order_id');
         });
     }
 

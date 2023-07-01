@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPackageExtensionDateToOrders extends Migration
+class CreatePurchasesCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class AddPackageExtensionDateToOrders extends Migration
      */
     public function up()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->date('package_extension_date')->nullable();
+        Schema::create('purchases_categories', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('purchase_id');
+            $table->unsignedBigInteger('category_id');
         });
     }
 
@@ -25,8 +27,6 @@ class AddPackageExtensionDateToOrders extends Migration
      */
     public function down()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('package_extension_date');
-        });
+        Schema::dropIfExists('purchases_categories');
     }
 }

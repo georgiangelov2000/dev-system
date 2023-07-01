@@ -17,17 +17,8 @@ class CreateCompanySettingsTable extends Migration
             $table->id();
             $table->string('email')->unique();
             $table->string('name');
-            $table->foreignId('state_id')
-            ->constrained('states')
-            ->onUpdate('cascade')
-            ->onDelete('cascade')
-            ->nullable();
-    
-            $table->foreignId('country_id')
-            ->constrained('countries')
-            ->onUpdate('cascade')
-            ->onDelete('cascade')
-            ->nullable();
+            $table->unsignedBigInteger('state_id');
+            $table->unsignedBigInteger('country_id');
             $table->string('phone_number');
             $table->string('tax_number');
             $table->string('address');

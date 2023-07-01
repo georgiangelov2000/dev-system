@@ -14,11 +14,7 @@ class CreateCustomerImagesTable extends Migration
     public function up()
     {
         Schema::create('customer_images', function (Blueprint $table) {
-            $table->foreignId('customer_id')
-                    ->constrained('customers')
-                    ->onUpdate('cascade')
-                    ->onDelete('cascade')
-                    ->nullable();
+            $table->unsignedBigInteger('customer_id');
             $table->string('path');
             $table->string('name');
         });

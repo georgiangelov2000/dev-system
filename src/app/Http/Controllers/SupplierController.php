@@ -169,7 +169,7 @@ class SupplierController extends Controller
         try {
 
             if ($supplier->purchases()->exists()) {
-                return response()->json(['message' => 'Supplier has related products'], 500);
+                return response()->json(['message' => 'Supplier has related purchases'], 500);
             }
 
             if($supplier->image) {

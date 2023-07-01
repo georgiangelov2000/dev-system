@@ -39,7 +39,7 @@ class ProductBrand extends Model
      */
     protected $fillable = [
         'id',
-        'product_id',
+        'purchase_id',
         'brand_id',
     ];
 
