@@ -1,5 +1,4 @@
 @extends('app')
-@section('title', 'Customer payments')
 
 @section('content')
     <div class="row justify-content-between mb-3">

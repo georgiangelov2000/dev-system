@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
-    public function createSupplierPayment()
+    public function createPurchasePayment()
     {
         $suppliers = Supplier::has('purchases')->select('id', 'name')->get();
 
@@ -35,10 +35,10 @@ class PaymentController extends Controller
     public function editSupplierPayment(PurchasePayment $payment)
     {
         $payment->load('purchase.supplier');
-        return view('payments.edit_supplier_payment', compact('payment'));
+        return view('payments.edit_purchase_payment', compact('payment'));
     }
 
-    public function storeSupplierPayment(PurchasePaymentRequest $request)
+    public function storePurchasePayment(PurchasePaymentRequest $request)
     {
         DB::beginTransaction();
 
@@ -78,6 +78,17 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Payment has not been created'], 200);
+        }
+    }
+
+    public function updateSupplierPayment(PurchasePayment $payment, PurchasePaymentRequest $request){
+        DB::beginTransaction();
+        dd($payment);
+        try {
+            $data = $request->validated();
+            dd($data);
+        } catch (\Exception $e) {
+            //throw $th;
         }
     }
 }

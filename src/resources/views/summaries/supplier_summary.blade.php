@@ -1,5 +1,4 @@
 @extends('app')
-@section('title', 'Supplier summary')
 
 @section('content')
     <div class="row justify-content-between mb-3">

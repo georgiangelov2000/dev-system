@@ -1,5 +1,4 @@
 @extends('app')
-@section('title', 'Company settings')
 
 @section('content')
     <div class="card card-default cardTemplate">
@@ -84,7 +83,7 @@
                             <div class="form-group col-3">
                                 <label for="comapny-name">Company name</label>
                                 <input value="{{ $company->name ?? "" }}" type="text" name="name" id="comapany-name"
-                                    class="form-control" placeholder="Enter comapny name" />
+                                    class="form-control" placeholder="Enter company name" />
                                 @error('name')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror

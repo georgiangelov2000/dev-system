@@ -1,5 +1,4 @@
 @extends('app')
-@section('title', 'Comapny payment')
 
 @section('content')
     <div class="row flex-wrap">
@@ -11,7 +10,7 @@
             </div>
             <div class="card-body">
                 <div class="col-12 d-flex flex-wrap">
-                    <form action="" class="col-12" method="POST">
+                    <form class="col-12" method="POST">
                         @method('PUT')
                         @csrf
                         <div class="form-group col-12">
@@ -28,12 +27,14 @@
                             <label for="payment_method">Payment method</label>
                             <select class="form-control" name="payment_method" id="payment_method">
                                 @foreach (config('statuses.payment_methods_statuses') as $key => $val)
-                                    <option {{ $key === $payment->payment_method ? 'selected' : '' }}
-                                        value="{{ $key }}">
+                                    <option {{ $key === $payment->payment_method ? 'selected' : '' }} value="{{ $key }}">
                                         {{ $val }}
                                     </option>
                                 @endforeach
                             </select>
+                            @error('payment_method')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="form-group col-12">
                             <label for="payment_status">Payment status</label>
@@ -45,6 +46,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @error('payment_status')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="form-group col-12">
                             <label for="payment_status">Payment reference</label>

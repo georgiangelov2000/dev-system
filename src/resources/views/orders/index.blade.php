@@ -1,5 +1,4 @@
 @extends('app')
-@section('title', 'Orders')
 
 @section('content')
     <div class="row">

@@ -1,5 +1,4 @@
 @extends('app')
-@section('title', 'Create purchase payments')
 
 @section('content')
     <div class="row">
@@ -27,7 +26,7 @@
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div>
                 </div>
-                <form id="paymentPurchases" class="col-12" action="{{route('payment.store.supplier.payment')}}" method="POST">
+                <form id="paymentPurchases" class="col-12" action="{{route('payment.store.purchase.payment')}}" method="POST">
                     @csrf
 
                     <table id="purchases" class="table table-hover table-sm">

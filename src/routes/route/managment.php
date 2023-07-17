@@ -132,10 +132,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/customers', [PaymentController::class, 'customerPayments'])->name('customer');
         Route::get('/suppliers', [PaymentController::class, 'supplierPayments'])->name('supplier');
 
-        Route::get('/purchases', [PaymentController::class, 'createSupplierPayment'])->name('create.supplier.payment');
-        Route::post('/store/purchase/payments', [PaymentController::class, 'storeSupplierPayment'])->name('store.supplier.payment');
-
-        Route::get('/suppliers{payment}', [PaymentController::class, 'editSupplierPayment'])->name('supplier.edit');
+        Route::get('/purchases', [PaymentController::class, 'createPurchasePayment'])->name('create.purchase.payment');
+        Route::post('/store/purchase/payments', [PaymentController::class, 'storePurchasePayment'])->name('store.purchase.payment');
+    
+        Route::get('/suppliers/{payment}', [PaymentController::class, 'editSupplierPayment'])->name('supplier.edit');
     });
 
     Route::prefix('states')->name('state')->group(function(){

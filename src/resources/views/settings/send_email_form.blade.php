@@ -1,5 +1,4 @@
 @extends('app')
-@section('title', 'Company settings')
 
 @section('content')
     <div class="card card-default cardTemplate">
