@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Helpers\LoadStaticData;
 use App\Models\Supplier;
-use App\Models\SupplierPayment;
 use App\Http\Requests\PurchasePaymentRequest;
-use App\Models\InvoicePurchase;
 use App\Models\Purchase;
 use App\Models\PurchasePayment;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +24,7 @@ class PaymentController extends Controller
     {
         $suppliers = Supplier::has('purchases')->select('id', 'name')->get();
 
-        return view('payments.supplier_payments', [
+        return view('payments.purchase_payments', [
             'suppliers' => $suppliers
         ]);
     }
@@ -81,14 +78,19 @@ class PaymentController extends Controller
         }
     }
 
-    public function updateSupplierPayment(PurchasePayment $payment, PurchasePaymentRequest $request){
+    public function updatePurchasePayment(PurchasePayment $payment, PurchasePaymentRequest $request){
         DB::beginTransaction();
-        dd($payment);
         try {
             $data = $request->validated();
-            dd($data);
+            $data['notes'] = $data['notes'] ?? '';   
+
+            $payment->update($data);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Payment has been updated');
         } catch (\Exception $e) {
-            //throw $th;
+            DB::rollback();
+            return back()->withInput()->with('error', 'Payment has not been updated');
         }
     }
 }

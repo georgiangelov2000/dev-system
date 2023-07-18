@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\PurchasePayment;
 class InvoicePurchase extends Model
 {
     use HasFactory;
@@ -26,11 +26,15 @@ class InvoicePurchase extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'supplier_payment_id',
+        'purchase_payment_id',
         'invoice_number',
         'invoice_date',
         'price',
         'quantity',
         'status'
     ];
+
+    public function purchasePayment(){
+        return $this->belongsTo(PurchasePayment::class);
+    }
 }

@@ -46,6 +46,6 @@ class PurchasePayment extends Model
 
     public function invoice()
     {
-        return $this->hasOne(InvoicePurchase::class, 'supplier_payment_id');
+        return $this->hasOne(InvoicePurchase::class, 'purchase_payment_id');
     }
 }

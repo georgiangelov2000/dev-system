@@ -17,28 +17,15 @@ class PurchasePaymentApiController extends Controller
 
         $supplier = isset($request->supplier) && is_numeric($request->supplier) ? $request->supplier : null;
         $date = isset($request->date) && $request->date ? $request->date : null;
-        
+
         $dates = $this->formatDateRange($date);
-        $offset = $request->input('start', 0);  
+        $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
-        
+
         $paymentQ = PurchasePayment::query()
-            ->with(['purchase' => function ($query) {
-                $query->select(
-                    'id',
-                    'name',
-                    'supplier_id',
-                    'quantity',
-                    'price',
-                    'total_price',
-                    'initial_quantity',
-                    'notes',
-                    'code',
-                    'status',
-                    'is_paid'
-                );
-            }])
-            ->whereHas('purchase', function ($query) {
+            ->with(
+                ['purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,status,is_paid', 'invoice']
+            )->whereHas('purchase', function ($query) {
                 $query->where('is_paid', 1);
             });
 
@@ -79,7 +66,7 @@ class PurchasePaymentApiController extends Controller
 
         $filteredRecords = $paymentQ->count();
         $totalRecords = $paymentQ->count();
-        
+
         return response()->json([
             'draw' => intval($request->input('draw')),
             'recordsTotal' => $totalRecords,
@@ -87,7 +74,7 @@ class PurchasePaymentApiController extends Controller
             'data' => $result,
             'supplier' => $supplierObj,
             'date' => $dateToString,
-            'sum' => number_format($paymentQ->sum('price'),2,'.','')
+            'sum' => number_format($paymentQ->sum('price'), 2, '.', '')
         ]);
     }
 

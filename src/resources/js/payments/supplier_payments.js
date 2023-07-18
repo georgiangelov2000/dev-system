@@ -42,7 +42,6 @@ $(function () {
 
     function loadDataTable() {
         let table = `
-        <div class="card col-12 cardTemplate p-0">
             <div class="p-3 mb-3">
 
                 <div class="row">
@@ -116,11 +115,10 @@ $(function () {
                     </button>
                 </div>
             </div>
-        </div>
     </div>`;
-    
-        $('#paymentTemplate').html(table);
-    
+
+        $('#paymentTemplate').removeClass('d-none').html(table);
+
         dataTable = $('#paymentsTable').DataTable({
             serverSide: true,
             ajax: {
@@ -130,7 +128,7 @@ $(function () {
                     data.date = dateRangePicker.val();
                 },
                 dataSrc: function (response) {
-                    
+
                     let supplierData = response.supplier;
                     let sum = response.sum;
                     let date = response.date ? response.date : '';
@@ -146,6 +144,7 @@ $(function () {
                     $('span[data-target="city"]').text(supplierData.state.name);
                     $('span[data-target="zip"]').text(supplierData.zip);
                     $('#amountDueTable td[data-td-target="sum"]').text('€' + sum);
+                    $('#amountDueTable td[data-td-target="records"]').text(response.data.length);
 
                     return response.data;
                 }
@@ -184,17 +183,21 @@ $(function () {
                 { data: 'payment_status', orderable: false },
                 { data: 'notes', orderable: false },
                 {
-                    orderable:false,
-                    render: function (data,type,row) {
-                        return `
-                        <a href="${SUPPLIER_PAYMENT_EDIT.replace(':id',row.id)}">
+                    orderable: false,
+                    render: function (data, type, row) {
+                        let edit = `
+                        <a title="Edit" class="btn p-0" href="${SUPPLIER_PAYMENT_EDIT.replace(':id', row.id)}">
                             <i class="fa-light fa-pen text-primary"></i>
                         </a>
                         `;
+
+                        let invoice = `<a target="_blank" href="${INVOICE_PURCHASE_EDIT.replace(':id',row.invoice.id)}" title="Invoice" class="btn p-0"> <i class="fa-light fa-file-invoice text-primary"></i> </a>`;
+
+                        return `${edit} ${invoice}`;
                     }
                 }
             ]
         });
     }
-    
+
 })

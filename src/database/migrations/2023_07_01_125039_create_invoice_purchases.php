@@ -15,7 +15,7 @@ class CreateInvoicePurchases extends Migration
     {
         Schema::create('invoice_purchases', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('supplier_payment_id');
+            $table->unsignedBigInteger('purchase_payment_id');
             $table->string('invoice_number')->nullable()->unique();
             $table->date('invoice_date')->nullable();
             $table->unsignedDecimal('price')->default(0);

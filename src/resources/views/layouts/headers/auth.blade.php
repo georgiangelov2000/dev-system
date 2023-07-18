@@ -205,28 +205,6 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="fa-light fa-file-invoice"></i>
-                        <p>
-                            Invoices
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('order.index') }}" class="nav-link">
-                                <p>Orders</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('order.create') }}" class="nav-link">
-                                <p>Purchases</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
                         <i class="fa fa-light fa-users"></i>
                         <p>Еmployees</p>
                     </a>

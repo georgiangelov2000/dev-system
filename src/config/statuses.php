@@ -20,7 +20,6 @@ return [
         1 => true
     ],
     'payment_methods_statuses' => [
-        0 => '',
         1 => 'Cash',
         2 => 'Bank Transfer',
         3 => 'Credit Card',
@@ -28,7 +27,6 @@ return [
         5 => 'Online Payment'
     ],
     'payment_statuses' => [
-        0 => '',
         1 => 'Pending',
         2 => 'Paid',
         3 => 'Partially Paid',

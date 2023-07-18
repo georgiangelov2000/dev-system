@@ -3,6 +3,11 @@
 @section('content')
     <div class="row">
         <div class="card col-12 cardTemplate">
+            <div class="card-header">
+                <div class="col-12">
+                    <h3 class="card-title">Payments Overview</h3>
+                </div>
+            </div>
             <div class="card-body">
                 <div class="form-row">
                     <div class="col-3">
@@ -43,18 +48,15 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 p-0">
-            <div id="paymentTemplate" class="col-12 table-responsive">
-
-            </div>
-        </div>
+        <div id="paymentTemplate" class="card col-12 cardTemplate table-responsive d-none"></div>
     </div>
 
     @push('scripts')
         <script type="text/javascript" src="{{ mix('js/payments/supplier_payments.js') }}"></script>
         <script type="text/javascript">
             const SUPPLIER_PAYMENTS_API = "{{ route('api.supplier.payments') }}";
-            const SUPPLIER_PAYMENT_EDIT = "{{ route('payment.supplier.edit',':id') }}"
+            const SUPPLIER_PAYMENT_EDIT = "{{ route('payment.supplier.edit',':id') }}";
+            const INVOICE_PURCHASE_EDIT = "{{ route('invoice.edit',':id') }}";
         </script>
     @endpush
 

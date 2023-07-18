@@ -29,7 +29,7 @@
                 <div class="tab-content" id="custom-tabs-one-tabContent">
                     <div class="tab-pane active show" id="custom-tabs-one-home" role="tabpanel"
                         aria-labelledby="custom-tabs-one-home-tab">
-                        <form class="d-flex flex-wrap" action='{{ route('purchase.update', $product->id) }}' method='POST'
+                        <form class="d-flex flex-wrap" action='{{ route('purchase.update',$purchase->id) }}' method='POST'
                             enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
@@ -37,7 +37,7 @@
                             <div class="row flex-wrap">
                                 <div class="col-10 d-flex flex-wrap p-2">
 
-                                    @if (count($product->images) < 3)
+                                    @if (count($purchase->images) < 3)
                                         <div class="form-group col-6">
                                             <div style="height:30px">
                                                 <label for="image">File</label>
@@ -61,7 +61,7 @@
                                     <div class="form-group col-6">
                                         <label for="name">Name</label>
                                         <input type="text" class="form-control @error('name')  is-invalid @enderror"
-                                            id="name" name="name" value='{{ e($product->name) }}'
+                                            id="name" name="name" value='{{ e($purchase->name) }}'
                                             placeholder="Enter name">
                                         @error('name')
                                             <span class="text-danger">{{ $message }}</span>
@@ -71,7 +71,7 @@
                                         <label for="quantity">Quantity</label>
                                         <input type="number" placeholder="Enter quantity"
                                             class="form-control @error('quantity')  is-invalid @enderror" id="quantity"
-                                            name="quantity" min="1" value='{{ e($product->quantity) }}'>
+                                            name="quantity" min="1" value='{{ e($purchase->quantity) }}'>
                                         @error('quantity')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -79,7 +79,7 @@
                                     <div class="form-group col-6">
                                         <label for="price">Price</label>
                                         <input type="text" class="form-control @error('price')  is-invalid @enderror"
-                                            id="price" name="price" value='{{ e($product->price) }}'
+                                            id="price" name="price" value='{{ e($purchase->price) }}'
                                             placeholder="Enter price">
                                         @error('price')
                                             <span class="text-danger">{{ $message }}</span>
@@ -91,7 +91,7 @@
                                             <div class="input-group">
                                                 <input type="text"
                                                     class="form-control @error('code')  is-invalid @enderror" id="code"
-                                                    name="code" value='{{ e($product->code) }}'
+                                                    name="code" value='{{ e($purchase->code) }}'
                                                     placeholder="Generate code">
                                                 <span class="input-group-append">
                                                     <button type="button"
@@ -104,7 +104,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="notes">Notes</label>
-                                            <textarea cols="3" rows="8" class="form-control" name="notes">{{ e($product->notes) }}</textarea>
+                                            <textarea cols="3" rows="8" class="form-control" name="notes">{{ e($purchase->notes) }}</textarea>
                                         </div>
                                     </div>
                                     <div class="form-group col-6">
@@ -113,7 +113,7 @@
                                             <select class="form-control selectSupplier" name="supplier_id">
                                                 @foreach ($suppliers as $supplier)
                                                     <option value="{{ $supplier->id }}"
-                                                        {{ $supplier->id == $product->supplier_id ? 'selected' : '' }}>
+                                                        {{ $supplier->id == $purchase->supplier_id ? 'selected' : '' }}>
                                                         {{ $supplier->name }}</option>
                                                 @endforeach
                                             </select>
@@ -127,7 +127,7 @@
                                                 <option value="0">Nothing selected</option>
                                                 @foreach ($categories as $category)
                                                     <option
-                                                        {{ $category->id === $relatedProductData['productCategory'] ? 'selected' : '' }}
+                                                        {{ $category->id === $relatedProductData['purchaseCategory'] ? 'selected' : '' }}
                                                         value="{{ $category->id }}">{{ $category->name }}
                                                     </option>
                                                 @endforeach
@@ -142,7 +142,7 @@
                                                 multiple>
                                                 @foreach ($relatedProductData['categorySubCategories'] as $subcategory)
                                                     <option
-                                                        {{ in_array($subcategory['id'], $relatedProductData['productSubCategories']) ? 'selected' : '' }}
+                                                        {{ in_array($subcategory['id'], $relatedProductData['purchaseSubCategories']) ? 'selected' : '' }}
                                                         value="{{ $subcategory['id'] }}">{{ $subcategory['name'] }}
                                                     </option>
                                                 @endforeach
@@ -156,7 +156,7 @@
                                                 <option value="0">Nothing selected</option>
                                                 @foreach ($brands as $brand)
                                                     <option
-                                                        {{ in_array($brand->id, $relatedProductData['productBrands']) ? 'selected' : '' }}
+                                                        {{ in_array($brand->id, $relatedProductData['purchaseBrands']) ? 'selected' : '' }}
                                                         value="{{ $brand->id }}">{{ $brand->name }}</option>
                                                 @endforeach
                                             </select>
@@ -170,11 +170,11 @@
                                 </div>
                                 <div class="col-2 p-2">
                                     <div class="row w-100">
-                                        @if ($product->images && count($product->images) > 1)
+                                        @if ($purchase->images && count($purchase->images) > 1)
                                             <div id="carouselExampleControls" class="col-12 carousel slide"
                                                 data-ride="carousel">
                                                 <div class="carousel-inner rounded">
-                                                    @foreach ($product->images as $index => $image)
+                                                    @foreach ($purchase->images as $index => $image)
                                                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                                                             <img class="img-fluid cardWidgetImage d-block card card-widget w-100"
                                                                 src="{{ $image->path . '/' . $image->name }}"
@@ -193,10 +193,10 @@
                                                     <span class="sr-only">Next</span>
                                                 </a>
                                             </div>
-                                        @elseif ($product->images && count($product->images) === 1)
+                                        @elseif ($purchase->images && count($purchase->images) === 1)
                                             <div class="col-12 mb-3">
                                                 <img class="cardWidgetImage w-100 m-0"
-                                                    src="{{ $product->images[0]->path .'/' . $product->images[0]->name }}" />
+                                                    src="{{ $purchase->images[0]->path .'/' . $purchase->images[0]->name }}" />
                                             </div>
                                         @else
                                             <div class="col-12 mb-3">
@@ -223,9 +223,9 @@
                     </div>
                     <div class="tab-pane fade" id="custom-tabs-one-profile" role="tabpanel"
                         aria-labelledby="custom-tabs-one-profile-tab">
-                        @if (count($product->images))
+                        @if (count($purchase->images))
                             <div class="col-12 d-flex p-2">
-                                @foreach ($product->images as $image)
+                                @foreach ($purchase->images as $image)
                                     <div class="col-3 productImage" style="position: relative;">
                                         <img style="height: 200px; object-fit: contain;"
                                             class="d-block card card-widget widget-user w-100"
@@ -233,7 +233,7 @@
                                         <form   
                                             id="deleteImageForm" 
                                             data-image-id="{{ $image->id }}"
-                                            action="{{ route('purchase.delete.image', $product->id) }}" 
+                                            action="{{ route('purchase.delete.image', $purchase->id) }}" 
                                             method="POST"
                                             onsubmit="deleteImage(event)"
                                         >

@@ -14,6 +14,7 @@ use App\Http\Controllers\CustomerSummaryController;
 use App\Http\Controllers\SupplierSummaryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,7 +50,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [BrandController::class, 'store'])->name('store');
         Route::delete('/delete/{brand}', [BrandController::class, 'delete'])->name('delete');
         Route::delete('/detach/purchase/{brand}', [BrandController::class, 'detachPurchase'])->name('detach.purchase');
-        Route::get('/purchases/{brand}',[BrandController::class, 'purchases'])->name('purchases');
+        Route::get('/purchases/{brand}', [BrandController::class, 'purchases'])->name('purchases');
     });
 
     Route::prefix('suppliers')->name('supplier.')->group(function () {
@@ -62,19 +63,19 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/delete/{supplier}', [SupplierController::class, 'delete'])->name('delete');
         Route::get('/detach/category/{category}', [SupplierController::class, 'detachCategory'])->name('detach.category');
     });
-    
+
     Route::prefix('purchases')->name('purchase.')->group(function () {
         Route::get('/', [PurchaseController::class, 'index'])->name('index');
         Route::get('/create', [PurchaseController::class, 'create'])->name('create');
-        Route::get('/edit/{product}', [PurchaseController::class, 'edit'])->name('edit');
-        Route::get('/orders/{product}', [PurchaseController::class, 'orders'])->name('orders');
+        Route::get('/edit/{purchase}', [PurchaseController::class, 'edit'])->name('edit');
+        Route::get('/orders/{purchase}', [PurchaseController::class, 'orders'])->name('orders');
         Route::get('/preview/{product}', [PurchaseController::class, 'preview'])->name('preview');
         Route::post('/store', [PurchaseController::class, 'store'])->name('store');
-        Route::put('/update/{product}', [PurchaseController::class, 'update'])->name('update');
+        Route::put('/update/{purchase}', [PurchaseController::class, 'update'])->name('update');
         Route::put('/mass/edit', [PurchaseController::class, 'massEditUpdate'])->name('mass.update');
 
-        Route::delete('/delete/{product}', [PurchaseController::class, 'delete'])->name('delete');
-        Route::delete('/delete/image/{product}', [PurchaseController::class, 'deleteGalleryImage'])->name('delete.image');
+        Route::delete('/delete/{purchase}', [PurchaseController::class, 'delete'])->name('delete');
+        Route::delete('/delete/image/{purchase}', [PurchaseController::class, 'deleteGalleryImage'])->name('delete.image');
     });
 
     Route::prefix('customers')->name('customer.')->group(function () {
@@ -87,7 +88,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/delete/{customer}', [CustomerController::class, 'delete'])->name('delete');
         Route::get('/orders/{customer}', [CustomerController::class, 'customerOrders'])->name('orders');
     });
-    
+
     Route::prefix('orders')->name('order.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('/create', [OrderController::class, 'create'])->name('create');
@@ -119,7 +120,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/payment', [PackageController::class, 'createPayment'])->name('create.customer.payment');
     });
 
-    Route::prefix('settings')->name('settings.')->group(function(){
+    Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/company', [SettingsController::class, 'companySettingsForm'])->name('company');
         Route::get('/email', [SettingsController::class, 'emailForm'])->name('email');
         Route::get('/server', [SettingsController::class, 'serverInformation'])->name('server');
@@ -127,18 +128,25 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/send/email', [SettingsController::class, 'sendEmailForm'])->name('email.send');
         Route::put('/comapny/update', [SettingsController::class, 'updateCompanySettings'])->name('company.update');
     });
-    
-    Route::prefix('payments')->name('payment.')->group(function(){
+
+    Route::prefix('payments')->name('payment.')->group(function () {
         Route::get('/customers', [PaymentController::class, 'customerPayments'])->name('customer');
         Route::get('/suppliers', [PaymentController::class, 'supplierPayments'])->name('supplier');
 
         Route::get('/purchases', [PaymentController::class, 'createPurchasePayment'])->name('create.purchase.payment');
-        Route::post('/store/purchase/payments', [PaymentController::class, 'storePurchasePayment'])->name('store.purchase.payment');
-    
+        Route::post('/store/purchase/payment', [PaymentController::class, 'storePurchasePayment'])->name('store.purchase');
+        Route::put('/update/purchase/payment/{payment}', [PaymentController::class, 'updatePurchasePayment'])->name('update.purchase');
+
         Route::get('/suppliers/{payment}', [PaymentController::class, 'editSupplierPayment'])->name('supplier.edit');
     });
 
-    Route::prefix('states')->name('state')->group(function(){
+    Route::prefix('invoices')->name('invoice.')->group(function () {
+        Route::get('/edit/{invoice}', [InvoiceController::class, 'edit'])->name('edit');
+
+        Route::put('/update/{invoice}', [InvoiceController::class, 'updatePurchaseInvoice'])->name('purchase.update');
+    });
+
+    Route::prefix('states')->name('state')->group(function () {
         Route::get('/state/{countryId}', [SupplierController::class, 'getState']);
     });
 });
