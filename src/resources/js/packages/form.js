@@ -21,6 +21,7 @@ $(function () {
       { width: "5%", targets: 5, class:"text-center" },
       { width: "5%", targets: 6, class:"text-center" },
       { width: "5%", targets: 7, class:"text-center" },
+      { width: "5%", targets: 8, class:"text-center" },
       // add more targets and widths as needed
     ]
   });

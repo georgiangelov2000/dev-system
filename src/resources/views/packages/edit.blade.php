@@ -28,11 +28,7 @@
 
                         <div class="form-group col-3">
                             <label for="tracking_number">Tracking number</label>
-                            <input 
-                                type="text" 
-                                name="tracking_number" 
-                                placeholder="Tracking number" 
-                                id="tracking_number"
+                            <input type="text" name="tracking_number" placeholder="Tracking number" id="tracking_number"
                                 class="form-control" value="{{ $package->tracking_number }}" />
                             @error('tracking_number')
                                 <span class="text-danger">{{ $message }}</span>
@@ -82,12 +78,8 @@
                                         <i class="far fa-calendar-alt"></i>
                                     </span>
                                 </div>
-                                <input 
-                                    type="text"
-                                    class="form-control datepicker" 
-                                    name="expected_delivery_date"
-                                    value="{{$package->expected_delivery_date}}"
-                                >
+                                <input type="text" class="form-control datepicker" name="expected_delivery_date"
+                                    value="{{ $package->expected_delivery_date }}">
                                 <small id="emailHelp" class="form-text text-muted">
                                     When the delivery date for a package is interited, the purchase date will be
                                     automatically adjusted to reflect the new delivery date
@@ -132,14 +124,18 @@
                                 <th>Single sold price</th>
                                 <th>Total sold price</th>
                                 <th>Sold quantity</th>
+                                <th>Paid</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($package->orders as $order)
                                 <tr name="package">
                                     <td>
-                                        <button onclick='removeRow(this)' class='btn p-0'><i
-                                                class='fa-light fa-trash text-danger'></i></button>
+                                        @if (!$order->status === 1 && !$order->is_paid === 1)
+                                            <button onclick='removeRow(this)' class='btn p-0'>
+                                                <i class='fa-light fa-trash text-danger'></i>
+                                            </button>
+                                        @endif
                                     </td>
                                     <td>
                                         {{ $order->id }}
@@ -161,6 +157,11 @@
                                         €{{ $order->total_sold_price }}
                                     <td>
                                         {{ $order->sold_quantity }}
+                                    </td>
+                                    <td>
+                                        @if($order->status === 1 && $order->is_paid === 1 && $order->orderPayments)
+                                            <span class="text-success">Yes</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

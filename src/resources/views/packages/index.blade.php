@@ -122,7 +122,7 @@
     @include('templates.edit_single_modal_form', [
         'title' => 'Delivered package',
         'labelOne' => 'Official delivered date',
-        'inputOne' => 'delievery_date',
+        'inputOne' => 'delivery_date',
         'formMethod' => 'POST',
         'inputType' => 'text',
         'isDatePicker' => true

@@ -198,7 +198,7 @@ $(function () {
                 orderable: false,
                 name: "is_paid",
                 render: function (data, type, row) {
-                    if (row.is_paid) {
+                    if (row.is_paid == 1 && row.status == 'Received') {
                         return '<span class="text-success">Yes</span>';
                     } else {
                         return '<span class="text-danger">No</span>';

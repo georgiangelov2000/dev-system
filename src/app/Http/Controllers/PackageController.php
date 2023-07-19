@@ -120,6 +120,7 @@ class PackageController extends Controller
 
             if(isset($specificColumns['delivery_date'])) {
                 $specificColumns['delivery_date'] = date('Y-m-d', strtotime($specificColumns['delivery_date']));
+                $specificColumns['is_it_delivered'] = 1;
             }
 
             $package->update($specificColumns);

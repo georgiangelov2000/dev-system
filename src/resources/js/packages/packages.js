@@ -1,8 +1,8 @@
 import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
-import {showConfirmationDialog,openModal,swalText,closeModal,submit} from '../helpers/action_helpers';
+import { showConfirmationDialog, openModal, swalText, closeModal, submit } from '../helpers/action_helpers';
 
 $(function () {
-    
+
     $('input[name="delivery_date"]').datepicker({
         format: 'yyyy-mm-dd'
     });
@@ -17,9 +17,9 @@ $(function () {
     let editModal = $('#editModal');
     let editSubmitButton = editModal.find('#submitForm');
     let closeModalBtn = $('.modalCloseBtn');
-    
+
     let bootstrapPackageType = $('.bootstrap-select .selectPackageType');
-    
+
     let bootstrapDelieveryMethod = $('.bootstrap-select .selectDelieveryMethod');
     let bootstrapSelectCustomer = $('.bootstrap-select .selectCustomer');
 
@@ -38,19 +38,19 @@ $(function () {
         serverSide: true,
         ajax: {
             url: PACKAGE_API_ROUTE,
-            data: function (d){
+            data: function (d) {
                 let orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
                 let orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
-                
-                return $.extend({},d,{
+
+                return $.extend({}, d, {
                     "search": d.search.value,
                     'package': bootstrapPackageType.val(),
                     'delivery': bootstrapDelieveryMethod.val(),
-                    'customer' : bootstrapSelectCustomer.val(),
+                    'customer': bootstrapSelectCustomer.val(),
                     'delivery_date': deliveryRange,
                     'order_column': orderColumnName, // send the column name being sorted
                     'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
-                    'limit': d.custom_length = d.length, 
+                    'limit': d.custom_length = d.length,
                 })
 
             }
@@ -113,7 +113,7 @@ $(function () {
                 orderable: false,
                 render: function (data, type, row) {
                     let paidPercentage = row.paid_percentage;
-            
+
                     let progressHTML = `
                         <div class="progress" title=${paidPercentage}>
                             <div 
@@ -127,7 +127,7 @@ $(function () {
                                 <span class="sr-only">${paidPercentage}% Complete (success)</span>
                             </div>
                     `;
-            
+
                     return progressHTML;
                 }
             },
@@ -137,9 +137,9 @@ $(function () {
                 render: function (data, type, row) {
                     let paidOrdersCount = row.paid_orders_count;
                     let unpaidOrdersCount = row.unpaid_orders_count;
-            
+
                     let displayText = `<a class='text-success' ">${paidOrdersCount} paid</a> / <a class='text-danger'>${unpaidOrdersCount} unpaid</a>`;
-            
+
                     return displayText;
                 }
             },
@@ -156,15 +156,15 @@ $(function () {
                 data: 'delivery_date',
             },
             {
-                orderable:false,
+                orderable: false,
                 width: "5%",
-                name:'created_at',
+                name: 'created_at',
                 render: function (data, type, row) {
                     return `<span>${moment(row.created_at).format('YYYY-MM-DD')}<span>`
                 }
             },
             {
-                orderable:false,
+                orderable: false,
                 width: "5%",
                 name: 'updated_at',
                 render: function (data, type, row) {
@@ -180,7 +180,7 @@ $(function () {
                     var dateOfDelivery = moment(row.expected_delivery_date);
                     var currentDate = moment();
                     var daysRemaining = dateOfDelivery.diff(currentDate, 'days');
-            
+
                     if (currentDate.isAfter(dateOfDelivery, 'day') && !row.is_it_delivered) {
                         return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
                     } else if (row.status === 'Received') {
@@ -192,14 +192,14 @@ $(function () {
                         return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
                     }
                 }
-            },            
+            },
             {
-                orderable:false,
-                width:'1%',
-                name:'is_it_delivered',
+                orderable: false,
+                width: '1%',
+                name: 'is_it_delivered',
                 class: 'text-center',
-                render:function(data,type,row) {
-                    if(row.is_it_delivered){
+                render: function (data, type, row) {
+                    if (row.is_it_delivered) {
                         return `<span class="text-success">Yes</span>`
                     } else {
                         return `<span class="text-danger">No</span>`
@@ -210,19 +210,12 @@ $(function () {
                 orderable: false,
                 width: '50%',
                 name: 'actions',
-                class:'text-center',
+                class: 'text-center',
                 render: function (data, type, row) {
                     let deliveredBtn = '';
+                    let deleteFormTemplate = '';
 
-                    let deleteFormTemplate = "\
-                    <form style='display:inline-block;' action=" + PACKAGE_DELETE_ROUTE.replace(':id', row.id) + " id='delete-form' method='POST' data-name='" + row.package_name + "' >\
-                        <input type='hidden' name='_method' value='DELETE'>\
-                        <input type='hidden' name='id' value='" + row.id + "'>\
-                        <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentPackage(this);'><i class='fa-light fa-trash text-danger'></i></button>\
-                    </form>\
-                    ";                    
-
-                    let editButton = '<a href='+PACKAGE_EDIT_ROUTE.replace(':id',row.id)+' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+                    let editButton = '<a href=' + PACKAGE_EDIT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
 
                     let delieveryDropdown = `
                     <div class="dropdown d-inline">
@@ -240,9 +233,9 @@ $(function () {
                     </div>
                 `;
 
-                let orders = `<a href="${PACKGE_MASS_DELETE_ORDERS.replace(":id",row.id)}" class="btn p-1" title="Orders"><i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
+                    let orders = `<a href="${PACKGE_MASS_DELETE_ORDERS.replace(":id", row.id)}" class="btn p-1" title="Orders"><i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
 
-                let packageDropdown = `
+                    let packageDropdown = `
                     <div class="dropdown d-inline">
                         <button class="btn text-primary p-0" title="Change type" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa-light fa-rotate-right"></i>
@@ -257,9 +250,16 @@ $(function () {
                         </div>
                     </div>
                     `;
-
-                    if(!row.is_it_delivered) {
+                    
+                    if (!row.is_it_delivered) {
                         deliveredBtn = `<button data-id=${row.id} title="Mark as delivered" class="btn p-0 text-success delivered-btn" type="button"><i class="fa-light fa-check"></i></button>`;
+                        deleteFormTemplate = "\
+                        <form style='display:inline-block;' action=" + PACKAGE_DELETE_ROUTE.replace(':id', row.id) + " id='delete-form' method='POST' data-name='" + row.package_name + "' >\
+                            <input type='hidden' name='_method' value='DELETE'>\
+                            <input type='hidden' name='id' value='" + row.id + "'>\
+                            <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentPackage(this);'><i class='fa-light fa-trash text-danger'></i></button>\
+                        </form>\
+                        "
                     }
 
                     return ` ${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${delieveryDropdown} ${deliveredBtn}`;
@@ -281,7 +281,7 @@ $(function () {
 
     // Actions
 
-    bootstrapPackageType.bind('changed.bs.select',function(e, clickedIndex, isSelected, previousValue){
+    bootstrapPackageType.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         dataTable.ajax.reload(null, false);
     })
 
@@ -293,13 +293,13 @@ $(function () {
         dataTable.ajax.reload(null, false);
     });
 
-    closeModalBtn.on('click',function(){
+    closeModalBtn.on('click', function () {
         closeModal(editModal);
     })
 
-    editSubmitButton.on('click',function(e){
+    editSubmitButton.on('click', function (e) {
         e.preventDefault();
-        submit(e,editModal,table);
+        submit(e, editModal, table);
     })
 
     $(document).on('click', '.change-delivery-method-btn', function (e) {
@@ -355,8 +355,8 @@ $(function () {
 
     // Window actions
 
-    $(document).on('click', '.delivered-btn', function(e) {
-        openModal(editModal, PACKAGE_UPDATE_ROUTE.replace(':id',$(this).data('id')));
+    $(document).on('click', '.delivered-btn', function (e) {
+        openModal(editModal, PACKAGE_UPDATE_ROUTE.replace(':id', $(this).data('id')));
     });
 
     window.selectPackage = function (e) {
@@ -397,14 +397,14 @@ $(function () {
 
         let template = swalText(searchedNames);
 
-        showConfirmationDialog('Selected packages',template,function(){
+        showConfirmationDialog('Selected packages', template, function () {
             APIDELETECALLER(PACKAGE_DELETE_ROUTE.replace(':id', id), function (response) {
                 toastr['success'](response.message);
                 dataTable.ajax.reload(null, false);
             }, function (error) {
                 toastr['error'](error.message);
             });
-        },function(error){
+        }, function (error) {
             console.log(error);
         })
     };
