@@ -39,11 +39,11 @@
                     <div class="col-12 d-flex flex-wrap p-0">
                         <div class="form-group col-2">
                             <label for="price">Single price</label>
-                            <input type="text" placeholder="Price" class="form-control" name="price" id="price">
+                            <input type="text" class="form-control" name="price" id="price">
                         </div>
                         <div class="form-group col-2">
                             <label for="quantity">Quantity</label>
-                            <input type="number" placeholder="Quantity" class="form-control" name="quantity"
+                            <input type="number" class="form-control" name="quantity"
                                 id="quantity">
                         </div>
                         <div class="form-group col-2">

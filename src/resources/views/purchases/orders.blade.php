@@ -4,7 +4,7 @@
     <div class="card card-default cardTemplate">
         <div class="card-header">
             <div class="col-12">
-                <h3 class="card-title">Orders for {{ $product->name }}</h3>
+                <h3 class="card-title">Orders for {{ $purchase->name }}</h3>
             </div>
         </div>
         <div class="card-body">
@@ -57,7 +57,7 @@
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/purchases/orders.js') }}"></script>
     <script type="text/javascript">
-        let PRODUCT_ID = "{{$product->id}}"
+        let PRODUCT_ID = "{{$purchase->id}}"
         let ORDER_API_ROUTE = "{{route('api.orders')}}";
         let CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}"
     </script>
