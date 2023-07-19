@@ -5,16 +5,16 @@
         <div class="card col-12 cardTemplate">
             <div class="card-header">
                 <div class="col-12">
-                    <h3 class="card-title">Purchase payments</h3>
+                    <h3 class="card-title">Order payments</h3>
                 </div>
             </div>
             <div class="card-body">
                 <div class="form-row">
                     <div class="col-3">
-                        <label for="customRange1">Select supplier</label>
-                        <select class="form-control selectSupplier" name="customer">
+                        <label for="customRange1">Select Customer</label>
+                        <select class="form-control selectCustomer" name="customer">
                             <option value="0">Nothing selected</option>
-                            @foreach ($suppliers as $item)
+                            @foreach ($customers as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                             @endforeach
                         </select>
@@ -29,7 +29,7 @@
                         <div class="col mb-2">
                             <label></label>
                         </div>
-                        <button title="Filter" class="btn btn-primary filter" type="button">
+                        <button id="filter" title="Filter" class="btn btn-primary" type="button">
                             <i class="fa-light fa-magnifying-glass"></i>
                         </button>
                     </div>
@@ -52,11 +52,11 @@
     </div>
 
     @push('scripts')
-        <script type="text/javascript" src="{{ mix('js/payments/supplier_payments.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/payments/customer_payments.js') }}"></script>
         <script type="text/javascript">
-            const SUPPLIER_PAYMENTS_API = "{{ route('api.supplier.payments') }}";
-            const SUPPLIER_PAYMENT_EDIT = "{{ route('payment.purchase.edit',':id') }}";
-            const INVOICE_PURCHASE_EDIT = "{{ route('invoice.purchase.edit',':id') }}";
+            const ORDER_PAYMENT_API = "{{route('api.order.payments')}}";
+            const ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
+            const ORDER_PAYMENT_EDIT_ROUTE = "{{route('payment.edit.order',':id')}}"
         </script>
     @endpush
 

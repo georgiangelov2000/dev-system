@@ -134,16 +134,22 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/suppliers', [PaymentController::class, 'supplierPayments'])->name('supplier');
 
         Route::get('/purchases', [PaymentController::class, 'createPurchasePayment'])->name('create.purchase.payment');
+        Route::get('/purchase/{payment}', [PaymentController::class, 'editPurchasePayment'])->name('purchase.edit');
         Route::post('/store/purchase/payment', [PaymentController::class, 'storePurchasePayment'])->name('store.purchase');
         Route::put('/update/purchase/payment/{payment}', [PaymentController::class, 'updatePurchasePayment'])->name('update.purchase');
 
-        Route::get('/suppliers/{payment}', [PaymentController::class, 'editSupplierPayment'])->name('supplier.edit');
+        Route::get('/orders', [PaymentController::class, 'createOrderPayment'])->name('create.order');
+        Route::get('/order/{payment}', [PaymentController::class, 'editOrderPayment'])->name('edit.order');
+
     });
 
     Route::prefix('invoices')->name('invoice.')->group(function () {
-        Route::get('/edit/{invoice}', [InvoiceController::class, 'edit'])->name('edit');
-
+        Route::get('/edit/{invoice}', [InvoiceController::class, 'editPurchaseInvoice'])->name('purchase.edit');
         Route::put('/update/{invoice}', [InvoiceController::class, 'updatePurchaseInvoice'])->name('purchase.update');
+
+
+        Route::get('/order/edit/{invoice}', [InvoiceController::class, 'editOrderInvoice'])->name('purchase.edit');
+        Route::put('/order/update/{invoice}', [InvoiceController::class, 'updatePurchaseInvoice'])->name('purchase.update');
     });
 
     Route::prefix('states')->name('state')->group(function () {

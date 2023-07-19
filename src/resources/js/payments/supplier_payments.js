@@ -1,5 +1,3 @@
-import { APIPOSTCALLER } from '../ajax/methods';
-
 $(function () {
     $('.selectSupplier').selectpicker('refresh').val('').trigger('change')
 

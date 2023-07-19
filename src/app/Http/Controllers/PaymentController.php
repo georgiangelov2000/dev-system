@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Supplier;
 use App\Http\Requests\PurchasePaymentRequest;
 use App\Models\Purchase;
+use App\Models\Customer;
+use App\Models\InvoiceOrder;
+use App\Models\OrderPayment;
 use App\Models\PurchasePayment;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +32,12 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function editSupplierPayment(PurchasePayment $payment)
+    public function customerPayments(){
+        $customers = Customer::has('orders')->select('id','name')->get();
+        return view('payments.order_payments',['customers' => $customers]);
+    }
+
+    public function editPurchasePayment(PurchasePayment $payment)
     {
         $payment->load('purchase.supplier');
         return view('payments.edit_purchase_payment', compact('payment'));
@@ -92,5 +100,16 @@ class PaymentController extends Controller
             DB::rollback();
             return back()->withInput()->with('error', 'Payment has not been updated');
         }
+    }
+
+
+    // Order payments
+    public function createOrderPayment(){
+        return view('orders.create_payment');
+    }
+
+    public function editOrderPayment(OrderPayment $payment){
+        $payment->load('order');
+        return view('orders.edit_payment',compact('payment'));
     }
 }

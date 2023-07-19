@@ -16,9 +16,13 @@ class CreateOrderPaymentsTable extends Migration
         Schema::create('order_payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('order_id');
-            $table->date('date_of_payment');
-            $table->unsignedDecimal('price',8,2)->default(0);
             $table->unsignedInteger('quantity')->default(0);
+            $table->unsignedDecimal('price',8,2)->default(0);
+            $table->tinyInteger('payment_method')->nullable()->comment('1: Cash, 2: Bank Transfer, 3: Credit Card, 4: Cheque, 5: Online Payment');
+            $table->string('payment_reference')->default('N/A');
+            $table->tinyInteger('payment_status')->nullable()->comment('1: Pending, 2: Paid, 3: Partially Paid, 4: Overdue, 5: Refunded, 6: Other');
+            $table->string('notes')->default('');
+            $table->date('date_of_payment');
         });
     }
 
