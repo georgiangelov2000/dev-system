@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Supplier;
+use App\Http\Requests\OrderPaymentRequest;
 use App\Http\Requests\PurchasePaymentRequest;
 use App\Models\Purchase;
 use App\Models\Customer;
@@ -32,9 +33,10 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function customerPayments(){
-        $customers = Customer::has('orders')->select('id','name')->get();
-        return view('payments.order_payments',['customers' => $customers]);
+    public function customerPayments()
+    {
+        $customers = Customer::has('orders')->select('id', 'name')->get();
+        return view('payments.order_payments', ['customers' => $customers]);
     }
 
     public function editPurchasePayment(PurchasePayment $payment)
@@ -72,8 +74,7 @@ class PaymentController extends Controller
                         $supplierPaymentRecord->invoice()->create([
                             'price' => $purchase->total_price,
                             'quantity' => $purchase->initial_quantity
-                        ]);                        
-
+                        ]);
                     }
                 }
             }
@@ -86,14 +87,12 @@ class PaymentController extends Controller
         }
     }
 
-    public function updatePurchasePayment(PurchasePayment $payment, PurchasePaymentRequest $request){
+    public function updatePurchasePayment(PurchasePayment $payment, PurchasePaymentRequest $request)
+    {
         DB::beginTransaction();
         try {
             $data = $request->validated();
-            $data['notes'] = $data['notes'] ?? '';   
-
             $payment->update($data);
-
             DB::commit();
             return redirect()->back()->with('success', 'Payment has been updated');
         } catch (\Exception $e) {
@@ -104,12 +103,28 @@ class PaymentController extends Controller
 
 
     // Order payments
-    public function createOrderPayment(){
+    public function createOrderPayment()
+    {
         return view('orders.create_payment');
     }
 
-    public function editOrderPayment(OrderPayment $payment){
-        $payment->load('order');
-        return view('orders.edit_payment',compact('payment'));
+    public function editOrderPayment(OrderPayment $payment)
+    {
+        $payment->load('order.customer');
+        return view('orders.edit_payment', compact('payment'));
+    }
+
+    public function updateOrderPayment(OrderPayment $payment, OrderPaymentRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->validated();
+            $payment->update($data);
+            DB::commit();
+            return redirect()->back()->with('success', 'Payment has been updated');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withInput()->with('error', 'Payment has not been updated');
+        }
     }
 }

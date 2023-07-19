@@ -30,7 +30,10 @@ class OrderPayment extends Model
         'order_id',
         'price',
         'quantity',
-        'date_of_payment'
+        'date_of_payment',
+        'payment_method',
+        'payment_reference',
+        'payment_status'
     ];
 
     public function order()

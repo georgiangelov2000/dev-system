@@ -136,10 +136,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/purchases', [PaymentController::class, 'createPurchasePayment'])->name('create.purchase.payment');
         Route::get('/purchase/{payment}', [PaymentController::class, 'editPurchasePayment'])->name('purchase.edit');
         Route::post('/store/purchase/payment', [PaymentController::class, 'storePurchasePayment'])->name('store.purchase');
-        Route::put('/update/purchase/payment/{payment}', [PaymentController::class, 'updatePurchasePayment'])->name('update.purchase');
+        Route::put('/update/purchase/{payment}', [PaymentController::class, 'updatePurchasePayment'])->name('update.purchase');
 
         Route::get('/orders', [PaymentController::class, 'createOrderPayment'])->name('create.order');
         Route::get('/order/{payment}', [PaymentController::class, 'editOrderPayment'])->name('edit.order');
+        Route::put('/update/order/{payment}', [PaymentController::class, 'updateOrderPayment'])->name('update.order');
 
     });
 
