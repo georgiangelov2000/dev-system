@@ -1,4 +1,3 @@
-import { APICaller } from "../ajax/methods";
 import { handleErrors } from '../helpers/action_helpers';
 
 $(function () {

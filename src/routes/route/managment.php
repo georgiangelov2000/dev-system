@@ -97,8 +97,6 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{order}', [OrderController::class, 'update'])->name('update');
         Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
         Route::put('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
-        Route::get('/create/payment', [OrderController::class, 'createPayment'])->name('create.payment');
-        Route::post('/store/payment', [OrderController::class, 'storePayment'])->name('store.payment');
     });
 
     Route::prefix('summary')->name('summary.')->group(function () {
@@ -133,13 +131,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/customers', [PaymentController::class, 'customerPayments'])->name('customer');
         Route::get('/suppliers', [PaymentController::class, 'supplierPayments'])->name('supplier');
 
-        Route::get('/purchases', [PaymentController::class, 'createPurchasePayment'])->name('create.purchase.payment');
+        Route::get('/purchases', [PaymentController::class, 'createPurchasePayment'])->name('purchase');
         Route::get('/purchase/{payment}', [PaymentController::class, 'editPurchasePayment'])->name('purchase.edit');
         Route::post('/store/purchase/payment', [PaymentController::class, 'storePurchasePayment'])->name('store.purchase');
         Route::put('/update/purchase/{payment}', [PaymentController::class, 'updatePurchasePayment'])->name('update.purchase');
 
-        Route::get('/orders', [PaymentController::class, 'createOrderPayment'])->name('create.order');
+        Route::get('/orders', [PaymentController::class, 'createOrderPayment'])->name('orders');
         Route::get('/order/{payment}', [PaymentController::class, 'editOrderPayment'])->name('edit.order');
+        Route::post('/store/order/payment', [PaymentController::class, 'storeOrderPayment'])->name('store.order');
         Route::put('/update/order/{payment}', [PaymentController::class, 'updateOrderPayment'])->name('update.order');
 
     });

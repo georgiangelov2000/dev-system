@@ -257,12 +257,12 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('order.create.payment') }}" class="nav-link">
+                            <a href="{{ route('payment.orders') }}" class="nav-link">
                                 <p>Order payments</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('payment.create.purchase.payment') }}" class="nav-link">
+                            <a href="{{ route('payment.purchase') }}" class="nav-link">
                                 <p>Purchase payments</p>
                             </a>
                         </li>

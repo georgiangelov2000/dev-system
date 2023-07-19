@@ -8,7 +8,7 @@ use App\Http\Requests\OrderPaymentRequest;
 use App\Http\Requests\PurchasePaymentRequest;
 use App\Models\Purchase;
 use App\Models\Customer;
-use App\Models\InvoiceOrder;
+use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\PurchasePayment;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +23,8 @@ class PaymentController extends Controller
             'suppliers' => $suppliers
         ]);
     }
+
+
 
     public function supplierPayments()
     {
@@ -105,13 +107,58 @@ class PaymentController extends Controller
     // Order payments
     public function createOrderPayment()
     {
-        return view('orders.create_payment');
+        $customers = Customer::has('orders')->select('id', 'name')->get();
+        return view('orders.create_payment', ['customers' => $customers]);
     }
 
     public function editOrderPayment(OrderPayment $payment)
     {
         $payment->load('order.customer');
         return view('orders.edit_payment', compact('payment'));
+    }
+
+    public function storeOrderPayment(OrderPaymentRequest $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            $data = $request->validated();
+            
+            if (isset($data['order_id']) && count($data['order_id'])) {
+                $orders = $data['order_id'];
+
+                foreach ($orders as $key => $id) {
+                    $order = Order::find($id);
+
+                    if ($order) {
+                        $order->is_paid = 1;
+                        $order->status = 1;
+                        $order->save();
+
+                        $paymentData = [
+                            'order_id' => $id,
+                            'price' => $data['price'][$key],
+                            'quantity' => $data['quantity'][$key],
+                            'date_of_payment' => date('Y-m-d', strtotime($data['date_of_payment'][$key]))
+                        ];
+
+                        $orderInvoice = OrderPayment::create($paymentData);
+
+                        $orderInvoice->invoice()->create([
+                            'price' => $data['price'][$key],
+                            'quantity' => $data['quantity'][$key]
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Payment has been created'], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            dd($e->getMessage());
+            return response()->json(['message' => 'Payment has not been created'], 500);
+        }
     }
 
     public function updateOrderPayment(OrderPayment $payment, OrderPaymentRequest $request)

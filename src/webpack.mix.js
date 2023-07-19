@@ -30,6 +30,7 @@ mix.js('resources/js/customers/payments.js', 'public/js/customers'),
 
 mix.js('resources/js/orders/form.js', 'public/js/orders'),
 mix.js('resources/js/orders/orders.js', 'public/js/orders'),
+mix.js('resources/js/orders/payments.js', 'public/js/orders'),
 
 mix.js('resources/js/packages/form.js', 'public/js/packages'),
 mix.js('resources/js/packages/packages.js', 'public/js/packages'),

@@ -217,44 +217,4 @@ class OrderController extends Controller
         }
         return response()->json(['message' => 'Order has been deleted'], 200);
     }
-
-    public function createPayment()
-    {
-        return view('payments.create_customer_payments');
-    }
-
-    public function storePayment(OrderPaymentRequest $request)
-    {
-        DB::beginTransaction();
-
-        try {
-            $ids = $request->id;
-            
-            if (count($ids)) {
-                foreach ($ids as $key => $value) {
-
-                    $order = Order::where('id', $value)->update([
-                        'status' => 1,
-                        'is_paid' => 1
-                    ]);
-
-                    if ($order > 0) {
-                        OrderPayment::create([
-                            'order_id' => $value,
-                            'date_of_payment' => date('Y-m-d', strtotime($request->date_of_payment[$key])),
-                            'price' => $request->price[$key],
-                            'quantity' => $request->quantity[$key],
-                        ]);
-                    }
-                }
-            }
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => "Package payment has not been created"], 500);
-        }
-
-        return response()->json(['message' => "Package payment has been created"], 200);
-    }
 }

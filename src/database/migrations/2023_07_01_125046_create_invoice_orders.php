@@ -16,8 +16,8 @@ class CreateInvoiceOrders extends Migration
         Schema::create('invoice_orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('order_payment_id');
-            $table->string('invoice_number')->unique();
-            $table->date('invoice_date');
+            $table->string('invoice_number')->nullable()->unique();
+            $table->date('invoice_date')->nullable();
             $table->unsignedDecimal('price')->default(0);
             $table->unsignedInteger('quantity')->default(0);
             $table->tinyInteger('status')->comment('1: Projecting, 2: Paid,3: Not paid');
