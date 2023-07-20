@@ -93,6 +93,7 @@
                                 <label class="form-check-label" for="flexCheckDefault"></label>
                             </div>
                         </th>
+                        <th>Payment</th>
                         <th>ID</th>
                         <th class='text-center'>Image</th>
                         <th>Name</th>
@@ -128,8 +129,9 @@
             let EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
             let EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
             let CATEGORY_ROUTE = "{{ route('api.subcategories') }}";
-            let CONFIG_URL = "{{config('app.url')}}"
-            let ORDERS = "{{route('purchase.orders',':id')}}"
+            let CONFIG_URL = "{{config('app.url')}}";
+            let ORDERS = "{{route('purchase.orders',':id')}}";
+            let PAYMENT = "{{route('payment.purchase.edit',':id')}}";
         </script>
     @endpush
 

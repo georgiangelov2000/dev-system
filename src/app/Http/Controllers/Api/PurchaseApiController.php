@@ -111,7 +111,7 @@ class PurchaseApiController extends Controller
                 $purchaseQuery->get()
             );
         } else {
-            $purchaseQuery->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name', "orders:id,status,is_paid"]);
+            $purchaseQuery->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name', 'orders:id,status,is_paid','payment:id,purchase_id,date_of_payment']);
 
             $purchaseQuery
                 ->withCount([

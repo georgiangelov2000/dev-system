@@ -186,7 +186,20 @@ $(function () {
         {
           name: 'payment_status',
           render: function (data, type, row) {
-            return `<span>${row.payment_status ? row.payment_status : ''}</span>`
+            if(row.payment_status === 'Paid') {
+              return `<i title="Paid" class="fa-light fa-check"></i>`
+            }
+            else if(row.payment_status === 'Pending') {
+              return `<i title="Pending" class="fa-light fa-loader"></i>`
+            }
+            else if(row.payment_status === 'Overdue') {
+              return `<i title="Overdue" class="fa-light fa-exclamation"></i>`
+            } else if(row.payment_status === 'Refunded') {
+              return `<i title="Refunded" class="fa-light fa-rotate-left"></i>`
+            } 
+            else {
+              return '';
+            }
           }
         },
         {

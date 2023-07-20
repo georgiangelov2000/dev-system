@@ -163,12 +163,11 @@ class CustomerController extends Controller
         DB::beginTransaction();
         try {
 
-            if ($customer->orders()->exists()) {
+            if ($customer->orders->count() > 0) {
                 return response()->json(['message' => 'Customer has related orders and cannot be deleted'], 500);
             }
 
-            $customer->orders()->delete();
-            $customer_image = $customer->image;
+            $customer_image = $customer->image;            
             if ($customer_image) {
                 $imagePath = storage_path('app/public/images/customers/' . $customer_image->name);
 

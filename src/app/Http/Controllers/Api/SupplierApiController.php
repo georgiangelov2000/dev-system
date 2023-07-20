@@ -59,7 +59,7 @@ class SupplierApiController extends Controller {
             'notes',
             'state_id',
             'country_id'
-        ]);
+        ])->withCount('purchases');
 
         $totalRecords = Supplier::count();
         $filteredRecords = $supplierQuery->count();

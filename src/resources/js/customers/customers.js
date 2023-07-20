@@ -1,6 +1,6 @@
 import { APICaller, APICallerWithoutData } from '../ajax/methods';
 
-$(function(){
+$(function () {
     let table = $('#customersTable');
     $('.selectAction, .selectCountry, .selectState').selectpicker('refresh').val('').trigger('change');
 
@@ -8,51 +8,51 @@ $(function(){
     const selectState = $('.bootstrap-select .selectState');
 
     let dataTable = table.DataTable({
-        serverSide:true,
+        serverSide: true,
         dom: 'Bfrtip',
         buttons: [
             {
-              extend: 'copy',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
-              }
+                extend: 'copy',
+                class: 'btn btn-outline-secondary',
+                exportOptions: {
+                    columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
+                }
             },
             {
-              extend: 'csv',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
-              }
+                extend: 'csv',
+                class: 'btn btn-outline-secondary',
+                exportOptions: {
+                    columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
+                }
             },
             {
-              extend: 'excel',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10] 
-              }
+                extend: 'excel',
+                class: 'btn btn-outline-secondary',
+                exportOptions: {
+                    columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
+                }
             },
             {
-              extend: 'pdf',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
-              }
+                extend: 'pdf',
+                class: 'btn btn-outline-secondary',
+                exportOptions: {
+                    columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
+                }
             },
             {
-              extend: 'print',
-              class: 'btn btn-outline-secondary',
-              exportOptions: {
-                columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
-              }
+                extend: 'print',
+                class: 'btn btn-outline-secondary',
+                exportOptions: {
+                    columns: [1, 3, 4, 5, 6, 7, 8, 9, 10]
+                }
             }
-          ],
+        ],
         ajax: {
             url: CUSTOMER_API_ROUTE,
-            data: function(d) {
-                return $.extend({},d, {
+            data: function (d) {
+                return $.extend({}, d, {
                     'country': selectCountry.val(),
-                    'state':selectState.val(),
+                    'state': selectState.val(),
                     "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : '',
                 });
             }
@@ -116,7 +116,7 @@ $(function(){
                 width: '7%',
                 orderable: false,
                 name: "website",
-                render:function(data,type,row){
+                render: function (data, type, row) {
                     return `<a target="_blank" href="${row.website}">${row.website}<a>`
                 }
             },
@@ -131,7 +131,7 @@ $(function(){
                 orderable: false,
                 name: "country",
                 render: function (data, type, row) {
-                    if(row.country) {
+                    if (row.country) {
                         return `<span title="${row.country.name}" class="flag-icon flag-icon-${row.country.short_name.toLowerCase()}"></span>`
                     } else {
                         return ``;
@@ -155,12 +155,25 @@ $(function(){
                 }
             },
             {
+                width: '1%',
+                orderable: false,
+                name: "orders_count",
+                class:'text-center',
+                render: function (data, type, row) {
+                    return `<span>${row.orders_count}</span>`
+                }
+            },
+
+            {
                 orderable: false,
                 width: '20%',
                 render: function (data, type, row) {
-                    let deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentCustomer(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
-                    let editButton = '<a data-id=' + row.id + ' href="'+CUSTOMER_EDIT_ROUTE.replace(':id',row.id)+'" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
-                    let ordersButton = '<a data-id=' + row.id + ' href="'+ CUSTOMER_ORDERS_ROUTE.replace(':id',row.id)+'" title="Orders"> <i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i>  </a>';
+                    let deleteButton = '';
+                    if (!row.orders_count) {
+                        deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentCustomer(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
+                    }
+                    let editButton = '<a data-id=' + row.id + ' href="' + CUSTOMER_EDIT_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+                    let ordersButton = '<a data-id=' + row.id + ' href="' + CUSTOMER_ORDERS_ROUTE.replace(':id', row.id) + '" title="Orders"> <i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i>  </a>';
                     return `${deleteButton} ${editButton} ${ordersButton}`;
                 }
             }
@@ -173,18 +186,18 @@ $(function(){
 
     //ACTIONS
 
-    builtInDataTableSearch.bind('keyup',function(){
-        dataTable.ajax.reload( null, false );
+    builtInDataTableSearch.bind('keyup', function () {
+        dataTable.ajax.reload(null, false);
     })
 
-    selectCountry.bind('changed.bs.select',function(){
+    selectCountry.bind('changed.bs.select', function () {
         let countryId = $(this).val();
         dataTable.ajax.reload(null, false);
         selectState.empty();
-    
-        if(countryId !== '0') {
-            APICaller(STATE_ROUTE.replace(':id', countryId), function(response){
-                if(response.length > 0) {
+
+        if (countryId !== '0') {
+            APICaller(STATE_ROUTE.replace(':id', countryId), function (response) {
+                if (response.length > 0) {
                     selectState.append('<option value="">All</option>');
                     $.each(response, function (key, value) {
                         selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
@@ -193,7 +206,7 @@ $(function(){
                     selectState.append('<option value="0" disabled>Nothing selected</option>');
                 }
                 selectState.selectpicker('refresh');
-            }, function(error){
+            }, function (error) {
                 console.log(error);
             });
         } else {
@@ -201,8 +214,8 @@ $(function(){
         }
     });
 
-    selectState.bind('changed.bs.select',function(){
-        dataTable.ajax.reload( null, false );
+    selectState.bind('changed.bs.select', function () {
+        dataTable.ajax.reload(null, false);
     });
 
     window.selectCustomer = function (e) {
@@ -216,14 +229,14 @@ $(function(){
     window.deleteCurrentCustomer = function (e) {
         let id = $(e).attr('data-id');
         let name = $(e).attr('data-name');
-        let url = CUSTOMER_DELETE_ROUTE.replace(':id', id); 
+        let url = CUSTOMER_DELETE_ROUTE.replace(':id', id);
 
         let template = swalText(name);
 
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
             APICallerWithoutData(url, function (response) {
                 toastr['success'](response.message);
-                dataTable.ajax.reload( null, false );
+                dataTable.ajax.reload(null, false);
             }, function (error) {
                 toastr['error']('Customer has not been deleted');
             });
@@ -242,17 +255,17 @@ $(function(){
         let template = swalText(searchedNames);
 
         confirmAction('Selected items!', template, 'Yes, delete it!', 'Cancel', function () {
-            searchedIds.forEach(function(id,index){
+            searchedIds.forEach(function (id, index) {
                 APICallerWithoutData(CUSTOMER_DELETE_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);
-                    dataTable.ajax.reload( null, false );
+                    dataTable.ajax.reload(null, false);
                 }, function (error) {
                     console.log(error);
                     toastr['error']('Customer has not been deleted');
                 });
             });
         });
-        
+
     };
 
     $(document).on('change', ".selectAll", function () {
@@ -270,7 +283,7 @@ $(function(){
         }
     });
 
-     $('.bootstrap-select .selectAction').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+    $('.bootstrap-select .selectAction').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         switch ($(this).val()) {
             case 'delete':
                 deleteMultipleCustomers();
@@ -284,7 +297,7 @@ $(function(){
 
         if (Array.isArray(params)) {
             params.forEach(function (name, index) {
-                text += `<p class="font-weight-bold m-0">${index !== params.length - 1 ? name + ', ' : name }</p>`;
+                text += `<p class="font-weight-bold m-0">${index !== params.length - 1 ? name + ', ' : name}</p>`;
             });
         } else {
             text += `<p class="font-weight-bold m-0">${params}</p>`;

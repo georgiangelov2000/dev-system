@@ -36,7 +36,7 @@ $(function () {
     })
 
     let buttons = mapButtons([6, 7, 9, 10, 11, 12, 13, 14, 15, 16]);
-    
+
     let dataTable = table.DataTable({
         serverSide: true,
         dom: 'Bfrtip',
@@ -46,7 +46,7 @@ $(function () {
             data: function (d) {
                 var orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
                 var orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
-                
+
                 return $.extend({}, d, {
                     'supplier': bootstrapSelectSupplier.val() === null ? '' : bootstrapSelectSupplier.val().toLowerCase(),
                     "single_total_price": customTotalPrice.val().toLowerCase(),
@@ -59,7 +59,7 @@ $(function () {
                     'out_of_stock': bootstrapSelectStock.val(),
                     'order_column': orderColumnName, // send the column name being sorted
                     'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
-                    'limit': d.custom_length = d.length, 
+                    'limit': d.custom_length = d.length,
                 });
             }
         },
@@ -69,7 +69,7 @@ $(function () {
                 width: '1%',
                 render: function (data, type, row) {
                     let statusStr = ''
-                    if (row.status === 'enabled') {
+                    if (row.status) {
                         statusStr = '<i title="Enabled" class="fa-solid fa-circle text-success"></i>'
                     } else {
                         statusStr = '<i title="Disabled" class="fa-solid fa-circle text-danger"></i>'
@@ -90,8 +90,15 @@ $(function () {
             },
             {
                 width: '1%',
+                orderable: false,
+                render: function (data, type, row) {
+                    return `<a href="${PAYMENT.replace(':id', row.payment.id)}">${row.payment.date_of_payment}</a>`
+                }
+            },
+            {
+                width: '1%',
                 orderable: true,
-                name:'id',
+                name: 'id',
                 render: function (data, type, row) {
                     return '<span class="font-weight-bold">' + row.id + '</span>';
                 }
@@ -106,7 +113,7 @@ $(function () {
                         let carouselItems = row.images.map((image, index) => {
                             let isActive = index === 0 ? 'active' : ''; // Set first image as active
                             return `<div class="carousel-item ${isActive}">
-                                        <img class="d-block w-100" src="${ CONFIG_URL +  image.path  + "/" + image.name}" alt="Slide ${index + 1}">
+                                        <img class="d-block w-100" src="${CONFIG_URL + image.path + "/" + image.name}" alt="Slide ${index + 1}">
                                     </div>`;
                         }).join('');
 
@@ -181,9 +188,9 @@ $(function () {
                 render: function (data, type, row) {
                     let paidOrdersCount = row.paid_orders_count;
                     let unpaidOrdersCount = row.unpaid_orders_count;
-            
+
                     let displayText = `<a class='text-success' ">${paidOrdersCount} paid</a> / <a class='text-danger'>${unpaidOrdersCount} unpaid</a>`;
-            
+
                     return displayText;
                 }
             },
@@ -271,35 +278,39 @@ $(function () {
                 width: '8%',
                 class: 'text-center',
                 render: function (data, type, row) {
-                    let deleteFormTemplate = `
-                    <form style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
-                        <input type='hidden' name='_method' value='DELETE'>
-                        <input type='hidden' name='id' value='${row.id}'>
-                        <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'>
-                            <i class='fa-light fa-trash text-danger'></i>
-                        </button>
-                    </form>
-                `;
-                
-                let previewLink = `
+                    let deleteFormTemplate = '';
+
+                    if (!row.is_paid) {
+                        deleteFormTemplate = `
+                        <form style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
+                            <input type='hidden' name='_method' value='DELETE'>
+                            <input type='hidden' name='id' value='${row.id}'>
+                            <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'>
+                                <i class='fa-light fa-trash text-danger'></i>
+                            </button>
+                        </form>
+                    `;
+                    }
+
+                    let previewLink = `
                     <a title='Preview' href="${PREVIEW_ROUTE.replace(':id', row.id)}" class='btn p-0'>
                         <i class='fa-light fa-magnifying-glass text-info' aria-hidden='true'></i>
                     </a>
                 `;
-                
-                let orderCart = `
+
+                    let orderCart = `
                     <a title='Orders' href="${ORDERS.replace(':id', row.id)}" class='btn p-0'>
                         <i class='text-success fa-light fa-basket-shopping' aria-hidden='true'></i>
                     </a>
                 `;
-                
-                let editButton = `
+
+                    let editButton = `
                     <a href=${EDIT_PRODUCT_ROUTE.replace(':id', row.id)} data-id=${row.id} class="btn p-0" title="Edit">
                         <i class="fa-light fa-pencil text-warning"></i>
                     </a>
                 `;
-                
-                return `${deleteFormTemplate} ${editButton} ${previewLink} ${orderCart}`;                
+
+                    return `${deleteFormTemplate} ${editButton} ${previewLink} ${orderCart}`;
                 }
             }
         ],
@@ -311,7 +322,7 @@ $(function () {
     $('.selectSupplier input[type="text"]').on('keyup', _.debounce(function () {
         let text = $(this).val();
         bootstrapSelectSupplier.empty();
-        
+
         bootstrapSelectSupplier.append('<option value="" class="d-none"></option>');
 
         if (text === '') {
@@ -338,7 +349,7 @@ $(function () {
         bootstrapSelectCategory.empty();
 
         bootstrapSelectCategory.append('<option value="" class="d-none"></option>');
-        
+
         if (text === '') {
             bootstrapSelectCategory.append('<option value="">All</option>');
             bootstrapSelectCategory.selectpicker('refresh');
@@ -390,7 +401,7 @@ $(function () {
     bootstrapSelectStock.bind('changed.bs.select', function () {
         dataTable.ajax.reload(null, false);
     })
-    
+
     bootstrapSelectTotalPrice.bind('changed.bs.select', function () {
         dataTable.ajax.reload(null, false);
     })
@@ -404,7 +415,7 @@ $(function () {
         bootstrapSelectSubCategory.empty();
         let category = $(this).val();
 
-        APICaller(CATEGORY_ROUTE, { "category": category,'select_json': true }, function (response) {
+        APICaller(CATEGORY_ROUTE, { "category": category, 'select_json': true }, function (response) {
             let subCategories = response.data;
             bootstrapSelectSubCategory.empty();
 
@@ -475,7 +486,7 @@ $(function () {
                 toastr['success'](response.message);
                 table.DataTable().ajax.reload();
             }, function (error) {
-                toastr['error']('Product has not been deleted');
+                toastr['error'](error.message);
             });
         })
     };
@@ -495,10 +506,14 @@ $(function () {
         showConfirmationDialog('Selected purchases!', template, function () {
             searchedIds.forEach(function (id, index) {
                 APIDELETECALLER(REMOVE_PRODUCT_ROUTE.replace(':id', id), function (response) {
-                    toastr['success'](response.message);
+                    if(response.status === 500) {
+                        toastr['error'](response.responseJSON.message);
+                    } else {
+                        toastr['success'](response.message);
+                    }
                     table.DataTable().ajax.reload();
                 }, function (error) {
-                    toastr['error']('Supplier has not been deleted');
+                    toastr['error'](error.message);
                 });
             });
         })

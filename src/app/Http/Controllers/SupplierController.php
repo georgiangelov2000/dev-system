@@ -182,9 +182,9 @@ class SupplierController extends Controller
         DB::beginTransaction();
         try {
 
-            if ($supplier->purchases()->exists()) {
+            if ($supplier->purchases->count() > 0) {
                 return response()->json(['message' => 'Supplier has related purchases'], 500);
-            }
+            }            
 
             if ($supplier->image) {
                 $current_image = $this->dir . DIRECTORY_SEPARATOR . $supplier->image->name;

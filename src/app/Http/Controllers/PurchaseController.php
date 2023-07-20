@@ -69,7 +69,7 @@ class PurchaseController extends Controller
                 "status" => 1,
                 "total_price" => $totalPrice
             ]);
-            
+
             if ($category) {
                 $purchase->categories()->sync([$category]);
             }
@@ -269,6 +269,9 @@ class PurchaseController extends Controller
         DB::beginTransaction();
 
         try {
+            if ($purchase->payment()->exists()) {
+                return response()->json(['message' => 'Payment already exists for this purchase'], 500);
+            }
 
             if (!empty($purchase->images)) {
                 $image_names = $purchase->images()->pluck('name');

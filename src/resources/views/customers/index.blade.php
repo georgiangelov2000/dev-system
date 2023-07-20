@@ -66,6 +66,7 @@
                             <th>Country</th>
                             <th>State</th>
                             <th>Notes</th>
+                            <th>Orders</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
