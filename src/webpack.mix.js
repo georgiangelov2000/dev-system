@@ -44,30 +44,40 @@ mix.js('resources/js/payments/supplier_payments.js', 'public/js/payments'),
 mix.js('resources/js/packages/customer_package_payment.js', 'public/js/packages'),
 
 // Javascript libraries
-mix.js('resources/js/adminlte.min.js', 'public/js'),
-mix.js('resources/js/app.js', 'public/js'),
-mix.js('resources/js/bootstrap.js', 'public/js'),
-mix.js('resources/js/jquery.min.js', 'public/js'),
-mix.js('resources/js/jqueryui.min.js', 'public/js'),
-mix.js('resources/js/toastr.min.js', 'public/js'),
-mix.js('resources/js/bootstrap.bundle.min.js', 'public/js'),
-mix.js('resources/js/sweetalert2.min.js', 'public/js'),
-mix.js('resources/js/datatables.min.js', 'public/js'),
-mix.js('resources/js/bootstrap-select-min.js', 'public/js'),
-mix.js('resources/js/datepicker.min.js', 'public/js'),
-mix.js('resources/js/moment.min.js', 'public/js'),
-mix.js('resources/js/daterangepicker.min.js', 'public/js')
+mix.babel('resources/js/adminlte.min.js', 'public/js/adminlte.min.js'),
+mix.babel('resources/js/app.js', 'public/js/app.js'),
+mix.babel('resources/js/bootstrap.js', 'public/js/bootstrap.js'),
+mix.babel('resources/js/jquery.min.js', 'public/js/jquery.min.js'),
+mix.babel('resources/js/jqueryui.min.js', 'public/js/jqueryui.min.js'),
+mix.babel('resources/js/toastr.min.js', 'public/js/toastr.min.js'),
+mix.babel('resources/js/bootstrap.bundle.min.js', 'public/js/bootstrap.bundle.min.js'),
+mix.babel('resources/js/sweetalert2.min.js', 'public/js/sweetalert2.min.js'),
+mix.babel('resources/js/datatables.min.js', 'public/js/datatables.min.js'),
+mix.babel('resources/js/bootstrap-select-min.js', 'public/js/bootstrap-select-min.js'),
+mix.babel('resources/js/datepicker.min.js', 'public/js/datepicker.min.js'),
+mix.babel('resources/js/moment.min.js', 'public/js/moment.min.js'),
+mix.babel('resources/js/daterangepicker.min.js', 'public/js/daterangepicker.min.js'),
+mix.babel('resources/js/jspdf.min.js', 'public/js/jspdf.min.js'),
+mix.babel('resources/js/dataTables.buttons.min.js', 'public/js/dataTables.buttons.min.js'),
+mix.babel('resources/js/buttons.print.min.js', 'public/js/buttons.print.min.js'),
+mix.babel('resources/js/jszip.min.js', 'public/js/jszip.min.js'),
+mix.babel('resources/js/pdfmake.min.js', 'public/js/pdfmake.min.js'),
+mix.babel('resources/js/leaflet.js', 'public/js/leaflet.js'),
+mix.babel('resources/js/lodash.min.js', 'public/js/lodash.min.js')
+mix.babel('resources/js/buttons.html5.min.js', 'public/js/buttons.html5.min.js')
+mix.babel('resources/js/buttons.print.min.js', 'public/js/buttons.print.min.js')
+
 .version();
 
-mix.sass('resources/sass/_variables.scss', 'public/css'),
-mix.sass('resources/sass/all.min.scss', 'public/css'),
-mix.sass('resources/sass/app.scss', 'public/css'),
-mix.sass('resources/sass/template.scss', 'public/css'),
-mix.sass('resources/sass/toastr.min.scss', 'public/css'),
-mix.sass('resources/sass/sweetalert2.scss', 'public/css'),
-mix.sass('resources/sass/datatables.min.scss', 'public/css'),
-mix.sass('resources/sass/bootstrap-select.min.scss', 'public/css'),
-mix.sass('resources/sass/datepicker.min.scss', 'public/css'),
-mix.sass('resources/sass/daterangepicker.min.scss', 'public/css'),
-mix.sass('resources/sass/icheck-bootstrap.min.scss', 'public/css')
-.version();
+mix.sass('resources/sass/_variables.scss', 'public/css')
+    .sass('resources/sass/all.min.scss', 'public/css')
+    .sass('resources/sass/app.scss', 'public/css')
+    .sass('resources/sass/template.scss', 'public/css')
+    .sass('resources/sass/toastr.min.scss', 'public/css')
+    .sass('resources/sass/sweetalert2.scss', 'public/css')
+    .sass('resources/sass/datatables.min.scss', 'public/css')
+    .sass('resources/sass/bootstrap-select.min.scss', 'public/css')
+    .sass('resources/sass/datepicker.min.scss', 'public/css')
+    .sass('resources/sass/daterangepicker.min.scss', 'public/css')
+    .sass('resources/sass/icheck-bootstrap.min.scss', 'public/css')
+    .version();

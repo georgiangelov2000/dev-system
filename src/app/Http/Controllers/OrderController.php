@@ -57,7 +57,7 @@ class OrderController extends Controller
                 $foundPurchase->quantity -= $orderQuantity;
 
                 if ($foundPurchase->quantity === 0) {
-                    $foundPurchase->status = 'disabled';
+                    $foundPurchase->status = 0;
                 }
 
                 $foundPurchase->save();

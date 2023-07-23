@@ -35,7 +35,6 @@ class PackageController extends Controller
     public function store(PackageRequest $request)
     {
         $data = $request->validated();
-
         DB::beginTransaction();
 
         try {

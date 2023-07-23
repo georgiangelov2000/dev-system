@@ -138,8 +138,17 @@ $(document).ready(function () {
                 }
             },
             {
+                width:'5%',
+                orderable:false,
+                name:'purchases_count',
+                class:'text-center',
+                render: function(data,type,row) {
+                    return `${row.purchases_count}`;
+                }
+            },
+            {
                 orderable: false,
-                width: '32%',
+                width: '25%',
                 render: function (data, type, row) {
                     let deleteFormTemplate = '';
 

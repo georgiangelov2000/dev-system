@@ -20,9 +20,7 @@
         <link type="text/css" href="{{ mix('css/icheck-bootstrap.min.css') }}" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" />
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         
         <link rel="icon" type="image/png" href="/storage/images/static/logo.jpg">
     </head>
@@ -56,14 +54,17 @@
         <script type="text/javascript" src="{{ mix('js/datepicker.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/moment.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/daterangepicker.min.js') }}"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+        <script type="text/javascript" src="{{ mix('js/jspdf.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/dataTables.buttons.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/buttons.print.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/jszip.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/pdfmake.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/leaflet.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/lodash.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/buttons.html5.min.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/buttons.print.min.js') }}"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.print.min.js"></script>
-        
+         
         <script>
             @if (Session::has('message'))
                 toastr.options = {

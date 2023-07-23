@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\OrderPayment;
 
 class InvoiceOrder extends Model
 {
@@ -32,4 +33,7 @@ class InvoiceOrder extends Model
         'price',
         'quantity',
     ];
-}
+
+    public function orderPayment(){
+        return $this->belongsTo(OrderPayment::class);
+    }}

@@ -121,17 +121,18 @@
                                 <th>Tracking number</th>
                                 <th>Name</th>
                                 <th>Date of sale</th>
-                                <th>Single sold price</th>
-                                <th>Total sold price</th>
-                                <th>Sold quantity</th>
-                                <th>Paid</th>
+                                <th>Single price</th>
+                                <th>Official price</th>
+                                <th>Original price</th>
+                                <th>Discount</th>
+                                <th>Quantity</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($package->orders as $order)
                                 <tr name="package">
                                     <td>
-                                        @if (!$order->status === 1 && !$order->is_paid === 1)
+                                        @if ($order->status !== 1 && $order->is_paid !== 1)
                                             <button onclick='removeRow(this)' class='btn p-0'>
                                                 <i class='fa-light fa-trash text-danger'></i>
                                             </button>
@@ -155,14 +156,21 @@
                                     </td>
                                     <td name="total-sold-price">
                                         €{{ $order->total_sold_price }}
-                                    <td>
-                                        {{ $order->sold_quantity }}
                                     </td>
                                     <td>
+                                        €{{ $order->original_sold_price }}                                        
+                                    </td>
+                                    <td>
+                                        {{$order->discount_percent}}%
+                                    </td>
+                                    <td>
+                                        {{$order->sold_quantity}}
+                                    </td>
+                                    {{-- <td>
                                         @if($order->status === 1 && $order->is_paid === 1 && $order->orderPayments)
                                             <span class="text-success">Yes</span>
                                         @endif
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @endforeach
                         </tbody>

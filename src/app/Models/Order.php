@@ -67,6 +67,6 @@ class Order extends Model
     }
 
     public function orderPayments(){
-        return $this->hasMany(OrderPayment::class);
+        return $this->hasOne(OrderPayment::class);
     }
 }

@@ -216,6 +216,7 @@ $(function () {
         },
         {
           render: function (data, type, row) {
+
               let edit = `
               <a href="${ORDER_PAYMENT_EDIT_ROUTE.replace(":id",row.id)}" title="Edit" class="btn p-0" href="">
                   <i class="fa-light fa-pen text-primary"></i>
@@ -223,7 +224,7 @@ $(function () {
               `;
 
               let invoice = `
-              <a target="_blank" href="" title="Invoice" class="btn p-0"> 
+              <a href="${ORDER_INVOICE_EDIT_ROUTE.replace(":id",row.invoice.id)}" target="_blank" href="" title="Invoice" class="btn p-0"> 
                 <i class="fa-light fa-file-invoice text-primary"></i>
               </a>`;
 

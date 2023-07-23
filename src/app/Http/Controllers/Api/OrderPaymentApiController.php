@@ -23,7 +23,7 @@ class OrderPaymentApiController extends Controller
         $limit = $request->input('length', 10);
 
         $paymentQ = OrderPayment::query()
-            ->with('order.purchase')
+            ->with('order.purchase','invoice')
             ->whereHas('order', function ($query) {
                 $query->where('is_paid', 1)->where('status', 1);
             });

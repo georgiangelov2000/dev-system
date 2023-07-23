@@ -44,7 +44,8 @@ class CompanySettings extends Model
         "website",
         "owner_name",
         "bussines_type",
-        "image_path"
+        "image_path",
+        'registration_date'
     ];
     public function country(){
         return $this->belongsTo(Country::class,'country_id');

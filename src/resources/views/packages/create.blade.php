@@ -79,13 +79,13 @@
                                         <i class="far fa-calendar-alt"></i>
                                     </span>
                                 </div>
-                                <input type="text" class="form-control datepicker" name="delivery_date">
+                                <input type="text" class="form-control datepicker" name="expected_delivery_date">
                                 <small id="emailHelp" class="form-text text-muted">
                                     When the delivery date for a package is interited, the purchase date will be
                                     automatically adjusted to reflect the new delivery date
                                 </small>
                             </div>
-                            @error('delivery_date')
+                            @error('expected_delivery_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -135,7 +135,9 @@
                                 <th>Name</th>
                                 <th>Date of sale</th>
                                 <th>Single price</th>
-                                <th>Total price</th>
+                                <th>Official price</th>
+                                <th>Original price</th>
+                                <th>Discount</th>
                                 <th>Quantity</th>
                             </tr>
                         </thead>
@@ -189,5 +191,6 @@
         let CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
         let ORDER_API_ROUTE = "{{ route('api.orders') }}"
         let SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
+        let ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
     </script>
 @endpush

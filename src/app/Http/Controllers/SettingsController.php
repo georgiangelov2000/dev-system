@@ -57,6 +57,7 @@ class SettingsController extends Controller
                 "website" => $data['website'],
                 "owner_name" => $data['owner_name'],
                 "bussines_type" => $data['bussines_type'],
+                "registration_date" => date('Y-m-d', strtotime($data['registration_date']))
             ];
 
             if (isset($data['image']) && is_file($data['image'])) {
@@ -85,7 +86,7 @@ class SettingsController extends Controller
             return redirect()->back()->with('success', 'Company settings has been updated');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
+            dd($e->getMessage());
             return back()->withInput()->with('error', 'Company settings has not been updated');
         }
     }

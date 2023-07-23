@@ -179,7 +179,7 @@ class PurchaseController extends Controller
     public function preview(Purchase $purchase)
     {
         $purchase->load('brands', 'categories', 'supplier:id,name', 'subcategories', 'images');
-        return view('purchases.preview', ['purchase' => $purchase]);
+        return view('purchases.preview', compact('purchase'));
     }
 
     public function massEditUpdate(Request $request)

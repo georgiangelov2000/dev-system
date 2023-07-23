@@ -60,6 +60,21 @@ $(function () {
                 }
             },
             {
+                width:'5%',
+                orderable:false,
+                render: function(data,type,row) {
+                    let payment;
+
+                    if(row.order_payments) {
+                        payment = `<a href=${PAYMENT_API.replace(':id',row.order_payments.id)}>${row.order_payments.date_of_payment}</a>`
+                    } else {
+                        payment = ''
+                    }
+
+                    return payment;
+                }
+            },
+            {
                 width: '10%',
                 orderable: false,
                 name: "customer",
@@ -213,15 +228,7 @@ $(function () {
                     let editButton = '';
                     let dropdown = '';
                     let detachPackage = '';
-
-                    let deleteFormTemplate = `
-                    <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
-                        <input type='hidden' name='_method' value='DELETE'>
-                        <input type='hidden' name='id' value='${row.id}'>
-                        <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
-                            <i class='fa-light fa-trash text-danger'></i>
-                        </button>
-                    </form>`;
+                    let deleteFormTemplate = '';
 
                     if(row.package && !row.is_paid && (row.status === 'Ordered' || row.status === 'Pending') ) {
                         detachPackage = `
@@ -246,7 +253,15 @@ $(function () {
                                 <button type="submit" order-id="${row.id}" value="4" onclick="event.preventDefault(); changeStatus(this)" class="dropdown-item">Ordered</button>
                                 </div>
                             </form>
-                        </div>`;                    
+                        </div>`;         
+                        deleteFormTemplate = `
+                        <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
+                            <input type='hidden' name='_method' value='DELETE'>
+                            <input type='hidden' name='id' value='${row.id}'>
+                            <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
+                                <i class='fa-light fa-trash text-danger'></i>
+                            </button>
+                        </form>`;           
                     }
 
                     let previewButton = '<a title="Review" class="btn p-0"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'

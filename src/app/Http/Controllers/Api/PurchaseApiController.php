@@ -96,7 +96,7 @@ class PurchaseApiController extends Controller
             $purchaseQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
         }
         if(!$is_paid) {
-            $purchaseQuery->where('is_paid',0)->whereDoesntHave('payments');
+            $purchaseQuery->where('is_paid',0)->whereDoesntHave('payment');
         }
         if (isset($request->out_of_stock)) {
             if($request->out_of_stock) {

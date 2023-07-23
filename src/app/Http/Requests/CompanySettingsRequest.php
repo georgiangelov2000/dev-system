@@ -25,6 +25,7 @@ class CompanySettingsRequest extends FormRequest
             "website" => "required|string",
             "owner_name" => "required|string",
             "bussines_type" => "required|string",
+            "registration_date" => "required|string"
         ];
     }
 }

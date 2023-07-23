@@ -72,7 +72,6 @@ $(function () {
 
     function loadDataTable(data) {
         dataTable.clear().draw();
-        let counter = 0;
         
         if (data.length > 0) {
             let rows = data.map(function (item) {

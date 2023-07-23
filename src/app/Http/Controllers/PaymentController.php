@@ -8,6 +8,7 @@ use App\Http\Requests\OrderPaymentRequest;
 use App\Http\Requests\PurchasePaymentRequest;
 use App\Models\Purchase;
 use App\Models\Customer;
+use App\Models\InvoiceOrder;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\PurchasePayment;
@@ -113,7 +114,7 @@ class PaymentController extends Controller
 
     public function editOrderPayment(OrderPayment $payment)
     {
-        $payment->load('order.customer');
+        $payment->load('order.customer', 'invoice');
         return view('orders.edit_payment', compact('payment'));
     }
 
@@ -123,7 +124,7 @@ class PaymentController extends Controller
 
         try {
             $data = $request->validated();
-            
+
             if (isset($data['order_id']) && count($data['order_id'])) {
                 $orders = $data['order_id'];
 
@@ -145,8 +146,8 @@ class PaymentController extends Controller
                         $orderInvoice = OrderPayment::create($paymentData);
 
                         $orderInvoice->invoice()->create([
-                            'price' => $data['price'][$key],
-                            'quantity' => $data['quantity'][$key]
+                            'price' => $order->total_sold_price,
+                            'quantity' => $order->sold_quantity
                         ]);
                     }
                 }
@@ -156,7 +157,6 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Payment has been created'], 200);
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             return response()->json(['message' => 'Payment has not been created'], 500);
         }
     }
@@ -167,9 +167,17 @@ class PaymentController extends Controller
         try {
             $data = $request->validated();
             $payment->update($data);
+
+            $invoice = $payment->invoice ?: new InvoiceOrder();
+            $invoice->order_payment_id = $payment->id;
+            $invoice->price = $payment->order->total_sold_price;
+            $invoice->quantity = $payment->order->sold_quantity;
+            $invoice->save();
+
             DB::commit();
             return redirect()->back()->with('success', 'Payment has been updated');
         } catch (\Exception $e) {
+            dd($e->getMessage());
             DB::rollback();
             return back()->withInput()->with('error', 'Payment has not been updated');
         }

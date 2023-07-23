@@ -6,23 +6,23 @@ $(function () {
   let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
   let bootstrapOrders = $('.bootstrap-select .purchaseFilter');
 
-    $('.datepicker').datepicker({
-      format: 'yyyy-mm-dd'
-    });
+  $('.datepicker').datepicker({
+    format: 'yyyy-mm-dd'
+  });
 
   var table = $('.productOrderTable').DataTable({
     ordering: false,
     columnDefs: [
       { width: "1%", targets: 0 },
-      { width: "5%", targets: 1, class:"text-center" },
-      { width: "5%", targets: 2, class:"text-center"},
-      { width: "5%", targets: 3, class:"text-center" },
-      { width: "5%", targets: 4, class:"text-center" },
-      { width: "5%", targets: 5, class:"text-center" },
-      { width: "5%", targets: 6, class:"text-center" },
-      { width: "5%", targets: 7, class:"text-center" },
-      { width: "5%", targets: 8, class:"text-center" },
-      // add more targets and widths as needed
+      { width: "5%", targets: 1, class: "text-center" },
+      { width: "5%", targets: 2, class: "text-center" },
+      { width: "5%", targets: 3, class: "text-center" },
+      { width: "5%", targets: 4, class: "text-center" },
+      { width: "5%", targets: 5, class: "text-center" },
+      { width: "5%", targets: 6, class: "text-center" },
+      { width: "5%", targets: 7, class: "text-center" },
+      { width: "5%", targets: 8, class: "text-center" },
+      { width: "5%", targets: 9, class: "text-center" }
     ]
   });
 
@@ -57,14 +57,14 @@ $(function () {
     })
 
   })
-  
+
   bootstrapCustomer.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
     bootstrapOrders.empty();
 
-    APICaller(ORDER_API_ROUTE, { 
-      'customer': bootstrapCustomer.val(), 
-      'select_json':true, 
-      'withoutPackage':true,
+    APICaller(ORDER_API_ROUTE, {
+      'customer': bootstrapCustomer.val(),
+      'select_json': true,
+      'withoutPackage': true,
       'is_paid': 0
     }, function (response) {
       let orders = response;
@@ -81,7 +81,8 @@ $(function () {
             data-tracking_number = "${order.tracking_number}"
             data-quantity="${order.sold_quantity}"
             data-date_of_sale="${order.date_of_sale}"
-            value="${order.id}"
+            data-original_sold_price="${order.original_sold_price}"
+            data-discount="${order.sold_quantity}"
           > 
           ${order.purchase.name} </option>`)
         })
@@ -101,10 +102,11 @@ $(function () {
       let number = parseFloat(text.match(/\d+(\.\d+)?/)[0]);
       total += number;
     });
+
     console.log(total);
 
     total = parseFloat(total.toFixed(2));
-    
+
     $('.packagePrice').html(total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
     $('.ordersCount').html(packageRowsCount);
@@ -120,47 +122,95 @@ $(function () {
 
   bootstrapOrders.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
     let selectedOption = $(this).find('option').eq(clickedIndex);
-    let { 
-      id, 
-      quantity, 
-      totalSoldPrice, 
-      singleSoldPrice, 
+
+    let {
+      id,
+      name,
+      singleSoldPrice,
+      totalSoldPrice,
       tracking_number,
+      quantity,
       date_of_sale,
-      name 
+      original_sold_price,
+      discount
     } = selectedOption.data();
 
     let duplicate = false;
 
     table.rows().data().each(function (row) {
-      if (row[1] == id) {
+      const tempElement = $(`<div>${row[1]}</div>`);
+      const rowProductId = parseInt(tempElement.find('input').val(), 10);
+
+      if (rowProductId == id) {
         duplicate = true;
-        toastr['error']('You have already the current product in the table');
-        return false; // break out of the loop
+        toastr['error']('You have already the current order in the table');
+        return false;
       }
-    }); 
+    });
 
     // Create a new tbody with the data
     let tbody = $('<tbody>');
 
     if (!duplicate) {
+      // Create elements
+      const deleteButton = $("<button>", {
+        type: 'button',
+        class: 'btn p-0',
+        onclick: 'removeRow(this)',
+      }).append($('<i>', {
+        class: 'fa-light fa-trash text-danger',
+      }));
 
-      let newRow = $('<tr name="package">').append(
-        $('<td>').append($("<button type='button' onclick='removeRow(this)' class='btn p-0'><i class='fa-light fa-trash text-danger'></i></button>")),
-        $('<td>').text(id).append($("<input>").attr("type", "hidden").attr('name', 'order_id[]').val(id)),
+      const productIdInput = $("<input>", {
+        type: 'hidden',
+        name: 'order_id[]',
+        value: id,
+      });
+
+      const productNameLink = $("<a>", {
+        href: ORDER_EDIT_ROUTE.replace(':id', id),
+        html: name,
+      });
+
+      const singleSoldPriceTd = $('<td>', {
+        name: 'single-sold-price',
+        text: `€${singleSoldPrice}`,
+      });
+
+      const totalSoldPriceInput = $("<input>", {
+        type: 'hidden',
+        name: 'total_order_price[]',
+        value: totalSoldPrice,
+      });
+
+      const totalSoldPriceTd = $('<td>', {
+        name: 'total-sold-price',
+        text: `€${totalSoldPrice}`,
+      }).append(totalSoldPriceInput);
+
+      // Create the new row and append elements
+      let newRow = $('<tr>', {
+        name: 'package',
+      }).append(
+        $('<td>').append(deleteButton),
+        $('<td>').text(id).append(productIdInput),
         $('<td>').text(tracking_number),
-        $('<td>').text(name),
+        $('<td>').append(productNameLink),
         $('<td>').text(date_of_sale),
-        $('<td name="single-sold-price">').text('€' +  singleSoldPrice),
-        $('<td name="total-sold-price">').text('€' + totalSoldPrice).append($("<input>").attr("type", "hidden").attr('name', 'total_order_price[]').val(totalSoldPrice)),
-        $('<td>').text(quantity)
+        singleSoldPriceTd,
+        totalSoldPriceTd,
+        $('<td>').text(original_sold_price),
+        $('<td>').text(`${discount}%`),
+        $('<td>').text(`${quantity}`)
       );
+
       tbody.append(newRow);
 
       table.row.add(newRow).draw();
 
       overview();
     };
+
 
   });
 

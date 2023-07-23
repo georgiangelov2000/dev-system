@@ -80,6 +80,7 @@
                                 </div>
                             </th>
                             <th>ID</th>
+                            <th>Payment</th>
                             <th>Customer</th>
                             <th>Product</th>
                             <th>Quantity</th>
@@ -113,6 +114,7 @@
             const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
             const CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
             const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
+            const PAYMENT_API = "{{route('payment.edit.order',':id')}}"
         </script>
     @endpush
 @endsection

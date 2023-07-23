@@ -56,7 +56,8 @@
         <script type="text/javascript">
             const ORDER_PAYMENT_API = "{{route('api.order.payments')}}";
             const ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
-            const ORDER_PAYMENT_EDIT_ROUTE = "{{route('payment.edit.order',':id')}}"
+            const ORDER_PAYMENT_EDIT_ROUTE = "{{route('payment.edit.order',':id')}}";
+            const ORDER_INVOICE_EDIT_ROUTE = "{{route('invoice.order.edit',':id')}}";
         </script>
     @endpush
 

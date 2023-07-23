@@ -39,7 +39,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <form class="form-row" id="packagePayment" method="post" action="{{route('order.store.payment')}}">
+                        <form class="form-row" id="packagePayment" method="post" action="{{route('payment.store.order')}}">
                             @csrf
                             <div class="col-12">
                                 <table id="orders" class="table table-hover table-sm">
@@ -81,7 +81,6 @@
         <script>
             const PACKAGE_API_ROUTE = "{{ route('api.packages') }}";
             const ORDER_API_ROUTE = "{{ route('api.orders') }}";
-            const STORE_ORDER_PACKAGE_PAYMENT = "{{ route('order.store.payment') }}";
             const PRODUCT_EDIT_ROUTE = "{{ route('order.edit',':id') }}"
         </script>
     @endpush

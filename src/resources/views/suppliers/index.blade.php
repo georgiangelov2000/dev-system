@@ -45,7 +45,7 @@
                 </div>
                 <div class="col-3">
                     <label>Categories</label>
-                    <select class="form-control selectCategory" multiple>
+                    <select class="form-control selectCategory" multiple multiple data-selected-text-format="count > 2">
                         @foreach($categories as $category)
                             <option value="{{$category->id}}" >{{$category->name}}</option>
                         @endforeach
@@ -73,6 +73,7 @@
                         <th>State</th>
                         <th>Categories</th>
                         <th>Notes</th>
+                        <th>Purchases</th>
                         <th>Actions</th>
                     </tr>
                 </thead>

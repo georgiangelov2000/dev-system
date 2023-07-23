@@ -154,7 +154,15 @@
                                         {{ isset(config('statuses.payment_statuses')[$payment->payment_status]) ? config('statuses.payment_statuses')[$payment->payment_status] : '' }}
                                     </b>
                                 </td>
-                            </tr>                            
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span>Payment reference:</span>
+                                    <b>
+                                        {{$payment->payment_reference}}
+                                    </b>
+                                </td>
+                            </tr>                    
                         </tbody>
                     </table>
                 </div>

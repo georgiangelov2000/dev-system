@@ -56,14 +56,14 @@
                                 <input type="text" name="tracking_number" class="form-control rounded-0"
                                     placeholder="Enter or generate tracking number">
                                 <span class="input-group-append">
-                                    <button type="button" id="generateCode" class="btn btn-info btn-flat">Generate</button>
+                                    <button type="button" id="generateCode" class="btn btn-primary btn-flat">Generate</button>
                                 </span>
                             </div>
                             <span name="tracking_number" class="text-danger"></span>
                         </div>
 
                         <div class="form-group col-12">
-                            <label for="">Search product</label>
+                            <label for="">Search purchase</label>
                             <select name="" id="" class="productFilter form-control" data-live-search="true">
                             </select>
                         </div>
@@ -122,7 +122,6 @@
                             </div>
                         </div>
                     </div>
-
 
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>

@@ -20,11 +20,11 @@ class PackageRequest extends FormRequest
             "package_name" => "required|string",
             "package_type" => "required|string",
             "delivery_method" => "required|string",
-            "delivery_date" => "required|date",
             "package_notes" => "nullable|string",
             "customer_notes" => "nullable|string",
             "order_id" => "required|array",
-            "total_order_price" => "required|array"
+            "total_order_price" => "required|array",
+            'expected_delivery_date' => "required|date"
         ];
     }
 }
