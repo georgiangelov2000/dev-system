@@ -45,8 +45,13 @@ class PaymentController extends Controller
 
     public function editPurchasePayment(PurchasePayment $payment)
     {
-        $payment->load('purchase.supplier');
-        return view('payments.edit_purchase_payment', compact('payment'));
+        $payment->load('purchase.supplier', 'purchase.categories', 'invoice');
+        $company = CompanySettings::select('id', 'name', 'phone_number', 'address', 'tax_number', 'image_path')->first();
+        return view('purchases.edit_payment',
+        [
+            'payment' => $payment,
+            'company' => $company,
+        ]);
     }
 
     public function storePurchasePayment(PurchasePaymentRequest $request)
@@ -116,13 +121,14 @@ class PaymentController extends Controller
     public function editOrderPayment(OrderPayment $payment)
     {
         $payment->load('order.customer', 'invoice');
-        $company = CompanySettings::select('id','name','phone_number','address','tax_number','image_path')->first();
-        return view('orders.edit_payment', 
-        [
-            'payment'=>$payment,
-            'company' => $company,
-        ]
-);
+        $company = CompanySettings::select('id', 'name', 'phone_number', 'address', 'tax_number', 'image_path')->first();
+        return view(
+            'orders.edit_payment',
+            [
+                'payment' => $payment,
+                'company' => $company,
+            ]
+        );
     }
 
     public function storeOrderPayment(OrderPaymentRequest $request)

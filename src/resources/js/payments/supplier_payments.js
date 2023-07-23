@@ -1,3 +1,5 @@
+import { APICaller } from '../ajax/methods';
+import { handleErrors } from '../helpers/action_helpers';
 $(function () {
     $('.selectSupplier').selectpicker('refresh').val('').trigger('change')
 
@@ -8,11 +10,17 @@ $(function () {
         }
     });
 
+    $('.datepicker').datepicker({
+        format: 'yyyy-mm-dd'
+    });
+
     let disabledOption = $('.disabledDateRange');
     let dateRangePicker = $('input[name="datetimes"]');
     let dateRangeCol = $('.dateRange');
     let bootstrapSelectSupplier = $('.bootstrap-select .selectSupplier');
     let btnFilter = $('.filter');
+    let modalInvoice = $('#modalInvoice');
+    let submitForm = $('#submitForm');
 
     let dataTable;
     let supplierData;
@@ -189,7 +197,10 @@ $(function () {
                         </a>
                         `;
 
-                        let invoice = `<a target="_blank" href="${INVOICE_PURCHASE_EDIT.replace(':id',row.invoice.id)}" title="Invoice" class="btn p-0"> <i class="fa-light fa-file-invoice text-primary"></i> </a>`;
+                        let invoice = `
+                        <a data-id="${row.invoice.id}" onclick="editInvoice(this)" title="Invoice" class="btn p-0"> 
+                            <i class="fa-light fa-file-invoice text-primary"></i> 
+                        </a>`;
 
                         return `${edit} ${invoice}`;
                     }
@@ -197,5 +208,59 @@ $(function () {
             ]
         });
     }
+
+    // Window actions
+    window.editInvoice = function (e) {
+        console.log(e);
+        let id = $(e).attr('data-id');
+        APICaller(PURCHASE_INVOICE_API_ROUTE, { 'id': id }, function (response) {
+            let invoice = response.data[0];
+
+            modalInvoice.modal('show');
+
+            modalInvoice.find('form').attr('action', PARCHASE_INVOICE_UPDATE_ROUTE.replace(":id", id))
+
+            modalInvoice.find('form input').each(function () {
+                let inputName = $(this).attr('name');
+
+                if (inputName && invoice.hasOwnProperty(inputName)) {
+                    $(this).val(invoice[inputName]);
+                }
+            });
+
+        }, function (error) {
+            toastr['error'](error.message);
+        });
+    }
+
+    submitForm.on('click', function (e) {
+        e.preventDefault();
+
+        let actionUrl = modalInvoice.find('form').attr('action');
+        let method = modalInvoice.find('form').attr('method');
+        let data = modalInvoice.find('form').serialize();
+
+        $.ajax({
+            url: actionUrl,
+            method: method,
+            data: data,
+            success: function (response) {
+                console.log(response.message);
+                toastr['success'](response.message);
+                modalInvoice.find('form').trigger('reset');
+                modalInvoice.modal('toggle');
+                dataTable.ajax.reload(null, false);
+            },
+            error: function (xhr, status, error) {
+                if (xhr.status === 422) {
+                    toastr['error'](xhr.responseJSON.message);
+                    var errors = xhr.responseJSON.errors;
+                    handleErrors(errors);
+                }
+            }
+        })
+
+    })
+
 
 })

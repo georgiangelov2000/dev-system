@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row flex-wrap">
-        <div class="card card-default col-5 cardTemplate mr-2">
+        <div class="card card-default col-5 cardTemplate mr-1">
             <div class="card-header">
                 <div class="col-12">
                     <h3 class="card-title">Payment</h3>
@@ -14,7 +14,7 @@
                         @method('PUT')
                         @csrf
                         <div class="form-group col-12">
-                            <input type="hidden" name="purchase_id" value="{{$payment->purchase->id}}">
+                            <input type="hidden" name="purchase_id" value="{{ $payment->purchase->id }}">
                         </div>
                         <div class="form-group col-12">
                             <label for="customer_id">Price</label>
@@ -37,12 +37,8 @@
                                         <i class="far fa-calendar-alt"></i>
                                     </span>
                                 </div>
-                                <input 
-                                    type="text" 
-                                    class="form-control datepicker" 
-                                    name="date_of_payment"
-                                    value="{{$payment->date_of_payment}}"
-                                >
+                                <input type="text" class="form-control datepicker" name="date_of_payment"
+                                    value="{{ $payment->date_of_payment }}">
                             </div>
                             @error('date_of_payment')
                                 <span class="text-danger">{{ $message }}</span>
@@ -77,7 +73,7 @@
                             @error('payment_status')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
-                        </div>                        
+                        </div>
                         <div class="form-group col-12">
                             <label for="payment_reference">Payment reference</label>
                             <input class="form-control" name="payment_reference" type="text"
@@ -100,85 +96,144 @@
                 </div>
             </div>
         </div>
-        <div class="card card-default col-5 cardTemplate">
+        <div class="card card-default col-6 cardTemplate print-only">
             <div class="card-header">
                 <div class="col-12">
                     <h3 class="card-title">Details</h3>
                 </div>
             </div>
             <div class="card-body">
-                <div class="col-12 mb-5">
-                    <div class="col-12">
-                        <span class="font-weight-bold">Name:</span>
-                        <span>{{ $payment->purchase->supplier->name }}</span>
+
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-6">
+                        <div class="col-12">
+                            <span class="font-weight-bold">Name:</span>
+                            <span>{{ $payment->purchase->supplier->name }}</span>
+                        </div>
+                        <div class="col-12">
+                            <span class="font-weight-bold">Email:</span>
+                            <span>{{ $payment->purchase->supplier->email }}</span>
+                        </div>
+                        <div class="col-12">
+                            <span class="font-weight-bold">Phone:</span>
+                            <span>{{ $payment->purchase->supplier->phone }}</span>
+                        </div>
                     </div>
-                    <div class="col-12">
-                        <span class="font-weight-bold">Email:</span>
-                        <span>{{ $payment->purchase->supplier->email }}</span>
-                    </div>
-                    <div class="col-12">
-                        <span class="font-weight-bold">Phone:</span>
-                        <span>{{ $payment->purchase->supplier->phone }}</span>
+                    <div class="col-6 text-right">
+                        @if ($payment->purchase->supplier->image)
+                            <img class="w-25 m-0"
+                                src="{{ $payment->purchase->supplier->image->path . '/' . $payment->purchase->supplier->image->name }}" />
+                        @endif
                     </div>
                 </div>
+
                 <div class="col-12">
-                    <h5 class="text-center">
-                        PAYMENT RECEIPT
-                    </h5>
-                    <table class="table table-hover">
+                    <h5 class="text-center">PAYMENT RECEIPT</h5>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Payment date</th>
+                                <th>Total price</th>
+                                <th>Quantity</th>
+                                <th>Payment method</th>
+                                <th>Payment status</th>
+                                <th>Payment reference</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             <tr>
-                                <td>
-                                    <span>Payment date:</span>
-                                    <b>{{ $payment->date_of_payment }}</b>
+                                <td>{{ $payment->date_of_payment }}</td>
+                                <td>${{ $payment->price }}</td>
+                                <td>{{ $payment->quantity }}</td>
+                                <td>{{ isset(config('statuses.payment_methods_statuses')[$payment->payment_method]) ? config('statuses.payment_methods_statuses')[$payment->payment_method] : '' }}
                                 </td>
+                                <td>{{ isset(config('statuses.payment_statuses')[$payment->payment_status]) ? config('statuses.payment_statuses')[$payment->payment_status] : '' }}
+                                </td>
+                                <td>{{ $payment->payment_reference }}</td>
                             </tr>
-                            <tr>
-                                <td>
-                                    <span>Total price:</span>
-                                    <b>${{ $payment->price }}</b>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span>Payment method:</span>
-                                    <b>
-                                        {{ isset(config('statuses.payment_methods_statuses')[$payment->payment_method]) ? config('statuses.payment_methods_statuses')[$payment->payment_method] : '' }}
-                                    </b>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span>Payment status:</span>
-                                    <b>
-                                        {{ isset(config('statuses.payment_statuses')[$payment->payment_status]) ? config('statuses.payment_statuses')[$payment->payment_status] : '' }}
-                                    </b>
-                                </td>
-                            </tr>                            
                         </tbody>
                     </table>
                 </div>
+
                 <div class="col-12">
-                    <h5 class="text-center">PAYMENT FOR</h5>
-                    <table class="table table-hover">
+                    <h5 class="text-center">PURCHASE</h5>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Single price</th>
+                                <th>Total price</th>
+                                <th>Quantity</th>
+                                <th>Category</th>
+                                <th>Code</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    {{ $payment->purchase->name }}
+                                </td>
+                                <td>
+                                    ${{ $payment->purchase->price }}
+                                </td>
+                                <td>
+                                    ${{ $payment->purchase->total_price }}
+                                </td>
+                                <td>
+                                    ${{ $payment->purchase->initial_quantity }}
+                                </td>
+                                <td>
+                                    {{ $payment->purchase->categories->first()->name }}
+                                </td>
+                                <td>
+                                    {{ $payment->purchase->code }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-12">
+                    <h5 class="text-center">INVOICE</h5>
+                    <table class="table table-striped table-hover">
                         <thead>
                             <tr>
                                 <th>Invoice number</th>
                                 <th>Invoice date</th>
                                 <th>Invoice price</th>
-                                <th>Payment price</th>
+                                <th>Invoice quantity</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>INV-000014</td>
-                                <td>30/06/2023</td>
-                                <td>$35,00</td>
-                                <td>$35,00</td>
+                                <td>{{ $payment->invoice->invoice_number }}</td>
+                                <td>{{ $payment->invoice->invoice_date }}</td>
+                                <td>${{ $payment->invoice->price }}</td>
+                                <td>{{ $payment->invoice->quantity }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+
+                <div class="row align-items-center">
+                    <div class="col-7">
+                        <div class="col-12"><b>Company:</b> <span>{{ $company->name }}</span></div>
+                        <div class="col-12"><b>Phone number:</b> <span>{{ $company->phone_number }}</span></div>
+                        <div class="col-12"><b>Address:</b> <span>{{ $company->address }}</span></div>
+                        <div class="col-12"><b>Tax number:</b> <span>{{ $company->tax_number }}</span></div>
+                    </div>
+                    <div class="col-5 text-right">
+                        @if ($company->image_path)
+                            <img class="w-25 m-0" src="{{ $company->image_path }}" />
+                        @endif
+                    </div>
+                </div>
+
+                <div class="col-12 text-left mt-5">
+                    <button id="print" type="button" class="btn btn-primary" style="margin-right: 5px;">
+                        <i class="fas fa-download"></i> Generate PDF
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -186,9 +241,14 @@
         <script type="text/javascript">
             $(function() {
                 $('select[name="payment_method"],select[name="payment_status"]').selectpicker();
+                
                 $('.datepicker').datepicker({
                     format: 'yyyy-mm-dd'
                 });
+
+                $('#print').on('click', function() {
+                    window.print();
+                })
             })
         </script>
     @endpush
