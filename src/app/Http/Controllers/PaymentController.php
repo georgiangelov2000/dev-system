@@ -12,6 +12,7 @@ use App\Models\InvoiceOrder;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\PurchasePayment;
+use App\Models\CompanySettings;
 use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
@@ -62,7 +63,7 @@ class PaymentController extends Controller
                     $purchase = Purchase::find($id);
 
                     if ($purchase) {
-                        $purchase->is_paid = 1;
+                        $purchase->status = 2;
                         $purchase->save();
 
                         $paymentData = [
@@ -115,7 +116,13 @@ class PaymentController extends Controller
     public function editOrderPayment(OrderPayment $payment)
     {
         $payment->load('order.customer', 'invoice');
-        return view('orders.edit_payment', compact('payment'));
+        $company = CompanySettings::select('id','name','phone_number','address','tax_number','image_path')->first();
+        return view('orders.edit_payment', 
+        [
+            'payment'=>$payment,
+            'company' => $company,
+        ]
+);
     }
 
     public function storeOrderPayment(OrderPaymentRequest $request)
@@ -132,8 +139,7 @@ class PaymentController extends Controller
                     $order = Order::find($id);
 
                     if ($order) {
-                        $order->is_paid = 1;
-                        $order->status = 1;
+                        $order->status = 2;
                         $order->save();
 
                         $paymentData = [
@@ -166,6 +172,16 @@ class PaymentController extends Controller
         DB::beginTransaction();
         try {
             $data = $request->validated();
+
+            if ((int) $data['payment_status'] === 1) {
+                $payment->order->is_paid = 1;
+                $payment->order->status = $data['payment_status'];
+            } else {
+                $payment->order->status = $data['payment_status'];
+            }
+
+            $payment->order->save();
+
             $payment->update($data);
 
             $invoice = $payment->invoice ?: new InvoiceOrder();
@@ -177,7 +193,6 @@ class PaymentController extends Controller
             DB::commit();
             return redirect()->back()->with('success', 'Payment has been updated');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
             return back()->withInput()->with('error', 'Payment has not been updated');
         }

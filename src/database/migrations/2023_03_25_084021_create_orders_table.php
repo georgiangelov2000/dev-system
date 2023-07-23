@@ -25,7 +25,7 @@ class CreateOrdersTable extends Migration
             $table->date('package_extension_date')->nullable();
             $table->date('date_of_sale');
             $table->string('tracking_number');
-            $table->tinyInteger('status')->comment('1=received,3=pending,4=ordered');
+            $table->tinyInteger('status')->comment('1=Paid, 2=Pending, 3=Partially Paid, 4=Overdue, 5=Refunded, 6=Ordered');
             $table->tinyInteger('is_paid')->comment('1=paid,0=not paid')->default(0);
             $table->timestamps();
         });

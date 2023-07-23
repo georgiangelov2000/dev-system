@@ -38,19 +38,6 @@
                         </div>
 
                         <div class="form-group col-3">
-                            <label for="order_status">Order status</label>
-                            <select name="status" id="order_status" class="form-control selectType">
-                                <option value="">Please select</option>
-                                @foreach (config('statuses.order_statuses') as $key => $status)
-                                    @if ($key !== 1 && $status !== 'Received')
-                                        <option value="{{ $key }}">{{ $status }}</option>
-                                    @endif
-                                @endforeach
-                            </select>
-                            <span name="status" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group col-3">
                             <label for="order_status">Tracking number</label>
                             <div class="input-group">
                                 <input type="text" name="tracking_number" class="form-control rounded-0"

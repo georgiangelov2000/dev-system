@@ -1,5 +1,5 @@
 import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
-import { swalText, showConfirmationDialog,mapButtons } from '../helpers/action_helpers';
+import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 
 $(function () {
     $('.selectAction, .selectType, .selectCustomer').selectpicker();
@@ -18,10 +18,10 @@ $(function () {
     });
     let dateRange = $('input[name="datetimes"]').val();
 
-    $('.datepicker').datepicker({format: 'mm/dd/yyyy'}).datepicker('setDate', new Date());
+    $('.datepicker').datepicker({ format: 'mm/dd/yyyy' }).datepicker('setDate', new Date());
 
     const applyBtn = $('.applyBtn');
-    
+
     applyBtn.bind('click', function () {
         dateRange = $('input[name="datetimes"]').val();
         dataTable.ajax.reload(null, false);
@@ -60,13 +60,13 @@ $(function () {
                 }
             },
             {
-                width:'5%',
-                orderable:false,
-                render: function(data,type,row) {
+                width: '5%',
+                orderable: false,
+                render: function (data, type, row) {
                     let payment;
 
-                    if(row.order_payments) {
-                        payment = `<a href=${PAYMENT_API.replace(':id',row.order_payments.id)}>${row.order_payments.date_of_payment}</a>`
+                    if (row.order_payments) {
+                        payment = `<a href=${PAYMENT_API.replace(':id', row.order_payments.id)}>${row.order_payments.date_of_payment}</a>`
                     } else {
                         payment = ''
                     }
@@ -132,7 +132,7 @@ $(function () {
                 width: '6%',
                 orderable: false,
                 render: function (data, type, row) {
-                    if(row.package_extension_date) {
+                    if (row.package_extension_date) {
                         return `<span>${moment(row.package_extension_date).format('YYYY-MM-DD')}</span>`
                     } else {
                         return `<span>${moment(row.date_of_sale).format('YYYY-MM-DD')}</span>`
@@ -146,8 +146,8 @@ $(function () {
                 name: 'expired',
                 render: function (data, type, row) {
                     let date;
-                    
-                    if(row.package_extension_date) {
+
+                    if (row.package_extension_date) {
                         date = moment(row.package_extension_date);
                     } else {
                         date = moment(row.date_of_sale);
@@ -155,16 +155,19 @@ $(function () {
 
                     let currentDate = moment();
                     let daysRemaining = date.diff(currentDate, 'days');
+                    
+                    console.log(row.status);
 
-                    if (currentDate.isAfter(date, 'day') && (row.status === 'Pending' || row.status === 'Ordered')) {
+                    if (row.status === 'Ordered' && row.is_paid !== true) {
                         return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
-                    } else if (row.status === 'Received') {
-                        return `<span class="badge badge-success p-2">Order received</span>`;
-                    }
-                    else {
+                    } else if (row.status === 'Ordered') {
                         let badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
                         return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
+                    } else {
+                        return `<span class="badge badge-success p-2">Order received</span>`;
                     }
+                    
+                    
                 }
             },
             {
@@ -188,7 +191,7 @@ $(function () {
                 orderable: false,
                 name: 'package',
                 render: function (data, type, row) {
-                   return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id',row.package_id)}>${row.package}</a>`;
+                    return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id', row.package_id)}>${row.package}</a>`;
                 }
             },
             {
@@ -197,14 +200,25 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    if (row.status === 'Received') {
-                        return '<i title="Reveived" class="fa-light fa-check"></i>';
+                    if (row.status === 'Paid') {
+                        return '<img style="height:40px;" class="w-50" title="Paid" src = "/storage/images/static/succesfully.png" /> '
                     }
                     else if (row.status === 'Pending') {
-                        return '<i title="Pending" class="fa-light fa-loader"></i>'
+                        return '<img style="height:40px;" class="w-50" title= "Pending" src = "/storage/images/static/pending.png" /> '
+                    }
+                    else if (row.status === 'Partially Paid') {
+                        return '<img style="height:40px;" class="w-50" title="Partially Paid" src = "/storage/images/static/partially-payment.png" /> '
+                    }
+                    else if (row.status === 'Overdue') {
+                        return '<img style="height:40px;" class="w-50" title="Overdue" src = "/storage/images/static/overdue.png" /> '
+                    }
+                    else if (row.status === 'Refunded') {
+                        return '<img style="height:40px;" class="w-50" title="Refunded" src = "/storage/images/static/ordered.png" /> '
                     }
                     else if (row.status === 'Ordered') {
-                        return '<i title="Ordered" class="fa-light fa-truck"></i>'
+                        return '<img style="height:40px;" class="w-50" title="Ordered" src = "/storage/images/static/refund.png" /> '
+                    } else {
+                        return '';
                     }
                 }
             },
@@ -230,7 +244,7 @@ $(function () {
                     let detachPackage = '';
                     let deleteFormTemplate = '';
 
-                    if(row.package && !row.is_paid && (row.status === 'Ordered' || row.status === 'Pending') ) {
+                    if (row.package && !row.is_paid && (row.status === 'Ordered' || row.status === 'Pending')) {
                         detachPackage = `
                         <form onsubmit="detachOrder(event)" style='display:inline-block;' id='detach-form' action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method='PUT'>
                             <input type='hidden' name='id' value='${row.id}'>
@@ -253,7 +267,7 @@ $(function () {
                                 <button type="submit" order-id="${row.id}" value="4" onclick="event.preventDefault(); changeStatus(this)" class="dropdown-item">Ordered</button>
                                 </div>
                             </form>
-                        </div>`;         
+                        </div>`;
                         deleteFormTemplate = `
                         <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
                             <input type='hidden' name='_method' value='DELETE'>
@@ -261,7 +275,7 @@ $(function () {
                             <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
                                 <i class='fa-light fa-trash text-danger'></i>
                             </button>
-                        </form>`;           
+                        </form>`;
                     }
 
                     let previewButton = '<a title="Review" class="btn p-0"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
@@ -276,7 +290,7 @@ $(function () {
     function packageData(d) {
         var orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
         var orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
-        
+
         var data = {
             'customer': bootstrapCustomer.val(),
             'status': bootstrapOrderStatus.val(),
@@ -284,16 +298,16 @@ $(function () {
             'date_range': dateRange,
             'order_column': orderColumnName, // send the column name being sorted
             'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
-            'limit': d.custom_length = d.length, 
+            'limit': d.custom_length = d.length,
         };
-    
+
         if (typeof PACKAGE !== 'undefined') {
             data.package = PACKAGE;
         }
-    
+
         return data;
     }
-    
+
 
     bootstrapCustomer.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         dataTable.ajax.reload(null, false);
@@ -352,18 +366,18 @@ $(function () {
         let form = event.target;
         let url = form.getAttribute('action');
         let method = form.getAttribute('method');
-        
+
         $.ajax({
-            url:url,
-            method:method,
+            url: url,
+            method: method,
             data: {
                 detach_package: true
             },
-            success: function(response){
+            success: function (response) {
                 toastr['success'](response.message);
-                dataTable.ajax.reload(null,false);
+                dataTable.ajax.reload(null, false);
             },
-            error: function(error) {
+            error: function (error) {
                 toastr['error'](error.message);
             }
         })
@@ -374,7 +388,7 @@ $(function () {
         let status = $(e).attr('value');
         let url = form.attr('action');
         let method = form.attr('method');
-        
+
 
         $.ajax({
             url: url,
@@ -382,11 +396,11 @@ $(function () {
             data: {
                 status: status
             },
-            success: function(response){
+            success: function (response) {
                 toastr['success'](response.message);
-                dataTable.ajax.reload(null,false);
+                dataTable.ajax.reload(null, false);
             },
-            error: function(error) {
+            error: function (error) {
                 toastr['error'](error.message);
             }
         })

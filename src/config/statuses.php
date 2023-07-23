@@ -1,9 +1,12 @@
 <?php 
 return [
     "order_statuses" => [
-        1 => "Received",
-        3 => "Pending",
-        4 => "Ordered"
+        1 => 'Paid',
+        2 => 'Pending',
+        3 => 'Partially Paid',
+        4 => 'Overdue',
+        5 => 'Refunded',
+        6 => 'Ordered',
     ],
     "package_types" => [
         1 => "Standart",
@@ -17,7 +20,7 @@ return [
     ],
     'is_paid_statuses' => [
         0 => false,
-        1 => true
+        1 => true,
     ],
     'payment_methods_statuses' => [
         1 => 'Cash',
@@ -27,8 +30,8 @@ return [
         5 => 'Online Payment'
     ],
     'payment_statuses' => [
-        1 => 'Pending',
-        2 => 'Paid',
+        1 => 'Paid',
+        2 => 'Pending',
         3 => 'Partially Paid',
         4 => 'Overdue',
         5 => 'Refunded',

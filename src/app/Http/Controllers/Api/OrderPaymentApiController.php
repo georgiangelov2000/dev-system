@@ -22,11 +22,7 @@ class OrderPaymentApiController extends Controller
         $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
 
-        $paymentQ = OrderPayment::query()
-            ->with('order.purchase','invoice')
-            ->whereHas('order', function ($query) {
-                $query->where('is_paid', 1)->where('status', 1);
-            });
+        $paymentQ = OrderPayment::query()->with('order.purchase','invoice');
 
         if ($customer) {
             $paymentQ->whereHas('order', function ($query) use ($customer) {

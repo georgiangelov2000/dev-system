@@ -28,12 +28,6 @@
                 </div>
             <table id="ordersTable" class="table table-hover table-sm dataTable no-footer">
                 <thead>
-                    <th>
-                        <div class="form-check">
-                            <input class="form-check-input selectAll" type="checkbox">
-                            <label class="form-check-label" for="flexCheckDefault"></label>
-                        </div>
-                    </th>
                     <th>ID</th>
                     <th>Invoice number</th>
                     <th>Customer</th>

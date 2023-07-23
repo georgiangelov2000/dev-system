@@ -137,12 +137,10 @@
                     </div>
                     <div class="col-2 p-2">
                         <div class="row w-100 mb-2">
-                            @if ($customer->image)
                                 <div class="col-12">
                                     <img class="cardWidgetImage w-100 m-0"
                                         src="{{ $customer->image ? $customer->image->path . '/' . $customer->image->name : 'https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg' }}" />
                                 </div>
-                            @endif
                             <div class="col-12 mt-3 d-none imagePreview">
                                 <div class="position-relative">
                                     <img id="preview-image" alt="Preview"

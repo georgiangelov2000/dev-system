@@ -235,3 +235,19 @@ table.dataTable{
 	width: 100%;
 	height: 100%;
   }
+
+  @media print {
+	.cardTemplate {
+		display: none !important; /* Hide the cardTemplate divs during print */
+	}
+
+	.print-only {
+		display: block !important; /* Show the Details div during print */
+		flex: 0 0 100%;
+		max-width: 100%;
+		border: none;
+	}
+	#print{
+		display: none;
+	}
+}

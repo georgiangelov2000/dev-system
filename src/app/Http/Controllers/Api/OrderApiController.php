@@ -48,7 +48,7 @@ class OrderApiController extends Controller
             $orderQuery->where('customer_id', $customer);
         }
         if($isPaid == false){
-            $orderQuery->where('is_paid',0)->whereIn('status',[3,4]);
+            $orderQuery->where('is_paid',0)->whereIn('status',[2,3,4,5,6]);
         }
         if($package) {
             $orderQuery->whereHas('packages', function ($query) use ($package) {

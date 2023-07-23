@@ -96,7 +96,7 @@ class PurchaseApiController extends Controller
             $purchaseQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
         }
         if(!$is_paid) {
-            $purchaseQuery->where('is_paid',0)->whereDoesntHave('payment');
+            $purchaseQuery->where('is_paid',0)->whereIn('status',[2,3,4,5,6]);
         }
         if (isset($request->out_of_stock)) {
             if($request->out_of_stock) {
@@ -119,7 +119,7 @@ class PurchaseApiController extends Controller
                         $query->where('status', 1)->where('is_paid', 1);
                     },
                     'orders as unpaid_orders_count' => function ($query) {
-                        $query->whereIn('status', [3, 4])->where('is_paid', false);
+                        $query->whereIn('status', [2,3,4,5,6])->where('is_paid', false);
                     }
                 ]);
         }

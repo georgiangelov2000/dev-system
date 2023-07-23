@@ -43,17 +43,6 @@ $(function () {
         },
         columns: [
             {
-                orderable: false,
-                width: "1%",
-                render: function (data, type, row) {
-                    let checkbox = '<div div class="form-check">\n\
-                       <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
-                    </div>';
-
-                    return `${checkbox}`;
-                }
-            },
-            {
                 width: '3%',
                 name: "id",
                 render: function (data, type, row) {
@@ -115,25 +104,33 @@ $(function () {
                 }
             },
             {
-                width: '7%',
+                width: '5%',
                 orderable: false,
                 name: 'expired',
                 render: function (data, type, row) {
-                    var dateOfSale = moment(row.date_of_sale);
-                    var currentDate = moment();
-                    var daysRemaining = dateOfSale.diff(currentDate, 'days');
+                    let date;
 
-                    if (currentDate.isAfter(dateOfSale, 'day') && (row.status === 'Pending' || row.status === 'Ordered')) {
+                    if (row.package_extension_date) {
+                        date = moment(row.package_extension_date);
+                    } else {
+                        date = moment(row.date_of_sale);
+                    }
+
+                    let currentDate = moment();
+                    let daysRemaining = date.diff(currentDate, 'days');
+                    
+                    console.log(row.status);
+
+                    if (row.status === 'Ordered' && row.is_paid !== true) {
                         return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
-                    } else if (row.status === 'Received') {
+                    } else if (row.status === 'Ordered') {
+                        let badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
+                        return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
+                    } else {
                         return `<span class="badge badge-success p-2">Order received</span>`;
                     }
-                    else {
-                        var badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
-                        return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
-                    } {
-
-                    }
+                    
+                    
                 }
             },
             {
@@ -168,14 +165,25 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    if (row.status === 'Received') {
-                        return '<i title="Reveived" class="fa-light fa-check"></i>';
+                    if (row.status === 'Paid') {
+                        return '<img style="height:40px;" class="w-50" title="Paid" src = "/storage/images/static/succesfully.png" /> '
                     }
                     else if (row.status === 'Pending') {
-                        return '<i title="Pending" class="fa-light fa-loader"></i>'
+                        return '<img style="height:40px;" class="w-50" title= "Pending" src = "/storage/images/static/pending.png" /> '
+                    }
+                    else if (row.status === 'Partially Paid') {
+                        return '<img style="height:40px;" class="w-50" title="Partially Paid" src = "/storage/images/static/partially-payment.png" /> '
+                    }
+                    else if (row.status === 'Overdue') {
+                        return '<img style="height:40px;" class="w-50" title="Overdue" src = "/storage/images/static/overdue.png" /> '
+                    }
+                    else if (row.status === 'Refunded') {
+                        return '<img style="height:40px;" class="w-50" title="Refunded" src = "/storage/images/static/ordered.png" /> '
                     }
                     else if (row.status === 'Ordered') {
-                        return '<i title="Ordered" class="fa-light fa-truck"></i>'
+                        return '<img style="height:40px;" class="w-50" title="Ordered" src = "/storage/images/static/refund.png" /> '
+                    } else {
+                        return '';
                     }
                 }
             },

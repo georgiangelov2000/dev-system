@@ -16,7 +16,6 @@ class OrderRequest extends FormRequest
         return [
             'customer_id' => 'required|integer',
             'date_of_sale' => 'required|date',
-            'status' => 'required|integer',
             'tracking_number' => 'required|string',
             
             'product_id' => 'required',

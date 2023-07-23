@@ -45,19 +45,6 @@
                             @enderror
                         </div>
 
-                        <div class="form-group col-3">
-                            <label for="">Order status</label>
-                            <select name="status" id="" class="form-control selectType">
-                                @foreach (config('statuses.order_statuses') as $key => $status)
-                                    <option {{ $currentOrder->status === $key ? 'selected' : '' }}
-                                        value="{{ $key }}">{{ $status }}</option>
-                                @endforeach
-                            </select>
-                            @error('status')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-
                         <div class="col-3">
                             <label for="order_status">Tracking number</label>
                             <div class="input-group mb-3">

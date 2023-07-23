@@ -39,7 +39,6 @@ class OrderController extends Controller
             $trackingNumber = (string) $request->tracking_number;
             $customer = (int) $request->customer_id;
             $orderDateOfSale = date('Y-m-d', strtotime($request->date_of_sale));
-            $orderStatus = (int) $request->status;
 
             $orders = [];
             foreach ($purchaseIds as $key => $purchaseId) {
@@ -75,8 +74,8 @@ class OrderController extends Controller
                     'original_sold_price' =>  $originalPrice,
                     'discount_percent' => $orderDiscount,
                     'date_of_sale' => $orderDateOfSale,
-                    'status' => $orderStatus,
                     'tracking_number' => $trackingNumber,
+                    'status' => 6,
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
@@ -108,7 +107,6 @@ class OrderController extends Controller
         try {
             $customer_id = (int) $request->customer_id;
             $date_of_sale = date('Y-m-d', strtotime($request->date_of_sale));
-            $status = $request->status;
             $tracking_number = (string) $request->tracking_number;
             $purchase_id = (int) $request->product_id;
             $sold_quantity = (int) $request->sold_quantity;
@@ -129,9 +127,9 @@ class OrderController extends Controller
             $purchase->quantity = $finalQuantity;
 
             if ($purchase->quantity === 0) {
-                $purchase->status = 'disabled';
+                $purchase->status = 0;
             } else {
-                $purchase->status = 'enabled';
+                $purchase->status = 1;
             }
 
             $purchase->save();
@@ -148,7 +146,6 @@ class OrderController extends Controller
                 'original_sold_price' => FunctionsHelper::calculatedFinalPrice($single_sold_price, $sold_quantity),
                 'discount_percent' => $discount_percent,
                 'date_of_sale' => $date_of_sale,
-                'status' => $status,
                 'tracking_number' => $tracking_number,
             ]);
             DB::commit();
