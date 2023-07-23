@@ -8,7 +8,7 @@
                     <h3 class="card-title">Payment</h3>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="col-12 d-flex flex-wrap">
                     <form action="{{ route('payment.update.order', $payment->id) }}" class="col-12" method="POST">
                         @method('PUT')
@@ -212,13 +212,13 @@
                     </table>
                 </div>
                 <div class="row align-items-center">
-                    <div class="col-6">
-                        <div><b>Company:</b> <span>{{ $company->name }}</span></div>
-                        <div><b>Phone number:</b> <span>{{ $company->phone_number }}</span></div>
-                        <div><b>Address:</b> <span>{{ $company->address }}</span></div>
-                        <div><b>Tax number:</b> <span>{{ $company->tax_number }}</span></div>
+                    <div class="col-7">
+                        <div class="col-12"><b>Company:</b> <span>{{ $company->name }}</span></div>
+                        <div class="col-12"><b>Phone number:</b> <span>{{ $company->phone_number }}</span></div>
+                        <div class="col-12"><b>Address:</b> <span>{{ $company->address }}</span></div>
+                        <div class="col-12"><b>Tax number:</b> <span>{{ $company->tax_number }}</span></div>
                     </div>
-                    <div class="col-6 text-right">
+                    <div class="col-5 text-right">
                         @if ($company->image_path)
                             <img class="w-25 m-0" src="{{ $company->image_path }}" />
                         @endif

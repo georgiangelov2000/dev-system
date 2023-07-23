@@ -1,3 +1,5 @@
+import { APICaller } from '../ajax/methods';
+import { handleErrors } from '../helpers/action_helpers';
 $(function () {
   $('.selectCustomer').selectpicker('refresh').val('').trigger('change')
 
@@ -8,11 +10,17 @@ $(function () {
     }
   });
 
+  $('.datepicker').datepicker({
+    format: 'yyyy-mm-dd'
+  });
+
   let disabledOption = $('.disabledDateRange');
   let dateRangePicker = $('input[name="datetimes"]');
   let dateRangeCol = $('.dateRange');
   let bootstrapSelectCustomer = $('.bootstrap-select .selectCustomer');
   let btnFilter = $('#filter');
+  let modalInvoice = $('#modalInvoice');
+  let submitForm = $('#submitForm');
 
   let dataTable;
   let supplierData;
@@ -186,17 +194,17 @@ $(function () {
         {
           name: 'payment_status',
           render: function (data, type, row) {
-            if(row.payment_status === 'Paid') {
+            if (row.payment_status === 'Paid') {
               return `<i title="Paid" class="fa-light fa-check"></i>`
             }
-            else if(row.payment_status === 'Pending') {
+            else if (row.payment_status === 'Pending') {
               return `<i title="Pending" class="fa-light fa-loader"></i>`
             }
-            else if(row.payment_status === 'Overdue') {
+            else if (row.payment_status === 'Overdue') {
               return `<i title="Overdue" class="fa-light fa-exclamation"></i>`
-            } else if(row.payment_status === 'Refunded') {
+            } else if (row.payment_status === 'Refunded') {
               return `<i title="Refunded" class="fa-light fa-rotate-left"></i>`
-            } 
+            }
             else {
               return '';
             }
@@ -217,23 +225,75 @@ $(function () {
         {
           render: function (data, type, row) {
 
-              let edit = `
-              <a href="${ORDER_PAYMENT_EDIT_ROUTE.replace(":id",row.id)}" title="Edit" class="btn p-0" href="">
+            let edit = `
+              <a href="${ORDER_PAYMENT_EDIT_ROUTE.replace(":id", row.id)}" title="Edit" class="btn p-0" href="">
                   <i class="fa-light fa-pen text-primary"></i>
               </a>
               `;
 
-              let invoice = `
-              <a href="${ORDER_INVOICE_EDIT_ROUTE.replace(":id",row.invoice.id)}" target="_blank" href="" title="Invoice" class="btn p-0"> 
+            let invoice = `
+              <a type="button" data-id="${row.invoice.id}" onclick="editInvoice(this)" title="Invoice" class="btn p-0"> 
                 <i class="fa-light fa-file-invoice text-primary"></i>
               </a>`;
 
-              return `${edit} ${invoice}`;
+            return `${edit} ${invoice}`;
           }
         }
       ]
     });
 
   }
+
+  // Window actions
+  window.editInvoice = function (e) {
+    let id = $(e).attr('data-id');
+    APICaller(ORDER_INVOICE_API_ROUTE, { 'id': id }, function (response) {
+      let invoice = response.data[0];
+
+      modalInvoice.modal('show');
+
+      modalInvoice.find('form').attr('action', ORDER_INVOICE_UPDATE_ROUTE.replace(":id", id))
+
+      modalInvoice.find('form input').each(function () {
+        let inputName = $(this).attr('name');
+
+        if (inputName && invoice.hasOwnProperty(inputName)) {
+          $(this).val(invoice[inputName]);
+        }
+      });
+
+    }, function (error) {
+      toastr['error'](error.message);
+    });
+  }
+
+  submitForm.on('click', function (e) {
+    e.preventDefault();
+
+    let actionUrl = modalInvoice.find('form').attr('action');
+    let method = modalInvoice.find('form').attr('method');
+    let data = modalInvoice.find('form').serialize();
+
+    $.ajax({
+      url: actionUrl,
+      method: method,
+      data: data,
+      success: function (response) {
+        console.log(response.message);
+        toastr['success'](response.message);
+        modalInvoice.find('form').trigger('reset');
+        modalInvoice.modal('toggle');
+        dataTable.ajax.reload(null, false);
+      },
+      error: function (xhr, status, error) {
+        if (xhr.status === 422) {
+          toastr['error'](xhr.responseJSON.message);
+          var errors = xhr.responseJSON.errors;
+          handleErrors(errors);
+        }
+      }
+    })
+
+  })
 
 })

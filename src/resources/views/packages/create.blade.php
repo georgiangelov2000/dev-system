@@ -160,7 +160,7 @@
                                             <h5 class="description-header ordersCount">
                                                 0
                                             </h5>
-                                            <span class="description-text">Total purchases</span>
+                                            <span class="description-text">Purchases</span>
                                         </div>
 
                                     </div>

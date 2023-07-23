@@ -10,23 +10,20 @@ use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
-    public function editPurchaseInvoice(InvoicePurchase $invoice){
-        $invoice->load('purchasePayment.purchase:id,name,supplier_id', 'purchasePayment.purchase.supplier');
-        return view('purchases.edit_invoice',compact('invoice'));
-    }
     
     public function updatePurchaseInvoice(InvoicePurchase $invoice, Request $request) {
         DB::beginTransaction();
         try {
 
             $data = $request->validated();
+
             $invoice->update($data);
 
             DB::commit();
-            return redirect()->back()->with('success', 'Invoice has been updated');
+            return response()->json(['message' => 'Successfully updated invoice',200]);
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withInput()->with('error', 'Invoice has not been updated');
+            return response()->json(['message' => 'Unsuccesfully updated invoice',500]);
         }
     }
 
@@ -35,18 +32,14 @@ class InvoiceController extends Controller
         try {
             
             $data = $request->validated();
+
             $invoice->update($data);
             
             DB::commit();
-            return redirect()->back()->with('success', 'Invoice has been updated');
+            return response()->json(['message' => 'Successfully updated invoice',200]);
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withInput()->with('error', 'Invoice has not been updated');
+            return response()->json(['message' => 'Unsuccesfully updated invoice',500]);
         }
-    }
-
-    public function editOrderInvoice(InvoiceOrder $invoice){
-        $invoice->load('orderPayment.order:id,customer_id','orderPayment.order.customer');
-        return view('orders.edit_invoice',compact('invoice'));
     }
 }

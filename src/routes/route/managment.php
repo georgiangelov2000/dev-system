@@ -144,12 +144,8 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('invoices')->name('invoice.')->group(function () {
-        Route::get('/edit/{invoice}', [InvoiceController::class, 'editPurchaseInvoice'])->name('purchase.edit');
         Route::put('/update/{invoice}', [InvoiceController::class, 'updatePurchaseInvoice'])->name('purchase.update');
-
-
-        Route::get('/order/edit/{invoice}', [InvoiceController::class, 'editOrderInvoice'])->name('order.edit');
-        Route::put('/order/update/{invoice}', [InvoiceController::class, 'updateOrderInvoice'])->name('order.update');
+        Route::put('/order/update/{invoice}', [InvoiceController::class, 'updateOrderInvoice'])->name('update.order');
     });
 
     Route::prefix('states')->name('state')->group(function () {
