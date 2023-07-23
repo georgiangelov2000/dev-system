@@ -155,8 +155,8 @@ $(function () {
                 orderable: false,
                 name: 'date_of_paymemt',
                 render: function (data, type, row) {
-                    if (row.order_payments.length) {
-                        return `<span>${moment(row.order_payments[0].date_of_payment).format('YYYY-MM-DD')}<span>`;
+                    if (row.order_payments) {
+                        return `<span>${moment(row.order_payments.date_of_payment).format('YYYY-MM-DD')}<span>`;
                     } else {
                         return ''
                     }
