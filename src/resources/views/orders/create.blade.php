@@ -25,7 +25,7 @@
                         </div>
 
                         <div class="form-group col-3">
-                            <label>Date order:</label>
+                            <label>Date of sale:</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
@@ -39,11 +39,19 @@
 
                         <div class="form-group col-3">
                             <label for="order_status">Tracking number</label>
-                            <div class="input-group">
-                                <input type="text" name="tracking_number" class="form-control rounded-0"
-                                    placeholder="Enter or generate tracking number">
+                            <div class="input-group mb-3">
+                                <input 
+                                    type="text" 
+                                    name="tracking_number" 
+                                    class="form-control"
+                                    placeholder="Enter or generate tracking number"
+                                >
                                 <span class="input-group-append">
-                                    <button type="button" id="generateCode" class="btn btn-primary btn-flat">Generate</button>
+                                    <button 
+                                        type="button" 
+                                        id="generateCode" 
+                                        class="btn btn-primary btn-flat"
+                                    >Generate</button>
                                 </span>
                             </div>
                             <span name="tracking_number" class="text-danger"></span>
@@ -59,57 +67,19 @@
 
                     <table class="table table-hover table-sm productOrderTable ">
                         <thead>
-                            <th>Action</th>
+                            <th>Actions</th>
                             <th>Product</th>
-                            <th>Quantity</th>
-                            <th>Single price</th>
-                            <th>Total order price</th>
-                            <th>Discount %</th>
-                            <th>Avail. quantity</th>
-                            <th>Single price</th>
-                            <th>Total price</th>
+                            <th>Unit price</th>
+                            <th>Qty</th>
+                            <th>Category</th>
+                            <th>Brands</th>
+                            <th>Order qty</th>
+                            <th>Order unit price</th>
+                            <th>Order discount %</th>
+                            <th>Order original price</th>
+                            <th>Order regular price</th>
                         </thead>
                     </table>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="cardTemplate mt-2 mb-2">
-                                <div class="card-footer rounded bg-white p-0">
-                                    <div class="row">
-                                        <div class="col-sm-4 col-6">
-                                            <div class="description-block border-right">
-                                                <h5 class="description-header" id="totalOrdersPrice">
-                                                    0
-                                                </h5>
-                                                <span class="description-text">Total purchase price</span>
-                                            </div>
-
-                                        </div>
-
-                                        <div class="col-sm-4 col-6">
-                                            <div class="description-block border-right">
-                                                <h5 class="description-header" id="totalOrdersQuantity">
-                                                    0
-                                                </h5>
-                                                <span class="description-text">Total purchase quantity</span>
-                                            </div>
-
-                                        </div>
-                                        <div class="col-sm-4 col-6">
-                                            <div class="description-block">
-                                                <h5 class="description-header">0</h5>
-                                                <span class="description-text">Total counts</span>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>

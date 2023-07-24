@@ -18,8 +18,8 @@ class OrderRequest extends FormRequest
             'date_of_sale' => 'required|date',
             'tracking_number' => 'required|string',
             
-            'product_id' => 'required',
-            'product_id.*' => 'numeric',
+            'purchase_id' => 'required',
+            'purchase_id.*' => 'numeric',
         
             'sold_quantity' => 'required',
             'sold_quantity.*' => 'numeric|min:1',

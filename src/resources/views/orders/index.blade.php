@@ -83,15 +83,15 @@
                             <th>Payment</th>
                             <th>Customer</th>
                             <th>Product</th>
-                            <th>Quantity</th>
-                            <th>Single price</th>
-                            <th>Official price</th>
-                            <th>Original price</th>
+                            <th title="Quantity">Qty</th>
+                            <th title="Single price">Unit Price</th>
+                            <th title="Official price">Official Price</th>
+                            <th title="Original price">Orig. Price</th>                            
                             <th>Discount</th>
                             <th>Date of sale</th>
                             <th>Expired</th>
-                            <th>Created</th>
-                            <th>Updated</th>
+                            <th>Delay Payment</th>
+                            <th>Payment date</th>
                             <th>Package</th>
                             <th class="text-center">Status</th>
                             <th>Paid</th>

@@ -92,7 +92,11 @@ $(function () {
                 width: '1%',
                 orderable: false,
                 render: function (data, type, row) {
-                    return `<a href="${PAYMENT.replace(':id', row.payment.id)}">${row.payment.date_of_payment}</a>`
+                    if(row.payment) {
+                        return `<a href="${PAYMENT.replace(':id', row.payment.id)}">${row.payment.date_of_payment}</a>`
+                    } else {
+                        return ``;
+                    }
                 }
             },
             {

@@ -106,7 +106,7 @@ class PurchaseApiController extends Controller
             }
         }
         if ($select_json !== null) {
-            $purchaseQuery->with([]);
+            $purchaseQuery->with(['categories:id,name','brands']);
             return response()->json(
                 $purchaseQuery->get()
             );

@@ -6,15 +6,9 @@ $(function () {
   $('.selectType').selectpicker();
   $('.productFilter').selectpicker();
 
-  if (typeof DATE_OF_SALE !== 'undefined' && DATE_OF_SALE) {
-    $('.datepicker').datepicker({
-      format: 'mm/dd/yyyy'
-    }).datepicker('setDate', new Date(DATE_OF_SALE));
-  } else {
-    $('.datepicker').datepicker({
-      format: 'mm/dd/yyyy'
-    }).datepicker('setDate', new Date());
-  }
+  $('.datepicker').datepicker({
+    format: 'mm/dd/yyyy'
+  })
 
   let totalPriceAllProducts = 0;
   let availableQuantity = 0;
@@ -24,19 +18,18 @@ $(function () {
   let table = $('.productOrderTable');
   let submitBtn = $('#orderForm button[type="submit"]');
 
+  let columns = [];
+  let tableTh = table.find('th').length;
+
+  for (let index = 0; index < tableTh; index++) {
+    columns.push(
+      { width: '5%', class: 'text-center' }
+    );
+  }
+
   table.DataTable({
     ordering:false,
-    columns: [
-      { width: '1%',},
-      { width: '5%', class: 'text-center' },
-      { width: '5%', class: 'text-center' },
-      { width: '5%', class: 'text-center' },
-      { width: '6%', class: 'text-center' },
-      { width: '5%', class: 'text-center' },
-      { width: '3%', class: 'text-center' },
-      { width: '2%', class: 'text-center' },
-      { width: '2%', class: 'text-center' },
-    ]
+    columns: columns
   });
 
   $('.selectCustomer input[type="text"]').on('keyup', function () {
@@ -76,12 +69,16 @@ $(function () {
       if (products.length > 0) {
         bootstrapProduct.append('<option value="" style="display:none;"></option>');
         $.each(products, function ($key, product) {
+          
           bootstrapProduct.append(`<option
                      value="${product.id}"
                      data-name="${product.name}"
                      data-quantity="${product.quantity}"
                      data-single-price="${product.price}"
                      data-total-price="${product.total_price}"
+                     data-category="${product.categories[0].name}"
+                     data-brands="${product.brands.map(brand => brand.name).join(', ')}"
+                     data-original_price="${product.original_price}"
                      > ${product.name} </option>`)
         })
       }
@@ -109,30 +106,36 @@ $(function () {
   let counter = 0;
   bootstrapProduct.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
     let selectedOption = $(this).find('option').eq(clickedIndex);
-    let { name, quantity, singlePrice, totalPrice } = selectedOption.data();
-
+  
+    let { name, quantity, singlePrice, totalPrice, category, brands, regularPrice } = selectedOption.data();
+  
     let existingRow = table.find(`tr[data-id="${$(this).val()}"]`);
     if (!existingRow.length) {
       totalPriceAllProducts += parseFloat(totalPrice);
       availableQuantity += parseInt(quantity);
       counter++;
-      renderData($(this).val(), name, quantity, singlePrice, totalPrice);
+      renderData(
+        $(this).val(),
+        name,
+        singlePrice,
+        category,
+        brands,
+        quantity,
+      );
+
+    // Destroy the Bootstrap Select to remove its functionality
+    $(this).empty()
+    $(this).selectpicker('refresh');
     }
-
-    updateOrderSummary();
   });
-
-  function updateOrderSummary() {
-    // console.log(totalPriceAllProducts)
-    $('#totalOrdersPrice').html(totalPriceAllProducts.toFixed(2));
-    $('#totalOrdersQuantity').html(availableQuantity);
-  }
+  
 
   function updateTotalOrderPrice(row) {
     const orderQuantity = parseInt(row.find('.orderQuantity').val()) || 0;
     const orderPrice = parseFloat(row.find('.orderSinglePrice').val()) || 0;
     const orderTotal = (orderQuantity * orderPrice).toLocaleString('en-US', { minimumFractionDigits: 2 }).replace(",", ".");
-    row.find('.totalOrderPrice').html(orderTotal);
+    row.find('.originalPrice').html(orderTotal);
+    row.find('.regularPrice').html(orderTotal)
   }
 
   window.removeRow = function (button) {
@@ -144,7 +147,6 @@ $(function () {
     totalPriceAllProducts -= parseFloat(rowTotalPrice);
     availableQuantity -= parseInt(rowQuantity);
     table.DataTable().row(tr).remove().draw();
-    updateOrderSummary();
   }
 
   window.handleSinglePrice = function (e) {
@@ -174,11 +176,18 @@ $(function () {
         const orderPrice = (quantity * singlePrice);
         discountPrice = orderPrice - (orderPrice * discount) / 100;
       }
-      row.find('.totalOrderPrice').html(discountPrice.toFixed(2));
+      row.find('.originalPrice').html(discountPrice.toFixed(2));
     }
   };
 
-  function renderData(id, name, quantity, singlePrice, totalPrice) {
+  function renderData(
+    id, 
+    name, 
+    singlePrice, 
+    category,
+    brands,
+    quantity,
+  ) {
 
     if (table.find(`tr[data-id="${id}"]`).length) {
       return;
@@ -186,20 +195,24 @@ $(function () {
 
     const template = `
           <tr data-id="${id}">
-              <input type="hidden" value='${id}' name="product_id[]" />
+              <input type="hidden" value='${id}' name="purchase_id[]" />
             <td>
               <button class="text-danger btn p-0" onclick="removeRow(this)" type="button">
                 <i class="fa-light fa-trash text-danger"></i>
               </button>
             </td>
-
             <td>${name}</td>
+            <td>€${singlePrice}</td>
+            <td>${quantity}</td>
+            <td>${category}</td>
+            <td>${brands}</td>
             <td>
               <div class="form-group col-12">
                 <input 
                   name="sold_quantity[]" 
                   type='number' 
-                  max='${quantity}' 
+                  max='${quantity}'
+                  min="1" 
                   class='form-control form-control-sm orderQuantity' 
                   value="0" 
                   onkeyup="handleOrderQuantity(this)" 
@@ -213,20 +226,19 @@ $(function () {
                   type='text'
                   name="single_sold_price[]" 
                   class='form-control form-control-sm orderSinglePrice' 
-                  value="0" 
+                  value="0"
+                  min="0"
                   onkeyup="handleSinglePrice(this)" 
                 />
                 <span name="single_sold_price.${counter -1}" class="text-danger"></span>
               </div>
-            </td>
-            <td>
-              <span class="totalOrderPrice"> </span>
             </td>
             <td> 
               <div class="form-group col-12">
                 <input 
                   type='text' 
                   value="0"
+                  min="0"
                   class='form-control form-control-sm' 
                   name="discount_percent[]"
                   onkeyup="handleDiscountChange(this)" 
@@ -234,9 +246,12 @@ $(function () {
                 <span name="discount_percent.${counter -1}" class="text-danger"></span>
               </div>
             </td>
-            <td class="purchaseQuantity">${quantity}</td>
-            <td>${singlePrice}</td>
-            <td class="totalPrice">${totalPrice}</td>
+            <td>
+              <span class="originalPrice">0</span>
+            </td>
+            <td>
+              <span class="regularPrice">0</span>
+            </td>
           </tr>
         `;
 

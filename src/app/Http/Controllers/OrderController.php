@@ -95,20 +95,18 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
-        $currentOrder = $order->load('customer:id,name', 'purchase');
-
-        return view('orders.edit', compact('currentOrder'));
+        $order->load('customer:id,name', 'purchase.categories', 'purchase.brands');
+        return view('orders.edit', compact('order'));
     }
 
     public function update(Order $order, OrderRequest $request)
     {
         DB::beginTransaction();
-
         try {
             $customer_id = (int) $request->customer_id;
             $date_of_sale = date('Y-m-d', strtotime($request->date_of_sale));
             $tracking_number = (string) $request->tracking_number;
-            $purchase_id = (int) $request->product_id;
+            $purchase_id = (int) $request->purchase_id;
             $sold_quantity = (int) $request->sold_quantity;
             $single_sold_price = (float) $request->single_sold_price;
             $discount_percent = (int) $request->discount_percent;
@@ -118,7 +116,7 @@ class OrderController extends Controller
             $remainingQuantity = $totalSoldQuantity - $order->sold_quantity;
 
             $updatedQuantity = ($remainingQuantity + $sold_quantity);
-
+            
             if ($updatedQuantity > $purchase->initial_quantity) {
                 return back()->with('error', 'Purchase quantity is not enough');
             }

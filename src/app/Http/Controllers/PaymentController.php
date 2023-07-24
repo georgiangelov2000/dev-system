@@ -47,11 +47,13 @@ class PaymentController extends Controller
     {
         $payment->load('purchase.supplier', 'purchase.categories', 'invoice');
         $company = CompanySettings::select('id', 'name', 'phone_number', 'address', 'tax_number', 'image_path')->first();
-        return view('purchases.edit_payment',
-        [
-            'payment' => $payment,
-            'company' => $company,
-        ]);
+        return view(
+            'purchases.edit_payment',
+            [
+                'payment' => $payment,
+                'company' => $company,
+            ]
+        );
     }
 
     public function storePurchasePayment(PurchasePaymentRequest $request)
@@ -145,14 +147,23 @@ class PaymentController extends Controller
                     $order = Order::find($id);
 
                     if ($order) {
-                        $order->status = 2;
+                        $status = 2;
+
+                        $paymentDate = date('Y-m-d', strtotime($data['date_of_payment'][$key]));
+                        $saleDate = strtotime($order->date_of_sale);
+
+                        if ($paymentDate > $saleDate) {
+                            $status = 4;
+                        }
+
+                        $order->status = $status;
                         $order->save();
 
                         $paymentData = [
                             'order_id' => $id,
                             'price' => $data['price'][$key],
                             'quantity' => $data['quantity'][$key],
-                            'date_of_payment' => date('Y-m-d', strtotime($data['date_of_payment'][$key]))
+                            $paymentDate
                         ];
 
                         $orderInvoice = OrderPayment::create($paymentData);
@@ -179,11 +190,32 @@ class PaymentController extends Controller
         try {
             $data = $request->validated();
 
-            if ((int) $data['payment_status'] === 1) {
-                $payment->order->is_paid = 1;
-                $payment->order->status = $data['payment_status'];
+            // Update the payment status and order status
+            $paymentStatus = (int) $data['payment_status'];
+
+            $paymentDate = strtotime($data['date_of_payment']);
+            $saleDate = strtotime($payment->order->date_of_sale);
+
+            // Check if payment date is greater than sale date (Overdue payment)
+            if ($paymentDate > $saleDate) {
+                $payment->order->is_paid = 1; // Mark as paid
+                $payment->order->status = 4;  // Mark as overdue
+                $data['payment_status'] = 4; // Update the payment status to 'Overdue'
             } else {
-                $payment->order->status = $data['payment_status'];
+                // Check the regular payment status values
+                if (in_array($paymentStatus, [1, 4])) {
+                    $payment->order->is_paid = 1; // Mark as paid
+                    $payment->order->status = $paymentStatus;
+                } elseif ($paymentStatus === 2) {
+                    $payment->order->is_paid = 0; // Mark as not paid
+                    $payment->order->status = $paymentStatus;
+                } elseif ($paymentStatus === 5) {
+                    $payment->order->is_paid = 2; // Mark with custom status
+                    $payment->order->status = $paymentStatus;
+                } elseif ($paymentStatus === 3) {
+                    $payment->order->is_paid = 3; // Mark with custom status
+                    $payment->order->status = $paymentStatus;
+                }
             }
 
             $payment->order->save();

@@ -91,7 +91,7 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '1%',
                 orderable: false,
                 name: "sold_quantity",
                 data: "sold_quantity"
@@ -156,8 +156,6 @@ $(function () {
                     let currentDate = moment();
                     let daysRemaining = date.diff(currentDate, 'days');
                     
-                    console.log(row.status);
-
                     if (row.status === 'Ordered' && row.is_paid !== true) {
                         return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
                     } else if (row.status === 'Ordered') {
@@ -171,19 +169,50 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '8%',
                 orderable: false,
-                name: 'created_at',
                 render: function (data, type, row) {
-                    return `<span>${moment(row.created_at).format('YYYY-MM-DD')}<span>`
+                    
+                    let dateOfSale;
+                    
+                    if (row.package_extension_date) {
+                        dateOfSale = moment(row.package_extension_date);
+                    } else {
+                        dateOfSale = moment(row.date_of_sale);
+                    }
+
+                    let dateOfPayment;
+                    let delayMessage = '';
+            
+                    if (row.order_payments) {
+                        dateOfPayment = moment(row.order_payments.date_of_payment);
+            
+                        // Calculate the delay in days (if any)
+                        let delayInDays = dateOfPayment.diff(dateOfSale, 'days');
+                        
+                        // Check if there is a delay in payment
+                        if (delayInDays > 0) {
+                            delayMessage = 'Payment is delayed by ' + delayInDays + ' day(s).';
+                        } else {
+                            delayMessage = 'Order was paid on time.';
+                        }
+                    }
+
+                    return delayMessage;
                 }
             },
             {
-                width: '5%',
+                width: '8%',
                 orderable: false,
-                name: 'updated_at',
+                name: 'payment.date_of_payment',
                 render: function (data, type, row) {
-                    return `<span>${moment(row.updated_at).format('YYYY-MM-DD')}<span>`
+                    let date = '';
+
+                    if(row.order_payments) {
+                        date = row.order_payments.date_of_payment;
+                    }
+
+                    return date;
                 }
             },
             {
@@ -227,7 +256,7 @@ $(function () {
                 orderable: false,
                 name: "is_paid",
                 render: function (data, type, row) {
-                    if (row.is_paid == 1 && row.status == 'Received') {
+                    if (row.is_paid == 1) {
                         return '<span class="text-success">Yes</span>';
                     } else {
                         return '<span class="text-danger">No</span>';

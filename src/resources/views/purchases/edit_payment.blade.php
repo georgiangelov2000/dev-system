@@ -8,7 +8,7 @@
                     <h3 class="card-title">Payment</h3>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="col-12 d-flex flex-wrap">
                     <form action="{{ route('payment.update.purchase', $payment->id) }}" class="col-12" method="POST">
                         @method('PUT')
