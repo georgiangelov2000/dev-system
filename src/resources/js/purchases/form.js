@@ -7,8 +7,10 @@ $(function () {
     const selectSupplier = $('.bootstrap-select .selectSupplier')
     const selectCategory = $('.bootstrap-select .selectCategory')
     const selectSubCategory = $('.bootstrap-select .selectSubCategory')
-    const deleteImage = $('#deletePurchaseImage');
-    const form = $('#deleteImageForm');
+
+    $('.datepicker').datepicker({
+        format: 'mm/dd/yyyy'
+    })
 
     selectSupplier.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
 

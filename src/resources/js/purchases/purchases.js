@@ -157,11 +157,21 @@ $(function () {
                     return `<span>€${row.price}</span>`
                 }
             },
+
             {
                 width: '6%',
+                name:'total_price',
                 orderable: true,
                 render: function (data, type, row) {
                     return `<span>€${row.total_price}</span>`
+                }
+            },
+            {
+                width:'5%',
+                name:'original_price',
+                orderable:true,
+                render:function(data,type,row) {
+                    return `<span>€${row.original_price}</span>`
                 }
             },
             {
@@ -175,6 +185,14 @@ $(function () {
                 orderable: true,
                 name: "initial_quantity",
                 data: 'initial_quantity'
+            },
+            {
+                width: '2%',
+                name: "discount_percent",
+                orderable: true,
+                render: function (data, type, row) {
+                    return `<span>${row.discount_percent}</span>`
+                }
             },
             {
                 width: '4%',
@@ -254,15 +272,17 @@ $(function () {
             {
                 width: '3%',
                 orderable: false,
+                name:'code',
                 render: function (data, type, row) {
                     return '<span class="font-weight-bold">' + row.code + '</span>';
                 }
             },
             {
-                width: '6%',
+                width: '10%',
                 orderable: false,
+                name: 'expected_date_of_payment',
                 render: function (data, type, row) {
-                    return '<span>' + moment(row.created_at).format('YYYY-MM-DD') + '</span>';
+                    return '<span>' + moment(row.expected_date_of_payment).format('YYYY-MM-DD') + '</span>';
                 }
             },
             {
@@ -279,7 +299,7 @@ $(function () {
             },
             {
                 orderable: false,
-                width: '8%',
+                width: '15%',
                 class: 'text-center',
                 render: function (data, type, row) {
                     let deleteFormTemplate = '';

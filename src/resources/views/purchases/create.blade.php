@@ -52,13 +52,28 @@
                         </div>
                         <div class="form-group col-6 mb-0">
                             <div class="form-group">
+                                <label for="discount_percent">Discount %</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control @error('discount_percent')  is-invalid @enderror" 
+                                    id="discount_percent"
+                                    name="discount_percent" 
+                                    min="0"
+                                    value="0"
+                                    value='{{ old('discount_percent') ? e(old('discount_percent')) : '' }}' 
+                                    >
+                                @error('discount_percent')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group">
                                 <label for="name">Generate unique code</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control @error('code')  is-invalid @enderror"
                                         id="code" name="code" value='{{ old('code') ? e(old('code')) : '' }}'
                                         placeholder="Generate code">
                                     <span class="input-group-append">
-                                        <button type="button" class="btn btn-info btn-flat generateCode">Generate</button>
+                                        <button type="button" class="btn btn-primary btn-flat generateCode">Generate</button>
                                     </span>
                                 </div>
                                 @error('code')
@@ -70,7 +85,7 @@
                                 <textarea cols="3" rows="8" class="form-control" name="notes"></textarea>
                             </div>
                         </div>
-                        <div class="form-group col-6 mb-0">
+                        <div class="form-group col-6">
                             <div class="form-group">
                                 <label>Suppliers</label>
                                 <select class="form-control selectSupplier" name="supplier_id"
@@ -108,6 +123,20 @@
                                         <option value="{{ $brand->id }}">{{ $brand->name }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Expected date of payment:</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" class="form-control datepicker" name="expected_date_of_payment">
+                                </div>
+                                @error('expected_date_of_payment')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                         <div class="form-group col-12">

@@ -39,7 +39,10 @@ class PurchaseApiController extends Controller
             'status',
             'created_at',
             'is_paid',
-            'initial_quantity'
+            'initial_quantity',
+            'expected_date_of_payment',
+            'original_price',
+            'discount_percent'
         );
 
         if($limit) {

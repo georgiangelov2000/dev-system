@@ -87,6 +87,21 @@
                                     </div>
                                     <div class="form-group col-6">
                                         <div class="form-group">
+                                            <label for="discount_percent">Discount %</label>
+                                            <input 
+                                                type="number" 
+                                                class="form-control @error('discount_percent')  is-invalid @enderror" 
+                                                id="discount_percent"
+                                                name="discount_percent" 
+                                                min="0"
+                                                value="0"
+                                                value='{{$purchase->discount_percent}}' 
+                                                >
+                                            @error('discount_percent')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div class="form-group">
                                             <label for="name">Generate unique code</label>
                                             <div class="input-group">
                                                 <input type="text"
@@ -95,7 +110,7 @@
                                                     placeholder="Generate code">
                                                 <span class="input-group-append">
                                                     <button type="button"
-                                                        class="btn btn-info btn-flat generateCode">Generate</button>
+                                                        class="btn btn-primary btn-flat generateCode">Generate</button>
                                                 </span>
                                             </div>
                                             @error('code')
@@ -160,6 +175,25 @@
                                                         value="{{ $brand->id }}">{{ $brand->name }}</option>
                                                 @endforeach
                                             </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Expected date of payment:</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">
+                                                        <i class="far fa-calendar-alt"></i>
+                                                    </span>
+                                                </div>
+                                                <input 
+                                                    type="text" 
+                                                    value="{{ date('m/d/Y', strtotime($purchase->expected_date_of_payment)) }}" 
+                                                    class="form-control datepicker" 
+                                                    name="expected_date_of_payment"
+                                                >
+                                            </div>
+                                            @error('expected_date_of_payment')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                     </div>
                                     <div class="col-12">

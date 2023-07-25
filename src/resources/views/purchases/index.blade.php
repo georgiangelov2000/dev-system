@@ -99,8 +99,10 @@
                         <th>Name</th>
                         <th>Price</th>
                         <th>Tot.price</th>
+                        <th>Orig.price</th>
                         <th>Quantity</th>
                         <th>Init.quantity</th>
+                        <th>Discount</th>
                         <th>Stock</th>
                         <th>Balance</th>
                         <th>Supplier</th>
@@ -108,7 +110,7 @@
                         <th>Subcategories</th>
                         <th>Brands</th>
                         <th>Code</th>
-                        <th>Created</th>
+                        <th title="Expected date of payment">EDT</th>
                         <th>Paid</th>
                         <th>Actions</th>
                     </thead>

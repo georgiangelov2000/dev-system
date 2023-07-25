@@ -23,6 +23,8 @@ class PurchaseRequest extends FormRequest {
             "subcategories" => "nullable|array",
             "notes" => 'nullable|string',
             "brands" => "nullable|array",
+            'expected_date_of_payment' => 'required|date',
+            'discount_percent' => 'required|numeric|min:0'
         ];
     }
 

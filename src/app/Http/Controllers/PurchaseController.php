@@ -57,7 +57,7 @@ class PurchaseController extends Controller
             $imagePath = Storage::url($this->dir);
 
             $totalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
-
+            
             $purchase = Purchase::create([
                 "name" => $data['name'],
                 "supplier_id" => $data['supplier_id'],
@@ -121,12 +121,13 @@ class PurchaseController extends Controller
     public function update(Purchase $purchase, PurchaseRequest $request)
     {
         $data = $request->validated();
-
         DB::beginTransaction();
+
         try {
             $file = isset($data['image']) ? $data['image'] : false;
             $price = $data['price'];
             $quantity = $data['quantity'];
+            $discount = $data['discount_percent'];
             $subcategories = isset($data['subcategories']) && !empty($data['subcategories']) ? $data['subcategories'] : null;
             $brands = isset($data['brands']) && !empty($data['brands']) ? $data['brands'] : null;
             $category = $data['category_id'];
@@ -154,8 +155,9 @@ class PurchaseController extends Controller
                 ]);
             }
 
-            $totalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
-
+            $originalPrice = FunctionsHelper::calculatedFinalPrice($price,$quantity);
+            $totalPrice = FunctionsHelper::calculatedDiscountPrice($originalPrice,$discount);
+            
             $purchase->update([
                 "name" => $data['name'],
                 "supplier_id" => $data['supplier_id'],
@@ -164,8 +166,10 @@ class PurchaseController extends Controller
                 "notes" => $data["notes"] ?? "",
                 "price" => $price,
                 "code" => $data["code"],
-                "status" => 'enabled',
-                "total_price" => $totalPrice
+                "status" => 1,
+                "total_price" => $totalPrice,
+                'original_price' => $originalPrice,
+                'expected_date_of_payment' => date('Y-m-d', strtotime($data['expected_date_of_payment']))
             ]);
 
             DB::commit();

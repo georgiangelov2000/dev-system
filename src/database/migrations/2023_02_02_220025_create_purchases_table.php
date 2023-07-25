@@ -19,11 +19,14 @@ class CreatePurchasesTable extends Migration {
             $table->unsignedInteger('quantity')->default(0);
             $table->unsignedDecimal('price', 8, 2)->default(0);
             $table->unsignedDecimal('total_price', 8, 2)->default(0);
+            $table->unsignedDecimal('original_price',8,2)->default(0);
+            $table->date('expected_date_of_payment');
+            $table->unsignedInteger('discount_percent')->default(0);
             $table->unsignedInteger('initial_quantity')->default(0);
             $table->string('notes')->default('');
             $table->string('code',20);
-            $table->tinyInteger('status')->default(0)->comment('0=disabled, 1=enabled');
-            $table->tinyInteger('is_paid')->comment('1=is_paid,0=not paid')->default(0);
+            $table->tinyInteger('status')->comment('1=Paid, 2=Pending, 3=Partially Paid, 4=Overdue, 5=Refunded')->default(0);
+            $table->tinyInteger('is_paid')->comment('0: Not paid, 1: Paid, 2: Refund, 3: Partially Paid')->default(0);
             $table->timestamps();
         });
     }

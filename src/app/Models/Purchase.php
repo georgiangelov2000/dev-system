@@ -46,7 +46,10 @@ class Purchase extends Model {
         'total_price',
         'initial_quantity',
         'is_paid',
-        'status'
+        'status',
+        'discount',
+        'expected_date_of_payment',
+        'original_price'
     ];
 
     public function categories() {
