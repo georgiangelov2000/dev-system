@@ -36,7 +36,6 @@ class PurchasePayment extends Model
         'payment_method',
         'payment_reference',
         'payment_status',
-        'notes'
     ];
 
     public function purchase()

@@ -35,6 +35,10 @@ return [
         3 => 'Partially Paid',
         4 => 'Overdue',
         5 => 'Refunded',
+    ],
+    'stock_statuses' => [
+        0 => 'In stock',
+        1 => 'Out of stock',
     ]
 ]
 

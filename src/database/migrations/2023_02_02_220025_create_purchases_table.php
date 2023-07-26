@@ -25,7 +25,7 @@ class CreatePurchasesTable extends Migration {
             $table->unsignedInteger('initial_quantity')->default(0);
             $table->string('notes')->default('');
             $table->string('code',20);
-            $table->tinyInteger('status')->comment('1=Paid, 2=Pending, 3=Partially Paid, 4=Overdue, 5=Refunded')->default(1);
+            $table->tinyInteger('status')->comment('1: Paid, 2: Pending, 3: Partially Paid, 4: Overdue, 5: Refunded')->nullable();
             $table->tinyInteger('is_paid')->comment('0: Not paid, 1: Paid, 2: Refund, 3: Partially Paid')->default(0);
             $table->timestamps();
         });

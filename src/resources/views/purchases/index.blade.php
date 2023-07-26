@@ -71,18 +71,28 @@
                         </div>
                     </div>
                     <div class="col-3">
-                        <label for="customRange1">Publishing</label>
-                        <input type="text" class="form-control pull-right" name="datetimes" />
-                    </div>
-                    <div class="col-3">
                         <div class="form-group">
                             <label for="stock">Stock</label>
                             <select class="form-control selectStock" name="" id="stock">
-                                <option selected value="1">In stock</option>
-                                <option value="0">Out of stock</option>
+                                <option value="">Nothing selected</option>
+                                @foreach (config('statuses.stock_statuses') as $key => $status)
+                                    <option value="{{ $key }}">{{ $status }}</option>
+                                @endforeach
                             </select>
                         </div>
-                    </div>                    
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select name="status" id="" class="form-control selectType" multiple>
+                                @foreach (config('statuses.order_statuses') as $key => $status)
+                                    @if($key !== 6)
+                                        <option value="{{ $key }}">{{ $status }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>     
                 </div>  
                 <table id="purchasedProducts" class="table table-hover table-sm dataTable no-footer">
                     <thead>

@@ -4,7 +4,7 @@ import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_
 $(function () {
     let table = $('table#purchasedProducts');
 
-    $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice, .selectStock')
+    $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice, .selectStock, .selectType')
         .selectpicker('refresh')
         .trigger('change');
 
@@ -24,16 +24,8 @@ $(function () {
     let bootstrapSelectBrands = $('.bootstrap-select .selectBrands');
     let bootstrapSelectTotalPrice = $('.bootstrap-select .selectPrice');
     let bootstrapSelectStock = $('.bootstrap-select .selectStock')
+    let bootstrapPurchaseStatus = $('.bootstrap-select .selectType');
     let customTotalPrice = $('.customPrice');
-    let applyBtn = $('.applyBtn');
-
-    let publishingValue = $('input[name="datetimes"]').val();
-
-    applyBtn.bind('click', function () {
-        let date = $('input[name="datetimes"]').val();
-        publishingValue = date;
-        dataTable.ajax.reload(null, false);
-    })
 
     let buttons = mapButtons([6, 7, 9, 10, 11, 12, 13, 14, 15, 16]);
 
@@ -52,9 +44,9 @@ $(function () {
                     "single_total_price": customTotalPrice.val().toLowerCase(),
                     "total_price_range": bootstrapSelectTotalPrice.val().toLowerCase(),
                     "category": bootstrapSelectCategory.val() === null ? '' : bootstrapSelectCategory.val().toLowerCase(),
-                    'publishing': publishingValue,
                     'sub_category': bootstrapSelectSubCategory.val(), //array of key => value
                     'brand': bootstrapSelectBrands.val(), //array of key => value
+                    'status': bootstrapPurchaseStatus.val(),
                     "search": d.search.value,
                     'out_of_stock': bootstrapSelectStock.val(),
                     'order_column': orderColumnName, // send the column name being sorted
@@ -69,7 +61,7 @@ $(function () {
                 width: '1%',
                 render: function (data, type, row) {
                     let statusStr = ''
-                    if (row.status) {
+                    if (row.quantity > 0) {
                         statusStr = '<i title="Enabled" class="fa-solid fa-circle text-success"></i>'
                     } else {
                         statusStr = '<i title="Disabled" class="fa-solid fa-circle text-danger"></i>'
@@ -421,6 +413,10 @@ $(function () {
     customTotalPrice.bind('keyup', function () {
         dataTable.ajax.reload(null, false);
     });
+
+    bootstrapPurchaseStatus.bind('changed.bs.select', function () {
+        dataTable.ajax.reload(null, false);
+    })
 
     bootstrapSelectStock.bind('changed.bs.select', function () {
         dataTable.ajax.reload(null, false);

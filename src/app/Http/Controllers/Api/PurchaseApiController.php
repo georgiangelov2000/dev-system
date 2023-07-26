@@ -14,9 +14,9 @@ class PurchaseApiController extends Controller
 
         $supplier = isset($request->supplier) ? $request->supplier : null;
         $category = isset($request->category) ? $request->category : null;
+        $status = isset($request->status) ? $request->status : null;
         $sub_category = isset($request->sub_category) ? $request->sub_category : null;
         $brand = isset($request->brand) ? $request->brand : null;
-        $publishing = isset($request->publishing) ? $request->publishing : null;
         $single_total_price = isset($request->single_total_price) ? $request->single_total_price : null;
         $total_price_range = isset($request->total_price_range) ? $request->total_price_range : null;
         $search = isset($request->search) ? $request->search : null;
@@ -54,6 +54,9 @@ class PurchaseApiController extends Controller
         if ($search) {
             $purchaseQuery->where('name', 'LIKE', '%' . $search . '%');
         }
+        if($status) {
+            $purchaseQuery->whereIn('status', $status);
+        }
         if ($supplier) {
             $purchaseQuery->where('supplier_id', $supplier);
         }
@@ -78,15 +81,6 @@ class PurchaseApiController extends Controller
                 });
             }
         }
-        if ($publishing) {
-            $dates = explode(" - ", $publishing);
-            $date1_formatted = date('Y-m-d 23:59:59', strtotime($dates[0]));
-            $date2_formatted = date('Y-m-d 23:59:59', strtotime($dates[1]));
-
-            $purchaseQuery
-                ->where('created_at', '>=', $date1_formatted)
-                ->where('created_at', '<=', $date2_formatted);
-        }
         if ($total_price_range) {
             $pieces = explode('-', $total_price_range);
 
@@ -103,9 +97,9 @@ class PurchaseApiController extends Controller
         }
         if (isset($request->out_of_stock)) {
             if($request->out_of_stock) {
-                $purchaseQuery->where('quantity', '>', 0)->where('status', 1);
+                $purchaseQuery->where('quantity', '>', 0);
             } else {
-                $purchaseQuery->where('quantity', '<=', 0)->where('status', 0);
+                $purchaseQuery->where('quantity', '<=', 0);
             }
         }
         if ($select_json !== null) {

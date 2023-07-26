@@ -23,7 +23,6 @@ class OrderPaymentRequest extends FormRequest
             'payment_method' => 'nullable',
             'payment_reference' => 'nullable',
             'payment_status' => 'nullable',
-            'notes' => 'nullable',
         ];
 
         if ($this->isMethod('PUT')) {

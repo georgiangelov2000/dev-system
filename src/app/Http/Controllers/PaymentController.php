@@ -9,6 +9,7 @@ use App\Http\Requests\PurchasePaymentRequest;
 use App\Models\Purchase;
 use App\Models\Customer;
 use App\Models\InvoiceOrder;
+use App\Models\InvoicePurchase;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\PurchasePayment;
@@ -94,7 +95,7 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Payment has been created'], 200);
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Payment has not been created'], 200);
+            return response()->json(['message' => 'Payment has not been created'], 500);
         }
     }
 
@@ -103,7 +104,44 @@ class PaymentController extends Controller
         DB::beginTransaction();
         try {
             $data = $request->validated();
+            
+            // Update the payment status and order status
+            $paymentStatus = (int) $data['payment_status'];
+            $paymentDate = strtotime($data['date_of_payment']);
+            $dateOfPayment = strtotime($payment->purchase->expected_date_of_payment);
+
+            // Check if payment date is greater than sale date (Overdue payment)
+            if ($paymentDate > $dateOfPayment) {
+                $payment->purchase->is_paid = 1; // Mark as paid
+                $payment->purchase->status = 4;  // Mark as overdue
+                $data['payment_status'] = 4; // Update the payment status to 'Overdue'
+            } else {
+                // Check the regular payment status values
+                if ($paymentStatus === 1 || $paymentStatus === 4) {
+                    $payment->purchase->is_paid = 1; // Mark as paid
+                    $payment->purchase->status = $paymentStatus;
+                } elseif ($paymentStatus === 2) {
+                    $payment->purchase->is_paid = 0; // Mark as not paid
+                    $payment->purchase->status = $paymentStatus;
+                } elseif ($paymentStatus === 5) {
+                    $payment->purchase->is_paid = 2; // Mark with custom status
+                    $payment->purchase->status = $paymentStatus;
+                } elseif ($paymentStatus === 3) {
+                    $payment->purchase->is_paid = 3; // Mark with custom status
+                    $payment->purchase->status = $paymentStatus;
+                }
+            }
+            
+            $payment->purchase->save();
+
             $payment->update($data);
+
+            $invoice = $payment->invoice ?: new InvoicePurchase();
+            $invoice->purchase_payment_id = $payment->id;
+            $invoice->price = $payment->purchase->total_price;
+            $invoice->quantity = $payment->purchase->initial_quantity;
+            $invoice->save();
+
             DB::commit();
             return redirect()->back()->with('success', 'Payment has been updated');
         } catch (\Exception $e) {

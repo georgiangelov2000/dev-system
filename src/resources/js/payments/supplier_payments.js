@@ -84,7 +84,6 @@ $(function () {
                                     <th>Payment method</th>
                                     <th>Payment reference</th>
                                     <th>Payment status</th>
-                                    <th>Notes</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -187,7 +186,6 @@ $(function () {
                 { data: 'payment_method', orderable: false },
                 { data: 'payment_reference', orderable: false },
                 { data: 'payment_status', orderable: false },
-                { data: 'notes', orderable: false },
                 {
                     orderable: false,
                     render: function (data, type, row) {
