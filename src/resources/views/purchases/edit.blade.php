@@ -29,6 +29,13 @@
                 <div class="tab-content" id="custom-tabs-one-tabContent">
                     <div class="tab-pane active show" id="custom-tabs-one-home" role="tabpanel"
                         aria-labelledby="custom-tabs-one-home-tab">
+                        @if(!$is_available)
+                        <div class="alert alert-danger alert-dismissible col-10">
+                            <h5><i class="icon fas fa-ban"></i> Alert!</h5>
+                            The product has already been paid for, and as a result, cannot update some of the data. The payment associated with the product indicates that the transaction has been completed, and it's crucial to maintain the integrity of the payment records. To avoid any discrepancies or potential conflicts, modifications to the product are restricted once a payment has been made. If you need to make changes to the product details, it's advisable to create a new entry or consider relevant adjustments within a new context.
+                            </div>
+                        @endif
+
                         <form class="d-flex flex-wrap" action='{{ route('purchase.update',$purchase->id) }}' method='POST'
                             enctype="multipart/form-data">
                             @csrf
@@ -69,37 +76,61 @@
                                     </div>
                                     <div class="form-group col-6">
                                         <label for="quantity">Quantity</label>
-                                        <input type="number" placeholder="Enter quantity"
-                                            class="form-control @error('quantity')  is-invalid @enderror" id="quantity"
-                                            name="quantity" min="1" value='{{ e($purchase->quantity) }}'>
-                                        @error('quantity')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
+                                        @if($is_available)
+                                            <input 
+                                                type="number" 
+                                                placeholder="Enter quantity"
+                                                class="form-control @error('quantity')  is-invalid @enderror" 
+                                                id="quantity"
+                                                name="quantity" 
+                                                min="{{$purchase->initial_quantity > 0 ? 0 : 1}}" value='{{ e($purchase->quantity) }}'
+                                            >
+                                            @error('quantity')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        @else
+                                            <p class="input-group-text col-12">
+                                                {{$purchase->quantity}}
+                                            </p>
+                                        @endif
                                     </div>
                                     <div class="form-group col-6">
                                         <label for="price">Price</label>
-                                        <input type="text" class="form-control @error('price')  is-invalid @enderror"
-                                            id="price" name="price" value='{{ e($purchase->price) }}'
-                                            placeholder="Enter price">
-                                        @error('price')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
+                                        @if($is_available)
+                                            <input 
+                                                type="text" 
+                                                class="form-control @error('price')  is-invalid @enderror"
+                                                id="price" 
+                                                name="price" 
+                                                value='{{ e($purchase->price) }}'
+                                                placeholder="Enter price"
+                                            >
+                                            @error('price')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        @else
+                                            <p class="input-group-text col-12">€ {{$purchase->price}}</p>
+                                        @endif
                                     </div>
                                     <div class="form-group col-6">
                                         <div class="form-group">
                                             <label for="discount_percent">Discount %</label>
-                                            <input 
-                                                type="number" 
-                                                class="form-control @error('discount_percent')  is-invalid @enderror" 
-                                                id="discount_percent"
-                                                name="discount_percent" 
-                                                min="0"
-                                                value="0"
-                                                value='{{$purchase->discount_percent}}' 
+                                            @if($is_available)
+                                                <input 
+                                                    type="number" 
+                                                    class="form-control @error('discount_percent')  is-invalid @enderror" 
+                                                    id="discount_percent"
+                                                    name="discount_percent" 
+                                                    min="0"
+                                                    value="0"
+                                                    value='{{$purchase->discount_percent}}' 
                                                 >
-                                            @error('discount_percent')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
+                                                @error('discount_percent')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            @else
+                                                <p class="input-group-text col-12">{{$purchase->discount_percent}}</p>
+                                            @endif
                                         </div>
                                         <div class="form-group">
                                             <label for="name">Generate unique code</label>
@@ -178,22 +209,26 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Expected date of payment:</label>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">
-                                                        <i class="far fa-calendar-alt"></i>
-                                                    </span>
+                                            @if($is_available)
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input 
+                                                        type="text" 
+                                                        value="{{ date('m/d/Y', strtotime($purchase->expected_date_of_payment)) }}" 
+                                                        class="form-control datepicker" 
+                                                        name="expected_date_of_payment"
+                                                    >
                                                 </div>
-                                                <input 
-                                                    type="text" 
-                                                    value="{{ date('m/d/Y', strtotime($purchase->expected_date_of_payment)) }}" 
-                                                    class="form-control datepicker" 
-                                                    name="expected_date_of_payment"
-                                                >
-                                            </div>
-                                            @error('expected_date_of_payment')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
+                                                @error('expected_date_of_payment')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            @else
+                                                <p class="input-group-text col-12">{{$purchase->expected_date_of_payment}}</p>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="col-12">

@@ -66,7 +66,6 @@ class PurchaseController extends Controller
                 "notes" => $data["notes"] ?? "",
                 "price" => $price,
                 "code" => $data["code"],
-                "status" => 1,
                 "total_price" => $totalPrice
             ]);
 
@@ -94,7 +93,6 @@ class PurchaseController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             return redirect()->route('purchase.index')->with('error', 'Purchase has not been created');
         }
         return redirect()->route('purchase.index')->with('success', 'Purchase has been created');
@@ -107,6 +105,7 @@ class PurchaseController extends Controller
         $brands = $this->staticDataHelper::callBrands();
         $suppliers = $this->staticDataHelper::callSupliers();
         $categories = $this->staticDataHelper::loadCallCategories();
+        $is_available = $purchase->status == true  && $purchase->is_paid == false && $purchase->payment == null ? true : false;
 
         return view('purchases.edit', compact(
             'purchase',
@@ -114,7 +113,8 @@ class PurchaseController extends Controller
             'suppliers',
             'brands',
             'suppliers',
-            'categories'
+            'categories',
+            'is_available'
         ));
     }
 
@@ -124,10 +124,8 @@ class PurchaseController extends Controller
         DB::beginTransaction();
 
         try {
+
             $file = isset($data['image']) ? $data['image'] : false;
-            $price = $data['price'];
-            $quantity = $data['quantity'];
-            $discount = $data['discount_percent'];
             $subcategories = isset($data['subcategories']) && !empty($data['subcategories']) ? $data['subcategories'] : null;
             $brands = isset($data['brands']) && !empty($data['brands']) ? $data['brands'] : null;
             $category = $data['category_id'];
@@ -155,22 +153,34 @@ class PurchaseController extends Controller
                 ]);
             }
 
-            $originalPrice = FunctionsHelper::calculatedFinalPrice($price,$quantity);
-            $totalPrice = FunctionsHelper::calculatedDiscountPrice($originalPrice,$discount);
+            $attributes = [
+                'name' => $data['name'],
+                'supplier_id' => $data['supplier_id'],
+                'notes' => $data['notes'] ?? '',
+                'code' => $data['code'],
+            ];
+
+            if($purchase->status == true  && $purchase->is_paid == false && $purchase->payment == null) {
+                $price = $data['price'];
+                $quantity = $data['quantity'];
+                $discount = $data['discount_percent'];
+
+                $originalPrice = FunctionsHelper::calculatedFinalPrice($price,$quantity);
+                $totalPrice = FunctionsHelper::calculatedDiscountPrice($originalPrice,$discount);
+
+                $attributes = array_merge($attributes,[
+                    'quantity' => $quantity,
+                    'discount_percent' => $discount,
+                    'inital_quantity' => $quantity,
+                    'price' => $price,
+                    'total_price' => $totalPrice,
+                    'original_price' => $originalPrice,
+                    'expected_date_of_payment' => date('Y-m-d', strtotime($data['expected_date_of_payment'])),
+                ]);
+
+            }
             
-            $purchase->update([
-                "name" => $data['name'],
-                "supplier_id" => $data['supplier_id'],
-                "quantity" => $data['quantity'],
-                "initial_quantity" => $data['quantity'],
-                "notes" => $data["notes"] ?? "",
-                "price" => $price,
-                "code" => $data["code"],
-                "status" => 1,
-                "total_price" => $totalPrice,
-                'original_price' => $originalPrice,
-                'expected_date_of_payment' => date('Y-m-d', strtotime($data['expected_date_of_payment']))
-            ]);
+            $purchase->update($attributes);
 
             DB::commit();
         } catch (\Exception $e) {

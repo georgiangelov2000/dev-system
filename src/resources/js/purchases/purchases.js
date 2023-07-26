@@ -191,7 +191,7 @@ $(function () {
                 name: "discount_percent",
                 orderable: true,
                 render: function (data, type, row) {
-                    return `<span>${row.discount_percent}</span>`
+                    return `<span>${row.discount_percent}%</span>`
                 }
             },
             {
