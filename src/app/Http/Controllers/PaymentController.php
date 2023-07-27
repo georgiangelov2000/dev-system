@@ -185,23 +185,16 @@ class PaymentController extends Controller
                     $order = Order::find($id);
 
                     if ($order) {
-                        $status = 2;
+                        $order->status = 2;
+                        $order->save();
 
                         $paymentDate = date('Y-m-d', strtotime($data['date_of_payment'][$key]));
-                        $saleDate = strtotime($order->date_of_sale);
-
-                        if ($paymentDate > $saleDate) {
-                            $status = 4;
-                        }
-
-                        $order->status = $status;
-                        $order->save();
 
                         $paymentData = [
                             'order_id' => $id,
                             'price' => $data['price'][$key],
                             'quantity' => $data['quantity'][$key],
-                            $paymentDate
+                            'date_of_payment' => $paymentDate
                         ];
 
                         $orderInvoice = OrderPayment::create($paymentData);
@@ -232,7 +225,7 @@ class PaymentController extends Controller
             $paymentStatus = (int) $data['payment_status'];
 
             $paymentDate = strtotime($data['date_of_payment']);
-            $saleDate = strtotime($payment->order->date_of_sale);
+            $saleDate = strtotime($payment->order->package_extension_date ? $payment->order->package_extension_date : $payment->order->date_of_sale);
 
             // Check if payment date is greater than sale date (Overdue payment)
             if ($paymentDate > $saleDate) {

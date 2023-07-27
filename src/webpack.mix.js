@@ -21,7 +21,6 @@ mix.js('resources/js/suppliers/mass_edit_purchases.js', 'public/js/suppliers'),
 
 mix.js('resources/js/purchases/form.js', 'public/js/purchases'),
 mix.js('resources/js/purchases/purchases.js', 'public/js/purchases'),
-mix.js('resources/js/purchases/orders.js', 'public/js/purchases'),
 mix.js('resources/js/purchases/payments.js', 'public/js/purchases'),
 
 mix.js('resources/js/customers/form.js', 'public/js/customers'),

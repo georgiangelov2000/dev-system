@@ -20,6 +20,9 @@ $(function () {
     let bootstrapSelectCustomer = $('.bootstrap-select .selectCustomer');
     let createdRange;
 
+    // Set the default status array
+    let statusArray = [6];
+
     let dataTable = table.DataTable({
         serverSide: true,
         ajax: {
@@ -35,6 +38,7 @@ $(function () {
                     'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
                     'limit': d.custom_length = d.length,
                     'is_paid': 0,
+                    'status':statusArray,
                     'publishing': createdRange,
                 });
             }

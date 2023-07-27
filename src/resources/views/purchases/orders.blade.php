@@ -28,20 +28,24 @@
                 </div>
             <table id="ordersTable" class="table table-hover table-sm dataTable no-footer">
                 <thead>
+                    <th></th>
                     <th>ID</th>
-                    <th>Invoice number</th>
+                    <th>Payment</th>
                     <th>Customer</th>
-                    <th>Quantity</th>
-                    <th>Single price</th>
-                    <th>Selling price</th>
-                    <th>Original price</th>
+                    <th>Product</th>
+                    <th title="Quantity">Qty</th>
+                    <th title="Single price">Unit Price</th>
+                    <th title="Official price">Official Price</th>
+                    <th title="Original price">Orig. Price</th>                            
                     <th>Discount</th>
-                    <th>Expired</th>
-                    <th>Created at</th>
                     <th>Date of sale</th>
-                    <th>Date of payment</th>
-                    <th>Status</th>
+                    <th>Expired</th>
+                    <th>Delay Payment</th>
+                    <th>Payment date</th>
+                    <th>Package</th>
+                    <th class="text-center">Status</th>
                     <th>Paid</th>
+                    <th>Actions</th>
                 </thead>
             </table>
         </div>
@@ -49,10 +53,13 @@
 @endsection
 
 @push('scripts')
-    <script type="text/javascript" src="{{ mix('js/purchases/orders.js') }}"></script>
+    <script type="text/javascript" src="{{ mix('js/orders/orders.js') }}"></script>
     <script type="text/javascript">
-        let PRODUCT_ID = "{{$purchase->id}}"
-        let ORDER_API_ROUTE = "{{route('api.orders')}}";
-        let CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}"
+        const PRODUCT_ID = "{{$purchase->id}}"
+        const ORDER_API_ROUTE = "{{route('api.orders')}}";
+        const CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}"
+        const PAYMENT_API = "{{route('payment.edit.order',':id')}}"
+        const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
+        const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
     </script>
 @endpush

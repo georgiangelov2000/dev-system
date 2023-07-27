@@ -62,10 +62,10 @@ class PackageApiController extends Controller
         }
         $packageQuery->withCount([
             'orders as paid_orders_count' => function ($query) {
-                $query->where('status', 1)->where('is_paid', 1);
+                $query->whereIn('status', [1,4])->where('is_paid', 1);
             },
             'orders as unpaid_orders_count' => function ($query) {
-                $query->whereIn('status', [3, 4])->where('is_paid', false);
+                $query->whereIn('status', [2,6])->where('is_paid', false);
             }
         ])->withCount('orders');
         

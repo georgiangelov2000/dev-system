@@ -45,9 +45,14 @@ $(function () {
                 orderable: false,
                 width: "1%",
                 render: function (data, type, row) {
-                    let checkbox = '<div div class="form-check">\n\
-                       <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
-                    </div>';
+                    let checkbox = '';
+
+                    if(row.is_paid == false && row.status === 'Ordered') {
+                        checkbox = 
+                        '<div div class="form-check">\n\
+                            <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
+                        </div>';
+                    }
 
                     return `${checkbox}`;
                 }
@@ -256,8 +261,10 @@ $(function () {
                 orderable: false,
                 name: "is_paid",
                 render: function (data, type, row) {
-                    if (row.is_paid == 1) {
+                    if ( (row.is_paid == 1) && (row.status == 'Paid' || row.status == 'Overdue')  ) {
                         return '<span class="text-success">Yes</span>';
+                    } else if ( (row.is_paid == 3) && (row.status == 'Refund') ) {
+                        return '<span class="text-warning">Refund</span>';
                     } else {
                         return '<span class="text-danger">No</span>';
                     }
@@ -332,6 +339,10 @@ $(function () {
 
         if (typeof PACKAGE !== 'undefined') {
             data.package = PACKAGE;
+        }
+
+        if(typeof PRODUCT_ID !== 'undefined') {
+            data.product_id = PRODUCT_ID;
         }
 
         return data;

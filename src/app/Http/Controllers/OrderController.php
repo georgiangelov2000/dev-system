@@ -33,9 +33,8 @@ class OrderController extends Controller
     public function store(OrderRequest $request)
     {
         DB::beginTransaction();
-
         try {
-            $purchaseIds = $request->product_id;
+            $purchaseIds = $request->purchase_id;
             $trackingNumber = (string) $request->tracking_number;
             $customer = (int) $request->customer_id;
             $orderDateOfSale = date('Y-m-d', strtotime($request->date_of_sale));
@@ -54,10 +53,6 @@ class OrderController extends Controller
                 };
 
                 $foundPurchase->quantity -= $orderQuantity;
-
-                if ($foundPurchase->quantity === 0) {
-                    $foundPurchase->status = 0;
-                }
 
                 $foundPurchase->save();
 
@@ -89,7 +84,7 @@ class OrderController extends Controller
             return response()->json(['message' => 'Order has been created'],200);
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Order has not been created'],200);
+            return response()->json(['message' => 'Order has not been created'],500);
         }
     }
 
@@ -122,13 +117,8 @@ class OrderController extends Controller
             }
 
             $finalQuantity = ($purchase->initial_quantity - $updatedQuantity);
-            $purchase->quantity = $finalQuantity;
 
-            if ($purchase->quantity === 0) {
-                $purchase->status = 0;
-            } else {
-                $purchase->status = 1;
-            }
+            $purchase->quantity = $finalQuantity;
 
             $purchase->save();
 

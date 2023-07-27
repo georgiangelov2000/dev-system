@@ -93,7 +93,7 @@ class PurchaseApiController extends Controller
             $purchaseQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
         }
         if(!$is_paid) {
-            $purchaseQuery->where('is_paid',0)->whereIn('status',[2,3,4,5,6]);
+            $purchaseQuery->where('is_paid',0);
         }
         if (isset($request->out_of_stock)) {
             if($request->out_of_stock) {
@@ -109,7 +109,7 @@ class PurchaseApiController extends Controller
             );
         } else {
             $purchaseQuery->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name', 'orders:id,status,is_paid','payment:id,purchase_id,date_of_payment']);
-
+            
             $purchaseQuery
                 ->withCount([
                     'orders as paid_orders_count' => function ($query) {

@@ -119,7 +119,7 @@
                         <th>Category</th>
                         <th>Subcategories</th>
                         <th>Brands</th>
-                        <th>Code</th>
+                        <th>Status</th>
                         <th title="Expected date of payment">EDT</th>
                         <th>Paid</th>
                         <th>Actions</th>

@@ -63,7 +63,12 @@ $(function () {
       return;
     }
 
-    APICaller(PRODUCT_API_ROUTE, { 'search': text, 'out_of_stock': true, 'select_json':true }, function (response) {
+    APICaller(PRODUCT_API_ROUTE, 
+      { 
+      'search': text, 
+      'out_of_stock': true, 
+      'select_json':true 
+    }, function (response) {
       let products = response;
 
       if (products.length > 0) {
@@ -264,15 +269,17 @@ $(function () {
     let form = $('#orderForm');
     let url = form.attr('action');
     let formData = form.serialize();
-
+    console.log(formData);
     $.ajax({
       type: 'POST',
       url: url,
       data: formData,
       success: function (response) {
+        console.log(response);
         toastr['success'](response.message);
       },
       error: function (xhr, status, error) {
+        console.log(error);
         if (xhr.status === 422) {
           toastr['error'](xhr.responseJSON.message);
           var errors = xhr.responseJSON.errors;

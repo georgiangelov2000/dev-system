@@ -262,11 +262,32 @@ $(function () {
                 }
             },
             {
-                width: '3%',
+                width: '5%',
                 orderable: false,
-                name:'code',
+                name: "status",
+                class: "text-center",
                 render: function (data, type, row) {
-                    return '<span class="font-weight-bold">' + row.code + '</span>';
+                    console.log(row.status);
+                    if (row.status === 1) {
+                        return '<img style="height:40px;" class="w-50" title="Paid" src = "/storage/images/static/succesfully.png" /> '
+                    }
+                    else if (row.status === 2) {
+                        return '<img style="height:40px;" class="w-50" title= "Pending" src = "/storage/images/static/pending.png" /> '
+                    }
+                    else if (row.status ===3) {
+                        return '<img style="height:40px;" class="w-50" title="Partially Paid" src = "/storage/images/static/partially-payment.png" /> '
+                    }
+                    else if (row.status === 4) {
+                        return '<img style="height:40px;" class="w-50" title="Overdue" src = "/storage/images/static/overdue.png" /> '
+                    }
+                    else if (row.status === 5) {
+                        return '<img style="height:40px;" class="w-50" title="Refunded" src = "/storage/images/static/ordered.png" /> '
+                    }
+                    else if (row.status === 6) {
+                        return '<img style="height:40px;" class="w-50" title="Ordered" src = "/storage/images/static/refund.png" /> '
+                    } else {
+                        return '';
+                    }
                 }
             },
             {
@@ -282,8 +303,10 @@ $(function () {
                 orderable: false,
                 name: "is_paid",
                 render: function (data, type, row) {
-                    if (row.is_paid) {
+                    if ( (row.is_paid === 1) && (row.status === 1 || row.status === 4)  ) {
                         return '<span class="text-success">Yes</span>';
+                    } else if ( (row.is_paid === 3) && (row.status === 3) ) {
+                        return '<span class="text-warning">Refund</span>';
                     } else {
                         return '<span class="text-danger">No</span>';
                     }
