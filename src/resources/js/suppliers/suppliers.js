@@ -130,20 +130,21 @@ $(document).ready(function () {
                 }
             },
             {
-                width: '15%',
-                orderable: false,
-                name: "notes",
-                render: function (data, type, row) {
-                    return "<div class='notes'>" + row.notes + "</div>"
-                }
-            },
-            {
-                width:'5%',
+                width:'20%',
                 orderable:false,
-                name:'purchases_count',
                 class:'text-center',
                 render: function(data,type,row) {
-                    return `${row.purchases_count}`;
+                    let paidPurchases = row.paid_purchases_count;
+                    let overduePurchases = row.overdue_purchases_count;
+                    let pendingPurchases = row.pending_purchases_count;
+                    let refundPurchases = row.refund_purchases_count;
+
+                    return `<div>
+                        <span class="text-success">${paidPurchases} paid</span> /
+                        <span class="text-danger">${overduePurchases} overdue</span> /
+                        <span class="text-primary">${pendingPurchases} pending</span> /
+                        <span class="text-dark">${refundPurchases} refund</span>
+                    </div>`
                 }
             },
             {

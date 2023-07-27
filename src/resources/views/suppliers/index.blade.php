@@ -72,7 +72,6 @@
                         <th>Country</th>
                         <th>State</th>
                         <th>Categories</th>
-                        <th>Notes</th>
                         <th>Purchases</th>
                         <th>Actions</th>
                     </tr>

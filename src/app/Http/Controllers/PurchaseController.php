@@ -51,12 +51,14 @@ class PurchaseController extends Controller
             $file = isset($data['image']) ? $data['image'] : false;
             $price = $data['price'];
             $quantity = $data['quantity'];
+            $discount = $data['discount_percent'];
             $subcategories = isset($data['subcategories']) && !empty($data['subcategories']) ? $data['subcategories'] : null;
             $brands = isset($data['brands']) && !empty($data['brands']) ? $data['brands'] : null;
             $category = $data['category_id'];
             $imagePath = Storage::url($this->dir);
-
-            $totalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
+            
+            $originalPrice = FunctionsHelper::calculatedFinalPrice($price,$quantity);
+            $totalPrice = FunctionsHelper::calculatedDiscountPrice($originalPrice,$discount);
             
             $purchase = Purchase::create([
                 "name" => $data['name'],
@@ -66,7 +68,9 @@ class PurchaseController extends Controller
                 "notes" => $data["notes"] ?? "",
                 "price" => $price,
                 "code" => $data["code"],
-                "total_price" => $totalPrice
+                "total_price" => $totalPrice,
+                'original_price' => $originalPrice,
+                'expected_date_of_payment' => date('Y-m-d', strtotime($data['expected_date_of_payment'])),
             ]);
 
             if ($category) {

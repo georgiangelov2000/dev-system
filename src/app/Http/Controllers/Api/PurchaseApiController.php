@@ -102,24 +102,33 @@ class PurchaseApiController extends Controller
                 $purchaseQuery->where('quantity', '<=', 0);
             }
         }
-        if ($select_json !== null) {
+        if ($select_json) {
             $purchaseQuery->with(['categories:id,name','brands']);
             return response()->json(
                 $purchaseQuery->get()
             );
-        } else {
+        }
             $purchaseQuery->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name', 'orders:id,status,is_paid','payment:id,purchase_id,date_of_payment']);
             
             $purchaseQuery
                 ->withCount([
-                    'orders as paid_orders_count' => function ($query) {
-                        $query->where('status', 1)->where('is_paid', 1);
+                    'orders as paid_orders_count' => function($query) {
+                        $query->where('status',1)
+                        ->where('is_paid',1);
                     },
-                    'orders as unpaid_orders_count' => function ($query) {
-                        $query->whereIn('status', [2,3,4,5,6])->where('is_paid', false);
+                    'orders as overdue_orders_count' => function($query) {
+                        $query->where('status',4)
+                        ->where('is_paid',1);
+                    },
+                    'orders as pending_orders_count' => function($query) {
+                        $query->where('status',2)
+                        ->where('is_paid',0);
+                    },
+                    'orders as refund_orders_count' => function($query) {
+                        $query->where('status',5)
+                        ->where('is_paid',2);
                     }
                 ]);
-        }
 
         $filteredRecords = $purchaseQuery->count();
         $result = $purchaseQuery->get();

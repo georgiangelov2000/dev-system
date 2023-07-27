@@ -17,7 +17,9 @@ $(function () {
                 return $.extend({}, d, {
                     'supplier': SUPPLIER_ID,
                     'search': d.search.value,
-                    'out_of_stock': 1
+                    'out_of_stock': 1,
+                    'is_paid':0,
+                    'status': 0
                 });
             }
         },

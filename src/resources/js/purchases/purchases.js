@@ -100,7 +100,7 @@ $(function () {
                 }
             },
             {
-                width: '10%',
+                width: '1%',
                 orderable: false,
                 name: "image",
                 render: function (data, type, row) {
@@ -200,12 +200,17 @@ $(function () {
                 width: '10%',
                 orderable: false,
                 render: function (data, type, row) {
-                    let paidOrdersCount = row.paid_orders_count;
-                    let unpaidOrdersCount = row.unpaid_orders_count;
+                    let paidOrders = row.paid_orders_count;
+                    let overdueOrders = row.overdue_orders_count;
+                    let pendingOrders = row.pending_orders_count;
+                    let refundOrders = row.refund_orders_count;
 
-                    let displayText = `<a class='text-success' ">${paidOrdersCount} paid</a> / <a class='text-danger'>${unpaidOrdersCount} unpaid</a>`;
-
-                    return displayText;
+                    return `<div>
+                        <span class="text-success">${paidOrders} paid</span> /
+                        <span class="text-danger">${overdueOrders} overdue</span> /
+                        <span class="text-primary">${pendingOrders} pending</span> /
+                        <span class="text-dark">${refundOrders} refund</span>
+                    </div>`
                 }
             },
             {
@@ -274,7 +279,7 @@ $(function () {
                     else if (row.status === 2) {
                         return '<img style="height:40px;" class="w-50" title= "Pending" src = "/storage/images/static/pending.png" /> '
                     }
-                    else if (row.status ===3) {
+                    else if (row.status === 3) {
                         return '<img style="height:40px;" class="w-50" title="Partially Paid" src = "/storage/images/static/partially-payment.png" /> '
                     }
                     else if (row.status === 4) {
@@ -291,7 +296,7 @@ $(function () {
                 }
             },
             {
-                width: '10%',
+                width: '8%',
                 orderable: false,
                 name: 'expected_date_of_payment',
                 render: function (data, type, row) {
@@ -299,7 +304,7 @@ $(function () {
                 }
             },
             {
-                width: '2%',
+                width: '1%',
                 orderable: false,
                 name: "is_paid",
                 render: function (data, type, row) {

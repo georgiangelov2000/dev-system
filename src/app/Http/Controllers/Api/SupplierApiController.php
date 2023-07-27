@@ -59,7 +59,24 @@ class SupplierApiController extends Controller {
             'notes',
             'state_id',
             'country_id'
-        ])->withCount('purchases');
+        ])->withCount([
+            'purchases as paid_purchases_count' => function($query) {
+                $query->where('status',1)
+                ->where('is_paid',1);
+            },
+            'purchases as overdue_purchases_count' => function($query) {
+                $query->where('status',4)
+                ->where('is_paid',1);
+            },
+            'purchases as pending_purchases_count' => function($query) {
+                $query->where('status',2)
+                ->where('is_paid',0);
+            },
+            'purchases as refund_purchases_count' => function($query) {
+                $query->where('status',5)
+                ->where('is_paid',2);
+            }
+        ]);
 
         $totalRecords = Supplier::count();
         $filteredRecords = $supplierQuery->count();

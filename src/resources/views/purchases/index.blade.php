@@ -114,7 +114,7 @@
                         <th>Init.quantity</th>
                         <th>Discount</th>
                         <th>Stock</th>
-                        <th>Balance</th>
+                        <th>Purchases</th>
                         <th>Supplier</th>
                         <th>Category</th>
                         <th>Subcategories</th>
