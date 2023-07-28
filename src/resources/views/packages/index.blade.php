@@ -98,7 +98,7 @@
                                 </div>
                             </th>
                             <th>ID</th>
-                            <th>Package name</th>
+                            <th>Name</th>
                             <th>Tracking number</th>
                             <th>Type</th>
                             <th>Method</th>
@@ -106,9 +106,7 @@
                             <th>Orders</th>
                             <th>Exp.delivery date</th>
                             <th>Off.delivery date</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th>Expired</th>
+                            <th>Delay</th>
                             <th>Delivered</th>
                             <th>Actions</th>
                         </tr>

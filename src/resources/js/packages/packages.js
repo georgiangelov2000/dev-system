@@ -132,15 +132,20 @@ $(function () {
                 }
             },
             {
-                width: '10%',
+                width: '17%',
                 orderable: false,
                 render: function (data, type, row) {
-                    let paidOrdersCount = row.paid_orders_count;
-                    let unpaidOrdersCount = row.unpaid_orders_count;
+                    let paidOrders = row.paid_orders_count;
+                    let overdueOrders = row.overdue_orders_count;
+                    let pendingOrders = row.pending_orders_count;
+                    let refundOrders = row.refund_orders_count;
 
-                    let displayText = `<a class='text-success' ">${paidOrdersCount} paid</a> / <a class='text-danger'>${unpaidOrdersCount} unpaid</a>`;
-
-                    return displayText;
+                    return `<div>
+                        <span class="text-success">${paidOrders} paid</span> /
+                        <span class="text-danger">${overdueOrders} overdue</span> /
+                        <span class="text-primary">${pendingOrders} pending</span> /
+                        <span class="text-dark">${refundOrders} refund</span>
+                    </div>`
                 }
             },
             {
@@ -157,40 +162,35 @@ $(function () {
             },
             {
                 orderable: false,
-                width: "5%",
-                name: 'created_at',
-                render: function (data, type, row) {
-                    return `<span>${moment(row.created_at).format('YYYY-MM-DD')}<span>`
-                }
-            },
-            {
-                orderable: false,
-                width: "5%",
-                name: 'updated_at',
-                render: function (data, type, row) {
-                    return `<span>${moment(row.updated_at).format('YYYY-MM-DD')}<span>`
-                }
-            },
-            {
-                orderable: false,
-                width: "5%",
+                width: "10%",
                 name: 'expired',
                 class: 'text-center',
                 render: function (data, type, row) {
-                    var dateOfDelivery = moment(row.expected_delivery_date);
-                    var currentDate = moment();
-                    var daysRemaining = dateOfDelivery.diff(currentDate, 'days');
+                  let expectedDeliveryDate = moment(row.expected_delivery_date);
+                  let officialDeliveryDate = moment(row.delivery_date);
+                  let currentDate = moment();
+                  let delayInDays;
+                  let delayMessage = '';
+              
+                  if (officialDeliveryDate.isValid() && expectedDeliveryDate.isValid()) {
+                    delayInDays = officialDeliveryDate.diff(expectedDeliveryDate, 'days');
 
-                    if (currentDate.isAfter(dateOfDelivery, 'day') && !row.is_it_delivered) {
-                        return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
-                    } else if (row.status === 'Received') {
-                        return `<span class="badge badge-success p-2">Package delivered</span>`;
-                    } else if (row.delivery_date) { // Check if delivery_date exists
-                        return `<span class="badge badge-info p-2">Package has been delivered</span>`;
+                    if (delayInDays > 0) {
+                      delayMessage = 'Package has been delivered with a delay of ' + delayInDays + ' day(s).';
                     } else {
-                        var badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
-                        return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
+                      delayMessage = 'Package was delivered on time.';
                     }
+                  } else {
+                    delayInDays = expectedDeliveryDate.diff(currentDate, 'days');
+
+                    if (delayInDays > 0) {
+                      delayMessage = 'Package has not been delivered with a delay of ' + delayInDays + ' day(s).';
+                    } else {
+                      delayMessage = 'Expected Delivery Date is ' + moment().to(expectedDeliveryDate);
+                    }
+                  }
+
+                  return delayMessage;
                 }
             },
             {

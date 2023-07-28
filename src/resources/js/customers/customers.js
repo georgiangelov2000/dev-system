@@ -77,7 +77,7 @@ $(function () {
                 }
             },
             {
-                width: '10%',
+                width: '5%',
                 orderable: false,
                 name: "image",
                 render: function (data, type, row) {
@@ -147,26 +147,25 @@ $(function () {
                 }
             },
             {
-                width: '15%',
+                width: '21%',
                 orderable: false,
-                name: "notes",
                 render: function (data, type, row) {
-                    return "<div class='notes p-0'>" + row.notes + "</div>"
-                }
-            },
-            {
-                width: '1%',
-                orderable: false,
-                name: "orders_count",
-                class:'text-center',
-                render: function (data, type, row) {
-                    return `<span>${row.orders_count}</span>`
-                }
-            },
+                    let paidOrders = row.paid_orders_count;
+                    let overdueOrders = row.overdue_orders_count;
+                    let pendingOrders = row.pending_orders_count;
+                    let refundOrders = row.refund_orders_count;
 
+                    return `<div>
+                        <span class="text-success">${paidOrders} paid</span> /
+                        <span class="text-danger">${overdueOrders} overdue</span> /
+                        <span class="text-primary">${pendingOrders} pending</span> /
+                        <span class="text-dark">${refundOrders} refund</span>
+                    </div>`
+                }
+            },
             {
                 orderable: false,
-                width: '20%',
+                width: '25%',
                 render: function (data, type, row) {
                     let deleteButton = '';
                     if (!row.orders_count) {
