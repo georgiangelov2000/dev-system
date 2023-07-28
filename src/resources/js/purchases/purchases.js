@@ -149,7 +149,6 @@ $(function () {
                     return `<span>€${row.price}</span>`
                 }
             },
-
             {
                 width: '6%',
                 name:'total_price',
@@ -272,7 +271,6 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    console.log(row.status);
                     if (row.status === 1) {
                         return '<img style="height:40px;" class="w-50" title="Paid" src = "/storage/images/static/succesfully.png" /> '
                     }
@@ -287,11 +285,8 @@ $(function () {
                     }
                     else if (row.status === 5) {
                         return '<img style="height:40px;" class="w-50" title="Refunded" src = "/storage/images/static/ordered.png" /> '
-                    }
-                    else if (row.status === 6) {
-                        return '<img style="height:40px;" class="w-50" title="Ordered" src = "/storage/images/static/refund.png" /> '
-                    } else {
-                        return '';
+                    }else {
+                        return '<img style="height:40px;" class="w-50" title="Unpaid" src = "/storage/images/static/unpaid.png" />'
                     }
                 }
             },

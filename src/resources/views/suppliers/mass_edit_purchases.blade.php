@@ -19,15 +19,19 @@
                             </div>
                         </th>
                         <th>ID</th>
+                        <th>Image</th>
                         <th>Name</th>
-                        <th>Single price</th>
+                        <th>Price</th>
+                        <th>Tot.price</th>
+                        <th>Orig.price</th>
                         <th>Quantity</th>
                         <th>Initial Quantity</th>
-                        <th>Total Price</th>
+                        <th>Discount</th>
                         <th>Categories</th>
                         <th>Sub categories</th>
                         <th>Brands</th>
-                        <th>Created</th>
+                        <th>Paid</th>
+                        <th class="text-center">Status</th>
                     </thead>
                 </table>
 
@@ -89,7 +93,8 @@
         const SUPPLIER_ID = {{ "$supplier->id" }};
         const PURCHASE_API = "{{ route('api.products') }}";
         const PURCHASE_EDIT = "{{ route('purchase.edit', ':id') }}";
-        const PURCHASE_UPDATE = "{{route('purchase.mass.update')}}"
-        const SUB_CATEGORY_API_ROUTE = "{{route('api.subcategories')}}"
+        const PURCHASE_UPDATE = "{{route('purchase.mass.update')}}";
+        const SUB_CATEGORY_API_ROUTE = "{{route('api.subcategories')}}";
+        const CONFIG_URL = "{{config('app.url')}}";
     </script>
 @endpush

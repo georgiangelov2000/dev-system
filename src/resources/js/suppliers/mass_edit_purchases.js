@@ -41,6 +41,42 @@ $(function () {
                 }
             },
             {
+                width: '1%',
+                orderable: false,
+                name: "image",
+                render: function (data, type, row) {
+                    if (row.images && row.images.length > 1) {
+                        // Generate carousel HTML with multiple images
+                        let carouselItems = row.images.map((image, index) => {
+                            let isActive = index === 0 ? 'active' : ''; // Set first image as active
+                            return `<div class="carousel-item ${isActive}">
+                                        <img class="d-block w-100" src="${CONFIG_URL + image.path + "/" + image.name}" alt="Slide ${index + 1}">
+                                    </div>`;
+                        }).join('');
+
+                        return `<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                                    <div class="carousel-inner">
+                                        ${carouselItems}
+                                    </div>
+                                    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </div>`;
+                    } else if (row.images && row.images.length === 1) {
+                        let imagePath = CONFIG_URL + row.images[0].path + "/" + row.images[0].name;
+                        return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${imagePath}" />`;
+
+                    } else {
+                        return `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;
+                    }
+                }
+            },
+            {
                 width: '5%',
                 render: function (data, type, row) {
                     return `<a href=${PURCHASE_EDIT.replace(':id', row.id)}>${row.name}</a>`
@@ -49,23 +85,48 @@ $(function () {
             {
                 width: '6%',
                 name: "price",
-                data: "price"
+                render:function(data,type,row) {
+                    return `<span>€${row.price}</span>`
+                }
+            },
+            {
+                orderable: true,
+                width: '5%',
+                name:'total_price',
+                render: function (data, type, row) {
+                    return `<span>€${row.total_price}</span>`
+                }
+            },
+            {
+                orderable:true,
+                width:'5%',
+                name:'original_price',
+                render:function(data,type,row) {
+                    return `<span>€${row.original_price}</span>`
+                }
             },
             {
                 width: '5%',
+                orderable: true,
+                class:'text-center',
                 name: "quantity",
                 data: "quantity"
             },
             {
                 width: '7%',
                 orderable: true,
+                class:'text-center',
                 name: "initial_quantity",
                 data: 'initial_quantity'
             },
             {
-                width: '6%',
-                name: "total_price",
-                data: "total_price"
+                width: '2%',
+                name: "discount_percent",
+                orderable: true,
+                class:'text-center',
+                render: function (data, type, row) {
+                    return `<span>${row.discount_percent}%</span>`
+                }
             },
             {
                 width: '7%',
@@ -110,10 +171,41 @@ $(function () {
                 }
             },
             {
+                width:'1%',
+                orderable:false,
+                name:'is_paid',
+                render:function(data,type,row) {
+                    if ( (row.is_paid === 1) && (row.status === 1 || row.status === 4)  ) {
+                        return '<span class="text-success">Yes</span>';
+                    } else if ( (row.is_paid === 3) && (row.status === 3) ) {
+                        return '<span class="text-warning">Refund</span>';
+                    } else {
+                        return '<span class="text-danger">No</span>';
+                    }
+                }
+            },
+            {
                 width: '5%',
                 orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
-                    return '<span>' + moment(row.created_at).format('YYYY-MM-DD') + '</span>';
+                    if (row.status === 1) {
+                        return '<img style="height:40px;" class="w-50" title="Paid" src = "/storage/images/static/succesfully.png" /> '
+                    }
+                    else if (row.status === 2) {
+                        return '<img style="height:40px;" class="w-50" title= "Pending" src = "/storage/images/static/pending.png" /> '
+                    }
+                    else if (row.status === 3) {
+                        return '<img style="height:40px;" class="w-50" title="Partially Paid" src = "/storage/images/static/partially-payment.png" /> '
+                    }
+                    else if (row.status === 4) {
+                        return '<img style="height:40px;" class="w-50" title="Overdue" src = "/storage/images/static/overdue.png" /> '
+                    }
+                    else if (row.status === 5) {
+                        return '<img style="height:40px;" class="w-50" title="Refunded" src = "/storage/images/static/ordered.png" /> '
+                    } else {
+                        return '<img style="height:40px;" class="w-50" title="Unpaid" src = "/storage/images/static/unpaid.png" />';
+                    }
                 }
             },
         ]
@@ -214,7 +306,21 @@ $(function () {
         } else {
             toastr['error']("Please select purchases");
         }
-
     }
+
+    $(document).on('change', ".selectAll", function () {
+        if (this.checked) {
+            $('.actions').removeClass('d-none');
+            $(':checkbox').each(function () {
+                this.checked = true;
+            });
+        } else {
+            $('.actions').addClass('d-none');
+
+            $(':checkbox').each(function () {
+                this.checked = false;
+            });
+        }
+    });
 
 });
