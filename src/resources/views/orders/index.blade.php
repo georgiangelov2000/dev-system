@@ -84,7 +84,8 @@
                             <th>Customer</th>
                             <th>Product</th>
                             <th title="Quantity">Qty</th>
-                            <th title="Single price">Unit Price</th>
+                            <th title="Unut price">Unit Price</th>
+                            <th title="Unit original price">Unit init price</th>
                             <th title="Official price">Official Price</th>
                             <th title="Original price">Orig. Price</th>                            
                             <th>Discount</th>

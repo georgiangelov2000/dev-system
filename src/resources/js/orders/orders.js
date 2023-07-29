@@ -2,7 +2,7 @@ import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 
 $(function () {
-    $('.selectAction, .selectType, .selectCustomer').selectpicker();
+    $('.selectAction, .selectType, .selectCustomer, select[name="package_id"], select[name="package_id"] ').selectpicker();
 
     const bootstrapCustomer = $('.bootstrap-select .selectCustomer');
     const bootstrapOrderStatus = $('.bootstrap-select .selectType');
@@ -18,7 +18,9 @@ $(function () {
     });
     let dateRange = $('input[name="datetimes"]').val();
 
-    $('.datepicker').datepicker({ format: 'mm/dd/yyyy' }).datepicker('setDate', new Date());
+    $('.datepicker').datepicker({
+        format: 'mm/dd/yyyy'
+    });
 
     const applyBtn = $('.applyBtn');
 
@@ -47,9 +49,9 @@ $(function () {
                 render: function (data, type, row) {
                     let checkbox = '';
 
-                    if(row.is_paid == false && row.status === 'Ordered') {
-                        checkbox = 
-                        '<div div class="form-check">\n\
+                    if (row.is_paid == false && row.status === 'Ordered') {
+                        checkbox =
+                            '<div div class="form-check">\n\
                             <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
                         </div>';
                     }
@@ -61,7 +63,13 @@ $(function () {
                 width: '3%',
                 name: "id",
                 render: function (data, type, row) {
-                    return '<span class="font-weight-bold">' + row.id + '</span>';
+                    let input = '';
+
+                    if (typeof CUSTOMER !== 'undefined') {
+                        input = `<input type="hidden" value="${row.id}" name="order_id[]" />`
+                    }
+                    return `<span class="font-weight-bold">${row.id}</span>${input}`;
+
                 }
             },
             {
@@ -80,7 +88,7 @@ $(function () {
                 }
             },
             {
-                width: '10%',
+                width: '5%',
                 orderable: false,
                 name: "customer",
                 render: function (data, type, row) {
@@ -88,7 +96,7 @@ $(function () {
                 }
             },
             {
-                width: '10%',
+                width: '7%',
                 orderable: false,
                 name: "product",
                 render: function (data, type, row) {
@@ -107,6 +115,14 @@ $(function () {
                 name: "single_sold_price",
                 render: function (data, type, row) {
                     return `<span>€${row.single_sold_price}</span>`
+                }
+            },
+            {
+                width: '8%',
+                orderable: false,
+                name: "original_single_sold_price",
+                render: function (data, type, row) {
+                    return `<span>€${row.original_single_sold_price}</span>`
                 }
             },
             {
@@ -160,7 +176,7 @@ $(function () {
 
                     let currentDate = moment();
                     let daysRemaining = date.diff(currentDate, 'days');
-                    
+
                     if (row.status === 'Ordered' && row.is_paid !== true) {
                         return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
                     } else if (row.status === 'Ordered') {
@@ -169,17 +185,17 @@ $(function () {
                     } else {
                         return `<span class="badge badge-success p-2">Order received</span>`;
                     }
-                    
-                    
+
+
                 }
             },
             {
                 width: '8%',
                 orderable: false,
                 render: function (data, type, row) {
-                    
+
                     let dateOfSale;
-                    
+
                     if (row.package_extension_date) {
                         dateOfSale = moment(row.package_extension_date);
                     } else {
@@ -188,13 +204,13 @@ $(function () {
 
                     let dateOfPayment;
                     let delayMessage = '';
-            
+
                     if (row.order_payments) {
                         dateOfPayment = moment(row.order_payments.date_of_payment);
-            
+
                         // Calculate the delay in days (if any)
                         let delayInDays = dateOfPayment.diff(dateOfSale, 'days');
-                        
+
                         // Check if there is a delay in payment
                         if (delayInDays > 0) {
                             delayMessage = 'Payment is delayed by ' + delayInDays + ' day(s).';
@@ -213,7 +229,7 @@ $(function () {
                 render: function (data, type, row) {
                     let date = '';
 
-                    if(row.order_payments) {
+                    if (row.order_payments) {
                         date = row.order_payments.date_of_payment;
                     }
 
@@ -261,9 +277,9 @@ $(function () {
                 orderable: false,
                 name: "is_paid",
                 render: function (data, type, row) {
-                    if ( (row.is_paid == 1) && (row.status == 'Paid' || row.status == 'Overdue')  ) {
+                    if ((row.is_paid == 1) && (row.status == 'Paid' || row.status == 'Overdue')) {
                         return '<span class="text-success">Yes</span>';
-                    } else if ( (row.is_paid == 3) && (row.status == 'Refund') ) {
+                    } else if ((row.is_paid == 3) && (row.status == 'Refund')) {
                         return '<span class="text-warning">Refund</span>';
                     } else {
                         return '<span class="text-danger">No</span>';
@@ -328,8 +344,6 @@ $(function () {
         var orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
 
         var data = {
-            'customer': bootstrapCustomer.val(),
-            'status': bootstrapOrderStatus.val(),
             "search": d.search.value,
             'date_range': dateRange,
             'order_column': orderColumnName, // send the column name being sorted
@@ -337,17 +351,32 @@ $(function () {
             'limit': d.custom_length = d.length,
         };
 
+        if (typeof CUSTOMER !== 'undefined') {
+            data.customer = CUSTOMER;
+        } else {
+            data.customer = bootstrapCustomer.val()
+        }
+
+        if (typeof STATUS !== 'undefined') {
+            data.status = STATUS;
+        } else {
+            data.status = bootstrapOrderStatus.val();
+        }
+
+        if (typeof IS_PAID !== 'undefined') {
+            data.is_paid = IS_PAID;
+        }
+
         if (typeof PACKAGE !== 'undefined') {
             data.package = PACKAGE;
         }
 
-        if(typeof PRODUCT_ID !== 'undefined') {
+        if (typeof PRODUCT_ID !== 'undefined') {
             data.product_id = PRODUCT_ID;
         }
 
         return data;
     }
-
 
     bootstrapCustomer.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         dataTable.ajax.reload(null, false);
@@ -496,4 +525,74 @@ $(function () {
             $('.actions').removeClass('d-none');
         }
     };
+
+    //Reusable functionallity for mass update on orders
+    let form = $('#massUpdateOrders');
+
+    form.on('submit', function (e) {
+        e.preventDefault();
+        let form = e.target;
+        let method = e.target.getAttribute('method');
+        let action = e.target.getAttribute('action');
+        let data = $(form).serialize();
+        let formData = {};
+
+        data.split('&').forEach(function (keyValue) {
+            let pair = keyValue.split('=');
+            let key = decodeURIComponent(pair[0]);
+            let value = decodeURIComponent(pair[1] || '');
+
+            if (formData[key]) {
+                if (Array.isArray(formData[key])) {
+                    formData[key].push(value);
+                } else {
+                    formData[key] = [formData[key], value];
+                }
+            } else {
+                formData[key] = value;
+            }
+        });
+        
+        let price = formData.price;
+        let discount = formData.discount_percent;
+        let quantity = formData.sold_quantity;
+        let package_id = formData.package_id;
+        let date_of_sale = formData.date_of_sale;
+
+        let searchedIds = [];
+
+        $('tbody input[type="checkbox"]:checked').map(function () {
+            searchedIds.push($(this).attr('data-id'));
+        });
+
+        if(searchedIds.length > 0) {
+            $.ajax({
+                url: action,
+                method: 'POST',
+                data: {
+                    'order_id': searchedIds,
+                    'price':price,
+                    'sold_quantity':quantity,
+                    'discount_percent':discount,
+                    'date_of_sale':date_of_sale,
+                    'package_id':package_id
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    'X-HTTP-Method-Override': 'PUT' // Set the X-HTTP-Method-Override header
+                },
+                success:function (response) {
+                    toastr['success'](response.message);
+                    dataTable.ajax.reload(null,false);
+                },
+                error: function(xhr,status,error) {
+                    toastr['error'](response.message);
+                }
+            })
+        } else {
+            toastr['error']("Please select orders");
+        }
+
+    });
+
 });

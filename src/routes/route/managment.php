@@ -73,7 +73,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [PurchaseController::class, 'store'])->name('store');
         Route::put('/update/{purchase}', [PurchaseController::class, 'update'])->name('update');
         Route::put('/mass/edit', [PurchaseController::class, 'massEditUpdate'])->name('mass.update');
-
         Route::delete('/delete/{purchase}', [PurchaseController::class, 'delete'])->name('delete');
         Route::delete('/delete/image/{purchase}', [PurchaseController::class, 'deleteGalleryImage'])->name('delete.image');
     });
@@ -82,7 +81,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('index');
         Route::get('/create', [CustomerController::class, 'create'])->name('create');
         Route::post('/store', [CustomerController::class, 'store'])->name('store');
-        Route::put('/update/orders', [CustomerController::class, 'updateCustomerOrders'])->name('update.orders');
         Route::get('/edit/{customer}', [CustomerController::class, 'edit'])->name('edit');
         Route::put('/update/{customer}', [CustomerController::class, 'update'])->name('update');
         Route::get('/delete/{customer}', [CustomerController::class, 'delete'])->name('delete');
@@ -95,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [OrderController::class, 'store'])->name('store');
         Route::delete('/delete/{order}', [OrderController::class, 'delete'])->name('delete');
         Route::put('/update/{order}', [OrderController::class, 'update'])->name('update');
+        Route::put('/mass/update', [OrderController::class, 'massUpdate'])->name('mass.update');
         Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
         Route::put('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
     });

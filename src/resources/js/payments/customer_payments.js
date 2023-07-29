@@ -11,7 +11,7 @@ $(function () {
   });
 
   $('.datepicker').datepicker({
-    format: 'yyyy-mm-dd'
+    format: 'mm/dd/yyyy'
   });
 
   let disabledOption = $('.disabledDateRange');

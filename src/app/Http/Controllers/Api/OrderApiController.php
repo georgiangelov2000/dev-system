@@ -20,7 +20,7 @@ class OrderApiController extends Controller
         $product = isset($request->product_id) && $request->product_id ? $request->product_id : null;
         $withoutPackage = isset($request->withoutPackage) && $request->withoutPackage ? $request->withoutPackage : null;
         $isPaid = isset($request->is_paid) ? $request->is_paid : true;
-
+        
         $offset = $request->input('start', 0);  
         $limit = $request->input('length', 10);
 
@@ -33,6 +33,7 @@ class OrderApiController extends Controller
             'tracking_number',
             'sold_quantity',
             'single_sold_price',
+            'original_single_sold_price',
             'total_sold_price',
             'original_sold_price',
             'discount_percent',
@@ -48,7 +49,7 @@ class OrderApiController extends Controller
             $orderQuery->where('customer_id', $customer);
         }
         if($isPaid == false){
-            $orderQuery->where('is_paid',0)->whereIn('status',[2,3,4,5,6]);
+            $orderQuery->where('is_paid',0);
         }
         if($package) {
             $orderQuery->whereHas('packages', function ($query) use ($package) {

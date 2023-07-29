@@ -9,6 +9,7 @@ use App\Models\OrderPayment;
 use App\Http\Requests\OrderPaymentRequest;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
+use App\Models\Package;
 use App\Models\Purchase;
 use App\Helpers\LoadStaticData;
 
@@ -65,6 +66,7 @@ class OrderController extends Controller
                     'purchase_id' => $purchaseId,
                     'sold_quantity' => $orderQuantity,
                     'single_sold_price' => $finalSinglePrice,
+                    'original_single_sold_price' => $orderSinglePrice,
                     'total_sold_price' => $finalPrice,
                     'original_sold_price' =>  $originalPrice,
                     'discount_percent' => $orderDiscount,
@@ -81,10 +83,10 @@ class OrderController extends Controller
             Order::insert($orders);
             DB::commit();
 
-            return response()->json(['message' => 'Order has been created'],200);
+            return response()->json(['message' => 'Order has been created'], 200);
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Order has not been created'],500);
+            return response()->json(['message' => 'Order has not been created'], 500);
         }
     }
 
@@ -111,7 +113,7 @@ class OrderController extends Controller
             $remainingQuantity = $totalSoldQuantity - $order->sold_quantity;
 
             $updatedQuantity = ($remainingQuantity + $sold_quantity);
-            
+
             if ($updatedQuantity > $purchase->initial_quantity) {
                 return back()->with('error', 'Purchase quantity is not enough');
             }
@@ -130,6 +132,7 @@ class OrderController extends Controller
                 'purchase_id' => $purchase_id,
                 'sold_quantity' => $sold_quantity,
                 'single_sold_price' => $finalSinglePrice,
+                'original_single_sold_price' => $single_sold_price,
                 'total_sold_price' => $finalTotalPrice,
                 'original_sold_price' => FunctionsHelper::calculatedFinalPrice($single_sold_price, $sold_quantity),
                 'discount_percent' => $discount_percent,
@@ -144,31 +147,129 @@ class OrderController extends Controller
         }
     }
 
+    public function massUpdate(Request $request)
+    {
+        $data = $request->validate([
+            'order_id' => 'required|array',
+            'order_id.*' => 'required|numeric',
+            'price' => 'nullable|numeric',
+            'sold_quantity' => 'nullable|numeric',
+            'discount_percent' => 'nullable|numeric',
+            'date_of_sale' => 'nullable|date',
+            'package_id' => 'nullable|numeric'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $requestedQuantity = $data['sold_quantity'];
+            $requestedPrice = $data['price'];
+            $requestedDiscount = $data['discount_percent'];
+            $requestedDateOfSale = isset($data['date_of_sale']) ? date('Y-m-d', strtotime($data['date_of_sale'])) : null;
+            $requestedPackage = $data['package_id'];
+            $orderIds = $data['order_id'];
+
+            if (count($orderIds)) {
+
+                foreach ($orderIds as $key => $order) {
+
+                    // Check for exists order   
+                    $order = Order::where('id', $order)
+                        ->where('status', 6)
+                        ->where('is_paid', 0)
+                        ->firstOrFail();
+                    
+                    //Initial parameters 
+                    $price = $order->original_single_sold_price;
+                    $quantity = $order->sold_quantity;
+                    $discount = $order->discount_percent;
+
+                    // Find related purchase
+                    $purchase = Purchase::with('orders')->findOrFail($order->first()->purchase_id);
+
+                    // Rewrite initial parameters if the the requested date is exists;
+                    if(isset($requestedPrice) && $requestedPrice) {
+                        $price = $requestedPrice;
+                    }
+                    if(isset($requestedQuantity) && $requestedQuantity) {
+                        $quantity = $requestedQuantity;
+                    }
+                    if(isset($requestedDiscount) && $requestedDiscount) {
+                        $discount = $requestedDiscount;
+                    }
+
+                    //Calculate quantity of the purchase
+                    $totalSoldQuantity = $purchase->orders->sum('sold_quantity');
+                    $remainingQuantity = ($totalSoldQuantity - $order->first()->sold_quantity);
+                    $updatedQuantity = ($remainingQuantity + $quantity);
+
+                    if ($updatedQuantity > $purchase->initial_quantity) {
+                        return response()->json(['message','Purchase quantity is not enough']);
+                    }
+
+                    $finalQuantity = ($purchase->initial_quantity - $updatedQuantity);
+                    $purchase->quantity = $finalQuantity;
+                    $purchase->save();
+
+                    //Calculate price of the order
+                    $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($price, $discount);
+                    $finalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $quantity);
+                    $originalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
+                                        
+                    // Save order parameters
+                    $order->sold_quantity = $quantity;
+                    $order->single_sold_price = $finalSinglePrice;
+                    $order->original_single_sold_price = $price;
+                    $order->total_sold_price = $finalPrice;
+                    $order->original_sold_price = $originalPrice;
+
+                    if (isset($requestedDateOfSale) && $requestedDateOfSale) {
+                        $order->date_of_sale = $requestedDateOfSale;
+                    }
+
+                    if (isset($requestedPackage) && $requestedPackage) {
+                        $package = Package::findOrFail($requestedPackage);
+                        
+                        $package->orders()->attach([$order->id]);
+                        $order->package_extension_date = date('Y-m-d', strtotime($package->expected_delivery_date));
+                    }
+
+                    $order->save();
+                }
+            }
+            DB::commit();
+            return response()->json(['message' => 'Orders has been updated'],200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Orders has not been updated',500]);
+        }
+    }
+
     public function updateStatus(Order $order, Request $request)
     {
         try {
 
-            $specificColumns = $request->only(['status','detach_package']);
+            $specificColumns = $request->only(['status', 'detach_package']);
 
             $detachPackage = isset($specificColumns['detach_package'])
-            && $specificColumns['detach_package'] == true ? true : false;
-    
-            $status = isset($specificColumns['status']) && ($specificColumns['status'] == 3 || $specificColumns['status'] == 4) 
-            ? $specificColumns['status'] 
-            : false;
-                        
-            if($detachPackage) {
+                && $specificColumns['detach_package'] == true ? true : false;
+
+            $status = isset($specificColumns['status']) && ($specificColumns['status'] == 3 || $specificColumns['status'] == 4)
+                ? $specificColumns['status']
+                : false;
+
+            if ($detachPackage) {
                 $package = $order->packages()->first();
-                if($package) {
+                if ($package) {
                     $order->packages()->detach($package->id);
                     $order->package_extension_date = null;
                 }
             }
-    
-            if($status) {
+
+            if ($status) {
                 $order->status = $status;
             }
-            
+
             $order->save();
             DB::commit();
         } catch (\Exception $e) {
@@ -177,7 +278,7 @@ class OrderController extends Controller
         }
         return response()->json(['message' => 'Order has been updated'], 200);
     }
-    
+
     public function delete(Order $order)
     {
         DB::beginTransaction();

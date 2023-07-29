@@ -79,6 +79,7 @@ $(function () {
             {
                 width: '5%',
                 orderable: false,
+                class:'text-center',
                 name: "image",
                 render: function (data, type, row) {
                     if (row.image) {
@@ -91,12 +92,14 @@ $(function () {
             {
                 width: '10%',
                 orderable: false,
+                class:'text-center',
                 name: "name",
                 data: "name"
             },
             {
                 width: '10%',
                 orderable: false,
+                class:'text-center',
                 name: "email",
                 data: "email",
             },
@@ -147,8 +150,9 @@ $(function () {
                 }
             },
             {
-                width: '21%',
+                width: '19%',
                 orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
                     let paidOrders = row.paid_orders_count;
                     let overdueOrders = row.overdue_orders_count;
@@ -165,15 +169,17 @@ $(function () {
             },
             {
                 orderable: false,
-                width: '25%',
+                width: '27%',
+                class:'text-center',
                 render: function (data, type, row) {
                     let deleteButton = '';
                     if (!row.orders_count) {
                         deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentCustomer(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
                     }
                     let editButton = '<a data-id=' + row.id + ' href="' + CUSTOMER_EDIT_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
-                    let ordersButton = '<a data-id=' + row.id + ' href="' + CUSTOMER_ORDERS_ROUTE.replace(':id', row.id) + '" title="Orders"> <i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i>  </a>';
-                    return `${deleteButton} ${editButton} ${ordersButton}`;
+                    let massEdit = '<a data-id=' + row.id + ' href="' + CUSTOMER_ORDERS_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Mass edit"> <i class="fa-light fa-pen-to-square text-primary" aria-hidden="true"></i>  </a>';
+                    let orders = '<a data-id=' + row.id + ' href="' + CUSTOMER_ORDERS_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Orders"> <i class="fa fa-light fa-shopping-cart text-primary" aria-hidden="true"></i>  </a>';
+                    return `${deleteButton} ${editButton} ${massEdit} ${orders}`;
                 }
             }
 

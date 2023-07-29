@@ -225,7 +225,7 @@ class PurchaseController extends Controller
                 $purchase = Purchase::find($purchaseId);
 
                 if ($purchase) {
-                    if ($requestedQuantity !== null && $requestedQuantity !== null) {
+                    if ($requestedQuantity !== null && $requestedPrice !== null) {
                         $purchase->quantity = $requestedQuantity;
                         $purchase->initial_quantity = $requestedQuantity;
                         $purchase->price = $requestedPrice;
