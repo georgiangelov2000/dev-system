@@ -21,7 +21,8 @@
                         <th>ID</th>
                         <th>Image</th>
                         <th>Name</th>
-                        <th>Price</th>
+                        <th>Unit price</th>
+                        <th>Unit disc price</th>
                         <th>Tot.price</th>
                         <th>Orig.price</th>
                         <th>Quantity</th>

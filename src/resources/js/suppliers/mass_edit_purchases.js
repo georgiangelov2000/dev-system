@@ -17,7 +17,7 @@ $(function () {
                 return $.extend({}, d, {
                     'supplier': SUPPLIER_ID,
                     'search': d.search.value,
-                    'out_of_stock': 1,
+                    'out_of_stock': 0,
                     'is_paid':0,
                     'status': 0
                 });
@@ -41,9 +41,10 @@ $(function () {
                 }
             },
             {
-                width: '1%',
+                width: '2%',
                 orderable: false,
                 name: "image",
+                class:'text-center',
                 render: function (data, type, row) {
                     if (row.images && row.images.length > 1) {
                         // Generate carousel HTML with multiple images
@@ -77,7 +78,8 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '10%',
+                class:'text-center',
                 render: function (data, type, row) {
                     return `<a href=${PURCHASE_EDIT.replace(':id', row.id)}>${row.name}</a>`
                 }
@@ -85,8 +87,17 @@ $(function () {
             {
                 width: '6%',
                 name: "price",
+                class:'text-center',
                 render:function(data,type,row) {
                     return `<span>€${row.price}</span>`
+                }
+            },
+            {
+                width: '6%',
+                name: "discount_price",
+                class:'text-center',
+                render:function(data,type,row) {
+                    return `<span>€${row.discount_price}</span>`
                 }
             },
             {
