@@ -26,10 +26,10 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-3">
+                    {{-- <div class="col-3">
                         <label for="customRange1">Created</label>
                         <input type="text" class="form-control pull-right" name="datetimes" />
-                    </div>
+                    </div> --}}
                 </div>
                 <form id="paymentPurchases" class="col-12" action="{{route('payment.store.purchase')}}" method="POST">
                     @csrf
@@ -43,16 +43,19 @@
                                 </div>
                             </th>
                             <th>ID</th>
+                            <th>Image</th>
                             <th>Name</th>
-                            <th>Price</th>
+                            <th>Unit price</th>
+                            <th>Unit disc price</th>
                             <th>Total price</th>
+                            <th>Reg.price</th>
                             <th>Quantity</th>
                             <th>Init.quantity</th>
+                            <th>Discount %</th>
                             <th>Paid quantity</th>
                             <th>Paid total price</th>
                             <th>Date of payment</th>
-                            <th>Code</th>
-                            <th>Created</th>
+                            <th>Exp.date of payment</th>
                             <th>Paid</th>
                         </thead>
                     </table>

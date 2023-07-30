@@ -37,7 +37,7 @@ $(function () {
                     'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
                     'limit': d.custom_length = d.length,
                     'is_paid': 0,
-                    'status':statusArray,
+                    'stauts':statusArray,
                     'publishing': createdRange,
                 });
             }
@@ -66,24 +66,71 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '1%',
+                orderable: false,
+                name: "image",
+                render: function (data, type, row) {
+                    if (row.images && row.images.length > 1) {
+                        // Generate carousel HTML with multiple images
+                        let carouselItems = row.images.map((image, index) => {
+                            let isActive = index === 0 ? 'active' : ''; // Set first image as active
+                            return `<div class="carousel-item ${isActive}">
+                                        <img class="d-block w-100" src="${image.path + "/" + image.name}" alt="Slide ${index + 1}">
+                                    </div>`;
+                        }).join('');
+
+                        return `<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                                    <div class="carousel-inner">
+                                        ${carouselItems}
+                                    </div>
+                                    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                    <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </div>`;
+                    } else if (row.images && row.images.length === 1) {
+                        let imagePath = row.images[0].path + "/" + row.images[0].name;
+                        return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${imagePath}" />`;
+
+                    } else {
+                        return `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;
+                    }
+                }
+            },
+            {
+                width: '10%',
                 orderable: false,
                 name: "name",
+                class:'text-center',
                 render: function (data, type, row) {
                     return `<a href="#">${row.name}</a>`
                 }
             },
             {
-                width: '2%',
+                width: '5%',
+                orderable: false,
                 name: "price",
-                orderable: true,
                 render: function (data, type, row) {
                     return `<span>€${row.price}</span>`
                 }
             },
             {
+                width: '8%',
+                orderable: false,
+                name: "discount_price",
+                class:'text-center',
+                render: function (data, type, row) {
+                    return `<span>€${row.discount_price}</span>`
+                }
+            },
+            {
                 width: '5%',
-                orderable: true,
+                orderable: false,
+                name:'total_price',
                 render: function (data, type, row) {
                     return `
                     <span>€${row.total_price}</span>
@@ -92,9 +139,20 @@ $(function () {
                 }
             },
             {
+                width: '5%',
+                orderable: false,
+                name:'original_price',
+                render: function (data, type, row) {
+                    return `
+                    <span>€${row.original_price}</span>
+                    <a data-target="price" value="${row.original_price}" class="text-primary" type="button"><i class="fa-light fa-copy"></i></button>
+                    `;
+                }
+            },
+            {
                 width: '2%',
                 orderable: true,
-                name: "quantity",
+                name:'quantity',
                 data: "quantity"
             },
             {
@@ -109,8 +167,15 @@ $(function () {
                 }
             },
             {
+                width: '5%',
+                orderable: false,
+                name:'discount_percent',
+                data: "discount_percent"
+            },
+            {
                 width: '10%',
                 orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
                     return `
                     <input type="number" name="quantity" max="${row.initial_quantity}" class="form-control form-control-sm" />
@@ -121,6 +186,7 @@ $(function () {
             {
                 width: '10%',
                 orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
                     return `
                     <input type="text" name="price" max="${row.total_price}" class="form-control form-control-sm" />
@@ -131,6 +197,7 @@ $(function () {
             {
                 width: '10%',
                 orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
                     return `
                     <div class="input-group">
@@ -146,17 +213,12 @@ $(function () {
                 }
             },
             {
-                width: '3%',
+                width: '10%',
                 orderable: false,
+                name: 'expected_date_of_payment',
+                class:'text-center',
                 render: function (data, type, row) {
-                    return '<span class="font-weight-bold">' + row.code + '</span>';
-                }
-            },
-            {
-                width: '4%',
-                orderable: false,
-                render: function (data, type, row) {
-                    return '<span>' + moment(row.created_at).format('YYYY-MM-DD') + '</span>';
+                    return '<span>' + moment(row.expected_date_of_payment).format('YYYY-MM-DD') + '</span>';
                 }
             },
             {
@@ -172,7 +234,7 @@ $(function () {
                 }
             },
         ],
-        order: [[2, 'asc']]
+        order: [[1, 'asc']]
     });
 
     $('input[name="datetimes"]').on('apply.daterangepicker', function (ev, picker) {

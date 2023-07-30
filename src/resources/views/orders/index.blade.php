@@ -87,7 +87,7 @@
                             <th title="Unut price">Unit Price</th>
                             <th title="Discount unit price">Disc.unit price</th>
                             <th title="Official price">Official Price</th>
-                            <th title="Original price">Orig. Price</th>                            
+                            <th title="Regular price">Regular price</th>                            
                             <th>Discount</th>
                             <th>Date of sale</th>
                             <th>Expired</th>

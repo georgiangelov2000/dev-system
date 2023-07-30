@@ -165,14 +165,12 @@ class PurchaseController extends Controller
                 'notes' => $data['notes'] ?? '',
                 'code' => $data['code'],
             ];
-
-            if($purchase->status == true  && $purchase->is_paid == false && $purchase->payment == null) {
+            if($purchase->status === null && boolval($purchase->is_paid) === false && $purchase->payment === null) {
                 $price = $data['price'];
                 $quantity = $data['quantity'];
                 $discount = $data['discount_percent'];
             
                 $discountPrice = FunctionsHelper::calculatedDiscountPrice($price, $discount);
-                dd($discountPrice);
                 $totalPrice = FunctionsHelper::calculatedFinalPrice($discountPrice, $quantity);
                 $originalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
                 

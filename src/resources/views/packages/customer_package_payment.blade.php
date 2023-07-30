@@ -55,9 +55,9 @@
                                             <th>Name</th>
                                             <th class="Tracking numver">Track.number</th>
                                             <th>Unit price</th>
-                                            <th title="Initial unit price">Discount unit price</th>
-                                            <th>Total price</th>
+                                            <th title="Discount unit price">Disc.unit price</th>
                                             <th>Official price</th>
+                                            <th>Regular price</th>
                                             <th>Quantity</th>
                                             <th>Status</th>
                                             <th>Date of payment</th>

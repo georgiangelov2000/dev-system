@@ -6,7 +6,7 @@
             <div class="card-header">
                 <div class="col-12">
                     <h3 class="card-title">
-                        Orders {{ $customer->name }}
+                        Mass edit orders for {{ $customer->name }}
                     </h3>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                                 <th>Product</th>
                                 <th title="Quantity">Qty</th>
                                 <th title="Single price">Unit Price</th>
-                                <th title="Discount unit price">Discount unit price</th>
+                                <th title="Discount unit price">Disc.unit price</th>
                                 <th title="Official price">Official Price</th>
                                 <th title="Original price">Orig. Price</th>
                                 <th>Discount</th>

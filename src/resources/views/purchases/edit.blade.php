@@ -122,8 +122,7 @@
                                                     id="discount_percent"
                                                     name="discount_percent" 
                                                     min="0"
-                                                    value="0"
-                                                    value='{{$purchase->discount_percent}}' 
+                                                    value='{{$purchase->discount_percent ? $purchase->discount_percent : 0 }}' 
                                                 >
                                                 @error('discount_percent')
                                                     <span class="text-danger">{{ $message }}</span>
