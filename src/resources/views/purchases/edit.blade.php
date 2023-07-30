@@ -275,8 +275,7 @@
                                         @endif
                                         <div class="col-12 d-none imagePreview">
                                             <div class="position-relative">
-                                                <img id="preview-image" alt="Preview"
-                                                    class="img-fluid cardWidgetImage card card-widget w-100  m-0">
+                                                <img id="preview-image" alt="Preview" class="img-fluid cardWidgetImage card card-widget w-100  m-0">
                                                 <div class="ribbon-wrapper ribbon-lg">
                                                     <div class="ribbon bg-success text-lg">
                                                         Preview

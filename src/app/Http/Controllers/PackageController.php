@@ -59,7 +59,6 @@ class PackageController extends Controller
 
             DB::commit();
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollback();
             return back()->withInput()->with('error', 'Package has not been created');
         }

@@ -51,19 +51,18 @@
                                                     <label class="form-check-label" for="flexCheckDefault"></label>
                                                 </div>
                                             </th>
-                                            <th>
-                                                ID
-                                            </th>
+                                            <th>ID</th>
                                             <th>Name</th>
-                                            <th>Tracking number</th>
-                                            <th>Single price</th>
+                                            <th class="Tracking numver">Track.number</th>
+                                            <th>Unit price</th>
+                                            <th title="Initial unit price">Discount unit price</th>
                                             <th>Total price</th>
                                             <th>Official price</th>
                                             <th>Quantity</th>
                                             <th>Status</th>
                                             <th>Date of payment</th>
                                             <th>Date of sale</th>
-                                            <th>Extension date</th>
+                                            <th>Ext date</th>
                                         </tr>
                                     </thead>
                                 </table>

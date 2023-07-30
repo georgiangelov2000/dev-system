@@ -108,13 +108,14 @@
                         <th class='text-center'>Image</th>
                         <th>Name</th>
                         <th>Price</th>
+                        <th>Disc.price</th>
                         <th>Tot.price</th>
                         <th>Orig.price</th>
                         <th>Quantity</th>
                         <th>Init.quantity</th>
                         <th>Discount</th>
                         <th>Stock</th>
-                        <th>Purchases</th>
+                        {{-- <th>Purchases</th> --}}
                         <th>Supplier</th>
                         <th>Category</th>
                         <th>Subcategories</th>

@@ -17,8 +17,9 @@ class PackageApiController extends Controller
         $order_dir = isset($request->order_dir) ? $request->order_dir : null;
         $column_name = isset($request->order_column) ? $request->order_column : null;
         $search = isset($request->search) ? $request->search : null;
-        $select_json = isset($request->select_json) ? $request->select_json : null;
-        $no_paid_orders = isset($request->no_paid_orders) ? $request->no_paid_orders : null;
+        $select_json = isset($request->select_json) ? boolval($request->select_json) : null;
+        $no_paid_orders = isset($request->no_paid_orders) ? boolval($request->no_paid_orders) : null;
+        $is_it_delivered = isset($request->is_it_delivered) ? boolval($request->is_it_delivered) : null;
 
         $offset = $request->input('start', 0);
         $packageQuery = Package::query();
@@ -31,6 +32,9 @@ class PackageApiController extends Controller
         }
         if ($search) {
             $packageQuery->where('package_name', 'LIKE', '%' . $search . '%');
+        }
+        if($is_it_delivered) {
+
         }
         if($package) {
             $packageQuery->where('package_type',$package);
@@ -54,7 +58,7 @@ class PackageApiController extends Controller
         }
         if($no_paid_orders) {
             $packageQuery->whereHas('orders', function ($query) {
-                $query->whereIn('status',[3,4])->where('is_paid', false);
+                $query->whereIn('status',[6])->where('is_paid', false);
             });
         }
         if($select_json) {

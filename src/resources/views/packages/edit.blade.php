@@ -28,8 +28,20 @@
 
                         <div class="form-group col-3">
                             <label for="tracking_number">Tracking number</label>
-                            <input type="text" name="tracking_number" placeholder="Tracking number" id="tracking_number"
-                                class="form-control" value="{{ $package->tracking_number }}" />
+                            @if(!$package->is_it_delivered)
+                                <input 
+                                    type="text" 
+                                    name="tracking_number" 
+                                    placeholder="Tracking number" 
+                                    id="tracking_number"
+                                    class="form-control" 
+                                    value="{{ $package->tracking_number }}" 
+                                />
+                            @else
+                                <p class="input-group-text col-12">
+                                    {{$package->tracking_number}}
+                                </p>
+                            @endif
                             @error('tracking_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -73,13 +85,25 @@
                         <div class="form-group col-3 mb-0">
                             <label>Expected delivery date</label>
                             <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">
-                                        <i class="far fa-calendar-alt"></i>
-                                    </span>
-                                </div>
-                                <input type="text" class="form-control datepicker" name="expected_delivery_date"
-                                    value="{{ $package->expected_delivery_date }}">
+                                @if(!$package->is_it_delivered)
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+
+                                    <input 
+                                        type="text" 
+                                        class="form-control datepicker" 
+                                        name="expected_delivery_date"
+                                        value="{{ $package->expected_delivery_date }}"
+                                    />
+                                @else
+                                    <p class="input-group-text col-12">
+                                        {{$package->expected_delivery_date}}
+                                    </p>
+                                @endif
+
                                 <small id="emailHelp" class="form-text text-muted">
                                     When the delivery date for a package is interited, the purchase date will be
                                     automatically adjusted to reflect the new delivery date
@@ -107,8 +131,12 @@
                         </div>
 
                         <div class="form-group col-12">
-                            <label for="">Search purchase</label>
-                            <select id="" class="form-control purchaseFilter"></select>
+                            @if(!$package->is_it_delivered)
+                                <label for="purchase_id">Search orders</label>
+                                <select id="purchase_id" class="form-control purchaseFilter"></select>
+                            @else
+                                <p class="input-group-text col-12 mt-2 mb-2">The search option is disabled because the package is already delivered</p>
+                            @endif
                         </div>
 
                     </div>
@@ -121,7 +149,8 @@
                                 <th>Tracking number</th>
                                 <th>Name</th>
                                 <th>Date of sale</th>
-                                <th>Single price</th>
+                                <th>Unit price</th>
+                                <th>Discount unit price</th>
                                 <th>Official price</th>
                                 <th>Original price</th>
                                 <th>Discount</th>
@@ -150,6 +179,9 @@
                                     </td>
                                     <td>
                                         {{ $order->date_of_sale }}
+                                    </td>
+                                    <td>
+                                        {{$order->discount_single_sold_price}}
                                     </td>
                                     <td name="single-sold-price">
                                         €{{ $order->single_sold_price }}

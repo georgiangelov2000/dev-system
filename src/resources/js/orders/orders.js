@@ -9,25 +9,23 @@ $(function () {
     const bootstrapSelectAction = $('.bootstrap-select .selectAction');
 
     $('input[name="datetimes"]').daterangepicker({
-        timePicker: false,
-        startDate: moment().subtract(1, 'year'),
-        endDate: moment().startOf('hour'),
+        autoUpdateInput: false,
         locale: {
-            format: 'YYYY-MM-DD'
+          cancelLabel: 'Clear'
         }
     });
+
     let dateRange = $('input[name="datetimes"]').val();
+
+    $('input[name="datetimes"]').on('apply.daterangepicker', function (ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+        dateRange = $('input[name="datetimes"]').val();
+        dataTable.ajax.reload(null, false);
+    });
 
     $('.datepicker').datepicker({
         format: 'mm/dd/yyyy'
     });
-
-    const applyBtn = $('.applyBtn');
-
-    applyBtn.bind('click', function () {
-        dateRange = $('input[name="datetimes"]').val();
-        dataTable.ajax.reload(null, false);
-    })
 
     let table = $('#ordersTable');
     let buttons = mapButtons([1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -99,6 +97,7 @@ $(function () {
                 width: '7%',
                 orderable: false,
                 name: "product",
+                class:"text-center",
                 render: function (data, type, row) {
                     return '<a target="_blank" href="' + EDIT_PRODUCT_ROUTE.replace(':id', row.purchase.id) + '">' + row.purchase.name + '</a>';
                 }
@@ -120,9 +119,9 @@ $(function () {
             {
                 width: '8%',
                 orderable: false,
-                name: "original_single_sold_price",
+                name: "discount_single_sold_price",
                 render: function (data, type, row) {
-                    return `<span>€${row.original_single_sold_price}</span>`
+                    return `<span>€${row.discount_single_sold_price}</span>`
                 }
             },
             {

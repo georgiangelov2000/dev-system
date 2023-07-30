@@ -18,6 +18,7 @@ class CreatePurchasesTable extends Migration {
             $table->unsignedBigInteger('supplier_id');
             $table->unsignedInteger('quantity')->default(0);
             $table->unsignedDecimal('price', 8, 2)->default(0);
+            $table->unsignedDecimal('discount_price', 8, 2)->default(0);
             $table->unsignedDecimal('total_price', 8, 2)->default(0);
             $table->unsignedDecimal('original_price',8,2)->default(0);
             $table->date('expected_date_of_payment');

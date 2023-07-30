@@ -11,8 +11,10 @@ class PurchaseApiController extends Controller
 
     public function getData(Request $request)
     {
+        $relations = ['categories', 'subcategories', 'brands', 'images', 'supplier:id,name'];
 
         $supplier = isset($request->supplier) ? $request->supplier : null;
+        $id = isset($request->id) ? $request->id : null;
         $category = isset($request->category) ? $request->category : null;
         $status = isset($request->status) ? $request->status : null;
         $sub_category = isset($request->sub_category) ? $request->sub_category : null;
@@ -20,11 +22,12 @@ class PurchaseApiController extends Controller
         $single_total_price = isset($request->single_total_price) ? $request->single_total_price : null;
         $total_price_range = isset($request->total_price_range) ? $request->total_price_range : null;
         $search = isset($request->search) ? $request->search : null;
-        $select_json = isset($request->select_json) && $request->select_json ? $request->select_json : null;
+        $select_json = isset($request->select_json) ? boolval($request->select_json) : null;
         $order_dir = isset($request->order_dir) ? $request->order_dir : null;
         $column_name = isset($request->order_column) ? $request->order_column : null;
         $limit  = isset($request->limit) ? $request->limit : null;
         $is_paid = isset($request->is_paid) && !$request->is_paid ? false : true;
+        $out_of_stock = isset($request->out_of_stock) ? $request->out_of_stock : null;
         $offset = $request->input('start', 0);
 
         $purchaseQuery = Purchase::query()->select(
@@ -42,10 +45,11 @@ class PurchaseApiController extends Controller
             'initial_quantity',
             'expected_date_of_payment',
             'original_price',
-            'discount_percent'
+            'discount_percent',
+            'discount_price'
         );
 
-        if($limit) {
+        if ($limit) {
             $purchaseQuery->skip($offset)->take($limit);
         }
         if ($column_name && $order_dir) {
@@ -54,7 +58,10 @@ class PurchaseApiController extends Controller
         if ($search) {
             $purchaseQuery->where('name', 'LIKE', '%' . $search . '%');
         }
-        if($status) {
+        if ($id) {
+            $purchaseQuery->where('id', $id);
+        }
+        if ($status) {
             $purchaseQuery->whereIn('status', $status);
         }
         if ($supplier) {
@@ -71,7 +78,7 @@ class PurchaseApiController extends Controller
             });
         }
         if ($brand) {
-            if(is_array($brand)) {
+            if (is_array($brand)) {
                 $purchaseQuery->whereHas('brands', function ($query) use ($brand) {
                     $query->whereIn('brands.id', $brand);
                 });
@@ -92,43 +99,45 @@ class PurchaseApiController extends Controller
         if ($single_total_price) {
             $purchaseQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
         }
-        if(!$is_paid) {
-            $purchaseQuery->where('is_paid',0);
+        if (!$is_paid) {
+            $purchaseQuery->where('is_paid', 0);
         }
-        if (isset($request->out_of_stock)) {
-            if($request->out_of_stock) {
-                $purchaseQuery->where('quantity', '>', 0);
-            } else {
+        if (!is_null($out_of_stock)) {
+            if(boolval($out_of_stock) === true) {
                 $purchaseQuery->where('quantity', '<=', 0);
-            }
-        }
-        if ($select_json) {
-            $purchaseQuery->with(['categories:id,name','brands']);
+            } else if(boolval($out_of_stock) === false) {
+                $purchaseQuery->where('quantity', '>', 0);
+            } 
+        } 
+         if ($select_json) {
+            $purchaseQuery->with($relations);
             return response()->json(
                 $purchaseQuery->get()
             );
         }
-            $purchaseQuery->with(['categories', 'subcategories', 'brands', 'images', 'supplier:id,name', 'orders:id,status,is_paid','payment:id,purchase_id,date_of_payment']);
-            
-            $purchaseQuery
-                ->withCount([
-                    'orders as paid_orders_count' => function($query) {
-                        $query->where('status',1)
-                        ->where('is_paid',1);
-                    },
-                    'orders as overdue_orders_count' => function($query) {
-                        $query->where('status',4)
-                        ->where('is_paid',1);
-                    },
-                    'orders as pending_orders_count' => function($query) {
-                        $query->where('status',2)
-                        ->where('is_paid',0);
-                    },
-                    'orders as refund_orders_count' => function($query) {
-                        $query->where('status',5)
-                        ->where('is_paid',2);
-                    }
-                ]);
+
+        $relations = [...$relations, ...['orders:id,status,is_paid', 'payment:id,purchase_id,date_of_payment']];
+        $purchaseQuery->with($relations);
+
+        $purchaseQuery
+            ->withCount([
+                'orders as paid_orders_count' => function ($query) {
+                    $query->where('status', 1)
+                        ->where('is_paid', 1);
+                },
+                'orders as overdue_orders_count' => function ($query) {
+                    $query->where('status', 4)
+                        ->where('is_paid', 1);
+                },
+                'orders as pending_orders_count' => function ($query) {
+                    $query->where('status', 2)
+                        ->where('is_paid', 0);
+                },
+                'orders as refund_orders_count' => function ($query) {
+                    $query->where('status', 5)
+                        ->where('is_paid', 2);
+                }
+            ]);
 
         $filteredRecords = $purchaseQuery->count();
         $result = $purchaseQuery->get();

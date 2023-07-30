@@ -39,7 +39,7 @@ class Order extends Model
         "purchase_id",
         "sold_quantity",
         "single_sold_price",
-        'original_single_sold_price',
+        'discount_single_sold_price',
         "total_sold_price",
         "original_sold_price",
         "discount_percent",

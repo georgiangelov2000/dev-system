@@ -13,18 +13,19 @@ $(function () {
     let dataTable = table.DataTable({
         ordering: false,
         columnDefs: [
-            { width: "1%", targets: 0 },
-            { width: "1%", targets: 1, class:"text-center" },
+            { targets: 0, class:"text-center" },
+            { targets: 1, class:"text-center" },
             { width: "10%", targets: 2, class:"text-center" },
             { width: "10%", targets: 3, class:"text-center" },
-            { width: "7%", targets: 4, class:"text-center" },
-            { width: "12%", targets: 5, class:"text-center" },
-            { width: "8%", targets: 6, class:"text-center" },
-            { width: "12%", targets: 7, class:"text-center" },
-            { width: "1%", targets: 8, class:"text-center" },
-            { width: "14%", targets: 9, class:"text-center" },
-            { width: "8%", targets: 10, class:"text-center" },
+            { width: "5%", targets: 4, class:"text-center" },
+            { width: "10%", targets: 5, class:"text-center" },
+            { width: "10%", targets: 6, class:"text-center" },
+            { width: "10%", targets: 7, class:"text-center" },
+            { width: "10%", targets: 8, class:"text-center" },
+            { width: "5%", targets: 9, class:"text-center" },
+            { width: "10%", targets: 10, class:"text-center" },
             { width: "10%", targets: 11, class:"text-center" },
+            { width: "15%", targets: 12, class:"text-center" },
             // add more targets and widths as needed
           ]
     });
@@ -34,8 +35,9 @@ $(function () {
 
         APICaller(PACKAGE_API_ROUTE, {
             'customer': customer,
-            'select_json': true,
-            'no_paid_orders': true
+            'select_json': 1,
+            'no_paid_orders': 1,
+            'is_it_delivered': 0,
         }, function (response) {
             let packages = response;
             if (packages.length > 0) {
@@ -58,7 +60,7 @@ $(function () {
             APICaller(ORDER_API_ROUTE, {
                 'package': packId,
                 'is_paid': 0,
-                'select_json': true
+                'select_json': false,
             }, function (response) {
                 loadDataTable(response);
             }, function (error) {
@@ -88,30 +90,37 @@ $(function () {
                     '<div div class="form-check">\n\
                         <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + item.id + ' data-name= ' + item.purchase.name + ' type="checkbox"> \n\
                     </div>',
+
                     item.id + `<input type="hidden" value="${item.id}" name="ids">`,
+
                     `<a href='${PRODUCT_EDIT_ROUTE.replace(":id",item.purchase.id)}'>${item.purchase.name}</a>`,
+                    
                     item.tracking_number,
+
                     item.single_sold_price,
-                    `
-                    <input data-type="active" type="text" name="price" class="form-control form-control-sm" value="${item.total_sold_price}">
-                    <span data-active="true" name="price" class="text-danger"> </span>
-                    `,
+                    
+                    item.discount_single_sold_price,
+
+                    `<input data-type="active" type="text" name="price" class="form-control form-control-sm" value="${item.total_sold_price}">
+                    <span data-active="true" name="price" class="text-danger"> </span>`,
+                    
                     item.original_sold_price,
-                    `
-                    <input data-type="active" type="number" name="quantity" class="form-control form-control-sm" value="${item.sold_quantity}">
-                    <span data-active="true" name="quantity" class="text-danger"> </span>
-                    `,
+                    
+                    `<input data-type="active" type="number" name="quantity" class="form-control form-control-sm" value="${item.sold_quantity}">
+                    <span data-active="true" name="quantity" class="text-danger"> </span>`,
+                    
                     orderStatus,
+                    
                     `
-                <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">
-                        <i class="far fa-calendar-alt"></i>
-                    </span>
-                </div>
-                <input type="text" name="date_of_payment" class="form-control form-control-sm">
-                <span data-active="true" name="date_of_payment" class="text-danger"> </span>
-              `,
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="far fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <input type="text" name="date_of_payment" class="form-control form-control-sm">
+                    <span data-active="true" name="date_of_payment" class="text-danger"> </span>`,
+                    
                     item.date_of_sale,
                     item.package_extension_date
                 ];

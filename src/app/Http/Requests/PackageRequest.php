@@ -23,7 +23,6 @@ class PackageRequest extends FormRequest
             "package_notes" => "nullable|string",
             "customer_notes" => "nullable|string",
             "order_id" => "required|array",
-            "total_order_price" => "required|array",
             'expected_delivery_date' => "required|date"
         ];
     }

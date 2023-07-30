@@ -4,16 +4,18 @@ $(function () {
   $('.purchaseFilter, .selectCustomer, .packageType, .deliveryMethod, .selectSupplier').selectpicker();
 
   let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
-  let bootstrapOrders = $('.bootstrap-select .purchaseFilter');
+  let bootstrapOrder = $('.bootstrap-select .purchaseFilter');
 
   $('.datepicker').datepicker({
     format: 'yyyy-mm-dd'
   });
 
-  var table = $('.productOrderTable').DataTable({
+  let table = $('.productOrderTable');
+
+  let dataTable = table.DataTable({
     ordering: false,
     columnDefs: [
-      { width: "1%", targets: 0 },
+      { width: "1%", targets: 0, class:'text-center' },
       { width: "5%", targets: 1, class: "text-center" },
       { width: "5%", targets: 2, class: "text-center" },
       { width: "5%", targets: 3, class: "text-center" },
@@ -22,7 +24,8 @@ $(function () {
       { width: "5%", targets: 6, class: "text-center" },
       { width: "5%", targets: 7, class: "text-center" },
       { width: "5%", targets: 8, class: "text-center" },
-      { width: "5%", targets: 9, class: "text-center" }
+      { width: "5%", targets: 9, class: "text-center" },
+      { width: "5%", targets: 10, class: "text-center" },
     ]
   });
 
@@ -59,57 +62,53 @@ $(function () {
   })
 
   bootstrapCustomer.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-    bootstrapOrders.empty();
+    bootstrapOrder.empty();
 
     APICaller(ORDER_API_ROUTE, {
       'customer': bootstrapCustomer.val(),
-      'select_json': true,
-      'withoutPackage': true,
-      'is_paid': 0
+      'select_json': 1,
+      'without_package': 1,
+      'is_paid': 0,
+      'status': [6]
     }, function (response) {
       let orders = response;
+      let ordersLength = orders.length;
 
-      if (orders.length > 0) {
-        bootstrapOrders.append('<option value="" style="display:none;"></option>');
+      if(!ordersLength) {
+        toastr['error']('No orders found. Please try again later.');
+      } else {
+        toastr['success'](`${ordersLength} ${ordersLength > 1 ? "orders" : 'order'} was fetched.`);
+        bootstrapOrder.append('<option value="" style="display:none;"></option>');
         $.each(orders, function ($key, order) {
-          bootstrapOrders.append(`<option 
-            value="${order.id}"
-            data-id="${order.id}"
-            data-name="${order.purchase.name}"
-            data-single-sold-price="${order.single_sold_price}"
-            data-total-sold-price="${order.total_sold_price}"
-            data-tracking_number = "${order.tracking_number}"
-            data-quantity="${order.sold_quantity}"
-            data-date_of_sale="${order.date_of_sale}"
-            data-original_sold_price="${order.original_sold_price}"
-            data-discount="${order.sold_quantity}"
-          > 
-          ${order.purchase.name} </option>`)
-        })
+          bootstrapOrder.append(`<option value="${order.id}"> ${order.purchase.name} </option>`);
+        });
       }
-      bootstrapOrders.selectpicker('refresh');
+
+      bootstrapOrder.selectpicker('refresh');
     }, function (error) {
       console.log(error);
     })
   });
 
   function overview() {
-    let total = 0;
-    let packageRowsCount = table.rows().nodes().to$().filter('tr[name="package"]').length;
-
-    table.cells('tbody tr[name="package"] td[name="total-sold-price"]').every(function () {
-      let text = $(this.node()).text();
-      let number = parseFloat(text.match(/\d+(\.\d+)?/)[0]);
-      total += number;
+    let tbody = table.find('tbody tr[data-id]');
+    let totalSum = 0;
+    
+    tbody.each(function () {
+      let row = $(this);
+      let totalSoldPriceCell = row.find('td[data-price]').attr('data-price');
+    
+      // Parse the value as a floating-point number
+      let priceValue = parseFloat(totalSoldPriceCell);
+    
+      // Check if the value is a valid number and then accumulate the total
+      if (!isNaN(priceValue)) {
+        totalSum += priceValue;
+      }
     });
-
-    console.log(total);
-
-    total = parseFloat(total.toFixed(2));
-
-    $('.packagePrice').html(total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-
-    $('.ordersCount').html(packageRowsCount);
+        
+    $('.ordersCount').html(tbody.length);
+    $('.packagePrice').html(totalSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
   }
 
   overview();
@@ -120,97 +119,66 @@ $(function () {
     overview();
   };
 
-  bootstrapOrders.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-    let selectedOption = $(this).find('option').eq(clickedIndex);
+  bootstrapOrder.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+    let id = $(this).val();
+    bootstrapOrder.empty().selectpicker('refresh');
 
-    let {
-      id,
-      name,
-      singleSoldPrice,
-      totalSoldPrice,
-      tracking_number,
-      quantity,
-      date_of_sale,
-      original_sold_price,
-      discount
-    } = selectedOption.data();
+    APICaller(ORDER_API_ROUTE, {
+      "id": id,
+      'select_json': 1,
+    }, function (response) {
+      let order = response[0];
 
-    let duplicate = false;
+      let id = order.id;
 
-    table.rows().data().each(function (row) {
-      const tempElement = $(`<div>${row[1]}</div>`);
-      const rowProductId = parseInt(tempElement.find('input').val(), 10);
+      let row = table.find(`tr[data-id="${id}"]`);
 
-      if (rowProductId == id) {
-        duplicate = true;
-        toastr['error']('You have already the current order in the table');
+      if (row.length) {
+        toastr['error']('This order is already in the table. Please select a different order.');
         return false;
       }
-    });
 
-    // Create a new tbody with the data
-    let tbody = $('<tbody>');
-
-    if (!duplicate) {
-      // Create elements
-      const deleteButton = $("<button>", {
-        type: 'button',
-        class: 'btn p-0',
-        onclick: 'removeRow(this)',
-      }).append($('<i>', {
-        class: 'fa-light fa-trash text-danger',
-      }));
-
-      const productIdInput = $("<input>", {
-        type: 'hidden',
-        name: 'order_id[]',
-        value: id,
-      });
-
-      const productNameLink = $("<a>", {
-        href: ORDER_EDIT_ROUTE.replace(':id', id),
-        html: name,
-      });
-
-      const singleSoldPriceTd = $('<td>', {
-        name: 'single-sold-price',
-        text: `€${singleSoldPrice}`,
-      });
-
-      const totalSoldPriceInput = $("<input>", {
-        type: 'hidden',
-        name: 'total_order_price[]',
-        value: totalSoldPrice,
-      });
-
-      const totalSoldPriceTd = $('<td>', {
-        name: 'total-sold-price',
-        text: `€${totalSoldPrice}`,
-      }).append(totalSoldPriceInput);
-
-      // Create the new row and append elements
-      let newRow = $('<tr>', {
-        name: 'package',
-      }).append(
-        $('<td>').append(deleteButton),
-        $('<td>').text(id).append(productIdInput),
-        $('<td>').text(tracking_number),
-        $('<td>').append(productNameLink),
-        $('<td>').text(date_of_sale),
-        singleSoldPriceTd,
-        totalSoldPriceTd,
-        $('<td>').text(original_sold_price),
-        $('<td>').text(`${discount}%`),
-        $('<td>').text(`${quantity}`)
-      );
-
-      tbody.append(newRow);
-
-      table.row.add(newRow).draw();
+      renderData(order);
 
       overview();
-    };
+    })
 
+    function renderData(data) {
+      console.log(data);
+
+      let images = '';
+
+      if (data.purchase.images.length > 0) {
+        let imageTags = data.purchase.images.map((element) => {
+          return `<img src="${element.path}/${element.name}" />`;
+        });
+        images = imageTags.join('');
+      }
+
+        let template = `
+        <tr data-id="${data.id}">
+            <input type="hidden" value='${data.id}' name="order_id[]" />
+          <td>
+            <button class="text-danger btn p-0" onclick="removeRow(this)" type="button">
+              <i class="fa-light fa-trash text-danger"></i>
+            </button>
+          </td>
+          <td>${images}</td>
+          <td>${data.customer.name}</td>
+          <td>${data.purchase.name}</td>
+          <td>${data.sold_quantity}</td>
+          <td>€${data.single_sold_price}</td>
+          <td>€${data.discount_single_sold_price}</td>
+          <td data-price="${data.total_sold_price}">€${data.total_sold_price}</td>
+          <td>€${data.original_sold_price}</td>
+          <td>${data.discount_percent}</td>
+          <td>${data.date_of_sale}</td>
+        </tr>
+      `;
+
+      table.DataTable().row.add($(template)).draw();
+
+    }
 
   });
 

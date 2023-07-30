@@ -178,8 +178,7 @@ $(function () {
                     }
                     let editButton = '<a data-id=' + row.id + ' href="' + CUSTOMER_EDIT_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
                     let massEdit = '<a data-id=' + row.id + ' href="' + CUSTOMER_ORDERS_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Mass edit"> <i class="fa-light fa-pen-to-square text-primary" aria-hidden="true"></i>  </a>';
-                    let orders = '<a data-id=' + row.id + ' href="' + CUSTOMER_ORDERS_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Orders"> <i class="fa fa-light fa-shopping-cart text-primary" aria-hidden="true"></i>  </a>';
-                    return `${deleteButton} ${editButton} ${massEdit} ${orders}`;
+                    return `${deleteButton} ${editButton} ${massEdit}`;
                 }
             }
 

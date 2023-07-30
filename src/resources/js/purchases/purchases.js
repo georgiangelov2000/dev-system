@@ -81,8 +81,8 @@ $(function () {
                 }
             },
             {
-                width: '1%',
                 orderable: false,
+                width: '1%',
                 render: function (data, type, row) {
                     if(row.payment) {
                         return `<a href="${PAYMENT.replace(':id', row.payment.id)}">${row.payment.date_of_payment}</a>`
@@ -151,6 +151,14 @@ $(function () {
             },
             {
                 width: '6%',
+                name: "discount_price",
+                orderable: true,
+                render: function (data, type, row) {
+                    return `<span>€${row.discount_price}</span>`
+                }
+            },
+            {
+                width: '6%',
                 name:'total_price',
                 orderable: true,
                 render: function (data, type, row) {
@@ -195,23 +203,23 @@ $(function () {
                     return `<span class="${stockColor}">${stockStatus}</span>`
                 }
             },
-            {
-                width: '10%',
-                orderable: false,
-                render: function (data, type, row) {
-                    let paidOrders = row.paid_orders_count;
-                    let overdueOrders = row.overdue_orders_count;
-                    let pendingOrders = row.pending_orders_count;
-                    let refundOrders = row.refund_orders_count;
+            // {
+            //     width: '10%',
+            //     orderable: false,
+            //     render: function (data, type, row) {
+            //         let paidOrders = row.paid_orders_count;
+            //         let overdueOrders = row.overdue_orders_count;
+            //         let pendingOrders = row.pending_orders_count;
+            //         let refundOrders = row.refund_orders_count;
 
-                    return `<div>
-                        <span class="text-success">${paidOrders} paid</span> /
-                        <span class="text-danger">${overdueOrders} overdue</span> /
-                        <span class="text-primary">${pendingOrders} pending</span> /
-                        <span class="text-dark">${refundOrders} refund</span>
-                    </div>`
-                }
-            },
+            //         return `<div>
+            //             <span class="text-success">${paidOrders} paid</span> /
+            //             <span class="text-danger">${overdueOrders} overdue</span> /
+            //             <span class="text-primary">${pendingOrders} pending</span> /
+            //             <span class="text-dark">${refundOrders} refund</span>
+            //         </div>`
+            //     }
+            // },
             {
                 width: '7%',
                 orderable: false,
@@ -353,7 +361,7 @@ $(function () {
                 }
             }
         ],
-        order: [[2, 'asc']]
+        order: [[3, 'asc']]
     });
 
     // Searchable

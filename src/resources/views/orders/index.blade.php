@@ -82,10 +82,10 @@
                             <th>ID</th>
                             <th>Payment</th>
                             <th>Customer</th>
-                            <th>Product</th>
+                            <th>Purchase</th>
                             <th title="Quantity">Qty</th>
                             <th title="Unut price">Unit Price</th>
-                            <th title="Unit original price">Unit init price</th>
+                            <th title="Discount unit price">Disc.unit price</th>
                             <th title="Official price">Official Price</th>
                             <th title="Original price">Orig. Price</th>                            
                             <th>Discount</th>

@@ -17,15 +17,12 @@ $(function () {
     let editModal = $('#editModal');
     let editSubmitButton = editModal.find('#submitForm');
     let closeModalBtn = $('.modalCloseBtn');
+    let deliveryRange;
 
     let bootstrapPackageType = $('.bootstrap-select .selectPackageType');
 
     let bootstrapDelieveryMethod = $('.bootstrap-select .selectDelieveryMethod');
     let bootstrapSelectCustomer = $('.bootstrap-select .selectCustomer');
-
-    let startDate = moment().startOf('month').format('YYYY-MM-DD')
-    let endDate = moment().endOf('month').format('YYYY-MM-DD')
-    let deliveryRange = startDate + ' - ' + endDate;
 
     $('input[name="datetimes"]').daterangepicker({
         autoUpdateInput: false,
@@ -41,7 +38,6 @@ $(function () {
             data: function (d) {
                 let orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
                 let orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
-
                 return $.extend({}, d, {
                     "search": d.search.value,
                     'package': bootstrapPackageType.val(),

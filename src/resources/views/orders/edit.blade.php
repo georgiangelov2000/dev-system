@@ -65,10 +65,13 @@
 
                     <table class="table table-hover table-sm productOrderTable ">
                         <thead>
+                            <th>ID</th>
+                            <th>Image</th>      
                             <th>Product</th>
                             <th>Unit price</th>
                             <th>Qty</th>
                             <th>Category</th>
+                            <th>Sub categories</th>
                             <th>Brands</th>
                             <th>Order qty</th>
                             <th>Order unit price</th>
@@ -78,6 +81,19 @@
                         </thead>
                         <tbody>
                             <tr>
+                                <td>{{$order->id}}</td>
+                                <td>
+                                    @if(count($order->purchase->images) > 1)
+                                        @php
+                                            $images = $order->purchase->images;
+                                        @endphp
+                                        @foreach ($images as $index => $image)
+                                            
+                                        @endforeach
+                                    @elseif(count($order->purchase->images) === 1)
+                                        <img src="{{$order->purchase->images[0]->path . '/' . $order->purchase->images[0]->name}}" />
+                                    @endif
+                                </td>
                                 <td>
                                     <input type="hidden" value="{{ $order->purchase->id }}" name="purchase_id" />
                                     {{ $order->purchase->name }}
@@ -94,6 +110,11 @@
                                     @endif
                                 </td>
                                 <td>
+                                    @if ($order->purchase->subcategories)
+                                        {{ implode(', ', $order->purchase->subcategories->pluck('name')->toArray()) }}
+                                    @endif
+                                </td>
+                                <td>
                                     @if ($order->purchase->brands)
                                         {{ implode(', ', $order->purchase->brands->pluck('name')->toArray()) }}
                                     @endif
@@ -103,7 +124,8 @@
                                         <input 
                                             name="sold_quantity" 
                                             type='number'
-                                            class='form-control form-control-sm orderQuantity'
+                                            data-manipulation-name="sold_quantity"
+                                            class='form-control form-control-sm'
                                             value="{{ $order->sold_quantity }}" onkeyup="handleOrderQuantity(this)" 
                                         />
                                         @error('sold_quantity')
@@ -116,7 +138,8 @@
                                         <input 
                                             type='text' 
                                             name="single_sold_price"
-                                            class='form-control form-control-sm orderSinglePrice'
+                                            data-manipulation-name="single_sold_price"
+                                            class='form-control form-control-sm'
                                             value="{{ $order->single_sold_price }}" 
                                             onkeyup="handleSinglePrice(this)" 
                                         />
@@ -130,6 +153,7 @@
                                         <input 
                                             type='text' 
                                             name="discount_percent"
+                                            data-manipulation-name="discount_percent"
                                             value="{{ $order->discount_percent }}"
                                             class='form-control form-control-sm' 
                                             onkeyup="handleDiscountChange(this)" />
@@ -139,10 +163,14 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="originalPrice">{{ $order->total_sold_price }}</span>
+                                    <span name="original_price">
+                                        {{number_format($order->total_sold_price, 2, '.', ',')}}
+                                    </span>
                                 </td>
                                 <td>
-                                    <span class="">{{ $order->original_sold_price }}</span>
+                                    <span name="regular_price">
+                                        {{number_format($order->original_sold_price, 2, '.', ',')}}
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>

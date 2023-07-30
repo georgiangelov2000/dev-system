@@ -121,6 +121,7 @@
                         <div class="form-group col-12">
                             <label for="purchase_id">Search orders</label>
                             <select id="purchase_id" class="form-control purchaseFilter">
+                                <option disabled>Nothing selected</option>
                             </select>
                         </div>
 
@@ -130,15 +131,16 @@
                         <thead>
                             <tr>
                                 <th>Actions</th>
-                                <th>ID</th>
-                                <th>Tracking number</th>
-                                <th>Name</th>
-                                <th>Date of sale</th>
-                                <th>Single price</th>
-                                <th>Official price</th>
+                                <th>Image</th>
+                                <th>Customer</th>
+                                <th>Purchase</th>
+                                <th title="Quantity">Quantity</th>
+                                <th>Unit price</th>
+                                <th>Disc unit price</th>
                                 <th>Original price</th>
-                                <th>Discount</th>
-                                <th>Quantity</th>
+                                <th>Regular price</th>
+                                <th>Discount %</th>
+                                <th>Date of sale</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -166,7 +168,7 @@
                                     </div>
                                     <div class="col-sm-6 col-6">
                                         <div class="description-block">
-                                            <h5 class="description-header packagePrice">0</h5>
+                                            <h5 class="description-header packagePrice">0.00</h5>
                                             <span class="description-text">Price</span>
                                         </div>
 

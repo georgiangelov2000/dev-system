@@ -56,10 +56,11 @@ class PurchaseController extends Controller
             $brands = isset($data['brands']) && !empty($data['brands']) ? $data['brands'] : null;
             $category = $data['category_id'];
             $imagePath = Storage::url($this->dir);
-            
-            $originalPrice = FunctionsHelper::calculatedFinalPrice($price,$quantity);
-            $totalPrice = FunctionsHelper::calculatedDiscountPrice($originalPrice,$discount);
-            
+
+            $discountPrice = FunctionsHelper::calculatedDiscountPrice($price, $discount);
+            $totalPrice = FunctionsHelper::calculatedFinalPrice($discountPrice, $quantity);
+            $originalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
+
             $purchase = Purchase::create([
                 "name" => $data['name'],
                 "supplier_id" => $data['supplier_id'],
@@ -67,6 +68,7 @@ class PurchaseController extends Controller
                 "initial_quantity" => $quantity,
                 "notes" => $data["notes"] ?? "",
                 "price" => $price,
+                'discount_price' => $discountPrice,
                 "code" => $data["code"],
                 "total_price" => $totalPrice,
                 'original_price' => $originalPrice,
@@ -109,7 +111,7 @@ class PurchaseController extends Controller
         $brands = $this->staticDataHelper::callBrands();
         $suppliers = $this->staticDataHelper::callSupliers();
         $categories = $this->staticDataHelper::loadCallCategories();
-        $is_available = $purchase->status == true  && $purchase->is_paid == false && $purchase->payment == null ? true : false;
+        $is_available = $purchase->status == null  && $purchase->is_paid == false && $purchase->payment == null ? true : false;
 
         return view('purchases.edit', compact(
             'purchase',
@@ -168,15 +170,18 @@ class PurchaseController extends Controller
                 $price = $data['price'];
                 $quantity = $data['quantity'];
                 $discount = $data['discount_percent'];
-
-                $originalPrice = FunctionsHelper::calculatedFinalPrice($price,$quantity);
-                $totalPrice = FunctionsHelper::calculatedDiscountPrice($originalPrice,$discount);
-
+            
+                $discountPrice = FunctionsHelper::calculatedDiscountPrice($price, $discount);
+                dd($discountPrice);
+                $totalPrice = FunctionsHelper::calculatedFinalPrice($discountPrice, $quantity);
+                $originalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
+                
                 $attributes = array_merge($attributes,[
                     'quantity' => $quantity,
                     'discount_percent' => $discount,
                     'inital_quantity' => $quantity,
                     'price' => $price,
+                    'discount_price' => $discountPrice,
                     'total_price' => $totalPrice,
                     'original_price' => $originalPrice,
                     'expected_date_of_payment' => date('Y-m-d', strtotime($data['expected_date_of_payment'])),

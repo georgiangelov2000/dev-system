@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Helpers\FunctionsHelper;
 use Illuminate\Http\Request;
 use App\Http\Requests\OrderRequest;
-use App\Models\OrderPayment;
-use App\Http\Requests\OrderPaymentRequest;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\Package;
@@ -57,16 +55,16 @@ class OrderController extends Controller
 
                 $foundPurchase->save();
 
-                $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($orderSinglePrice, $orderDiscount);
-                $finalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $orderQuantity);
+                $discountPrice = FunctionsHelper::calculatedDiscountPrice($orderSinglePrice, $orderDiscount);
+                $finalPrice = FunctionsHelper::calculatedFinalPrice($discountPrice, $orderQuantity);
                 $originalPrice = FunctionsHelper::calculatedFinalPrice($orderSinglePrice, $orderQuantity);
 
                 $order = [
                     'customer_id' => $customer,
                     'purchase_id' => $purchaseId,
                     'sold_quantity' => $orderQuantity,
-                    'single_sold_price' => $finalSinglePrice,
-                    'original_single_sold_price' => $orderSinglePrice,
+                    'single_sold_price' => $orderSinglePrice,
+                    'discount_single_sold_price' => $discountPrice,
                     'total_sold_price' => $finalPrice,
                     'original_sold_price' =>  $originalPrice,
                     'discount_percent' => $orderDiscount,
@@ -92,7 +90,7 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
-        $order->load('customer:id,name', 'purchase.categories', 'purchase.brands');
+        $order->load('customer:id,name', 'purchase.categories', 'purchase.brands','purchase.images');
         return view('orders.edit', compact('order'));
     }
 
@@ -124,17 +122,18 @@ class OrderController extends Controller
 
             $purchase->save();
 
-            $finalSinglePrice = FunctionsHelper::calculatedDiscountPrice($single_sold_price, $discount_percent);
-            $finalTotalPrice = FunctionsHelper::calculatedFinalPrice($finalSinglePrice, $sold_quantity);
+            $discountPrice = FunctionsHelper::calculatedDiscountPrice($single_sold_price, $discount_percent);
+            $finalTotalPrice = FunctionsHelper::calculatedFinalPrice($discountPrice, $sold_quantity);
+            $originalPrice = FunctionsHelper::calculatedFinalPrice($single_sold_price, $sold_quantity);
 
             $order->update([
                 'customer_id' => $customer_id,
                 'purchase_id' => $purchase_id,
                 'sold_quantity' => $sold_quantity,
-                'single_sold_price' => $finalSinglePrice,
-                'original_single_sold_price' => $single_sold_price,
+                'single_sold_price' => $single_sold_price,
+                'discount_single_sold_price' => $discountPrice,
                 'total_sold_price' => $finalTotalPrice,
-                'original_sold_price' => FunctionsHelper::calculatedFinalPrice($single_sold_price, $sold_quantity),
+                'original_sold_price' => $originalPrice,
                 'discount_percent' => $discount_percent,
                 'date_of_sale' => $date_of_sale,
                 'tracking_number' => $tracking_number,
@@ -180,7 +179,7 @@ class OrderController extends Controller
                         ->firstOrFail();
                     
                     //Initial parameters 
-                    $price = $order->original_single_sold_price;
+                    $price = $order->single_sold_price;
                     $quantity = $order->sold_quantity;
                     $discount = $order->discount_percent;
 
@@ -218,8 +217,8 @@ class OrderController extends Controller
                                         
                     // Save order parameters
                     $order->sold_quantity = $quantity;
-                    $order->single_sold_price = $finalSinglePrice;
-                    $order->original_single_sold_price = $price;
+                    $order->single_sold_price = $price;
+                    $order->discount_single_sold_price = $finalSinglePrice;
                     $order->total_sold_price = $finalPrice;
                     $order->original_sold_price = $originalPrice;
 

@@ -19,7 +19,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedBigInteger('purchase_id');
             $table->unsignedInteger('sold_quantity')->default(0);
             $table->unsignedDecimal('single_sold_price', 8, 2)->default(0);
-            $table->unsignedDecimal('original_single_sold_price', 8, 2)->default(0);
+            $table->unsignedDecimal('discount_single_sold_price', 8, 2)->default(0);
             $table->unsignedDecimal('total_sold_price', 8, 2)->default(0);
             $table->unsignedDecimal('original_sold_price', 8, 2)->default(0);
             $table->unsignedInteger('discount_percent')->default(0);

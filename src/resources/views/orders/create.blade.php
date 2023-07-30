@@ -16,7 +16,7 @@
 
                     <div class="row flex-wrap">
 
-                        <div class="form-group col-3">
+                        <div class="form-group col-3 mb-0">
                             <label for="customer_id">Customer</label>
                             <select id="customer_id" name="customer_id" class="form-control selectCustomer"
                                 data-live-search="true">
@@ -24,7 +24,7 @@
                             <span name="customer_id" class="text-danger"></span>
                         </div>
 
-                        <div class="form-group col-3">
+                        <div class="form-group col-3 mb-0">
                             <label>Date of sale:</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -37,7 +37,7 @@
                             <span name="date_of_sale" class="text-danger"></span>
                         </div>
 
-                        <div class="form-group col-3">
+                        <div class="form-group col-3 mb-0">
                             <label for="order_status">Tracking number</label>
                             <div class="input-group mb-3">
                                 <input 
@@ -68,10 +68,12 @@
                     <table class="table table-hover table-sm productOrderTable ">
                         <thead>
                             <th>Actions</th>
+                            <th>Image</th>
                             <th>Product</th>
                             <th>Unit price</th>
                             <th>Qty</th>
                             <th>Category</th>
+                            <th>Sub categories</th>
                             <th>Brands</th>
                             <th>Order qty</th>
                             <th>Order unit price</th>
