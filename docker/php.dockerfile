@@ -34,6 +34,9 @@ RUN docker-php-ext-install pdo pdo_mysql xmlwriter fileinfo calendar mbstring zi
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 RUN docker-php-ext-install gd
 
+# Install Redis PHP extension
+RUN pecl install redis && docker-php-ext-enable redis
+
 RUN mv "/usr/local/etc/php/php.ini-production" "/usr/local/etc/php/php.ini"
 RUN rm "/usr/local/etc/php/php.ini-development"
 

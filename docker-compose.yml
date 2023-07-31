@@ -64,5 +64,6 @@ services:
  redis:
     image: redis:latest
     restart: always
+    command: redis-server --requirepass 1914725113
     volumes:
       - ./redis/data:/data
