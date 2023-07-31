@@ -38,6 +38,7 @@ $(function () {
                     'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
                     'limit': d.custom_length = d.length,
                     'is_paid': 0,
+                    'without_package':0,
                     'status':statusArray,
                     'publishing': createdRange,
                 });
@@ -67,30 +68,50 @@ $(function () {
                 }
             },
             {
-                width: '5%',
-                name: "name",
+                width: '8%',
+                name: "purchase.name",
                 orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
                     return `<a href="#">${row.purchase.name}</a>`
                 }
             },
             {
-                width: '2%',
-                name: "price",
                 orderable: false,
+                width: '5%',
+                name: "single_sold_price",
+                class:'text-center',
                 render: function (data, type, row) {
                     return `<span>€${row.single_sold_price}</span>`
                 }
             },
             {
-                width: '8%',
                 orderable: false,
+                width: '5%',
+                name: "discount_single_sold_price",
+                class:'text-center',
+                render: function (data, type, row) {
+                    return `<span>€${row.discount_single_sold_price}</span>`
+                }
+            },
+            {
+                orderable: false,
+                width: '8%',
                 name:"total_sold_price",
                 render: function (data, type, row) {
                     return`
                     <input type="text" max="${row.total_sold_price}" value="${row.total_sold_price}" name="price" class="form-control form-control-sm" />
                     <span data-active="true" class="text-danger" name="price"></span>
                     `;
+                }
+            },
+            {
+                width: '8%',
+                orderable: false,
+                name: "original_sold_price",
+                class:'text-center',
+                render: function (data, type, row) {
+                    return `<span>€${row.original_sold_price}</span>`
                 }
             },
             {
@@ -129,21 +150,9 @@ $(function () {
                 }
             },
             {
-                width: '4%',
+                width: '6%',
                 orderable: false,
-                render: function (data, type, row) {
-                    let pack;
-                    if(row.package) {
-                        pack = row.package;
-                    } else {
-                        pack = '';
-                    }
-                    return pack;
-                }
-            },
-            {
-                width: '4%',
-                orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
                     let date;
                     if(row.package_extension_date) {
@@ -155,22 +164,15 @@ $(function () {
                 }
             },
             {
-                width: '4%',
+                width: '6%',
                 orderable: false,
                 render: function (data, type, row) {
                     return `<span>${moment(row.date_of_sale).format('YYYY-MM-DD')}</span>
                     <a data-target="date_of_payment" value="${row.date_of_sale}" class="text-primary" type="button"><i class="fa-light fa-copy"></i></a>`;
                 }
-            },
+            },        
             {
-                width: '4%',
-                orderable: false,
-                render: function (data, type, row) {
-                    return `<span>${moment(row.created_at).format('YYYY-MM-DD')}</span>`
-                }
-            },            
-            {
-                width: '2%',
+                width: '1%',
                 orderable: false,
                 name: "is_paid",
                 render: function (data, type, row) {

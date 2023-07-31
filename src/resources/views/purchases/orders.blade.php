@@ -32,11 +32,12 @@
                     <th>ID</th>
                     <th>Payment</th>
                     <th>Customer</th>
-                    <th>Product</th>
+                    <th>Purchase</th>
                     <th title="Quantity">Qty</th>
-                    <th title="Single price">Unit Price</th>
+                    <th title="Unut price">Unit Price</th>
+                    <th title="Discount unit price">Disc.unit price</th>
                     <th title="Official price">Official Price</th>
-                    <th title="Original price">Orig. Price</th>                            
+                    <th title="Regular price">Regular price</th>                            
                     <th>Discount</th>
                     <th>Date of sale</th>
                     <th>Expired</th>
@@ -60,6 +61,9 @@
         const CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}"
         const PAYMENT_API = "{{route('payment.edit.order',':id')}}"
         const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
-        const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
+        const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}";
+        const ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";
+        const ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
+        const ORDER_DELETE_ROUTE = "{{route('order.delete',':id')}}";
     </script>
 @endpush

@@ -16,10 +16,12 @@ class DatabaseSeederRole extends Seeder {
         DB::table('roles')->insert(
                 [
                     [
-                        'name' => 'admin'
+                        'name' => 'admin',
+                        'access' => 1, 
                     ],
                     [
-                        'name' => 'user',
+                        'name' => 'driver',
+                        'access' => 2,
                     ]
                 ]
         );

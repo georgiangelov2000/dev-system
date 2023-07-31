@@ -37,7 +37,6 @@ $(function () {
             'customer': customer,
             'select_json': 1,
             'no_paid_orders': 1,
-            'is_it_delivered': 0,
         }, function (response) {
             let packages = response;
             if (packages.length > 0) {

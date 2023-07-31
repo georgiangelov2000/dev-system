@@ -44,15 +44,15 @@
                             </th>
                             <th>ID</th>
                             <th>Name</th>
-                            <th>Price</th>
-                            <th>Total price</th>
+                            <th>Unit price</th>
+                            <th>Disc.unit price</th>
+                            <th>Official price</th>
+                            <th>Regular price</th>
                             <th>Quantity</th>
                             <th>Date of payment</th>
                             <th>Tracking number</th>
-                            <th>Package</th>
                             <th>Extension date</th>
                             <th>Date of sale</th>
-                            <th>Created</th>
                             <th>Paid</th>
                         </thead>
                     </table>

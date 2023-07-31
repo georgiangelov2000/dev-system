@@ -33,9 +33,9 @@ class PackageApiController extends Controller
         if ($search) {
             $packageQuery->where('package_name', 'LIKE', '%' . $search . '%');
         }
-        if($is_it_delivered) {
+        // if($is_it_delivered) {
 
-        }
+        // }
         if($package) {
             $packageQuery->where('package_type',$package);
         }

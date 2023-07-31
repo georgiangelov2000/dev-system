@@ -1,32 +1,28 @@
 <nav class="main-header navbar navbar-expand header-navigation mb-3 navbar-white">
     <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link burgerLink" data-widget="pushmenu" href="#" role="button"><i
+            <a class="nav-link burgerLink btn" data-widget="pushmenu" href="#" role="button"><i
                     class="fas fa-bars"></i></a>
-        </li>
-        <li class="nav-item">
-            <button title="Calculator" class="btn btn-dark">
-                <i class="fa-light fa-calculator-simple"></i>
-            </button>
-        </li>
-        <li class="nav-item ml-2">
-            <button title="Change style" class="btn btn-dark">
-                <i class="fa-light fa-frame"></i>
-            </button>
-        </li>
-        <li class="nav-item ml-2">
-            <button title="Language" class="btn btn-dark">
-                <i class="fa-light fa-globe"></i>
-            </button>
         </li>
     </ul>
 
     <ul class="navbar-nav ml-auto">
-        <li class="nav-item d-none d-sm-inline-block">
-            <span href="#" class="nav-link bg-danger rounded">
-                <i title="User" class="fa-light fa-user"></i> {{ $user !== false ? $user : '' }}
-            </span>
-        </li>
+        <li class="nav-item d-flex align-items-center">
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; border-radius: 8px; padding: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                @php
+                    $user = Auth::user();
+                    $email = $user->email;
+                    $role = $user->role->name;
+                @endphp
+                <span style="color: #555;">
+                    <b>User:</b> {{ $email }}
+                </span>
+        
+                <span style="color: #555;">
+                    <b>Role:</b> {{ $role }}
+                </span> 
+            </div>
+        </li>        
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <li class="nav-item">

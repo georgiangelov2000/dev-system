@@ -24,8 +24,9 @@
         
         <link rel="icon" type="image/png" href="/storage/images/static/logo.jpg">
     </head>
+    
     <!--"sidebar-mini layout-fixed"-->
-    <body class="sidebar-mini layout-fixed sidebar-collapse {{$isAuth ? "" : "body-class"}}" style="height: auto;">
+    <body class="sidebar-mini layout-fixed sidebar-collapse @guest{{ 'body-class' }}@endguest" style="height: auto;">
         <div class='wrapper'>
             @include("layouts.header")
             @auth

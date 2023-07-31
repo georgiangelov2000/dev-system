@@ -24,18 +24,7 @@ class AppServiceProvider extends ServiceProvider {
      * @return void
      */
     public function boot() {
-        Paginator::useBootstrap();
-
-        view()->composer('app', function ($view) {
-            
-            $isAuth = Auth::check();
-            
-            $isAuth  ? $user = Auth::user()->email: $user = false;  
-
-            return $view
-                    ->with('isAuth', $isAuth)
-                    ->with('user', $user);
-        });
+        
     }
 
 }
