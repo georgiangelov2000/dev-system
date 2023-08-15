@@ -3,58 +3,60 @@ body {
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-size: cover;
-	font-family: "Source Sans Pro",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+	font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 	font-size: .85rem;
 	font-weight: 400;
 	line-height: 1.5;
 	margin: 0;
-    background-color: #f4f6f9;
+	background-color: #f4f6f9;
 }
+
 .body-class {
 	height: auto;
 	background-image: url("https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=1600");
 	background-repeat: no-repeat;
 	background-attachment: fixed;
 	background-size: cover;
-	font-family: "Source Sans Pro",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+	font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 	font-size: 1rem;
 	font-weight: 400;
 	line-height: 1.5;
 	margin: 0;
 }
 
-.staticDashboardImages{
+.staticDashboardImages {
 	width: 180px;
 	height: 180px;
 	object-fit: contain;
 }
 
-.cardWidgetImage{
+.cardWidgetImage {
 	height: 200px;
 	object-fit: contain;
 }
 
-.dashboardBox{
-	.statisticsColumn{
+.dashboardBox {
+	.statisticsColumn {
 		height: 240px;
 	}
 }
 
-.dt-button{
+.dt-button {
 	background: none !important;
 	border-color: #6c757d !important;
 	color: #6c757d !important;
 	border-radius: .25rem !important;
 }
 
-.dt-button:hover, .dt-button:active {
+.dt-button:hover,
+.dt-button:active {
 	box-shadow: none !important;
 	color: #fff !important;
 	background-color: #6c757d !important;
 	border-color: #6c757d !important;
-  }
+}
 
-#company-logo{
+#company-logo {
 	height: 100px;
 	width: 100%;
 	object-fit: contain;
@@ -63,66 +65,73 @@ body {
 select.form-control:not(.selectpicker) {
 	display: none;
 }
-  
+
 select.form-control.selectpicker {
 	display: block;
 }
 
-.bootstrap-select{
-	button{
+.bootstrap-select {
+	button {
 		background: inherit;
 		color: #444 !important;
 	}
 }
-  
-.input-daterange{
-	input{
+
+.input-daterange {
+	input {
 		border-radius: .25rem;
 	}
-	.input-group-addon{
+
+	.input-group-addon {
 		border-top: 1px solid #ced4da;
 		border-bottom: 1px solid #ced4da;
 	}
 }
 
-#modalForm .modal-body{
-    height: 230px;
-    overflow-y: auto;
+#modalForm .modal-body {
+	height: 230px;
+	overflow-y: auto;
 }
 
 label.required:after {
-    content: '*';
-    color: #DC3545 !important;
-    margin-left: 2px;
+	content: '*';
+	color: #DC3545 !important;
+	margin-left: 2px;
 }
 
 .authentication {
 	margin: 10rem auto;
+
 	.nav-item {
 		margin-left: .5rem;
 		margin-top: .5rem;
 	}
+
 	.nav-tabs {
 		border: unset;
+
 		.nav-link {
 			border-color: unset;
 			border: unset;
 			color: #343a40 !important;
 		}
+
 		.nav-link.active {
 			background: rgb(220, 53, 69);
 			color: white !important;
 			font-weight: bold;
 			border-radius: .25rem;
-			box-shadow: 0 0 1px rgba(0,0,0,.125),0 1px 3px rgba(0,0,0,.2);
+			box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
 		}
 	}
 }
+
 .elevation-4 {
 	.nav-item {
 		.nav-link {
 			color: inherit;
 			margin: 0;
+
 			&:hover {
 				color: inherit;
 				background: #e1e1e1;
@@ -130,12 +139,14 @@ label.required:after {
 			}
 		}
 	}
+
 	.nav-treeview {
 		.nav-item {
 			border: none;
 		}
 	}
 }
+
 .form-control {
 	&::placeholder {
 		color: inherit;
@@ -158,100 +169,136 @@ label.required:after {
 
 .table-without-border {
 	thead th {
-	  border: unset !important;
+		border: unset !important;
 	}
-  
+
 	td {
-	  border-bottom: unset;
-	  border-right: unset;
-	  border-left: unset;
+		border-bottom: unset;
+		border-right: unset;
+		border-left: unset;
 	}
-  
+
 	tbody tr {
-	  border-bottom: 1px solid #dee2e6;
+		border-bottom: 1px solid #dee2e6;
 	}
-  
+
 	border: unset;
 }
 
-table.dataTable{
-    width:100% !important;
-    .subTable{
-        thead th{
-            border:none;
-        }
-    }
-    img{
-        object-fit: contain;
-        height: 50px;
-    }
-	.previewImageWrapper{
+table.dataTable {
+	width: 100% !important;
+
+	.subTable {
+		thead th {
+			border: none;
+		}
+	}
+
+	img {
+		object-fit: contain;
+		height: 50px;
+	}
+
+	.previewImageWrapper {
 		width: 50%;
 		margin: auto;
 	}
-    thead th {
-        vertical-align: bottom;
-        border-bottom: none !important;
-    }
-    tbody{
-        .notes{
-            height:100px;
-            overflow: auto;
-            padding: .5rem;
-        }
-    }
-    select{
-        box-shadow: unset;
-    }
+
+	thead th {
+		vertical-align: bottom;
+		border-bottom: none !important;
+	}
+
+	tbody {
+		.notes {
+			height: 100px;
+			overflow: auto;
+			padding: .5rem;
+		}
+	}
+
+	select {
+		box-shadow: unset;
+	}
+
 	/* Assuming you want to limit the displayed link text to two lines */
 	.truncated-link {
-		display: block; /* Ensure the container spans the whole width */
-		white-space: nowrap; /* Prevent text from wrapping */
-		overflow: hidden; /* Hide any overflowing text */
-		text-overflow: ellipsis; /* Add ellipsis (...) when text overflows */
-		width: 150px; /* Set the desired width for the link text container */
+		display: block;
+		/* Ensure the container spans the whole width */
+		white-space: nowrap;
+		/* Prevent text from wrapping */
+		overflow: hidden;
+		/* Hide any overflowing text */
+		text-overflow: ellipsis;
+		/* Add ellipsis (...) when text overflows */
+		width: 150px;
+		/* Set the desired width for the link text container */
 	}
 }
-.cardTemplate{
-	.cardHeaderTemplate{
+
+.cardTemplate {
+	.cardHeaderTemplate {
 		border-radius: 0;
 	}
-    box-shadow:unset;
-    border:1px solid #dee2e6;
+
+	box-shadow:unset;
+	border:1px solid #dee2e6;
 	padding: 0;
-    .filters{
-        border-radius:.2rem;
-        width:5%;
-    }
+
+	.filters {
+		border-radius: .2rem;
+		width: 5%;
+	}
 }
 
 #map-container {
 	position: relative;
 	width: 100%;
 	height: 0;
-	padding-bottom: 56.25%; /* Adjust this value to control the aspect ratio (e.g., 16:9) */
-  }
-  
-  #map {
+	padding-bottom: 56.25%;
+	/* Adjust this value to control the aspect ratio (e.g., 16:9) */
+}
+
+#map {
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
-  }
+}
 
-  @media print {
+@media print {
 	.cardTemplate {
-		display: none !important; /* Hide the cardTemplate divs during print */
+		display: none !important;
+		/* Hide the cardTemplate divs during print */
 	}
 
 	.print-only {
-		display: block !important; /* Show the Details div during print */
+		display: block !important;
+		/* Show the Details div during print */
 		flex: 0 0 100%;
 		max-width: 100%;
 		border: none;
 	}
-	#print{
+
+	#print {
 		display: none;
+	}
+}
+
+// Apply styles to adjacent list group items
+.list-group-item {
+	+.list-group-item {
+		border-top-width: thin !important;
+	}
+
+	&:first-child {
+		border-top-right-radius: initial !important;
+	}
+
+	&:last-child {
+		border-radius: 0.25rem !important;
+		border-top-left-radius: initial !important;
+		border-bottom-right-radius: initial !important;
 	}
 }

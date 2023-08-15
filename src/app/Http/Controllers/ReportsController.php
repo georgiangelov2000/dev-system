@@ -10,7 +10,14 @@ class ReportsController extends Controller
         return view('reports.index');
     }
 
-    public function takeReport(){
-
+    public function takeReport(Request $request){
+        $request->only([
+            'type_export' => 'integer|required',
+            'export' =>  'integer|required',
+            'data_type_export' => 'integer|required',
+            'month' => 'required'
+        ]);
     }
+
+
 }
