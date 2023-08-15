@@ -202,14 +202,23 @@
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa fa-light fa-users"></i>
-                        <p>Еmployees</p>
+                        <p>
+                            Staff members
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-file-signature"></i>
-                        <p>Contracts</p>
-                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{{ route('user.index') }}" class="nav-link">
+                                <p>Staff</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('user.create') }}" class="nav-link">
+                                <p>Create member</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">

@@ -16,6 +16,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\UserController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -24,6 +26,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('dashboard')->name('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'index']);
+    });
+
+    Route::prefix('users')->name('user.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
+        Route::post('/store', [UserController::class, 'store'])->name('store');
+        Route::get('/edit/{user}', [UserController::class, 'edit'])->name('edit');
+        Route::post('/update/{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('/delete/{user}', [UserController::class, 'delete'])->name('delete');
     });
 
     Route::prefix('categories')->name('category.')->group(function () {

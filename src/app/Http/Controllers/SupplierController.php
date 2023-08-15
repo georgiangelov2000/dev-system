@@ -91,7 +91,7 @@ class SupplierController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Supplier has not been created'], 500);
+            return back()->withInput()->with('error', 'Supplier has not been created');
         }
 
         return redirect()->route('supplier.index')->with('success', 'Supplier has been created');

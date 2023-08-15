@@ -25,6 +25,14 @@
                         </div>
 
                         <div class="form-group col-3 mb-0">
+                            <label for="user_id">Assign to driver</label>
+                            <select id="user_id" name="user_id" class="form-control selectUser"
+                                data-live-search="true">
+                            </select>
+                            <span name="user_id" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-3 mb-0">
                             <label>Date of sale:</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -89,14 +97,15 @@
         </div>
     </div>
 
-@endsection
+    @push('scripts')
+        <script type="text/javascript" src="{{ mix('js/helpers/render_helpers.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/orders/form.js') }}"></script>
+        <script type="text/javascript">
+            const ORDER_INDEX_ROUTE = "{{route('order.index')}}";
+            const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
+            const PRODUCT_API_ROUTE = "{{ route('api.products') }}";
+            const USER_API_ROUTE = "{{route('api.users')}}";
+        </script>
+    @endpush
 
-@push('scripts')
-    <script type="text/javascript" src="{{ mix('js/helpers/render_helpers.js') }}"></script>
-    <script type="text/javascript" src="{{ mix('js/orders/form.js') }}"></script>
-    <script type="text/javascript">
-        const ORDER_INDEX_ROUTE = "{{route('order.index')}}";
-        const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
-        const PRODUCT_API_ROUTE = "{{ route('api.products') }}";
-    </script>
-@endpush
+@endsection

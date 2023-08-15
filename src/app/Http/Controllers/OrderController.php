@@ -31,9 +31,11 @@ class OrderController extends Controller
 
     public function store(OrderRequest $request)
     {
-        DB::beginTransaction();
         try {
+            DB::beginTransaction();
+
             $purchaseIds = $request->purchase_id;
+            $user = (int) $request->user_id;
             $trackingNumber = (string) $request->tracking_number;
             $customer = (int) $request->customer_id;
             $orderDateOfSale = date('Y-m-d', strtotime($request->date_of_sale));
@@ -61,6 +63,7 @@ class OrderController extends Controller
 
                 $order = [
                     'customer_id' => $customer,
+                    'user_id' => $user,
                     'purchase_id' => $purchaseId,
                     'sold_quantity' => $orderQuantity,
                     'single_sold_price' => $orderSinglePrice,
@@ -90,7 +93,7 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
-        $order->load('customer:id,name', 'purchase.categories', 'purchase.brands','purchase.images');
+        $order->load('customer:id,name', 'user:id,username', 'purchase.categories', 'purchase.brands','purchase.images');
         return view('orders.edit', compact('order'));
     }
 
@@ -99,6 +102,7 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $customer_id = (int) $request->customer_id;
+            $user = (int) $request->user_id;
             $date_of_sale = date('Y-m-d', strtotime($request->date_of_sale));
             $tracking_number = (string) $request->tracking_number;
             $purchase_id = (int) $request->purchase_id;
@@ -128,6 +132,7 @@ class OrderController extends Controller
 
             $order->update([
                 'customer_id' => $customer_id,
+                'user_id' => $user,
                 'purchase_id' => $purchase_id,
                 'sold_quantity' => $sold_quantity,
                 'single_sold_price' => $single_sold_price,

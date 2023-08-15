@@ -39,6 +39,15 @@ return [
     'stock_statuses' => [
         0 => 'In stock',
         1 => 'Out of stock',
+    ],
+    'genders' => [
+        1 => 'Male',
+        2 => 'Female',
+        3 => 'Other'
+    ],
+    'roles' => [
+        1 => 'Admin',
+        2 => 'Driver'
     ]
 ]
 

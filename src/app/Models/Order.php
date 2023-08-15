@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Customer;
 use App\Models\Purchase;
+use App\Models\User;
 use App\Models\OrderPayment;
 
 class Order extends Model
@@ -60,6 +61,10 @@ class Order extends Model
 
     public function package(){
         return $this->belongsTo(Package::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 
     public function packages()

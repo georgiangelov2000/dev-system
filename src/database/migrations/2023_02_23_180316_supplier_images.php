@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class SuppliersImages extends Migration {
+class SupplierImages extends Migration {
 
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class SuppliersImages extends Migration {
      * @return void
      */
     public function up() {
-        Schema::create('suppliers_images', function (Blueprint $table) {
+        Schema::create('supplier_images', function (Blueprint $table) {
 
             $table->id();
             $table->unsignedBigInteger('supplier_id');
@@ -27,7 +27,7 @@ class SuppliersImages extends Migration {
      * @return void
      */
     public function down() {
-        Schema::dropIfExists('suppliers_images');
+        Schema::dropIfExists('supplier_images');
     }
 
 }

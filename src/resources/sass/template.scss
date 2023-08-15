@@ -203,6 +203,14 @@ table.dataTable{
     select{
         box-shadow: unset;
     }
+	/* Assuming you want to limit the displayed link text to two lines */
+	.truncated-link {
+		display: block; /* Ensure the container spans the whole width */
+		white-space: nowrap; /* Prevent text from wrapping */
+		overflow: hidden; /* Hide any overflowing text */
+		text-overflow: ellipsis; /* Add ellipsis (...) when text overflows */
+		width: 150px; /* Set the desired width for the link text container */
+	}
 }
 .cardTemplate{
 	.cardHeaderTemplate{

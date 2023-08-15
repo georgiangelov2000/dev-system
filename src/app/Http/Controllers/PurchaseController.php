@@ -43,11 +43,11 @@ class PurchaseController extends Controller
 
     public function store(PurchaseRequest $request)
     {
-        $data = $request->validated();
-
         DB::beginTransaction();
 
         try {
+            $data = $request->validated();
+
             $file = isset($data['image']) ? $data['image'] : false;
             $price = $data['price'];
             $quantity = $data['quantity'];

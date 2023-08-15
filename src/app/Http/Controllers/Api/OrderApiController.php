@@ -10,7 +10,7 @@ class OrderApiController extends Controller
 {
     public function getData(Request $request)
     {   
-        $relations = ['customer:id,name','purchase:id,name','orderPayments','purchase.images'];
+        $relations = ['customer:id,name','purchase:id,name','orderPayments','purchase.images','user:id,username'];
 
         $id = isset($request->id) && $request->id ? $request->id : null;
         $customer = isset($request->customer) && $request->customer ? $request->customer : null;
@@ -45,6 +45,7 @@ class OrderApiController extends Controller
             'status',
             'is_paid',
             'package_extension_date',
+            'user_id',
             'created_at',
             'updated_at',
         );

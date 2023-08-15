@@ -30,6 +30,14 @@
                             @enderror
                         </div>
 
+                        <div class="form-group col-3 mb-0">
+                            <label for="user_id">Assign to driver</label>
+                            <select id="user_id" name="user_id" class="form-control selectUser" data-live-search="true">
+                                <option value="{{$order->user->id}}">{{$order->user->username}}</option>
+                            </select>
+                            <span name="user_id" class="text-danger"></span>
+                        </div>
+
                         <div class="form-group col-3">
                             <label>Date of sale:</label>
                             <div class="input-group">
@@ -187,8 +195,9 @@
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/orders/form.js') }}"></script>
     <script type="text/javascript">
-        let DATE_OF_SALE = "{{ $order->date_of_sale }}";
-        let CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
-        let PRODUCT_API_ROUTE = "{{ route('api.products') }}"
+        const DATE_OF_SALE = "{{ $order->date_of_sale }}";
+        const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
+        const PRODUCT_API_ROUTE = "{{ route('api.products') }}"
+        const USER_API_ROUTE = "{{route('api.users')}}";
     </script>
 @endpush

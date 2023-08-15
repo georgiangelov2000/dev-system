@@ -111,7 +111,7 @@ $(document).ready(function () {
                 orderable: false,
                 name: 'state',
                 render: function (data, type, row) {
-                    return row.states ? row.states.name : "";
+                    return row.state ? row.state.name : "";
                 }
             },
             {
@@ -158,13 +158,13 @@ $(document).ready(function () {
                         <form method='POST' onsubmit='deleteCurrentSupplier(event)' style='display:inline-block'; id='delete-form' action=" + REMOVE_SUPPLIER_ROUTE.replace(':id', row.id) + " data-name=" + row.name + ">\
                             <input type='hidden' name='_method' value='DELETE'>\
                             <input type='hidden' name='id' value='" + row.id + "'>\
-                            <button class='btn p-1' title='Delete'><i class='fa-light fa-trash text-danger'></i></button>\
+                            <button class='btn p-0' title='Delete'><i class='fa-light fa-trash text-danger'></i></button>\
                         </form>\ ";
                     }
 
-                    let editButton = '<a data-id=' + row.id + ' href=' + EDIT_SUPPLIER_ROUTE.replace(":id", row.id) + ' class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
-                    let massEdit = '<a data-id=' + row.id + ' href='+MASS_EDIT_PURCHASES.replace(":id",row.id)+' class="btn p-1" title="Mass edit"><i class="fa-light fa-pen-to-square text-primary"></i></a>';
-                    let categories = "<button data-toggle='collapse' data-target='#categories_" + row.id + "' title='Categories' class='btn btn-outline-muted showCategories p-1'><i class='fa-light fa-list' aria-hidden='true'></i></button>";
+                    let editButton = '<a data-id=' + row.id + ' href=' + EDIT_SUPPLIER_ROUTE.replace(":id", row.id) + ' class="btn p-0" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+                    let massEdit = '<a data-id=' + row.id + ' href='+MASS_EDIT_PURCHASES.replace(":id",row.id)+' class="btn p-0" title="Mass edit"><i class="fa-light fa-pen-to-square text-primary"></i></a>';
+                    let categories = "<button data-toggle='collapse' data-target='#categories_" + row.id + "' title='Categories' class='btn btn-outline-muted showCategories p-0'><i class='fa-light fa-list' aria-hidden='true'></i></button>";
                     return `${categories} ${deleteFormTemplate} ${editButton} ${massEdit}`;
                 }
             }

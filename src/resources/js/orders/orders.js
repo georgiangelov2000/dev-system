@@ -2,9 +2,10 @@ import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 
 $(function () {
-    $('.selectAction, .selectType, .selectCustomer, select[name="package_id"], select[name="package_id"] ').selectpicker();
+    $('.selectAction, .selectType, .selectCustomer, select[name="package_id"], .selectDriver').selectpicker();
 
     const bootstrapCustomer = $('.bootstrap-select .selectCustomer');
+    const bootstrapSelectDriver = $('.bootstrap-select .selectDriver');
     const bootstrapOrderStatus = $('.bootstrap-select .selectType');
     const bootstrapSelectAction = $('.bootstrap-select .selectAction');
 
@@ -96,7 +97,7 @@ $(function () {
             {
                 width: '7%',
                 orderable: false,
-                name: "product",
+                name: "purchase",
                 class:"text-center",
                 render: function (data, type, row) {
                     return '<a target="_blank" href="' + EDIT_PRODUCT_ROUTE.replace(':id', row.purchase.id) + '">' + row.purchase.name + '</a>';
@@ -377,6 +378,10 @@ $(function () {
         return data;
     }
 
+    bootstrapSelectDriver.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        dataTable.ajax.reload(null, false);
+    })
+
     bootstrapCustomer.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         dataTable.ajax.reload(null, false);
     })
@@ -407,6 +412,29 @@ $(function () {
                 })
             }
             bootstrapCustomer.selectpicker('refresh');
+        }, function (error) {
+            console.log(error);
+        })
+    })
+
+    $('.selectDriver input[type="text"]').on('keyup', function () {
+
+        let text = $(this).val();
+        bootstrapSelectDriver.empty();
+
+        APICaller(USER_API_ROUTE, { 
+            'search': text,
+            'role_id': 2,
+            'no_datatable_draw':1,
+         }, function (response) {
+            let drivers = response;
+            if (drivers.length > 0) {
+                bootstrapSelectDriver.append('<option value="" style="display:none;"></option>');
+                $.each(drivers, function ($key, driver) {
+                    bootstrapSelectDriver.append(`<option value="${driver.id}"> ${driver.username} </option>`)
+                })
+            }
+            bootstrapSelectDriver.selectpicker('refresh');
         }, function (error) {
             console.log(error);
         })

@@ -100,7 +100,7 @@
                                 <input value="{{ old('address') ? e(old('address')) : '' }}" type="text" id="address"
                                     name="address" class="form-control" placeholder="Enter address" />
                                 <span class="input-group-append">
-                                    <button type="button" id="searchAddress" class="btn btn-info btn-flat">Search</button>
+                                    <button type="button" id="searchAddress" class="btn btn-primary btn-flat">Search</button>
                                 </span>
                             </div>
                             @error('address')
@@ -149,11 +149,11 @@
         </div>
     </div>
 
-@endsection
-
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/customers/form.js') }}"></script>
     <script type="text/javascript">
         let STATE_ROUTE = "{{ route('state', ':id') }}";
     </script>
 @endpush
+
+@endsection

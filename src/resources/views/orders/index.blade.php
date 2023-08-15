@@ -33,6 +33,14 @@
                         </div>
                     </div>
                     <div class="col-3">
+                        <div class="form-group">
+                            <label>Drivers</label>
+                            <select class="form-control selectDriver" name="driver" data-live-search="true">
+                                <option value=''>All</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-3">
                         <label for="customRange1">Date of sale</label>
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div>
@@ -108,6 +116,7 @@
         <script type="text/javascript" src="{{ mix('js/orders/orders.js') }}"></script>
         <script type="text/javascript">
             const ORDER_API_ROUTE = "{{ route('api.orders') }}";
+            const USER_API_ROUTE = "{{ route('api.users') }}";
             const CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
             const ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";
             const ORDER_DELETE_ROUTE = "{{route('order.delete',':id')}}";
