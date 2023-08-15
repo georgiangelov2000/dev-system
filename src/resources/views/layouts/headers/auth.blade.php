@@ -289,7 +289,7 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('order.index') }}" class="nav-link">
+                            <a href="{{ route('report.index') }}" class="nav-link">
                                 <p>Company reports</p>
                             </a>
                         </li>

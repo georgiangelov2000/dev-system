@@ -17,7 +17,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
-use App\Models\User;
+use App\Http\Controllers\ReportsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -114,6 +114,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/suppliers', [SupplierSummaryController::class, 'index'])->name('supplier');
         Route::post('/take/customers', [CustomerSummaryController::class, 'summary'])->name('take.customer');
         Route::post('/take/suppliers', [SupplierSummaryController::class, 'summary'])->name('take.supplier');
+    });
+
+    Route::prefix('reports')->name('report.')->group(function () {
+        Route::get('/', [ReportsController::class, 'index'])->name('index');
     });
 
     Route::prefix('packages')->name('package.')->group(function () {
