@@ -84,7 +84,7 @@ $(function () {
                 orderable: false,
                 width: '1%',
                 render: function (data, type, row) {
-                    if(row.payment) {
+                    if (row.payment) {
                         return `<a href="${PAYMENT.replace(':id', row.payment.id)}">${row.payment.date_of_payment}</a>`
                     } else {
                         return ``;
@@ -159,17 +159,17 @@ $(function () {
             },
             {
                 width: '6%',
-                name:'total_price',
+                name: 'total_price',
                 orderable: true,
                 render: function (data, type, row) {
                     return `<span>€${row.total_price}</span>`
                 }
             },
             {
-                width:'5%',
-                name:'original_price',
-                orderable:true,
-                render:function(data,type,row) {
+                width: '5%',
+                name: 'original_price',
+                orderable: true,
+                render: function (data, type, row) {
                     return `<span>€${row.original_price}</span>`
                 }
             },
@@ -177,18 +177,21 @@ $(function () {
                 width: '5%',
                 orderable: true,
                 name: "quantity",
-                data: "quantity"
+                data: "quantity",
+                class:'text-center'
             },
             {
                 width: '7%',
                 orderable: true,
                 name: "initial_quantity",
-                data: 'initial_quantity'
+                data: "initial_quantity",
+                class:"text-center"
             },
             {
                 width: '2%',
                 name: "discount_percent",
                 orderable: true,
+                class:"text-center",
                 render: function (data, type, row) {
                     return `<span>${row.discount_percent}%</span>`
                 }
@@ -279,45 +282,41 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
+                    let status;
+                    let iconClass;
+
                     if (row.status === 1) {
-                        return '<img style="height:40px;" class="w-50" title="Paid" src = "/storage/images/static/succesfully.png" /> '
+                        status = "Paid";
+                        iconClass = "fal fa-check-circle"; // Light FontAwesome icon for Paid
+                    } else if (row.status === 2) {
+                        status = "Pending";
+                        iconClass = "fal fa-hourglass-half"; // Light FontAwesome icon for Pending
+                    } else if (row.status === 3) {
+                        status = "Partially Paid";
+                        iconClass = "fal fa-money-bill-alt"; // Light FontAwesome icon for Partially Paid
+                    } else if (row.status === 4) {
+                        status = "Overdue";
+                        iconClass = "fal fa-exclamation-circle"; // Light FontAwesome icon for Overdue
+                    } else if (row.status === 5) {
+                        status = "Refunded";
+                        iconClass = "fal fa-undo-alt"; // Light FontAwesome icon for Refunded
+                    } else {
+                        status = "Unpaid";
+                        iconClass = "fal fa-exclamation-triangle"; // Light FontAwesome icon for Unpaid or any default icon
                     }
-                    else if (row.status === 2) {
-                        return '<img style="height:40px;" class="w-50" title= "Pending" src = "/storage/images/static/pending.png" /> '
-                    }
-                    else if (row.status === 3) {
-                        return '<img style="height:40px;" class="w-50" title="Partially Paid" src = "/storage/images/static/partially-payment.png" /> '
-                    }
-                    else if (row.status === 4) {
-                        return '<img style="height:40px;" class="w-50" title="Overdue" src = "/storage/images/static/overdue.png" /> '
-                    }
-                    else if (row.status === 5) {
-                        return '<img style="height:40px;" class="w-50" title="Refunded" src = "/storage/images/static/ordered.png" /> '
-                    }else {
-                        return '<img style="height:40px;" class="w-50" title="Unpaid" src = "/storage/images/static/unpaid.png" />'
-                    }
+
+                    return `<div title="${status}" class="status">
+                    <span class="icon"><i class="${iconClass}"></i></span>
+                </div>`;
                 }
             },
             {
                 width: '8%',
                 orderable: false,
                 name: 'expected_date_of_payment',
+                class: 'text-center',
                 render: function (data, type, row) {
                     return '<span>' + moment(row.expected_date_of_payment).format('YYYY-MM-DD') + '</span>';
-                }
-            },
-            {
-                width: '1%',
-                orderable: false,
-                name: "is_paid",
-                render: function (data, type, row) {
-                    if ( (row.is_paid === 1) && (row.status === 1 || row.status === 4)  ) {
-                        return '<span class="text-success">Yes</span>';
-                    } else if ( (row.is_paid === 3) && (row.status === 3) ) {
-                        return '<span class="text-warning">Refund</span>';
-                    } else {
-                        return '<span class="text-danger">No</span>';
-                    }
                 }
             },
             {
@@ -327,7 +326,7 @@ $(function () {
                 render: function (data, type, row) {
                     let deleteFormTemplate = '';
 
-                    if (!row.is_paid) {
+                    if (!row.payment) {
                         deleteFormTemplate = `
                         <form style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
                             <input type='hidden' name='_method' value='DELETE'>
@@ -557,7 +556,7 @@ $(function () {
         showConfirmationDialog('Selected purchases!', template, function () {
             searchedIds.forEach(function (id, index) {
                 APIDELETECALLER(REMOVE_PRODUCT_ROUTE.replace(':id', id), function (response) {
-                    if(response.status === 500) {
+                    if (response.status === 500) {
                         toastr['error'](response.responseJSON.message);
                     } else {
                         toastr['success'](response.message);

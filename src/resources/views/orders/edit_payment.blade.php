@@ -109,9 +109,6 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @error('payment_status')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
                         </div>
                         <div class="form-group col-12">
                             <label for="payment_reference">Payment reference</label>

@@ -64,8 +64,9 @@
         <script type="text/javascript" src="{{ mix('js/lodash.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/buttons.html5.min.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/buttons.print.min.js') }}"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
-         
+        <script type="text/javascript" src="{{ mix('js/jquery.fileDownload.min.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        
         <script>
             @if (Session::has('message'))
                 toastr.options = {

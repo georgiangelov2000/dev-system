@@ -36,8 +36,7 @@ $(function () {
                     'order_column': orderColumnName, // send the column name being sorted
                     'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
                     'limit': d.custom_length = d.length,
-                    'is_paid': 0,
-                    'stauts':statusArray,
+                    'status':statusArray,
                     'publishing': createdRange,
                 });
             }

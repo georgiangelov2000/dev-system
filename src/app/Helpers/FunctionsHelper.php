@@ -29,4 +29,27 @@ class FunctionsHelper
 
         return $finalPrice;
     }
+
+    public static function dateRangeConverter($data)
+    {
+        $dates = explode(" - ", $data);
+
+        if (count($dates) !== 2) {
+            throw new \InvalidArgumentException("Invalid date range format");
+        }
+
+        $startTimestamp = strtotime($dates[0]);
+        $endTimestamp = strtotime($dates[1]);
+
+        if ($startTimestamp === false || $endTimestamp === false) {
+            throw new \InvalidArgumentException("Invalid date format");
+        }
+
+        if ($startTimestamp > $endTimestamp) {
+            // Swap start and end timestamps if they are reversed
+            list($startTimestamp, $endTimestamp) = [$endTimestamp, $startTimestamp];
+        }
+
+        return [$startTimestamp, $endTimestamp];
+    }
 }

@@ -115,21 +115,4 @@ class SettingsController extends Controller
             return response()->json(['message' => 'Failed to send email'], 500);
         }
     }
-
-    public function serverInformation(){
-        $serverName = request()->server();
-
-        $serverObj =  new stdClass;
-        
-        $serverObj->web_server = $serverName['SERVER_SOFTWARE'];
-        $serverObj->http_user_agent = $serverName['HTTP_USER_AGENT'];
-        $serverObj->gateway_interface = $serverName['GATEWAY_INTERFACE'];
-        $serverObj->server_protocol = $serverName['SERVER_PROTOCOL'];
-        $serverObj->php_version = $serverName['PHP_VERSION'];
-        $serverObj->php_url = $serverName['PHP_URL'];
-        $serverObj->os = php_uname('s');
-        $serverObj->ar = php_uname('m');
-
-        return view('settings.server_settings',compact('serverObj'));
-    }
 }

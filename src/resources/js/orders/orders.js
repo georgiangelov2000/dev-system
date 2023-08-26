@@ -207,15 +207,19 @@ $(function () {
 
                     if (row.order_payments) {
                         dateOfPayment = moment(row.order_payments.date_of_payment);
-
-                        // Calculate the delay in days (if any)
                         let delayInDays = dateOfPayment.diff(dateOfSale, 'days');
 
-                        // Check if there is a delay in payment
-                        if (delayInDays > 0) {
-                            delayMessage = 'Payment is delayed by ' + delayInDays + ' day(s).';
-                        } else {
-                            delayMessage = 'Order was paid on time.';
+                        if(row.status === 1 && row.order_payments.payment_status === 1) {
+                            delayMessage = `Order was paid on time.`;
+                        }
+                        else if(row.status === 2 && row.order_payments.payment_status === 2) {
+                            delayMessage = `Please complete your payment to proceed.`
+                        }
+                        else if(row.status === 4 && row.order_payments.payment_status === 4) {
+                            delayMessage =  `Payment is delayed by ${delayInDays} day(s)`; 
+                        }
+                        else if (row.status === 5 && row.order_payments.payment_status === 5) {
+                            delayMessage = `The order is refunded`;
                         }
                     }
 
@@ -250,40 +254,32 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    if (row.status === 'Paid') {
-                        return '<img style="height:40px;" class="w-50" title="Paid" src = "/storage/images/static/succesfully.png" /> '
+                    let status;
+                    let iconClass;
+
+                    if (row.status === 1) {
+                        status = "Paid";
+                        iconClass = "fal fa-check-circle"; // Light FontAwesome icon for Paid
+                    } else if (row.status ===  2) {
+                        status = "Pending";
+                        iconClass = "fal fa-hourglass-half"; // Light FontAwesome icon for Pending
+                    } else if (row.status === 3) {
+                        status = "Partially Paid";
+                        iconClass = "fal fa-money-bill-alt"; // Light FontAwesome icon for Partially Paid
+                    } else if (row.status === 4) {
+                        status = "Overdue";
+                        iconClass = "fal fa-exclamation-circle"; // Light FontAwesome icon for Overdue
+                    } else if (row.status === 5) {
+                        status = "Refunded";
+                        iconClass = "fal fa-undo-alt"; // Light FontAwesome icon for Refunded
+                    } else if (row.status === 6) {
+                        status = "Ordered";
+                        iconClass = "fal fa-shopping-cart"; // Light FontAwesome icon for Unpaid or any default icon
                     }
-                    else if (row.status === 'Pending') {
-                        return '<img style="height:40px;" class="w-50" title= "Pending" src = "/storage/images/static/pending.png" /> '
-                    }
-                    else if (row.status === 'Partially Paid') {
-                        return '<img style="height:40px;" class="w-50" title="Partially Paid" src = "/storage/images/static/partially-payment.png" /> '
-                    }
-                    else if (row.status === 'Overdue') {
-                        return '<img style="height:40px;" class="w-50" title="Overdue" src = "/storage/images/static/overdue.png" /> '
-                    }
-                    else if (row.status === 'Refunded') {
-                        return '<img style="height:40px;" class="w-50" title="Refunded" src = "/storage/images/static/ordered.png" /> '
-                    }
-                    else if (row.status === 'Ordered') {
-                        return '<img style="height:40px;" class="w-50" title="Ordered" src = "/storage/images/static/refund.png" /> '
-                    } else {
-                        return '';
-                    }
-                }
-            },
-            {
-                width: '1%',
-                orderable: false,
-                name: "is_paid",
-                render: function (data, type, row) {
-                    if ((row.is_paid == 1) && (row.status == 'Paid' || row.status == 'Overdue')) {
-                        return '<span class="text-success">Yes</span>';
-                    } else if ((row.is_paid == 3) && (row.status == 'Refund')) {
-                        return '<span class="text-warning">Refund</span>';
-                    } else {
-                        return '<span class="text-danger">No</span>';
-                    }
+
+                    return `<div title="${status}" class="status">
+                    <span class="icon"><i class="${iconClass}"></i></span>
+                </div>`;
                 }
             },
             {

@@ -41,7 +41,7 @@ class AuthController extends Controller {
             
             $this->clearAttempts($request);
             
-            return redirect()->intended('home');
+            return redirect()->intended('dashboard');
         }
             
         $this->incrementAttempts($request);

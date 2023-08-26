@@ -118,6 +118,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('reports')->name('report.')->group(function () {
         Route::get('/', [ReportsController::class, 'index'])->name('index');
+        Route::post('/take', [ReportsController::class, 'takeReport'])->name('take');
     });
 
     Route::prefix('packages')->name('package.')->group(function () {
@@ -135,7 +136,6 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/company', [SettingsController::class, 'companySettingsForm'])->name('company');
         Route::get('/email', [SettingsController::class, 'emailForm'])->name('email');
-        Route::get('/server', [SettingsController::class, 'serverInformation'])->name('server');
 
         Route::post('/send/email', [SettingsController::class, 'sendEmailForm'])->name('email.send');
         Route::put('/comapny/update', [SettingsController::class, 'updateCompanySettings'])->name('company.update');

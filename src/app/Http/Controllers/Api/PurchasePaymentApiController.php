@@ -21,13 +21,11 @@ class PurchasePaymentApiController extends Controller
         $dates = $this->formatDateRange($date);
         $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
-
+        
         $paymentQ = PurchasePayment::query()
             ->with(
                 ['purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,status,is_paid', 'invoice']
-            )->whereHas('purchase', function ($query) {
-                $query->where('is_paid', 1);
-            });
+            );
 
         if ($supplier) {
             $paymentQ->whereHas('purchase', function ($query) use ($supplier) {

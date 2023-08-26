@@ -73,6 +73,7 @@ class PurchaseController extends Controller
                 "total_price" => $totalPrice,
                 'original_price' => $originalPrice,
                 'expected_date_of_payment' => date('Y-m-d', strtotime($data['expected_date_of_payment'])),
+                'delivery_date' => date('Y-m-d', strtotime($data['delivery_date'])),
             ]);
 
             if ($category) {
@@ -183,6 +184,7 @@ class PurchaseController extends Controller
                     'total_price' => $totalPrice,
                     'original_price' => $originalPrice,
                     'expected_date_of_payment' => date('Y-m-d', strtotime($data['expected_date_of_payment'])),
+                    'delivery_date' => date('Y-m-d', strtotime($data['delivery_date'])),
                 ]);
 
             }

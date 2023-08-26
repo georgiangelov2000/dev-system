@@ -103,7 +103,6 @@
                             <th>Payment date</th>
                             <th>Package</th>
                             <th class="text-center">Status</th>
-                            <th>Paid</th>
                             <th>Actions</th>
                         </tr>
                     </thead>

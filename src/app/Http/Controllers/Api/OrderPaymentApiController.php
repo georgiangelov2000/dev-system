@@ -41,11 +41,6 @@ class OrderPaymentApiController extends Controller
  
         $result = $paymentQ->skip($offset)->take($limit)->get();
 
-        foreach ($result as $key => $payment) {
-            $payment->payment_method = array_key_exists($payment->payment_method, config('statuses.payment_methods_statuses')) ? config('statuses.payment_methods_statuses.' . $payment->payment_method) : $payment->payment_method;
-            $payment->payment_status = array_key_exists($payment->payment_status, config('statuses.payment_statuses')) ? config('statuses.payment_statuses.' . $payment->payment_status) : $payment->payment_status;
-        }
-
         $filteredRecords = $paymentQ->count();
         $totalRecords = $paymentQ->count();
 

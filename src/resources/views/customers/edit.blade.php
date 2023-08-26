@@ -108,7 +108,7 @@
                                     class="form-control" placeholder="Enter address" />
                                 <span class="input-group-append">
                                     <button type="button" id="searchAddress"
-                                        class="btn btn-info btn-flat">Search</button>
+                                        class="btn btn-primary btn-flat">Search</button>
                                 </span>
                             </div>
                             @error('address')

@@ -122,7 +122,6 @@
                         <th>Brands</th>
                         <th>Status</th>
                         <th title="Expected date of payment">EDT</th>
-                        <th>Paid</th>
                         <th>Actions</th>
                     </thead>
                 </table>

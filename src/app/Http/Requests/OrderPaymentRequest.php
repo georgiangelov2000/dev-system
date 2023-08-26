@@ -26,7 +26,6 @@ class OrderPaymentRequest extends FormRequest
         ];
 
         if ($this->isMethod('PUT')) {
-            $rules['payment_method'] = 'required';
             $rules['payment_reference'] = 'required';
             $rules['payment_status'] = 'required';
         }

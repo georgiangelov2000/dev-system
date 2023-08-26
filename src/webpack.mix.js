@@ -44,6 +44,8 @@ mix.js('resources/js/payments/supplier_payments.js', 'public/js/payments'),
 
 mix.js('resources/js/packages/customer_package_payment.js', 'public/js/packages'),
 
+mix.js('resources/js/reports/reports.js', 'public/js/reports');
+
 // Javascript libraries
 mix.babel('resources/js/adminlte.min.js', 'public/js/adminlte.min.js'),
 mix.babel('resources/js/app.js', 'public/js/app.js'),
@@ -67,7 +69,7 @@ mix.babel('resources/js/leaflet.js', 'public/js/leaflet.js'),
 mix.babel('resources/js/lodash.min.js', 'public/js/lodash.min.js')
 mix.babel('resources/js/buttons.html5.min.js', 'public/js/buttons.html5.min.js')
 mix.babel('resources/js/buttons.print.min.js', 'public/js/buttons.print.min.js')
-
+mix.babel('resources/js/jquery.fileDownload.min.js', 'public/js/jquery.fileDownload.min.js')
 .version();
 
 mix.sass('resources/sass/_variables.scss', 'public/css')

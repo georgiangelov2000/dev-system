@@ -51,7 +51,8 @@ class Purchase extends Model {
         'expected_date_of_payment',
         'original_price',
         'discount_percent',
-        'discount_price'
+        'discount_price',
+        'delivery_date'
     ];
 
     public function categories() {

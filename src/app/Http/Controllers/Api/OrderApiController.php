@@ -103,8 +103,6 @@ class OrderApiController extends Controller
         $result = $orderQuery->skip($offset)->take($limit)->get();
         
         foreach ($result as $key => $order) {
-            $order->status = array_key_exists($order->status, config('statuses.order_statuses')) ? config('statuses.order_statuses.' . $order->status) : $order->status;
-            $order->is_paid = array_key_exists($order->is_paid, config('statuses.is_paid_statuses')) ? config('statuses.is_paid_statuses.' . $order->is_paid) : $order->is_paid;
             $order->package = $order->packages->first() ? $order->packages->first()->package_name : '';
             $order->package_id = $order->packages->first() ? $order->packages->first()->id : '';
         }

@@ -29,14 +29,19 @@
                 <div class="tab-content" id="custom-tabs-one-tabContent">
                     <div class="tab-pane active show" id="custom-tabs-one-home" role="tabpanel"
                         aria-labelledby="custom-tabs-one-home-tab">
-                        @if(!$is_available)
-                        <div class="alert alert-danger alert-dismissible col-10">
-                            <h5><i class="icon fas fa-ban"></i> Alert!</h5>
-                            The product has already been paid for, and as a result, cannot update some of the data. The payment associated with the product indicates that the transaction has been completed, and it's crucial to maintain the integrity of the payment records. To avoid any discrepancies or potential conflicts, modifications to the product are restricted once a payment has been made. If you need to make changes to the product details, it's advisable to create a new entry or consider relevant adjustments within a new context.
+                        @if (!$is_available)
+                            <div class="alert alert-danger alert-dismissible col-10">
+                                <h5><i class="icon fas fa-ban"></i> Alert!</h5>
+                                The product has already been paid for, and as a result, cannot update some of the data. The
+                                payment associated with the product indicates that the transaction has been completed, and
+                                it's crucial to maintain the integrity of the payment records. To avoid any discrepancies or
+                                potential conflicts, modifications to the product are restricted once a payment has been
+                                made. If you need to make changes to the product details, it's advisable to create a new
+                                entry or consider relevant adjustments within a new context.
                             </div>
                         @endif
 
-                        <form class="d-flex flex-wrap" action='{{ route('purchase.update',$purchase->id) }}' method='POST'
+                        <form class="d-flex flex-wrap" action='{{ route('purchase.update', $purchase->id) }}' method='POST'
                             enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
@@ -76,59 +81,46 @@
                                     </div>
                                     <div class="form-group col-6">
                                         <label for="quantity">Quantity</label>
-                                        @if($is_available)
-                                            <input 
-                                                type="number" 
-                                                placeholder="Enter quantity"
-                                                class="form-control @error('quantity')  is-invalid @enderror" 
-                                                id="quantity"
-                                                name="quantity" 
-                                                min="{{$purchase->initial_quantity > 0 ? 0 : 1}}" value='{{ e($purchase->quantity) }}'
-                                            >
+                                        @if ($is_available)
+                                            <input type="number" placeholder="Enter quantity"
+                                                class="form-control @error('quantity')  is-invalid @enderror" id="quantity"
+                                                name="quantity" min="{{ $purchase->initial_quantity > 0 ? 0 : 1 }}"
+                                                value='{{ e($purchase->quantity) }}'>
                                             @error('quantity')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         @else
                                             <p class="input-group-text col-12">
-                                                {{$purchase->quantity}}
+                                                {{ $purchase->quantity }}
                                             </p>
                                         @endif
                                     </div>
                                     <div class="form-group col-6">
                                         <label for="price">Price</label>
-                                        @if($is_available)
-                                            <input 
-                                                type="text" 
-                                                class="form-control @error('price')  is-invalid @enderror"
-                                                id="price" 
-                                                name="price" 
-                                                value='{{ e($purchase->price) }}'
-                                                placeholder="Enter price"
-                                            >
+                                        @if ($is_available)
+                                            <input type="text" class="form-control @error('price')  is-invalid @enderror"
+                                                id="price" name="price" value='{{ e($purchase->price) }}'
+                                                placeholder="Enter price">
                                             @error('price')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         @else
-                                            <p class="input-group-text col-12">€ {{$purchase->price}}</p>
+                                            <p class="input-group-text col-12">€ {{ $purchase->price }}</p>
                                         @endif
                                     </div>
                                     <div class="form-group col-6">
                                         <div class="form-group">
                                             <label for="discount_percent">Discount %</label>
-                                            @if($is_available)
-                                                <input 
-                                                    type="number" 
-                                                    class="form-control @error('discount_percent')  is-invalid @enderror" 
-                                                    id="discount_percent"
-                                                    name="discount_percent" 
-                                                    min="0"
-                                                    value='{{$purchase->discount_percent ? $purchase->discount_percent : 0 }}' 
-                                                >
+                                            @if ($is_available)
+                                                <input type="number"
+                                                    class="form-control @error('discount_percent')  is-invalid @enderror"
+                                                    id="discount_percent" name="discount_percent" min="0"
+                                                    value='{{ $purchase->discount_percent ? $purchase->discount_percent : 0 }}'>
                                                 @error('discount_percent')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             @else
-                                                <p class="input-group-text col-12">{{$purchase->discount_percent}}</p>
+                                                <p class="input-group-text col-12">{{ $purchase->discount_percent }}</p>
                                             @endif
                                         </div>
                                         <div class="form-group">
@@ -148,8 +140,28 @@
                                             @enderror
                                         </div>
                                         <div class="form-group">
+                                            <label>Delivery date:</label>
+                                            <div class="input-group">
+                                                @if ($is_available)
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">
+                                                            <i class="far fa-calendar-alt"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="form-control datepicker"
+                                                        name="delivery_date"
+                                                        value="{{ $purchase->delivery_date ? date('m/d/Y', strtotime($purchase->delivery_date)) : '' }}" />
+                                                @else
+                                                    <p class="input-group-text col-12">{{ $purchase->delivery_date }}</p>
+                                                @endif
+                                            </div>
+                                            @error('delivery_date')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div class="form-group">
                                             <label for="notes">Notes</label>
-                                            <textarea cols="3" rows="8" class="form-control" name="notes">{{ e($purchase->notes) }}</textarea>
+                                            <textarea cols="3" rows="5" class="form-control" name="notes">{{ e($purchase->notes) }}</textarea>
                                         </div>
                                     </div>
                                     <div class="form-group col-6">
@@ -208,25 +220,23 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Expected date of payment:</label>
-                                            @if($is_available)
+                                            @if ($is_available)
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text">
                                                             <i class="far fa-calendar-alt"></i>
                                                         </span>
                                                     </div>
-                                                    <input 
-                                                        type="text" 
-                                                        value="{{ date('m/d/Y', strtotime($purchase->expected_date_of_payment)) }}" 
-                                                        class="form-control datepicker" 
-                                                        name="expected_date_of_payment"
-                                                    >
+                                                    <input type="text"
+                                                        value="{{ date('m/d/Y', strtotime($purchase->expected_date_of_payment)) }}"
+                                                        class="form-control datepicker" name="expected_date_of_payment" />
                                                 </div>
                                                 @error('expected_date_of_payment')
                                                     <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             @else
-                                                <p class="input-group-text col-12">{{$purchase->expected_date_of_payment}}</p>
+                                                <p class="input-group-text col-12">
+                                                    {{ $purchase->expected_date_of_payment }}</p>
                                             @endif
                                         </div>
                                     </div>
@@ -264,7 +274,7 @@
                                         @elseif ($purchase->images && count($purchase->images) === 1)
                                             <div class="col-12 mb-3">
                                                 <img class="cardWidgetImage w-100 m-0"
-                                                    src="{{ $purchase->images[0]->path .'/' . $purchase->images[0]->name }}" />
+                                                    src="{{ $purchase->images[0]->path . '/' . $purchase->images[0]->name }}" />
                                             </div>
                                         @else
                                             <div class="col-12 mb-3">
@@ -274,7 +284,8 @@
                                         @endif
                                         <div class="col-12 d-none imagePreview">
                                             <div class="position-relative">
-                                                <img id="preview-image" alt="Preview" class="img-fluid cardWidgetImage card card-widget w-100  m-0">
+                                                <img id="preview-image" alt="Preview"
+                                                    class="img-fluid cardWidgetImage card card-widget w-100  m-0">
                                                 <div class="ribbon-wrapper ribbon-lg">
                                                     <div class="ribbon bg-success text-lg">
                                                         Preview
@@ -296,24 +307,16 @@
                                     <div class="col-3 productImage" style="position: relative;">
                                         <img style="height: 200px; object-fit: contain;"
                                             class="d-block card card-widget widget-user w-100"
-                                            src="{{ config('app.url') . $image->path  .'/' . $image->name }}">
-                                        <form   
-                                            id="deleteImageForm" 
-                                            data-image-id="{{ $image->id }}"
-                                            action="{{ route('purchase.delete.image', $purchase->id) }}" 
-                                            method="POST"
-                                            onsubmit="deleteImage(event)"
-                                        >
+                                            src="{{ config('app.url') . $image->path . '/' . $image->name }}">
+                                        <form id="deleteImageForm" data-image-id="{{ $image->id }}"
+                                            action="{{ route('purchase.delete.image', $purchase->id) }}" method="POST"
+                                            onsubmit="deleteImage(event)">
                                             @csrf
                                             @method('DELETE')
-                                            <button 
-                                                type="submit"
-                                                id="deletePurchaseImage" 
-                                                title="Delete" 
+                                            <button type="submit" id="deletePurchaseImage" title="Delete"
                                                 class="btn btn-dark"
-                                                style="position: absolute; opacity: 0.8; top: 50%; left: 50%; transform: translate(-50%, -50%);"
-                                            >   
-                                                <input type="hidden" value="{{$image->id}}" name="id">
+                                                style="position: absolute; opacity: 0.8; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                                <input type="hidden" value="{{ $image->id }}" name="id">
                                                 <i class="fa-light fa-trash"></i>
                                             </button>
                                         </form>
@@ -322,7 +325,8 @@
                             </div>
                         @else
                             <div class="col-6">
-                                <span class="text-danger">The gallery is empty, please upload images for the current purchase</span>
+                                <span class="text-danger">The gallery is empty, please upload images for the current
+                                    purchase</span>
                             </div>
                         @endif
                     </div>

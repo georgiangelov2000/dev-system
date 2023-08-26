@@ -105,32 +105,9 @@ class PaymentController extends Controller
         try {
             $data = $request->validated();
             
-            // Update the payment status and order status
             $paymentStatus = (int) $data['payment_status'];
-            $paymentDate = strtotime($data['date_of_payment']);
-            $dateOfPayment = strtotime($payment->purchase->expected_date_of_payment);
 
-            // Check if payment date is greater than sale date (Overdue payment)
-            if ($paymentDate > $dateOfPayment) {
-                $payment->purchase->is_paid = 1; // Mark as paid
-                $payment->purchase->status = 4;  // Mark as overdue
-                $data['payment_status'] = 4; // Update the payment status to 'Overdue'
-            } else {
-                // Check the regular payment status values
-                if ($paymentStatus === 1 || $paymentStatus === 4) {
-                    $payment->purchase->is_paid = 1; // Mark as paid
-                    $payment->purchase->status = $paymentStatus;
-                } elseif ($paymentStatus === 2) {
-                    $payment->purchase->is_paid = 0; // Mark as not paid
-                    $payment->purchase->status = $paymentStatus;
-                } elseif ($paymentStatus === 5) {
-                    $payment->purchase->is_paid = 2; // Mark with custom status
-                    $payment->purchase->status = $paymentStatus;
-                } elseif ($paymentStatus === 3) {
-                    $payment->purchase->is_paid = 3; // Mark with custom status
-                    $payment->purchase->status = $paymentStatus;
-                }
-            }
+            $payment->purchase->status = $paymentStatus;
             
             $payment->purchase->save();
 
@@ -194,7 +171,8 @@ class PaymentController extends Controller
                             'order_id' => $id,
                             'price' => $data['price'][$key],
                             'quantity' => $data['quantity'][$key],
-                            'date_of_payment' => $paymentDate
+                            'date_of_payment' => $paymentDate,
+                            'status' => 2
                         ];
 
                         $orderInvoice = OrderPayment::create($paymentData);

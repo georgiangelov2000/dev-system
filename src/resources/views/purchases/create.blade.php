@@ -81,8 +81,22 @@
                                 @enderror
                             </div>
                             <div class="form-group">
+                                <label>Delivery date:</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" class="form-control datepicker" name="delivery_date">
+                                </div>
+                                @error('delivery_date')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="form-group">
                                 <label for="notes">Notes</label>
-                                <textarea cols="3" rows="8" class="form-control" name="notes"></textarea>
+                                <textarea cols="3" rows="5" class="form-control" name="notes"></textarea>
                             </div>
                         </div>
                         <div class="form-group col-6">

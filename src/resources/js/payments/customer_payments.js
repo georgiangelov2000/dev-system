@@ -194,20 +194,32 @@ $(function () {
         {
           name: 'payment_status',
           render: function (data, type, row) {
-            if (row.payment_status === 'Paid') {
-              return `<i title="Paid" class="fa-light fa-check"></i>`
+            let status;
+            let iconClass;
+
+            if (row.payment_status === 1) {
+                status = "Paid";
+                iconClass = "fal fa-check-circle"; // Light FontAwesome icon for Paid
+            } else if (row.payment_status ===  2) {
+                status = "Pending";
+                iconClass = "fal fa-hourglass-half"; // Light FontAwesome icon for Pending
+            } else if (row.payment_status === 3) {
+                status = "Partially Paid";
+                iconClass = "fal fa-money-bill-alt"; // Light FontAwesome icon for Partially Paid
+            } else if (row.payment_status === 4) {
+                status = "Overdue";
+                iconClass = "fal fa-exclamation-circle"; // Light FontAwesome icon for Overdue
+            } else if (row.payment_status === 5) {
+                status = "Refunded";
+                iconClass = "fal fa-undo-alt"; // Light FontAwesome icon for Refunded
+            } else if (row.payment_status === 6) {
+                status = "Ordered";
+                iconClass = "fal fa-shopping-cart"; // Light FontAwesome icon for Unpaid or any default icon
             }
-            else if (row.payment_status === 'Pending') {
-              return `<i title="Pending" class="fa-light fa-loader"></i>`
-            }
-            else if (row.payment_status === 'Overdue') {
-              return `<i title="Overdue" class="fa-light fa-exclamation"></i>`
-            } else if (row.payment_status === 'Refunded') {
-              return `<i title="Refunded" class="fa-light fa-rotate-left"></i>`
-            }
-            else {
-              return '';
-            }
+
+            return `<div title="${status}" class="status">
+              <span class="icon"><i class="${iconClass}"></i></span>
+            </div>`;
           }
         },
         {
