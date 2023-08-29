@@ -1,3 +1,16 @@
+@php
+    $jsonSettings = App\Models\Settings::where('type', 1)->first()->settings;
+    
+    $cacheKey = 'json_settings' . md5('cxsiSPG6angFxFYY');
+    $cachedData = App\Helpers\RedisCacheHelper::get($cacheKey);
+        
+    if (!$cachedData) {
+        App\Helpers\RedisCacheHelper::put($cacheKey, $res, 3600);
+    }
+    
+    $res = json_decode($cachedData,true);    
+@endphp
+
 <nav class="main-header navbar navbar-expand header-navigation mb-3 navbar-white">
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -8,7 +21,8 @@
 
     <ul class="navbar-nav ml-auto">
         <li class="nav-item d-flex align-items-center">
-            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; border-radius: 8px; padding: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+            <div
+                style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; border-radius: 8px; padding: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
                 @php
                     $user = Auth::user();
                     $email = $user->email;
@@ -17,12 +31,12 @@
                 <span style="color: #555;">
                     <b>User:</b> {{ $email }}
                 </span>
-        
+
                 <span style="color: #555;">
                     <b>Role:</b> {{ $role }}
-                </span> 
+                </span>
             </div>
-        </li>        
+        </li>
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <li class="nav-item">
@@ -43,8 +57,13 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                        alt="Company logo" id="company-logo">
+                    @if ($res['image_path'])
+                        <img src="{{$res['image_path']}}"
+                            alt="Company logo" id="company-logo" />
+                    @else
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
+                            alt="Company logo" id="company-logo" />
+                    @endif
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
