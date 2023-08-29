@@ -48,6 +48,9 @@ return [
     'roles' => [
         1 => 'Admin',
         2 => 'Driver'
+    ],
+    'settings_type' => [
+        1 => 'Company Information',
     ]
 ]
 

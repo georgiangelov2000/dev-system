@@ -44,7 +44,6 @@ class SupplierApiController extends Controller {
 
         $supplierQuery ->with([
             'state:id,name',
-            'image:id,supplier_id,path,name',
             'country:id,name,short_name',
             'categories:id,name'
         ])
@@ -58,7 +57,8 @@ class SupplierApiController extends Controller {
             'website',
             'notes',
             'state_id',
-            'country_id'
+            'country_id',
+            'image_path'
         ])->withCount([
             'purchases as paid_purchases_count' => function($query) {
                 $query->where('status',1)

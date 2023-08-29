@@ -7,10 +7,14 @@ use App\Models\Category;
 use App\Models\SubCategory;
 use App\Http\Requests\CategoryRequest;
 use App\Helpers\LoadStaticData;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
     private $staticDataHelper;
+
+    private $dir = 'public/images/categories';
 
     public function __construct(LoadStaticData $staticDataHelper)
     {
@@ -26,15 +30,22 @@ class CategoryController extends Controller
 
     public function store(CategoryRequest $request)
     {
-        $data = $request->validated();
         DB::beginTransaction();
 
         try {
+            $data = $request->validated();            
+            $file = isset($data['image']) ? $data['image'] : false;
+            $imagePath = Storage::url($this->dir);
 
-            $category = Category::create([
-                'name' => $data['name'],
-                'description' => $data['description']
-            ]);
+            $category = new Category();
+            $category->name = $data['name'];
+            $category->description = $data['description'];
+            
+            if($file) {
+                $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
+                Storage::putFileAs($this->dir, $file, $hashed_image);
+                $category->image_path = $imagePath .'/'. $hashed_image;
+            }
 
             if (isset($data['sub_categories']) && count($data['sub_categories'])) {
                 foreach ($data['sub_categories'] as $subCategoryId) {
@@ -44,6 +55,7 @@ class CategoryController extends Controller
                 }
             }
 
+            $category->save();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -68,15 +80,32 @@ class CategoryController extends Controller
 
     public function update(Category $category, CategoryRequest $request)
     {
-
-        $data = $request->validated();
         DB::beginTransaction();
 
         try {
-            $category->update([
-                'name' => $data['name'],
-                'description' => $data['description']
-            ]);
+            $data = $request->validated();
+            $file = isset($data['image']) ? $data['image'] : false;
+
+            $imagePath = Storage::url($this->dir);
+
+            $category->name = $data['name'];
+            $category->description = $data['description'];
+            
+            if($file) {
+                $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
+                $current_image = null;
+                if($category->image_path) {
+                    $current_image = $category->image_path;
+                    if (Storage::exists($current_image)) {
+                        Storage::delete($current_image);
+                    }
+                    Storage::putFileAs($this->dir, $file, $hashed_image);
+                    $category->image_path = $imagePath .'/'. $hashed_image;
+                } else {
+                    Storage::putFileAs($this->dir, $file, $hashed_image);
+                    $category->image_path = $imagePath .'/'. $hashed_image;
+                }
+            }
 
             if (isset($data['sub_categories']) && count($data['sub_categories'])) {
                 foreach ($data['sub_categories'] as $subCategoryId) {
@@ -86,10 +115,11 @@ class CategoryController extends Controller
                 }
             }
 
+            $category->save();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['error' => 'Category has been deleted'], 500);
+            return response()->json(['error' => 'Category has not been updated'], 500);
         }
 
         return response()->json(['message' => 'Category has been updated'], 200);

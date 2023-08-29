@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\State;
 use App\Models\Country;
 use App\Models\Purchase;
-use App\Models\SupplierImage;
 use App\Models\Category;
 
 class Supplier extends Model {
@@ -50,10 +49,6 @@ class Supplier extends Model {
         return $this->belongsTo(State::class, 'state_id');
     }
     
-    public function image(){
-        return $this->hasOne(SupplierImage::class,'supplier_id');
-    }
-
     public function country(){
         return $this->belongsTo(Country::class,'country_id');
     }

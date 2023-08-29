@@ -51,9 +51,8 @@ $(document).ready(function () {
                 orderable: false,
                 name: "image",
                 render: function (data, type, row) {
-                    if (row.image) {
-                        let pathBuilder  = CONFIG_URL + row.image.path + "/" + row.image.name;
-                        return "<img class='rounded mx-auto w-100' src=" + pathBuilder + " />"
+                    if (row.image_path) {
+                        return "<img class='rounded mx-auto w-100' src=" + row.image_path + " />"
                     } else {
                         return "<img class='rounded mx-auto w-100' src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png'/>";
                     }

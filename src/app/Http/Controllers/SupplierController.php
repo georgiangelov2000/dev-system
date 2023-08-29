@@ -8,9 +8,7 @@ use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use App\Helpers\LoadStaticData;
-use App\Models\SupplierImage;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class SupplierController extends Controller
@@ -60,34 +58,32 @@ class SupplierController extends Controller
 
         try {
             $file = isset($data['image']) ? $data['image'] : false;
-            $categories = isset($data['categories']) ? $data['categories'] : false;
+            $categories = isset($data['categories']) ? $data['categories'] : [];
             $imagePath = Storage::url($this->dir);
+            
+            $supplier = new Supplier;
+            $supplier->name = $data['name'];
+            $supplier->email = $data['email'];
+            $supplier->phone = $data['phone'];
+            $supplier->address = $data['address'];
+            $supplier->website = $data['website'];
+            $supplier->zip = $data['zip'];
+            $supplier->country_id = $data['country_id'];
+            $supplier->state_id = $data['state_id'];
+            $supplier->notes = isset($data['notes']) ? $data['notes'] : "";
+            $supplier->website = isset($data['website']) ? $data['website'] : "";
 
-            if (!isset($data['notes'])) {
-                $data['notes'] = "";
-            }
-            if (!isset($data['website'])) {
-                $data['website'] = "";
-            }
-
-            $supplier = Supplier::create($data);
-
-            if (isset($categories) && !empty($categories)) {
+            if (isset($categories) && count($categories)) {
                 $supplier->categories()->sync($categories);
             }
 
             if ($file) {
-                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
                 Storage::putFileAs($this->dir, $file, $hashed_image);
-
-                $image = new SupplierImage([
-                    'path' => $imagePath,
-                    'name' => $hashed_image
-                ]);
-
-                $supplier->image()->save($image);
+                $supplier->image_path = $imagePath.'/'.$hashed_image;
             }
 
+            $supplier->save();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -105,8 +101,6 @@ class SupplierController extends Controller
         $states = $this->staticDataHelper->callStatesAndCountries($country, 'states');
         $countries = $this->staticDataHelper->callStatesAndCountries('countries');
 
-        $supplier = $supplier->load('image');
-
         return view('suppliers.edit', compact('supplier'), [
             'countries' => $countries,
             'states' => $states,
@@ -117,56 +111,48 @@ class SupplierController extends Controller
 
     public function update(Supplier $supplier, SupplierRequest $request)
     {
-        $data = $request->validated();
 
         DB::beginTransaction();
 
         try {
+            $data = $request->validated();
             $file = isset($data['image']) ? $data['image'] : false;
             $categories = isset($data['categories']) ? $data['categories'] : false;
             $imagePath = Storage::url($this->dir);
 
-            if (!isset($data['notes'])) {
-                $data['notes'] = "";
-            }
-            if (!isset($data['website'])) {
-                $data['website'] = "";
-            }
+            $supplier->name = $data['name'];
+            $supplier->email = $data['email'];
+            $supplier->phone = $data['phone'];
+            $supplier->address = $data['address'];
+            $supplier->website = $data['website'];
+            $supplier->zip = $data['zip'];
+            $supplier->country_id = $data['country_id'];
+            $supplier->state_id = $data['state_id'];
+            $supplier->notes = isset($data['notes']) ? $data['notes'] : "";
+            $supplier->website = isset($data['website']) ? $data['website'] : "";
 
             if (isset($categories) && !empty($categories)) {
                 $supplier->categories()->sync($categories);
             }
 
             if ($file) {
-                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
                 $current_image = null;
 
-                if ($supplier->image) {
-                    $current_image = $this->dir . DIRECTORY_SEPARATOR . $supplier->image->name;
-
+                if ($supplier->image_path) {
+                    $current_image = $this->dir . DIRECTORY_SEPARATOR . $supplier->image_path;
                     if (Storage::exists($current_image)) {
                         Storage::delete($current_image);
                     }
-
                     Storage::putFileAs($this->dir, $file, $hashed_image);
-
-                    $supplier->image->name = $hashed_image;
-                    $supplier->image->path = $imagePath;
-                    $supplier->image->save();
+                    $supplier->image_path = $imagePath .'/'. $hashed_image;
                 } else {
                     Storage::putFileAs($this->dir, $file, $hashed_image);
-
-                    $image = new SupplierImage([
-                        'path' => $imagePath,
-                        'name' => $hashed_image
-                    ]);
-
-                    $supplier->image()->save($image);
+                    $supplier->image_path = $imagePath .'/'. $hashed_image;
                 }
             }
 
-            $supplier->update($data);
-
+            $supplier->save();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -186,9 +172,8 @@ class SupplierController extends Controller
                 return response()->json(['message' => 'Supplier has related purchases'], 500);
             }            
 
-            if ($supplier->image) {
-                $current_image = $this->dir . DIRECTORY_SEPARATOR . $supplier->image->name;
-
+            if ($supplier->image_path) {
+                $current_image = $this->dir . DIRECTORY_SEPARATOR . $supplier->image_path;
                 if (Storage::exists($current_image)) {
                     Storage::delete($current_image);
                 };

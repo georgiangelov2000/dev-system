@@ -3,6 +3,8 @@ export function APIPOSTCALLER(url, data, callback) {
         type: "POST",
         url: url,
         data: data,
+        processData: false, // Prevent jQuery from processing the data
+        contentType: false, // Let the browser set the content type
         success: function (response,xhr) {
             if (typeof callback === 'function') {
                 callback(response,xhr);

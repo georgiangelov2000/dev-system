@@ -306,12 +306,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('settings.company') }}" class="nav-link">
+                            <a href="{{ route('settings.get') }}" class="nav-link">
                                 <p>Company info</p>
                             </a>
-                            <a href="{{ route('settings.email') }}" class="nav-link">
+                            {{-- <a href="{{ route('settings.email') }}" class="nav-link">
                                 <p>Send E-mails</p>
-                            </a>
+                            </a> --}}
                         </li>
                     </ul>
                 </li>

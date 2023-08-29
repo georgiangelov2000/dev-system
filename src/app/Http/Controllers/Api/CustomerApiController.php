@@ -44,18 +44,19 @@ class CustomerApiController extends Controller
 
     private function buildCustomerQuery(){
         return Customer::query()->select(
-            'id',
-            'name',
-            'email',
-            'phone',
-            'address',
-            'zip',
-            'website',
-            'notes',
-            'state_id',
-            'country_id'
+            "id",
+            "name",
+            "email",
+            "phone",
+            "address",
+            "zip",
+            "website",
+            "notes",
+            "state_id",
+            "country_id",
+            "image_path"
         )
-        ->with(['state:id,country_id,name','country:id,name,country_code,short_name','image'])
+        ->with(['state:id,country_id,name','country:id,name,country_code,short_name'])
         ->withCount([
             'orders as paid_orders_count' => function($query) {
                 $query->where('status',1)

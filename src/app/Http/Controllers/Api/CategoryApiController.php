@@ -42,9 +42,7 @@ class CategoryApiController extends Controller {
     }
 
     private function buildCategoriesQuery() {
-        return Category::query()
-        ->select('id','name','description')
-        ->with('subCategories');
+        return Category::query()->with('subCategories');
     }
 
     private function filterCategoriesBySupplier($query, $supplier) {        

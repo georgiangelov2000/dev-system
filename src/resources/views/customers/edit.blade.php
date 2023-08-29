@@ -20,9 +20,13 @@
                                 <label for="image">File</label>
                             </div>
                             <div class="custom-file col-12">
-                                <input type="file" class="custom-file-input" name="image" id="image"
+                                <input 
+                                    type="file" 
+                                    class="custom-file-input" 
+                                    name="image" 
+                                    id="image"
                                     accept="image/*"
-                                    value="{{ $customer->image ? $customer->image->path . $customer->image->name : '' }}">
+                                />
                                 <label class="custom-file-label" for="customFile">Choose file</label>
                                 @error('image')
                                     <span class="text-danger">{{ $message }}</span>
@@ -139,7 +143,7 @@
                         <div class="row w-100 mb-2">
                                 <div class="col-12">
                                     <img class="cardWidgetImage w-100 m-0"
-                                        src="{{ $customer->image ? $customer->image->path . '/' . $customer->image->name : 'https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg' }}" />
+                                        src="{{ $customer->image_path ? $customer->image_path : 'https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg' }}" />
                                 </div>
                             <div class="col-12 mt-3 d-none imagePreview">
                                 <div class="position-relative">

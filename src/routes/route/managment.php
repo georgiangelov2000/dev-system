@@ -134,11 +134,8 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('settings')->name('settings.')->group(function () {
-        Route::get('/company', [SettingsController::class, 'companySettingsForm'])->name('company');
-        Route::get('/email', [SettingsController::class, 'emailForm'])->name('email');
-
-        Route::post('/send/email', [SettingsController::class, 'sendEmailForm'])->name('email.send');
-        Route::put('/comapny/update', [SettingsController::class, 'updateCompanySettings'])->name('company.update');
+        Route::get('/', [SettingsController::class, 'form'])->name('get');
+        Route::put('/update', [SettingsController::class, 'update'])->name('update');
     });
 
     Route::prefix('payments')->name('payment.')->group(function () {

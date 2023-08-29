@@ -9,10 +9,16 @@
         </div>
         <div class="card-body">
 
-            <form method="POST" action="{{ route('settings.company.update') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="row d-flex flex-wrap p-2">
+                    <input
+                        type="hidden" 
+                        name="type" 
+                        value="1"
+                    />
+
                     <div class="col-10 d-flex flex-wrap mb-2">
                         <div class="form-group col-6 mb-0">
                             <div style="height:30px">
@@ -30,7 +36,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-light fa-envelope"></i></span>
                                 </div>
-                                <input type="email" value="{{ $company->email ?? '' }}" id="email" name="email"
+                                <input type="email" value="{{ $settings['email'] ?? '' }}" id="email" name="email"
                                     class="form-control" placeholder="Enter e-mail" />
                                 @error('email')
                                     <span class="text-danger">{{ $message }}</span>
@@ -43,7 +49,7 @@
                             <select class="form-control selectCountry" name="country_id" id="country_id">
                                 <option value="">Select option</option>
                                 @foreach ($countries as $item)
-                                    <option {{ $company->country_id ?? '' === $item->id ? 'selected' : '' }}
+                                    <option {{ $settings['country'] === $item->name ? 'selected' : '' }}
                                         value="{{ $item->id }}">{{ $item->name }}</option>
                                 @endforeach
                             </select>
@@ -56,7 +62,7 @@
                             <label for="state_id">State</label>
                             <select class="form-control selectState" name="state_id" id="state_id">
                                 @foreach ($states as $state)
-                                    <option {{ $state->id === $company->state_id ? 'selected' : '' }}
+                                    <option {{ $settings['state'] === $state->name ? 'selected' : '' }}
                                         value="{{ $state->id }}">{{ $state->name }}</option>
                                 @endforeach
                             </select>
@@ -71,8 +77,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-light fa-building"></i></span>
                                 </div>
-                                <input value="{{ $company->name ?? '' }}" type="text" name="name" id="comapany-name"
-                                    class="form-control" placeholder="Enter company name" />
+                                <input value="{{ $settings['name'] ?? '' }}" type="text" name="name" id="comapany-name"
+                                    class="form-control" placeholder="Enter settings name" />
                                 @error('name')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -85,7 +91,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-light fa-phone-flip"></i></span>
                                 </div>
-                                <input value="{{ $company->phone_number ?? '' }}" type="text" name="phone_number"
+                                <input value="{{ $settings['phone_number'] ?? '' }}" type="text" name="phone_number"
                                     id="phone_number" class="form-control" placeholder="Enter phone number" />
                                 @error('phone_number')
                                     <span class="text-danger">{{ $message }}</span>
@@ -99,7 +105,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-light fa-note-sticky"></i></span>
                                 </div>
-                                <input value="{{ $company->tax_number ?? '' }}" type="text" id="tax_number"
+                                <input value="{{ $settings['tax_number'] ?? '' }}" type="text" id="tax_number"
                                     name="tax_number" class="form-control" placeholder="Enter tax number" />
                                 @error('tax_number')
                                     <span class="text-danger">{{ $message }}</span>
@@ -113,7 +119,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-light fa-user"></i></span>
                                 </div>
-                                <input value="{{ $company->owner_name ?? '' }}" type="text" name="owner_name"
+                                <input value="{{ $settings['owner_name'] ?? '' }}" type="text" name="owner_name"
                                     id="owner_name" class="form-control" placeholder="Enter owner" />
                                 @error('owner_name')
                                     <span class="text-danger">{{ $message }}</span>
@@ -127,7 +133,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-light fa-globe"></i></span>
                                 </div>
-                                <input value="{{ $company->website ?? '' }}" type="text" id="website"
+                                <input value="{{ $settings['website'] ?? '' }}" type="text" id="website"
                                     name="website" class="form-control" placeholder="Enter website" />
                                 @error('website')
                                     <span class="text-danger">{{ $message }}</span>
@@ -140,7 +146,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-light fa-business-time"></i></span>
                                 </div>
-                                <input value="{{ $company->bussines_type ?? '' }}" type="text" name="bussines_type"
+                                <input value="{{ $settings['bussines_type'] ?? '' }}" type="text" name="bussines_type"
                                     id="bussines_type" class="form-control" placeholder="Enter type of the bussines" />
                                 @error('bussines_type')
                                     <span class="text-danger">{{ $message }}</span>
@@ -155,7 +161,7 @@
                                         <i class="far fa-calendar-alt"></i>
                                     </span>
                                 </div>
-                                <input id="registration_date" value="{{ $company->registration_date ?? '' }}"
+                                <input id="registration_date" value="{{ $settings['registration_date'] ?? '' }}"
                                     type="text" class="form-control datepicker" name="registration_date">
                             </div>
                             @error('registration_date')
@@ -168,7 +174,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-light fa-location-dot"></i></span>
                                 </div>
-                                <input value="{{ $company->address ?? '' }}" type="text" id="address"
+                                <input value="{{ $settings['address'] ?? '' }}" type="text" id="address"
                                     name="address" class="form-control" placeholder="Enter address" />
                                 <span class="input-group-append">
                                     <button type="button" id="searchAddress"
@@ -185,15 +191,15 @@
                     <div class="col p-2">
                         <div class="row w-100">
                             <div class="col-12">
-                                @if ($company)
-                                    @if ($company->image_path)
-                                        <img class="cardWidgetImage w-100 m-0" src="{{ $company->image_path }}" />
+                                @if ($settings)
+                                    @if ($settings['image_path'])
+                                        <img class="cardWidgetImage w-100 m-0" src="{{ $settings['image_path'] }}" />
                                     @else
-                                        <img id="companyImage" class="w-100 m-0"
+                                        <img id="settingsImage" class="w-100 m-0"
                                             src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png" />
                                     @endif
                                 @else
-                                    <img id="companyImage" class="w-100 m-0"
+                                    <img id="settingsImage" class="w-100 m-0"
                                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png" />
                                 @endif
                             </div>

@@ -18,9 +18,32 @@
                 <form 
                       method="{{$formMethod}}"
                       action=""
+                      enctype="multipart/form-data"
                 >
                     @csrf
                     <div class='modal-form'>
+                        @if(isset($isFileAvailable) && $isFileAvailable)
+                            <div class="col-1 p-0">
+                                <img class="w-100" id="icon" src="" alt="">
+                            </div>
+                            <div class="form-group">
+                                <div style="height:30px">
+                                    <label for="image">File</label>
+                                </div>
+                                <div class="custom-file">
+                                    <input 
+                                        type="file" 
+                                        class="custom-file-input" 
+                                        name="image" 
+                                        id="image"
+                                    >
+                                    <label class="custom-file-label" id="fileLabel" for="customFile">Choose file</label>
+                                    @error('image')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        @endif
                         <label class="required">{{ucfirst($labelOne)}}</label>
                         <div class="form-group">
                             <input 

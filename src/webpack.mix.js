@@ -6,8 +6,8 @@ mix.js('resources/js/ajax/leaflet.js','public/js/ajax');
 mix.js('resources/js/users/users.js', 'public/js/users'),
 mix.js('resources/js/users/form.js', 'public/js/users'),
 
-mix.js('resources/js/categories/categories.js', 'public/js'),
-mix.js('resources/js/subcategories/subcategories.js', 'public/js'),
+mix.js('resources/js/categories/categories.js', 'public/js/categories'),
+mix.js('resources/js/subcategories/subcategories.js', 'public/js/categories'),
 
 mix.js('resources/js/brands/brands.js', 'public/js/brands'),
 mix.js('resources/js/brands/purchases.js', 'public/js/brands'),

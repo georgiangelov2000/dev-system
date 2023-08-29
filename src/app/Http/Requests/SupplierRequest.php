@@ -24,7 +24,8 @@ class SupplierRequest extends FormRequest {
             'country_id' => "required|integer",
             'state_id' => "required|integer",
             "notes" => "nullable|string",
-            "categories" => "array"
+            "categories" => "array",
+            'image_path' => "nullable|string"
         ];
     }
 

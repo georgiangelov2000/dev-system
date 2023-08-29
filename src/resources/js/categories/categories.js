@@ -69,6 +69,19 @@ $(function(){
                 }
             },
             {
+                width: '5%',
+                orderable: false,
+                class:'text-center',
+                name: "image",
+                render: function (data, type, row) {
+                    if (row.image_path) {
+                        return "<img class='rounded mx-auto w-100' src=" + row.image_path + " />"
+                    } else {
+                        return "<img class='rounded mx-auto w-100' src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png'/>";
+                    }
+                }
+            },
+            {
                 orderable: false,
                 name: 'name',
                 width: '15%',
@@ -110,9 +123,9 @@ $(function(){
                     </form>
                   `;
 
-                  const editButton = `<a data-id="${row.id}" class="btn editCategory" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>`;
+                  const editButton = `<a data-id="${row.id}" class="btn editCategory p-1" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>`;
                   const productsButton = `<a data-id="${row.id}" class="btn p-1" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>`;
-                  const subCategories = `<button data-toggle="collapse" data-target="#subcategories_${row.id}" title="Sub categories" class="btn btn-outline-muted showSubCategories"><i class="fa-light fa-list" aria-hidden="true"></i></button>`;
+                  const subCategories = `<button data-toggle="collapse" data-target="#subcategories_${row.id}" title="Sub categories" class="btn btn-outline-muted showSubCategories p-1"><i class="fa-light fa-list" aria-hidden="true"></i></button>`;
               
                   return `${subCategories} ${deleteFormTemplate} ${editButton} ${productsButton}`;
                 }
@@ -198,11 +211,10 @@ $(function(){
     submitForm.on("click", function (e) {
         e.preventDefault();
 
-        var actionUrl = createForm.attr('action');
+        let actionUrl = createForm.attr('action');
+        let formData = new FormData(createForm[0]); // Use the form's DOM element
 
-        var data = createForm.serialize();
-
-        APIPOSTCALLER(actionUrl, data,
+        APIPOSTCALLER(actionUrl, formData,
             function (response,xhr) {
                 const status = xhr;
 
@@ -226,9 +238,10 @@ $(function(){
         e.preventDefault();
 
         var actionUrl = editForm.attr('action');
-        var data = editForm.serialize();
+        var formData =  new FormData(editForm[0]);
+        console.log(formData);
 
-        APIPOSTCALLER(actionUrl, data,
+        APIPOSTCALLER(actionUrl, formData,
             function (response,xhr) {
                 const status = xhr;
 
@@ -295,11 +308,11 @@ $(function(){
     };
 
     window.deleteCategory = function (e) {
-        const form = $(e).closest('form');
-        const url = form.attr('action');
-        const name = form.attr('data-name');        
+        let form = $(e).closest('form');
+        let url = form.attr('action');
+        let name = form.attr('data-name');        
 
-        const template = swalText(name);
+        let template = swalText(name);
 
         showConfirmationDialog('Selected items!', template, function () {
             APIDELETECALLER(url, function (response) {
@@ -322,9 +335,10 @@ $(function(){
             editForm.attr('action', UPDATE_CATEGORY_ROUTE.replace(':id', id));
             editForm.find('input[name="name"]').val(category.name);
             editForm.find('textarea[name="description"]').val(category.description);
+            editForm.find('img[id="icon"]').attr('src',category.image_path);
 
             for (let index = 0; index < allSubCategories.length; index++) {
-                const idToCheck = allSubCategories[index].id;
+                let idToCheck = allSubCategories[index].id;
                 let matchingSubCategory = relatedSubCategories.find(obj => obj == idToCheck ) ? 'selected' : "";
 
                 editModal.find('.bootstrap-select .selectSubCategory')
@@ -375,5 +389,9 @@ $(function(){
         })
     };
 
+    $('input[name="image"]').on('change', function () {
+        let fileName = $(this).val().split('\\').pop();
+        $('#fileLabel').text(fileName || 'Choose file');
+    });
 
 });

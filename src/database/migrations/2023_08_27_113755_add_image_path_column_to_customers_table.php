@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCustomerImagesTable extends Migration
+class AddImagePathColumnToCustomersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,8 @@ class CreateCustomerImagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('customer_images', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('customer_id');
-            $table->string('path');
-            $table->string('name');
+        Schema::table('customers', function (Blueprint $table) {
+            $table->string('image_path')->nullable();
         });
     }
 
@@ -28,6 +25,8 @@ class CreateCustomerImagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('customer_images');
+        Schema::table('customers', function (Blueprint $table) {
+            $table->dropColumn('image_path');
+        });
     }
 }

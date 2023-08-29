@@ -15,7 +15,8 @@ class CategoryRequest extends FormRequest {
         return [
             'name' => 'required|string',
             'description' => 'required|string',
-            'sub_categories' => "array"
+            'sub_categories' => "array",
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
         ];
     }
 

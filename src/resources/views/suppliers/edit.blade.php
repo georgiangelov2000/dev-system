@@ -20,8 +20,13 @@
                                 <label for="image">File</label>
                             </div>
                             <div class="custom-file col-12">
-                                <input type="file" class="custom-file-input" name="image" id="image"
-                                    accept="image/*" value="{{ $supplier ? $supplier->path . $supplier->name : '' }}">
+                                <input 
+                                    type="file" 
+                                    class="custom-file-input" 
+                                    name="image" 
+                                    id="image"
+                                    accept="image/*"
+                                />
                                 <label class="custom-file-label" for="customFile">Choose file</label>
                                 @error('image')
                                     <span class="text-danger">{{ $message }}</span>
@@ -148,10 +153,10 @@
                     </div>
                     <div class="col-2 p-2">
                         <div class="row w-100 mb-2">
-                            @if ($supplier->image)
+                            @if ($supplier->image_path)
                                 <div class="col-12">
                                     <img class="cardWidgetImage w-100 m-0 mb-2"
-                                        src="{{ $supplier->image->path.'/'.$supplier->image->name }}" />
+                                        src="{{ $supplier->image_path }}" />
                                 </div>
                             @endif
                             <div class="col-12 d-none imagePreview">

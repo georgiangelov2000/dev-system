@@ -16,32 +16,46 @@
                         <div class="col-md-12 col-sm-6 col-xs-12">
                             <div class="info-box">
                                 <div class="info-box-content flex-row align-items-center p-0">
-                                    <span class="info-box-text">Web server: </span>
+                                    @if (array_key_exists('company', $dashboard))
+                                        <img class="img-fluid w-50" src="{{ $dashboard['company']['image_path'] }}"
+                                            alt="">
+                                    @else
+                                    @endif
+                                </div>
+                                <div class="info-box-content flex-row align-items-center p-0">
+                                    <span>Name: </span>
                                     <span
-                                        class="info-box-number mt-0">{{ $dashboard['server_information']['web_server'] }}</span>
+                                        class="info-box-number mt-0">{{ array_key_exists('company', $dashboard) ? $dashboard['company']['name'] : '' }}</span>
                                 </div>
                                 <div class="info-box-content flex-row align-items-center p-0">
-                                    <span class="info-box-text">Http User Agent: </span>
+                                    <span>Email: </span>
                                     <span
-                                        class="info-box-number mt-0">{{ Str::limit($dashboard['server_information']['http_user_agent'], 20) }}</span>
+                                        class="info-box-number mt-0">{{ array_key_exists('company', $dashboard) ? $dashboard['company']['email'] : '' }}</span>
                                 </div>
                                 <div class="info-box-content flex-row align-items-center p-0">
-                                    <span class="info-box-text">Protocol: </span>
+                                    <span>Address: </span>
                                     <span
-                                        class="info-box-number mt-0">{{ $dashboard['server_information']['server_protocol'] }}</span>
+                                        class="info-box-number mt-0">{{ array_key_exists('company', $dashboard) ? $dashboard['company']['address'] : '' }}</span>
                                 </div>
                                 <div class="info-box-content flex-row align-items-center p-0">
-                                    <span class="info-box-text">PHP Version: </span>
+                                    <span>Country:</span>
                                     <span
-                                        class="info-box-number mt-0">{{ $dashboard['server_information']['php_version'] }}</span>
+                                        class="info-box-number mt-0">{{ array_key_exists('company', $dashboard) ? $dashboard['company']['country'] : '' }}</span>
                                 </div>
                                 <div class="info-box-content flex-row align-items-center p-0">
-                                    <span class="info-box-text">OS: </span>
-                                    <span class="info-box-number mt-0">{{ $dashboard['server_information']['os'] }}</span>
+                                    <span>State: </span>
+                                    <span
+                                        class="info-box-number mt-0">{{ array_key_exists('company', $dashboard) ? $dashboard['company']['state'] : '' }}</span>
                                 </div>
                                 <div class="info-box-content flex-row align-items-center p-0">
-                                    <span class="info-box-text">Architecture: </span>
-                                    <span class="info-box-number mt-0">{{ $dashboard['server_information']['ar'] }}</span>
+                                    <span>Type: </span>
+                                    <span
+                                        class="info-box-number mt-0">{{ array_key_exists('company', $dashboard) ? $dashboard['company']['bussines_type'] : '' }}</span>
+                                </div>
+                                <div class="info-box-content flex-row align-items-center p-0">
+                                    <span>Phone: </span>
+                                    <span
+                                        class="info-box-number mt-0">{{ array_key_exists('company', $dashboard) ? $dashboard['company']['phone_number'] : '' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -56,6 +70,15 @@
                         </div>
                         <div class="col-md-12 col-sm-6 col-xs-12">
                             <div class="info-box">
+                                <div class="info-box-content flex-row align-items-center p-0">
+                                    @if ($dashboard['server_information']['os'] === 'Linux')
+                                        <img class="img-fluid w-25" src="storage/images/static/linux.png"
+                                            alt="Linux image" />
+                                    @elseif($dashboard['server_information']['os'] === 'Windows')
+                                        <img class="img-fluid w-25" src="storage/images/static/windows.png"
+                                            alt="Window image" />
+                                    @endif
+                                </div>
                                 <div class="info-box-content flex-row align-items-center p-0">
                                     <span class="info-box-text">Web server: </span>
                                     <span
@@ -102,7 +125,7 @@
                                     <span class="info-box-icon bg-aqua"><i class="fas fa-users"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Customers</span>
-                                        <span class="info-box-number">250</span>
+                                        <span class="info-box-number">{{ $dashboard['customers'] }}</span>
                                     </div>
                                 </div>
                                 <a href="#" class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
@@ -115,10 +138,11 @@
                                     <span class="info-box-icon"><i class="fas text-green fa-truck"></i></span>
                                     <div class="info-box-content">
                                         <span class="info-box-text">Drivers</span>
-                                        <span class="info-box-number">50</span>
+                                        <span class="info-box-number">{{ $dashboard['drivers'] }}</span>
                                     </div>
                                 </div>
-                                <a href="#" class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
+                                <a href="{{ route('user.index') }}"
+                                    class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
                                     <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -127,9 +151,10 @@
                                 <span class="info-box-icon"><i class="fas text-yellow fa-shopping-cart"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Orders</span>
-                                    <span class="info-box-number">1000</span>
+                                    <span class="info-box-number">{{ $dashboard['orders'] }}</span>
                                 </div>
-                                <a href="#" class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
+                                <a href="{{ route('order.index') }}"
+                                    class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
                                     <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -138,9 +163,10 @@
                                 <span class="info-box-icon"><i class="fas text-red fa-money-bill-alt"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Purchases</span>
-                                    <span class="info-box-number">750</span>
+                                    <span class="info-box-number">{{ $dashboard['purchases'] }}</span>
                                 </div>
-                                <a href="#" class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
+                                <a href="{{ route('purchase.index') }}"
+                                    class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
                                     <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -149,9 +175,10 @@
                                 <span class="info-box-icon"><i class="fas text-purple fa-box"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Packages</span>
-                                    <span class="info-box-number">350</span>
+                                    <span class="info-box-number">{{ $dashboard['packages'] }}</span>
                                 </div>
-                                <a href="#" class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
+                                <a href="{{ route('package.index') }}"
+                                    class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
                                     <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -160,9 +187,10 @@
                                 <span class="info-box-icon"><i class="fas text-orange fa-industry"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">Suppliers</span>
-                                    <span class="info-box-number">25</span>
+                                    <span class="info-box-number">{{ $dashboard['suppliers'] }}</span>
                                 </div>
-                                <a href="#" class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
+                                <a href="{{ route('supplier.index') }}"
+                                    class="small-box-footer w-100 bg-primary p-2 mt-2 text-center">More info
                                     <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -188,77 +216,32 @@
                                 </h6>
                                 <div class="card-body p-0">
                                     <ul class="products-list product-list-in-card pl-2 pr-2">
-                                        <li class="item">
-                                            <div class="product-img">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                    alt="Product Image" class="img-size-50">
-                                            </div>
-                                            <div class="product-info">
-                                                <a href="javascript:void(0)" class="product-title">Samsung TV
-                                                    <span class="badge badge-warning float-right">$1800</span></a>
-                                                <span class="product-description">
-                                                    Samsung 32" 1080p 60Hz LED Smart HDTV.
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li class="item">
-                                            <div class="product-img">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                    alt="Product Image" class="img-size-50">
-                                            </div>
-                                            <div class="product-info">
-                                                <a href="javascript:void(0)" class="product-title">Samsung TV
-                                                    <span class="badge badge-warning float-right">$1800</span></a>
-                                                <span class="product-description">
-                                                    Samsung 32" 1080p 60Hz LED Smart HDTV.
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li class="item">
-                                            <div class="product-img">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                    alt="Product Image" class="img-size-50">
-                                            </div>
-                                            <div class="product-info">
-                                                <a href="javascript:void(0)" class="product-title">Bicycle
-                                                    <span class="badge badge-info float-right">$700</span></a>
-                                                <span class="product-description">
-                                                    26" Mongoose Dolomite Men's 7-speed, Navy Blue.
-                                                </span>
-                                            </div>
-                                        </li>
-
-                                        <li class="item">
-                                            <div class="product-img">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                    alt="Product Image" class="img-size-50">
-                                            </div>
-                                            <div class="product-info">
-                                                <a href="javascript:void(0)" class="product-title">
-                                                    Xbox One <span class="badge badge-danger float-right">
-                                                        $350
-                                                    </span>
-                                                </a>
-                                                <span class="product-description">
-                                                    Xbox One Console Bundle with Halo Master Chief Collection.
-                                                </span>
-                                            </div>
-                                        </li>
-
-                                        <li class="item">
-                                            <div class="product-img">
-                                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                    alt="Product Image" class="img-size-50">
-                                            </div>
-                                            <div class="product-info">
-                                                <a href="javascript:void(0)" class="product-title">PlayStation 4
-                                                    <span class="badge badge-success float-right">$399</span></a>
-                                                <span class="product-description">
-                                                    PlayStation 4 500GB Console (PS4)
-                                                </span>
-                                            </div>
-                                        </li>
-
+                                        @if (array_key_exists('top_selling_products', $dashboard))
+                                            @if (count($dashboard['top_selling_products']))
+                                                @foreach ($dashboard['top_selling_products'] as $item)
+                                                    <li class="item">
+                                                        <div class="product-img">
+                                                            <img src="{{ $item['image'] }}" alt="Product Image"
+                                                                class="img-size-50">
+                                                        </div>
+                                                        <div class="product-info">
+                                                            <a href="javascript:void(0)"
+                                                                class="product-title">{{ $item['product_name'] }}
+                                                                <span
+                                                                    class="badge badge-warning float-right">${{ $item['total_price'] }}</span>
+                                                                <br>
+                                                                <span class="badge badge-warning float-right">Amount:
+                                                                    {{ $item['total_quantity'] }}</span>
+                                                            </a>
+                                                            <span class="product-description">
+                                                                {{ $item['product_code'] }}
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            @endif
+                                        @else
+                                        @endif
                                     </ul>
                                 </div>
 
@@ -284,60 +267,33 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>
-                                                    $13
-                                                </td>
-                                                <td class="text-center">
-                                                    <b>12,000</b> Sold
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$29</td>
-                                                <td class="text-center">
-                                                    <b>123,234</b> Sold
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$1,230</td>
-                                                <td class="text-center">
-                                                    <b>198</b> Sold
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$199</td>
-                                                <td class="text-center">
-                                                    <b>87</b> Sold
-                                                </td>
-                                            </tr>
+                                            @if (array_key_exists('top_categories', $dashboard))
+                                                @if (count($dashboard['top_categories']))
+                                                    @foreach ($dashboard['top_categories'] as $item)
+                                                        <tr>
+                                                            <td class="pt-1 pb-1">
+                                                                @if ($item['image_path'])
+                                                                    <img src="{{ $item['image_path'] }}"
+                                                                        alt="Category Image" class="img-size-50" />
+                                                                @else
+                                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
+                                                                        alt="Category Image" class="img-size-50" />
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                <a
+                                                                    class="product-title font-weight-bold">{{ $item['name'] }}</a>
+                                                            </td>
+                                                            <td>
+                                                                <b>{{ $item['products_count'] }}</b>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <b>{{ $item['products_sum_total_price'] }}</b> USD
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>
@@ -359,58 +315,33 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$13</td>
-                                                <td class="text-center">
-                                                    <b>12,000</b> Sold
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$29</td>
-                                                <td class="text-center">
-                                                    <b>123,234</b> Sold
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$1,230</td>
-                                                <td class="text-center">
-                                                    <b>198</b> Sold
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$199</td>
-                                                <td class="text-center">
-                                                    <b>87</b> Sold
-                                                </td>
-                                            </tr>
+                                            @if (array_key_exists('top_suppliers', $dashboard))
+                                                @if (count($dashboard['top_suppliers']))
+                                                    @foreach ($dashboard['top_suppliers'] as $item)
+                                                        <tr>
+                                                            <td class="pt-1 pb-1">
+                                                                @if ($item['image_path'])
+                                                                    <img src="{{ $item['image_path'] }}"
+                                                                        alt="Supplier image" class="img-size-50" />
+                                                                @else
+                                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
+                                                                        alt="Supplier image" class="img-size-50" />
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                <a
+                                                                    class="product-title font-weight-bold">{{ $item['name'] }}</a>
+                                                            </td>
+                                                            <td>
+                                                                <b>{{ $item['purchases_count'] }}</b>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <b>{{ $item['purchases_sum_total_price'] }}</b> USD
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>
@@ -432,58 +363,33 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$13</td>
-                                                <td class="text-center">
-                                                    <b>12,000</b> Sold
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$29</td>
-                                                <td class="text-center">
-                                                    <b>123,234</b> Sold
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$1,230</td>
-                                                <td class="text-center">
-                                                    <b>198</b> Sold
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="pt-1 pb-1">
-                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                                                        alt="Product Image" class="img-size-50">
-                                                </td>
-                                                <td>
-                                                    <a href="javascript:void(0)" class="product-title font-weight-bold">Samsung TV</a>
-                                                </td>
-                                                <td>$199</td>
-                                                <td class="text-center">
-                                                    <b>87</b> Sold
-                                                </td>
-                                            </tr>
+                                            @if (array_key_exists('top_customers', $dashboard))
+                                                @if (count($dashboard['top_customers']))
+                                                    @foreach ($dashboard['top_customers'] as $item)
+                                                        <tr>
+                                                            <td class="pt-1 pb-1">
+                                                                @if ($item['image_path'])
+                                                                    <img src="{{ $item['image_path'] }}"
+                                                                        alt="Supplier image" class="img-size-50" />
+                                                                @else
+                                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
+                                                                        alt="Supplier image" class="img-size-50" />
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                <a
+                                                                    class="product-title font-weight-bold">{{ $item['name'] }}</a>
+                                                            </td>
+                                                            <td>
+                                                                <b>{{ $item['orders_count'] }}</b>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <b>{{ $item['orders_sum_total_sold_price'] }}</b> USD
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>

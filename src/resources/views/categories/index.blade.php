@@ -35,6 +35,7 @@
                                     </div>
                                 </th>
                                 <th>ID</th>
+                                <th>Image</th>
                                 <th>Name</th>
                                 <th>Description</th>
                                 <th>Subcategories</th>
@@ -47,36 +48,38 @@
 
     <!--create modal-->
     @include('templates.modal_form',[
-    'labelOne' => "name",
-    'labelTwo' => "description",
+        'labelOne' => "name",
+        'labelTwo' => "description",
 
-    'inputOne' => "name",
-    'inputTwo' => "description",
+        'inputOne' => "name",
+        'inputTwo' => "description",
 
-    'title'=>"Add Category",
+        'title'=>"Add Category",
 
-    'formMethod' => "post",
-    
-    'isAvailableMultiple' => true
+        'formMethod' => "post",
+        
+        'isFileAvailable' => true,
+        'isAvailableMultiple' => true
     ])
 
     <!--edit modal-->
     @include('templates.edit_modal_form',[
-    'labelOne' => "name",
-    'labelTwo' => "description",
+        'labelOne' => "name",
+        'labelTwo' => "description",
 
-    'inputOne' => "name",
-    'inputTwo' => "description",
+        'inputOne' => "name",
+        'inputTwo' => "description",
 
-    'title'=>"Edit Category",
+        'title'=>"Edit Category",
 
-    'formMethod' => "post",    
-    
-    'isAvailableMultiple' => true
+        'formMethod' => "post",    
+        
+        'isFileAvailable' => true,
+        'isAvailableMultiple' => true
     ])
 
     @push('scripts')
-    <script type="text/javascript" src="{{ mix('js/categories.js') }}"></script>
+    <script type="text/javascript" src="{{ mix('js/categories/categories.js') }}"></script>
     <script type="text/javascript">
         let CATEGORY_ROUTE = "{{route('api.categories')}}";
         let PRODUCT_API_ROUTE = "{{ route('api.products') }}";

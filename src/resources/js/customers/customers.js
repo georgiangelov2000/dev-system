@@ -82,8 +82,8 @@ $(function () {
                 class:'text-center',
                 name: "image",
                 render: function (data, type, row) {
-                    if (row.image) {
-                        return "<img class='rounded mx-auto w-100' src=" + row.image.path + '/' + row.image.name + " />"
+                    if (row.image_path) {
+                        return "<img class='rounded mx-auto w-100' src=" + row.image_path + " />"
                     } else {
                         return "<img class='rounded mx-auto w-100' src='https://leaveitwithme.com.au/wp-content/uploads/2013/11/dummy-image-square.jpg'/>";
                     }

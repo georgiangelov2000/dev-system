@@ -36,7 +36,7 @@ class Category extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id','name','description'];
+    protected $fillable = ['id','name','description','image_path'];
     
     public function subCategories()
     {
