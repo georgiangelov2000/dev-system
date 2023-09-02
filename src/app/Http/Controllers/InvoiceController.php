@@ -11,6 +11,14 @@ use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
+
+    public function update(){
+
+    }
+
+    private function modelFounder(){
+        
+    }
     
     public function updatePurchaseInvoice(InvoicePurchase $invoice, InvoicePurchaseRequest $request) {
         DB::beginTransaction();

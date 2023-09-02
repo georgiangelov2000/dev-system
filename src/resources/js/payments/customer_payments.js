@@ -1,5 +1,5 @@
-import { APICaller } from '../ajax/methods';
-import { handleErrors } from '../helpers/action_helpers';
+import { APICaller,APIDELETECALLER } from '../ajax/methods';
+import { handleErrors,swalText,showConfirmationDialog } from '../helpers/action_helpers';
 $(function () {
   $('.selectCustomer').selectpicker('refresh').val('').trigger('change')
 
@@ -92,6 +92,9 @@ $(function () {
 
         <div class="row justify-content-end">
           <div class="col-6">
+            <img class="img-fluid w-25 rounded" id="customerImage" src=""  />
+          </div>
+          <div class="col-6">
               <p class="lead" data-target="lead-date"></p>
               <div class="table-responsive">
                   <table id="amountDueTable" class="table">
@@ -152,7 +155,7 @@ $(function () {
           $('span[data-target="zip"]').text(customer.zip);
           $('#amountDueTable td[data-td-target="sum"]').text('€' + sum);
           $('#amountDueTable td[data-td-target="records"]').text(response.data.length);
-
+          $('img[id="customerImage"]').attr('src',customer.image_path);
           return response.data;
         }
       },
@@ -189,20 +192,22 @@ $(function () {
           name: 'payment_method',
           render: function (data, type, row) {
             let status;
-            if(row.payment_method === 1) {
+            if (row.payment_method === 1) {
               status = "Cash";
             }
-            else if(row.payment_method === 2) {
+            else if (row.payment_method === 2) {
               status = "Bank Transfer";
             }
-            else if(row.payment_method === 3) {
+            else if (row.payment_method === 3) {
               status = "Credit Card";
             }
-            else if(row.payment_method === 4) {
+            else if (row.payment_method === 4) {
               status = "Cheque";
             }
-            else if(row.payment_method === 5) {
+            else if (row.payment_method === 5) {
               status = "Online Payment";
+            } else {
+              status = "";
             }
             return `<span>${status}</span>`;
           }
@@ -214,23 +219,23 @@ $(function () {
             let iconClass;
 
             if (row.payment_status === 1) {
-                status = "Paid";
-                iconClass = "fal fa-check-circle"; // Light FontAwesome icon for Paid
-            } else if (row.payment_status ===  2) {
-                status = "Pending";
-                iconClass = "fal fa-hourglass-half"; // Light FontAwesome icon for Pending
+              status = "Paid";
+              iconClass = "fal fa-check-circle"; // Light FontAwesome icon for Paid
+            } else if (row.payment_status === 2) {
+              status = "Pending";
+              iconClass = "fal fa-hourglass-half"; // Light FontAwesome icon for Pending
             } else if (row.payment_status === 3) {
-                status = "Partially Paid";
-                iconClass = "fal fa-money-bill-alt"; // Light FontAwesome icon for Partially Paid
+              status = "Partially Paid";
+              iconClass = "fal fa-money-bill-alt"; // Light FontAwesome icon for Partially Paid
             } else if (row.payment_status === 4) {
-                status = "Overdue";
-                iconClass = "fal fa-exclamation-circle"; // Light FontAwesome icon for Overdue
+              status = "Overdue";
+              iconClass = "fal fa-exclamation-circle"; // Light FontAwesome icon for Overdue
             } else if (row.payment_status === 5) {
-                status = "Refunded";
-                iconClass = "fal fa-undo-alt"; // Light FontAwesome icon for Refunded
+              status = "Refunded";
+              iconClass = "fal fa-undo-alt"; // Light FontAwesome icon for Refunded
             } else if (row.payment_status === 6) {
-                status = "Ordered";
-                iconClass = "fal fa-shopping-cart"; // Light FontAwesome icon for Unpaid or any default icon
+              status = "Ordered";
+              iconClass = "fal fa-shopping-cart"; // Light FontAwesome icon for Unpaid or any default icon
             }
 
             return `<div title="${status}" class="status">
@@ -252,19 +257,28 @@ $(function () {
         },
         {
           render: function (data, type, row) {
-
-            let edit = `
+            let editBtn = `
               <a href="${ORDER_PAYMENT_EDIT_ROUTE.replace(":payment", row.id).replace(':type', 'order')}" title="Edit" class="btn p-0" href="">
                   <i class="fa-light fa-pen text-primary"></i>
               </a>
               `;
 
-            let invoice = `
+            let invoiceBtn = `
               <a type="button" data-id="${row.invoice.id}" onclick="editInvoice(this)" title="Invoice" class="btn p-0"> 
                 <i class="fa-light fa-file-invoice text-primary"></i>
               </a>`;
 
-            return `${edit} ${invoice}`;
+            let deleteForm = `
+            <form data-name=${row.date_of_payment}  style='display:inline-block;' id='delete-form' action="${ORDER_PAYMENT_DELETE_ROUTE.replace(":payment", row.id).replace(':type', 'order')}" method='POST'>
+                                <input type='hidden' name='_method' value='DELETE'>
+                                <input type='hidden' name='id' value='${row.id}'>
+                                <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deletePayment(this);'>
+                                    <i class='fa-light fa-trash text-primary'></i>
+                                </button>
+                            </form>
+            `;
+
+            return `${editBtn} ${invoiceBtn} ${deleteForm}`;
           }
         }
       ]
@@ -273,6 +287,24 @@ $(function () {
   }
 
   // Window actions
+  window.deletePayment = function (e) {
+    let form = $(e).closest('form');
+
+    let name = form.attr('data-name');
+    let url = form.attr('action');
+
+    const template = swalText(name);
+
+    showConfirmationDialog('Selected items!', template, function () {
+      APIDELETECALLER(url, function (response) {
+        toastr['success'](response.message);
+        dataTable.ajax.reload(null, false);
+      }, function (error) {
+        toastr['error']('Order payment has not been deleted');
+      });
+    });
+  };
+
   window.editInvoice = function (e) {
     let id = $(e).attr('data-id');
     APICaller(ORDER_INVOICE_API_ROUTE, { 'id': id }, function (response) {

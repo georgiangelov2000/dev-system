@@ -7,8 +7,6 @@ use App\Models\Supplier;
 use App\Http\Requests\PaymentRequest;
 use App\Models\Purchase;
 use App\Models\Customer;
-use App\Models\InvoiceOrder;
-use App\Models\InvoicePurchase;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\PurchasePayment;
@@ -78,6 +76,7 @@ class PaymentController extends Controller
                 $data['payment_reference'],
                 $data['payment_status'],
             );
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -85,6 +84,53 @@ class PaymentController extends Controller
         }
 
         return redirect()->back()->with('success', 'Payment has been updated');
+    }
+
+    public function delete($payment, $type)
+    {
+        DB::beginTransaction();
+
+        try {
+            $relations = [];
+
+            if ($type === 'order') {
+                array_push($relations, 'order', 'invoice');
+                $payment = OrderPayment::find($payment);
+            } elseif ($type === 'purchase') {
+                array_push($relations, 'purchase', 'invoice');
+                $payment = PurchasePayment::find($payment);
+            }
+
+            if (!$payment) {
+                return response()->json(['message' => 'Payment not found'], 400);
+            }
+
+            // Load related models
+            $payment->load($relations);
+            
+            // Delete the invoice relation
+            $invoice = $payment->invoice;
+            if ($invoice) {
+                $invoice->delete();
+            }
+
+            // Update the status of the associated purchase or order
+            $relatedModel = $payment->{$type};
+            if ($relatedModel) {
+                $relatedModel->status = 6; // Set the status to 6 (or your desired status)
+                $relatedModel->save();
+            }
+
+            // Delete the payment
+            $payment->delete();
+
+            DB::commit();
+
+            return response()->json(['message' => 'Payment has been deleted'], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['message' => 'Payment could not be deleted'], 500);
+        }
     }
 
     // Private methods
@@ -100,6 +146,7 @@ class PaymentController extends Controller
         $relations = [];
         $data = [];
 
+
         if ($type === 'order') {
             $payment !== null  ? array_push($relations, 'order.customer', 'invoice') : [];
             $query = $payment !== null ? OrderPayment::findOrFail($payment) : Customer::has('orders')->select('id', 'name');
@@ -109,10 +156,11 @@ class PaymentController extends Controller
         }
 
         if ($payment !== null) {
+
             $jsonEncoded = Settings::where('type', 1)->first();
             $jsonDecoded = json_decode($jsonEncoded->settings, true);
             $data['settings'] = $jsonDecoded;
-            $data['payment'] = $query->with($relations)->first();
+            $data['payment'] = $query->load($relations);
         } else {
             $data[$type === 'order' ? 'customers' : 'suppliers'] = $query->get();
         }
@@ -131,6 +179,7 @@ class PaymentController extends Controller
         ?string $payment_reference = null,
         ?string $payment_status = null
     ) {
+
         $relationName = ($type === 'order') ? 'order' : 'purchase';
         $modelFounder = $this->getModelFounder($type, $id, $method);
 
@@ -157,7 +206,8 @@ class PaymentController extends Controller
                 'price' => $modelFounder->price,
                 'quantity' => $modelFounder->quantity
             ]);
-            
+
+            return $modelFounder;
         } else {
             $modelFounder->status = 2;
             $modelFounder->save();
