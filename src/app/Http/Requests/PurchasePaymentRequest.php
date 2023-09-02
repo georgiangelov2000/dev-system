@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PurchasePaymentRequest extends FormRequest
+class PaymentRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -13,10 +13,10 @@ class PurchasePaymentRequest extends FormRequest
      */
     public function rules()
     {
-        $isSingleRecord = !is_array($this->input('purchase_id'));
+        $isSingleRecord = !is_array($this->input('id'));
         
         $rules = [
-            'purchase_id' => $isSingleRecord ? 'required' : 'required|array',
+            'id' => $isSingleRecord ? 'required' : 'required|array',
             'price' => $isSingleRecord ? 'required' : 'required|array',
             'quantity' => $isSingleRecord ? 'required' : 'required|array',
             'date_of_payment' => $isSingleRecord ? 'required' : 'required|array',
@@ -32,12 +32,12 @@ class PurchasePaymentRequest extends FormRequest
         }
 
         if ($isSingleRecord) {
-            $rules['purchase_id'] .= '|numeric';
+            $rules['id'] .= '|numeric';
             $rules['price'] .= '|numeric';
             $rules['quantity'] .= '|numeric';
             $rules['date_of_payment'] .= '|date';
         } else {
-            $rules['purchase_id.*'] = 'required|numeric';
+            $rules['id.*'] = 'required|numeric';
             $rules['price.*'] = 'required|numeric';
             $rules['quantity.*'] = 'required|numeric';
             $rules['date_of_payment.*'] = 'required|date';

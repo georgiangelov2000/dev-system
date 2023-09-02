@@ -190,7 +190,7 @@ $(function () {
                     orderable: false,
                     render: function (data, type, row) {
                         let edit = `
-                        <a title="Edit" class="btn p-0" href="${SUPPLIER_PAYMENT_EDIT.replace(':id', row.id)}">
+                        <a title="Edit" class="btn p-0" href="${SUPPLIER_PAYMENT_EDIT.replace(':payment', row.id).replace(':type','purchase')}">
                             <i class="fa-light fa-pen text-primary"></i>
                         </a>
                         `;

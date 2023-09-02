@@ -49,11 +49,11 @@
                                 received. Please complete the payment to avoid any delays in delivery.</span>
                         </div>
                     </div>
-                    <form action="{{ route('payment.update.order', $payment->id) }}" class="col-12" method="POST">
+                    <form action="{{ route('payment.update',[$payment->id,'order']) }}" class="col-12" method="POST">
                         @method('PUT')
                         @csrf
                         <div class="form-group col-12">
-                            <input type="hidden" name="order_id" value="{{ $payment->order->id }}">
+                            <input type="hidden" name="id" value="{{ $payment->order->id }}">
                         </div>
                         <div class="form-group col-12">
                             <label for="customer_id">Price</label>
@@ -156,9 +156,9 @@
                         </div>
                     </div>
                     <div class="col-6 text-right">
-                        @if ($payment->order->customer->image)
+                        @if ($payment->order->customer->image_path)
                             <img class="w-25 m-0"
-                                src="{{ $payment->order->customer->image->path . '/' . $payment->order->customer->image->name }}" />
+                                src="{{ $payment->order->customer->image_path  }}" />
                         @endif
                     </div>
                 </div>
@@ -271,14 +271,14 @@
                 </div>
                 <div class="row align-items-center">
                     <div class="col-7">
-                        <div class="col-12"><b>Company:</b> <span>{{ $company->name }}</span></div>
-                        <div class="col-12"><b>Phone number:</b> <span>{{ $company->phone_number }}</span></div>
-                        <div class="col-12"><b>Address:</b> <span>{{ $company->address }}</span></div>
-                        <div class="col-12"><b>Tax number:</b> <span>{{ $company->tax_number }}</span></div>
+                        <div class="col-12"><b>Company:</b> <span>{{ $settings['name'] }}</span></div>
+                        <div class="col-12"><b>Phone number:</b> <span>{{ $settings['phone_number'] }}</span></div>
+                        <div class="col-12"><b>Address:</b> <span>{{ $settings['address'] }}</span></div>
+                        <div class="col-12"><b>Tax number:</b> <span>{{ $settings['tax_number'] }}</span></div>
                     </div>
                     <div class="col-5 text-right">
-                        @if ($company->image_path)
-                            <img class="w-25 m-0" src="{{ $company->image_path }}" />
+                        @if ($settings['image_path'])
+                            <img class="w-25 m-0" src="{{ $settings['image_path'] }}" />
                         @endif
                     </div>
                 </div>

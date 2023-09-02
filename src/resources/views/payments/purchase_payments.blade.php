@@ -122,7 +122,7 @@
         <script type="text/javascript" src="{{ mix('js/payments/supplier_payments.js') }}"></script>
         <script type="text/javascript">
             const SUPPLIER_PAYMENTS_API = "{{ route('api.supplier.payments') }}";
-            const SUPPLIER_PAYMENT_EDIT = "{{ route('payment.purchase.edit', ':id') }}";
+            const SUPPLIER_PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
             const PURCHASE_INVOICE_API_ROUTE = "{{ route('api.purchase.invoices') }}";
             const PARCHASE_INVOICE_UPDATE_ROUTE = "{{ route('invoice.update.purchase',':id') }}";
         </script>

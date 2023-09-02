@@ -31,7 +31,7 @@
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div>
                 </div>
-                <form action="{{route('payment.store.order')}}" id="paymentOrders" class="col-12" method="POST">
+                <form action="{{route('payment.store','order')}}" id="paymentOrders" class="col-12" method="POST">
                     @csrf
 
                     <table id="orders" class="table table-hover table-sm">

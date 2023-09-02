@@ -123,7 +123,7 @@
             const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
             const CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
             const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
-            const PAYMENT_API = "{{route('payment.edit.order',':id')}}"
+            const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
         </script>
     @endpush
 @endsection

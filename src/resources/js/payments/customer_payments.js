@@ -188,7 +188,23 @@ $(function () {
         {
           name: 'payment_method',
           render: function (data, type, row) {
-            return `<span>${row.payment_method ? row.payment_method : ''}</span>`
+            let status;
+            if(row.payment_method === 1) {
+              status = "Cash";
+            }
+            else if(row.payment_method === 2) {
+              status = "Bank Transfer";
+            }
+            else if(row.payment_method === 3) {
+              status = "Credit Card";
+            }
+            else if(row.payment_method === 4) {
+              status = "Cheque";
+            }
+            else if(row.payment_method === 5) {
+              status = "Online Payment";
+            }
+            return `<span>${status}</span>`;
           }
         },
         {
@@ -238,7 +254,7 @@ $(function () {
           render: function (data, type, row) {
 
             let edit = `
-              <a href="${ORDER_PAYMENT_EDIT_ROUTE.replace(":id", row.id)}" title="Edit" class="btn p-0" href="">
+              <a href="${ORDER_PAYMENT_EDIT_ROUTE.replace(":payment", row.id).replace(':type', 'order')}" title="Edit" class="btn p-0" href="">
                   <i class="fa-light fa-pen text-primary"></i>
               </a>
               `;

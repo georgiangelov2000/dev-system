@@ -122,7 +122,7 @@
         <script type="text/javascript">
             const ORDER_PAYMENT_API = "{{ route('api.order.payments') }}";
             const ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";
-            const ORDER_PAYMENT_EDIT_ROUTE = "{{ route('payment.edit.order', ':id') }}";
+            const ORDER_PAYMENT_EDIT_ROUTE = "{{ route('payment.edit', [':payment', ':type']) }}";
             const ORDER_INVOICE_API_ROUTE = "{{route('api.order.invoices')}}"
             const ORDER_INVOICE_UPDATE_ROUTE = "{{route('invoice.update.order',':id')}}"
         </script>

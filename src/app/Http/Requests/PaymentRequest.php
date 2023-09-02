@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class OrderPaymentRequest extends FormRequest
+class PaymentRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -13,10 +13,10 @@ class OrderPaymentRequest extends FormRequest
      */
     public function rules()
     {
-        $isSingleRecord = !is_array($this->input('order_id'));
+        $isSingleRecord = !is_array($this->input('id'));
         
         $rules = [
-            'order_id' => $isSingleRecord ? 'required' : 'required|array',
+            'id' => $isSingleRecord ? 'required' : 'required|array',
             'price' => $isSingleRecord ? 'required' : 'required|array',
             'quantity' => $isSingleRecord ? 'required' : 'required|array',
             'date_of_payment' => $isSingleRecord ? 'required' : 'required|array',
@@ -31,12 +31,12 @@ class OrderPaymentRequest extends FormRequest
         }
 
         if ($isSingleRecord) {
-            $rules['order_id'] .= '|numeric';
+            $rules['id'] .= '|numeric';
             $rules['price'] .= '|numeric';
             $rules['quantity'] .= '|numeric';
             $rules['date_of_payment'] .= '|date';
         } else {
-            $rules['order_id.*'] = 'required|numeric';
+            $rules['id.*'] = 'required|numeric';
             $rules['price.*'] = 'required|numeric';
             $rules['quantity.*'] = 'required|numeric';
             $rules['date_of_payment.*'] = 'required|date';
@@ -54,11 +54,11 @@ class OrderPaymentRequest extends FormRequest
     public function messages()
     {
         return [
-            "order_id.required" => "The ID field is required.",
-            "order_id.array" => "The ID field must be an array.",
-            "order_id.*.required" => "The ID field is required.",
-            "order_id.*.numeric" => "The ID field must be a numeric value.",
-            "order_id.*.min" => "The ID field must be at least 0.",
+            "id.required" => "The ID field is required.",
+            "id.array" => "The ID field must be an array.",
+            "id.*.required" => "The ID field is required.",
+            "id.*.numeric" => "The ID field must be a numeric value.",
+            "id.*.min" => "The ID field must be at least 0.",
             "date_of_payment.required" => "The date of payment field is required.",
             "date_of_payment.array" => "The date of payment field must be an array.",
             "date_of_payment.*.required" => "The date of payment field is required.",

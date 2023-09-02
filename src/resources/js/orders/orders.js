@@ -12,7 +12,7 @@ $(function () {
     $('input[name="datetimes"]').daterangepicker({
         autoUpdateInput: false,
         locale: {
-          cancelLabel: 'Clear'
+            cancelLabel: 'Clear'
         }
     });
 
@@ -78,7 +78,7 @@ $(function () {
                     let payment;
 
                     if (row.order_payments) {
-                        payment = `<a href=${PAYMENT_API.replace(':id', row.order_payments.id)}>${row.order_payments.date_of_payment}</a>`
+                        payment = `<a href=${PAYMENT_EDIT.replace(':payment', row.order_payments.id).replace(':type', 'order')}>${row.order_payments.date_of_payment}</a>`
                     } else {
                         payment = ''
                     }
@@ -98,7 +98,7 @@ $(function () {
                 width: '7%',
                 orderable: false,
                 name: "purchase",
-                class:"text-center",
+                class: "text-center",
                 render: function (data, type, row) {
                     return '<a target="_blank" href="' + EDIT_PRODUCT_ROUTE.replace(':id', row.purchase.id) + '">' + row.purchase.name + '</a>';
                 }
@@ -166,60 +166,64 @@ $(function () {
                 orderable: false,
                 name: 'expired',
                 render: function (data, type, row) {
-                    let date;
+                    const date = row.package_extension_date ? moment(row.package_extension_date) : moment(row.date_of_sale);
+                    const currentDate = moment();
+                    const daysRemaining = date.diff(currentDate, 'days');
 
-                    if (row.package_extension_date) {
-                        date = moment(row.package_extension_date);
-                    } else {
-                        date = moment(row.date_of_sale);
+                    let badgeClass = '';
+                    let badgeText = '';
+
+                    switch (row.status) {
+                        case 6:
+                        case 2:
+                            badgeClass = 'badge-warning';
+                            badgeText = `${daysRemaining} days remaining`;
+                            break;
+                        case 1:
+                        case 3:
+                        case 4:
+                            badgeClass = 'badge-success';
+                            badgeText = 'Order received';
+                            break;
+                        default:
+                            badgeText = 'Invalid status please check the system!';
                     }
 
-                    let currentDate = moment();
-                    let daysRemaining = date.diff(currentDate, 'days');
-
-                    if (row.status === 'Ordered' && row.is_paid !== true) {
-                        return `<span class="badge badge-danger p-2">Overdue by ${Math.abs(daysRemaining)} days</span>`;
-                    } else if (row.status === 'Ordered') {
-                        let badgeClass = daysRemaining > 5 ? 'badge-success' : 'badge-warning';
-                        return `<span class="badge ${badgeClass} p-2">${daysRemaining} days remaining</span>`;
-                    } else {
-                        return `<span class="badge badge-success p-2">Order received</span>`;
-                    }
-
-
+                    return `<span class="badge p-2 ${badgeClass}">${badgeText}</span>`;
                 }
             },
             {
                 width: '8%',
                 orderable: false,
                 render: function (data, type, row) {
-
-                    let dateOfSale;
-
-                    if (row.package_extension_date) {
-                        dateOfSale = moment(row.package_extension_date);
-                    } else {
-                        dateOfSale = moment(row.date_of_sale);
-                    }
-
-                    let dateOfPayment;
+                    const dateOfSale = row.package_extension_date ? moment(row.package_extension_date) : moment(row.date_of_sale);
                     let delayMessage = '';
 
                     if (row.order_payments) {
-                        dateOfPayment = moment(row.order_payments.date_of_payment);
-                        let delayInDays = dateOfPayment.diff(dateOfSale, 'days');
+                        const dateOfPayment = moment(row.order_payments.date_of_payment);
+                        const delayInDays = dateOfPayment.diff(dateOfSale, 'days');
 
-                        if(row.status === 1 && row.order_payments.payment_status === 1) {
-                            delayMessage = `Order was paid on time.`;
-                        }
-                        else if(row.status === 2 && row.order_payments.payment_status === 2) {
-                            delayMessage = `Please complete your payment to proceed.`
-                        }
-                        else if(row.status === 4 && row.order_payments.payment_status === 4) {
-                            delayMessage =  `Payment is delayed by ${delayInDays} day(s)`; 
-                        }
-                        else if (row.status === 5 && row.order_payments.payment_status === 5) {
-                            delayMessage = `The order is refunded`;
+                        switch (row.status) {
+                            case 1:
+                                if (row.order_payments.payment_status === 1) {
+                                    delayMessage = 'Order was paid on time.';
+                                }
+                                break;
+                            case 2:
+                                if (row.order_payments.payment_status === 2) {
+                                    delayMessage = 'Please complete your payment to proceed.';
+                                }
+                                break;
+                            case 4:
+                                if (row.order_payments.payment_status === 4) {
+                                    delayMessage = `Payment is delayed by ${delayInDays} day(s)`;
+                                }
+                                break;
+                            case 5:
+                                if (row.order_payments.payment_status === 5) {
+                                    delayMessage = 'The order is refunded';
+                                }
+                                break;
                         }
                     }
 
@@ -254,32 +258,20 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    let status;
-                    let iconClass;
+                    const statusMap = {
+                        1: { text: "Paid", iconClass: "fal fa-check-circle" },
+                        2: { text: "Pending", iconClass: "fal fa-hourglass-half" },
+                        3: { text: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+                        4: { text: "Overdue", iconClass: "fal fa-exclamation-circle" },
+                        5: { text: "Refunded", iconClass: "fal fa-undo-alt" },
+                        6: { text: "Ordered", iconClass: "fal fa-shopping-cart" }
+                    };
 
-                    if (row.status === 1) {
-                        status = "Paid";
-                        iconClass = "fal fa-check-circle"; // Light FontAwesome icon for Paid
-                    } else if (row.status ===  2) {
-                        status = "Pending";
-                        iconClass = "fal fa-hourglass-half"; // Light FontAwesome icon for Pending
-                    } else if (row.status === 3) {
-                        status = "Partially Paid";
-                        iconClass = "fal fa-money-bill-alt"; // Light FontAwesome icon for Partially Paid
-                    } else if (row.status === 4) {
-                        status = "Overdue";
-                        iconClass = "fal fa-exclamation-circle"; // Light FontAwesome icon for Overdue
-                    } else if (row.status === 5) {
-                        status = "Refunded";
-                        iconClass = "fal fa-undo-alt"; // Light FontAwesome icon for Refunded
-                    } else if (row.status === 6) {
-                        status = "Ordered";
-                        iconClass = "fal fa-shopping-cart"; // Light FontAwesome icon for Unpaid or any default icon
-                    }
+                    const statusInfo = statusMap[row.status] || { text: "Unknown", iconClass: "fal fa-question" };
 
-                    return `<div title="${status}" class="status">
-                    <span class="icon"><i class="${iconClass}"></i></span>
-                </div>`;
+                    return `<div title="${statusInfo.text}" class="status">
+                        <span class="icon"><i class="${statusInfo.iconClass}"></i></span>
+                    </div>`;
                 }
             },
             {
@@ -287,50 +279,49 @@ $(function () {
                 orderable: false,
                 class: 'text-center',
                 render: function (data, type, row) {
-                    let editButton = '';
-                    let dropdown = '';
-                    let detachPackage = '';
-                    let deleteFormTemplate = '';
+                    const statusMap = {
+                        1: { text: "Paid", iconClass: "fal fa-check-circle" },
+                        2: { text: "Pending", iconClass: "fal fa-hourglass-half" },
+                        3: { text: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+                        4: { text: "Overdue", iconClass: "fal fa-exclamation-circle" },
+                        5: { text: "Refunded", iconClass: "fal fa-undo-alt" },
+                        6: { text: "Ordered", iconClass: "fal fa-shopping-cart" },
+                    };
 
-                    if (row.package && !row.is_paid && (row.status === 'Ordered' || row.status === 'Pending')) {
+                    const statusInfo = statusMap[row.status] || { text: "Unknown", iconClass: "fal fa-question" };
+
+                    let buttons = [];
+                    let deleteFormTemplate = '';
+                    let detachPackage = '';
+
+                    if (row.package && (statusInfo.text === 'Ordered')) {
                         detachPackage = `
-                        <form onsubmit="detachOrder(event)" style='display:inline-block;' id='detach-form' action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method='PUT'>
-                            <input type='hidden' name='id' value='${row.id}'>
-                            <button type='submit' class='btn p-0' title='Delete'>
-                                <i title="Detach order" class="fal fa-unlink text-danger"></i>
-                            </button>
-                        </form>`;
+                            <form onsubmit="detachOrder(event)" style='display:inline-block;' id='detach-form' action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method='PUT'>
+                                <input type='hidden' name='id' value='${row.id}'>
+                                <button type='submit' class='btn p-0' title='Delete'>
+                                    <i title="Detach order" class="fal fa-unlink text-danger"></i>
+                                </button>
+                            </form>`;
                     }
 
-                    if (!row.is_paid && row.status !== 'Received') {
-                        editButton = '<a href="' + ORDER_EDIT_ROUTE.replace(':id', row.id) + '" class="btn p-0" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
-                        dropdown = `
-                        <div class="dropdown d-inline">
-                            <button class="btn text-info p-0" title="Change status" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa-light fa-rotate-right"></i>
-                            </button>
-                            <form class="d-inline-block" action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method="PUT">
-                                <div id="changeStatus" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <button type="submit" order-id="${row.id}" value="3" onclick="event.preventDefault(); changeStatus(this)" class="dropdown-item">Pending</button>
-                                <button type="submit" order-id="${row.id}" value="4" onclick="event.preventDefault(); changeStatus(this)" class="dropdown-item">Ordered</button>
-                                </div>
-                            </form>
-                        </div>`;
+                    buttons.push(`<a href="${ORDER_EDIT_ROUTE.replace(':id', row.id)}" class="btn p-0" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>`);
+
+                    if (statusInfo.text === 'Ordered') {
                         deleteFormTemplate = `
-                        <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
-                            <input type='hidden' name='_method' value='DELETE'>
-                            <input type='hidden' name='id' value='${row.id}'>
-                            <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
-                                <i class='fa-light fa-trash text-danger'></i>
-                            </button>
-                        </form>`;
+                            <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
+                                <input type='hidden' name='_method' value='DELETE'>
+                                <input type='hidden' name='id' value='${row.id}'>
+                                <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
+                                    <i class='fa-light fa-trash text-danger'></i>
+                                </button>
+                            </form>`;
                     }
 
                     let previewButton = '<a title="Review" class="btn p-0"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
 
-                    return `${deleteFormTemplate} ${detachPackage} ${editButton} ${dropdown} ${previewButton}`;
+                    return `${deleteFormTemplate} ${detachPackage} ${buttons.join(' ')} ${previewButton}`;
                 }
-            },
+            }
         ],
         order: [[1, 'asc']],
     });
@@ -418,11 +409,11 @@ $(function () {
         let text = $(this).val();
         bootstrapSelectDriver.empty();
 
-        APICaller(USER_API_ROUTE, { 
+        APICaller(USER_API_ROUTE, {
             'search': text,
             'role_id': 2,
-            'no_datatable_draw':1,
-         }, function (response) {
+            'no_datatable_draw': 1,
+        }, function (response) {
             let drivers = response;
             if (drivers.length > 0) {
                 bootstrapSelectDriver.append('<option value="" style="display:none;"></option>');
@@ -575,7 +566,7 @@ $(function () {
                 formData[key] = value;
             }
         });
-        
+
         let price = formData.price;
         let discount = formData.discount_percent;
         let quantity = formData.sold_quantity;
@@ -588,27 +579,27 @@ $(function () {
             searchedIds.push($(this).attr('data-id'));
         });
 
-        if(searchedIds.length > 0) {
+        if (searchedIds.length > 0) {
             $.ajax({
                 url: action,
                 method: 'POST',
                 data: {
                     'order_id': searchedIds,
-                    'price':price,
-                    'sold_quantity':quantity,
-                    'discount_percent':discount,
-                    'date_of_sale':date_of_sale,
-                    'package_id':package_id
+                    'price': price,
+                    'sold_quantity': quantity,
+                    'discount_percent': discount,
+                    'date_of_sale': date_of_sale,
+                    'package_id': package_id
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                     'X-HTTP-Method-Override': 'PUT' // Set the X-HTTP-Method-Override header
                 },
-                success:function (response) {
+                success: function (response) {
                     toastr['success'](response.message);
-                    dataTable.ajax.reload(null,false);
+                    dataTable.ajax.reload(null, false);
                 },
-                error: function(xhr,status,error) {
+                error: function (xhr, status, error) {
                     toastr['error'](response.message);
                 }
             })

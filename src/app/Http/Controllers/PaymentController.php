@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Supplier;
-use App\Http\Requests\OrderPaymentRequest;
-use App\Http\Requests\PurchasePaymentRequest;
+use App\Http\Requests\PaymentRequest;
 use App\Models\Purchase;
 use App\Models\Customer;
 use App\Models\InvoiceOrder;
@@ -13,235 +12,192 @@ use App\Models\InvoicePurchase;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\PurchasePayment;
-use App\Models\CompanySettings;
+use App\Models\Settings;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\View\View;
 
 class PaymentController extends Controller
 {
-    public function createPurchasePayment()
+    public function index($type)
     {
-        $suppliers = Supplier::has('purchases')->select('id', 'name')->get();
-
-        return view('purchases.create_payment', [
-            'suppliers' => $suppliers
-        ]);
+        return $this->getView(null, $type);
     }
 
-
-
-    public function supplierPayments()
+    public function create($type)
     {
-        $suppliers = Supplier::has('purchases')->select('id', 'name')->get();
-
-        return view('payments.purchase_payments', [
-            'suppliers' => $suppliers
-        ]);
+        return $this->getView(null, $type, 'create');
     }
 
-    public function customerPayments()
+    public function edit(string $payment, string $type)
     {
-        $customers = Customer::has('orders')->select('id', 'name')->get();
-        return view('payments.order_payments', ['customers' => $customers]);
+        return $this->getView($payment, $type, 'edit');
     }
 
-    public function editPurchasePayment(PurchasePayment $payment)
-    {
-        $payment->load('purchase.supplier', 'purchase.categories', 'invoice');
-        $company = CompanySettings::select('id', 'name', 'phone_number', 'address', 'tax_number', 'image_path')->first();
-        return view(
-            'purchases.edit_payment',
-            [
-                'payment' => $payment,
-                'company' => $company,
-            ]
-        );
-    }
-
-    public function storePurchasePayment(PurchasePaymentRequest $request)
+    public function store(PaymentRequest $request, $type)
     {
         DB::beginTransaction();
 
         try {
             $data = $request->validated();
-
-            if (isset($data['purchase_id']) && count($data['purchase_id'])) {
-                $purchases = $data['purchase_id'];
-
-                foreach ($purchases as $key => $id) {
-                    $purchase = Purchase::find($id);
-
-                    if ($purchase) {
-                        $purchase->status = 2;
-                        $purchase->save();
-
-                        $paymentData = [
-                            'purchase_id' => $id,
-                            'price' => $data['price'][$key],
-                            'quantity' => $data['quantity'][$key],
-                            'date_of_payment' => date('Y-m-d', strtotime($data['date_of_payment'][$key]))
-                        ];
-
-                        $supplierPaymentRecord = PurchasePayment::create($paymentData);
-
-                        $supplierPaymentRecord->invoice()->create([
-                            'price' => $purchase->total_price,
-                            'quantity' => $purchase->initial_quantity
-                        ]);
-                    }
+            if (isset($data['id']) && count($data['id'])) {
+                foreach ($data['id'] as $key => $id) {
+                    $this->processPayment(
+                        $request->method(),
+                        $type,
+                        $id,
+                        $data['price'][$key],
+                        $data['quantity'][$key],
+                        $data['date_of_payment'][$key]
+                    );
                 }
             }
 
             DB::commit();
-            return response()->json(['message' => 'Payment has been created'], 200);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Payment has not been created'], 500);
         }
+        return response()->json(['message' => 'Payment has been created'], 200);
     }
 
-    public function updatePurchasePayment(PurchasePayment $payment, PurchasePaymentRequest $request)
+    public function update(PaymentRequest $request, $payment, $type)
     {
         DB::beginTransaction();
+
         try {
             $data = $request->validated();
-            
-            $paymentStatus = (int) $data['payment_status'];
 
-            $payment->purchase->status = $paymentStatus;
-            
-            $payment->purchase->save();
-
-            $payment->update($data);
-
-            $invoice = $payment->invoice ?: new InvoicePurchase();
-            $invoice->purchase_payment_id = $payment->id;
-            $invoice->price = $payment->purchase->total_price;
-            $invoice->quantity = $payment->purchase->initial_quantity;
-            $invoice->save();
-
+            $this->processPayment(
+                $request->method(),
+                $type,
+                $payment,
+                $data['price'],
+                $data['quantity'],
+                $data['date_of_payment'],
+                $data['payment_method'],
+                $data['payment_reference'],
+                $data['payment_status'],
+            );
             DB::commit();
-            return redirect()->back()->with('success', 'Payment has been updated');
         } catch (\Exception $e) {
             DB::rollback();
             return back()->withInput()->with('error', 'Payment has not been updated');
         }
+
+        return redirect()->back()->with('success', 'Payment has been updated');
     }
 
-
-    // Order payments
-    public function createOrderPayment()
+    // Private methods
+    private function getView(?string $payment = null, string $type, ?string $viewType = null): View
     {
-        $customers = Customer::has('orders')->select('id', 'name')->get();
-        return view('orders.create_payment', ['customers' => $customers]);
+        $data = $this->getData($payment, $type);
+        $view = $viewType !== null ? view($type . 's.' . $viewType . '_payment', $data) : view('payments.' . $type . '_payments', $data);
+        return $view;
     }
 
-    public function editOrderPayment(OrderPayment $payment)
+    private function getData(?string $payment = null, string $type): array
     {
-        $payment->load('order.customer', 'invoice');
-        $company = CompanySettings::select('id', 'name', 'phone_number', 'address', 'tax_number', 'image_path')->first();
-        return view(
-            'orders.edit_payment',
-            [
-                'payment' => $payment,
-                'company' => $company,
-            ]
-        );
+        $relations = [];
+        $data = [];
+
+        if ($type === 'order') {
+            $payment !== null  ? array_push($relations, 'order.customer', 'invoice') : [];
+            $query = $payment !== null ? OrderPayment::findOrFail($payment) : Customer::has('orders')->select('id', 'name');
+        } elseif ($type === 'purchase') {
+            $payment !== null ? array_push($relations, 'purchase.supplier', 'invoice') : [];
+            $query = $payment !== null ? PurchasePayment::findOrFail($payment) : Supplier::has('purchases')->select('id', 'name');
+        }
+
+        if ($payment !== null) {
+            $jsonEncoded = Settings::where('type', 1)->first();
+            $jsonDecoded = json_decode($jsonEncoded->settings, true);
+            $data['settings'] = $jsonDecoded;
+            $data['payment'] = $query->with($relations)->first();
+        } else {
+            $data[$type === 'order' ? 'customers' : 'suppliers'] = $query->get();
+        }
+
+        return $data;
     }
 
-    public function storeOrderPayment(OrderPaymentRequest $request)
-    {
-        DB::beginTransaction();
+    private function processPayment(
+        string $method,
+        string $type,
+        string $id,
+        string $price,
+        string $quantity,
+        string $date_of_payment,
+        ?string $payment_method = null,
+        ?string $payment_reference = null,
+        ?string $payment_status = null
+    ) {
+        $relationName = ($type === 'order') ? 'order' : 'purchase';
+        $modelFounder = $this->getModelFounder($type, $id, $method);
 
-        try {
-            $data = $request->validated();
 
-            if (isset($data['order_id']) && count($data['order_id'])) {
-                $orders = $data['order_id'];
+        if ($method !== 'PUT') {
+            $newRelation = $this->getNewModelRelation($type);
+        }
 
-                foreach ($orders as $key => $id) {
-                    $order = Order::find($id);
+        if ($modelFounder instanceof OrderPayment || $modelFounder instanceof PurchasePayment) {
+            $relation = $modelFounder->$relationName;
+            $relation->status = $payment_status;
+            $relation->save();
 
-                    if ($order) {
-                        $order->status = 2;
-                        $order->save();
+            $modelFounder->price = $price;
+            $modelFounder->quantity = $quantity;
+            $modelFounder->date_of_payment = date('Y-m-d', strtotime($date_of_payment));
+            $modelFounder->payment_method = $payment_method;
+            $modelFounder->payment_reference = $payment_reference;
+            $modelFounder->payment_status = $payment_status;
 
-                        $paymentDate = date('Y-m-d', strtotime($data['date_of_payment'][$key]));
+            $modelFounder->save();
 
-                        $paymentData = [
-                            'order_id' => $id,
-                            'price' => $data['price'][$key],
-                            'quantity' => $data['quantity'][$key],
-                            'date_of_payment' => $paymentDate,
-                            'status' => 2
-                        ];
+            $modelFounder->invoice()->update([
+                'price' => $modelFounder->price,
+                'quantity' => $modelFounder->quantity
+            ]);
+            
+        } else {
+            $modelFounder->status = 2;
+            $modelFounder->save();
 
-                        $orderInvoice = OrderPayment::create($paymentData);
-
-                        $orderInvoice->invoice()->create([
-                            'price' => $order->total_sold_price,
-                            'quantity' => $order->sold_quantity
-                        ]);
-                    }
-                }
+            if ($newRelation instanceof OrderPayment) {
+                $newRelation->order_id = $id;
+            } elseif ($newRelation instanceof PurchasePayment) {
+                $newRelation->purchase_id = $id;
             }
 
-            DB::commit();
-            return response()->json(['message' => 'Payment has been created'], 200);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['message' => 'Payment has not been created'], 500);
+            $newRelation->price = $price;
+            $newRelation->quantity = $quantity;
+            $newRelation->date_of_payment = date('Y-m-d', strtotime($date_of_payment));
+
+            $newRelation->save();
+
+            $newRelation->invoice()->create([
+                'price' => $newRelation->price,
+                'quantity' => $newRelation->quantity
+            ]);
         }
     }
 
-    public function updateOrderPayment(OrderPayment $payment, OrderPaymentRequest $request)
+    private function getModelFounder(string $type, string $id, ?string $method)
     {
-        DB::beginTransaction();
-        try {
-            $data = $request->validated();
+        if ($type === 'order') {
+            return ($method === 'PUT') ? OrderPayment::findOrFail($id) : Order::findOrFail($id);
+        } elseif ($type === 'purchase') {
+            return ($method === 'PUT') ? PurchasePayment::findOrFail($id) : Purchase::findOrFail($id);
+        }
 
-            // Update the payment status and order status
-            $paymentStatus = (int) $data['payment_status'];
+        return null;
+    }
 
-            $paymentDate = strtotime($data['date_of_payment']);
-            $saleDate = strtotime($payment->order->package_extension_date ? $payment->order->package_extension_date : $payment->order->date_of_sale);
-
-            // Check if payment date is greater than sale date (Overdue payment)
-            if ($paymentDate > $saleDate) {
-                $payment->order->is_paid = 1; // Mark as paid
-                $payment->order->status = 4;  // Mark as overdue
-                $data['payment_status'] = 4; // Update the payment status to 'Overdue'
-            } else {
-                // Check the regular payment status values
-                if (in_array($paymentStatus, [1, 4])) {
-                    $payment->order->is_paid = 1; // Mark as paid
-                    $payment->order->status = $paymentStatus;
-                } elseif ($paymentStatus === 2) {
-                    $payment->order->is_paid = 0; // Mark as not paid
-                    $payment->order->status = $paymentStatus;
-                } elseif ($paymentStatus === 5) {
-                    $payment->order->is_paid = 2; // Mark with custom status
-                    $payment->order->status = $paymentStatus;
-                } elseif ($paymentStatus === 3) {
-                    $payment->order->is_paid = 3; // Mark with custom status
-                    $payment->order->status = $paymentStatus;
-                }
-            }
-
-            $payment->order->save();
-
-            $payment->update($data);
-
-            $invoice = $payment->invoice ?: new InvoiceOrder();
-            $invoice->order_payment_id = $payment->id;
-            $invoice->price = $payment->order->total_sold_price;
-            $invoice->quantity = $payment->order->sold_quantity;
-            $invoice->save();
-
-            DB::commit();
-            return redirect()->back()->with('success', 'Payment has been updated');
-        } catch (\Exception $e) {
-            DB::rollback();
-            return back()->withInput()->with('error', 'Payment has not been updated');
+    private function getNewModelRelation(string $type)
+    {
+        if ($type === 'order') {
+            return  new OrderPayment();
+        } elseif ($type === 'purchase') {
+            return  new PurchasePayment();
         }
     }
 }

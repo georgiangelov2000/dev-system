@@ -139,19 +139,11 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('payments')->name('payment.')->group(function () {
-        Route::get('/customers', [PaymentController::class, 'customerPayments'])->name('customer');
-        Route::get('/suppliers', [PaymentController::class, 'supplierPayments'])->name('supplier');
-
-        Route::get('/purchases', [PaymentController::class, 'createPurchasePayment'])->name('purchase');
-        Route::get('/purchase/{payment}', [PaymentController::class, 'editPurchasePayment'])->name('purchase.edit');
-        Route::post('/store/purchase/payment', [PaymentController::class, 'storePurchasePayment'])->name('store.purchase');
-        Route::put('/update/purchase/{payment}', [PaymentController::class, 'updatePurchasePayment'])->name('update.purchase');
-
-        Route::get('/orders', [PaymentController::class, 'createOrderPayment'])->name('orders');
-        Route::get('/order/{payment}', [PaymentController::class, 'editOrderPayment'])->name('edit.order');
-        Route::post('/store/order/payment', [PaymentController::class, 'storeOrderPayment'])->name('store.order');
-        Route::put('/update/order/{payment}', [PaymentController::class, 'updateOrderPayment'])->name('update.order');
-
+        Route::get('/customers/{type}', [PaymentController::class, 'index'])->name('index');
+        Route::get('/create/{type}', [PaymentController::class, 'create'])->name('create');
+        Route::post('/store/{type}', [PaymentController::class, 'store'])->name('store');
+        Route::get('/edit/{payment}/{type}', [PaymentController::class, 'edit'])->name('edit');
+        Route::put('/update/{payment}/{type}', [PaymentController::class, 'update'])->name('update');
     });
 
     Route::prefix('invoices')->name('invoice.')->group(function () {

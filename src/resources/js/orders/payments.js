@@ -63,7 +63,7 @@ $(function () {
                 render: function (data, type, row) {
                     return `
                     <span class="font-weight-bold">${row.id}</span>
-                    <input type="hidden" value="${row.id}" name="order_id" />
+                    <input type="hidden" value="${row.id}" name="id" />
                     `;
                 }
             },

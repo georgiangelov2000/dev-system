@@ -1,15 +1,21 @@
 @php
-    $jsonSettings = App\Models\Settings::where('type', 1)->first()->settings;
-    
-    $cacheKey = 'json_settings' . md5('cxsiSPG6angFxFYY');
-    $cachedData = App\Helpers\RedisCacheHelper::get($cacheKey);
-        
+    use App\Models\Settings;
+    use App\Helpers\RedisCacheHelper;
+
+    $jsonSettings = Settings::where('type', 1)->first()->settings;
+
+    $cacheKey = 'json_settings_' . md5('cxsiSPG6angFxFYY');
+    $cachedData = RedisCacheHelper::get($cacheKey);
+
     if (!$cachedData) {
-        App\Helpers\RedisCacheHelper::put($cacheKey, $res, 3600);
+        // Cache miss, data is not in cache
+        RedisCacheHelper::put($cacheKey, $jsonSettings, 3600); // Store the data in cache
+        $cachedData = $jsonSettings; // Update $cachedData with the actual data
     }
-    
-    $res = json_decode($cachedData,true);    
+
+    $res = json_decode($cachedData, true);
 @endphp
+
 
 <nav class="main-header navbar navbar-expand header-navigation mb-3 navbar-white">
     <ul class="navbar-nav">
@@ -57,7 +63,7 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
-                    @if ($res['image_path'])
+                    @if ($res && array_key_exists('image_path', $res))
                         <img src="{{$res['image_path']}}"
                             alt="Company logo" id="company-logo" />
                     @else
@@ -271,22 +277,22 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('payment.customer') }}" class="nav-link">
+                            <a href="{{ route('payment.index','order') }}" class="nav-link">
                                 <p>Order payments overview</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('payment.supplier') }}" class="nav-link">
+                            <a href="{{ route('payment.index','purchase') }}" class="nav-link">
                                 <p>Purchase payments overview</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('payment.orders') }}" class="nav-link">
+                            <a href="{{ route('payment.create','order') }}" class="nav-link">
                                 <p>Order payments</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('payment.purchase') }}" class="nav-link">
+                            <a href="{{ route('payment.create','purchase') }}" class="nav-link">
                                 <p>Purchase payments</p>
                             </a>
                         </li>
