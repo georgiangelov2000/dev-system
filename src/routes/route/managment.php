@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [CategoryController::class, 'store'])->name('store');
         Route::delete('/delete/{category}', [CategoryController::class, 'delete'])->name('delete');
         Route::delete('/detach/subcategory/{subcategory}', [CategoryController::class, 'detachSubCategory'])->name('detach.subcategory');
+        Route::delete('/delete/image/{category}', [CategoryController::class, 'deleteImage'])->name('delete.image');
     });
 
     Route::prefix('subcategories')->name('subcategory.')->group(function () {
@@ -60,8 +61,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/update/{brand}', [BrandController::class, 'update'])->name('update');
         Route::post('/store', [BrandController::class, 'store'])->name('store');
         Route::delete('/delete/{brand}', [BrandController::class, 'delete'])->name('delete');
-        Route::delete('/detach/purchase/{brand}', [BrandController::class, 'detachPurchase'])->name('detach.purchase');
-        Route::get('/purchases/{brand}', [BrandController::class, 'purchases'])->name('purchases');
+        Route::delete('/delete/image/{brand}', [BrandController::class, 'deleteImage'])->name('delete.image');
     });
 
     Route::prefix('suppliers')->name('supplier.')->group(function () {

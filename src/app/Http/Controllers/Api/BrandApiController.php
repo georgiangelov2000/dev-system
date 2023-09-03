@@ -13,22 +13,21 @@ class BrandApiController extends Controller
     {
 
         $select_json = isset($request->select_json) && $request->select_json ? $request->select_json : null;
-        $order_dir = isset($request->order_dir) ? $request->order_dir : null;
-        $column_name = isset($request->order_column) ? $request->order_column : null;
+        $orderDir = isset($request->order_dir) ? $request->order_dir : null;
+        $columnName = isset($request->order_column) ? $request->order_column : null;
         $search = isset($request->search) ? $request->search : null;
 
-        $brandQuery = Brand::query()->select('id', 'name', 'description');
-
+        $brandQuery = Brand::query()->select('id', 'name', 'description','image_path')
+        ->when($search, function ($query) use ($search) {
+            $query->where('name', 'LIKE', '%' . $search . '%');
+        })
+        ->when($columnName && $orderDir, function ($query) use ($columnName, $orderDir) {
+            $query->orderBy($columnName, $orderDir);
+        });
             
         $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
 
-        if ($search) {
-            $brandQuery->where('name', 'LIKE', '%' . $search . '%');
-        }
-        if ($column_name && $order_dir) {
-            $brandQuery->orderBy($column_name, $order_dir);
-        }
         if ($select_json) {
             return response()->json($brandQuery->get());
         }
@@ -36,11 +35,10 @@ class BrandApiController extends Controller
         $filteredRecords = $brandQuery->count();
         $result = $brandQuery->skip($offset)->take($limit)->get();
 
-        $result->map(function ($brand) {
+        $result->each(function ($brand) {
             $brand->purchases_count = $brand->purchases()->count();
-            return $brand;
         });
-
+        
         $totalRecords = Brand::count();
 
         return response()->json(

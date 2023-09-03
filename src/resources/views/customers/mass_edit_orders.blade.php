@@ -46,7 +46,6 @@
                                 <th>Payment date</th>
                                 <th>Package</th>
                                 <th class="text-center">Status</th>
-                                <th>Paid</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -79,7 +78,7 @@
                                     <option value="">Please select</option>
                                     @foreach ($packages as $package)
                                         <option value="{{$package->id}}">
-                                            {{$package->name}}
+                                            {{$package->package_name}}
                                         </option>
                                     @endforeach
                                 </select>
@@ -121,9 +120,8 @@
             const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
             const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit', ':id') }}";
             const PACKAGE_EDIT_ROUTE = "{{ route('package.edit', ':id') }}"
-            const PAYMENT_API = "{{ route('payment.edit.order', ':id') }}"
-            const STATUS = [6, 7, 8];
-            const IS_PAID = 0;
+            const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
+            const STATUS = [6];
         </script>
     @endpush
 @endsection

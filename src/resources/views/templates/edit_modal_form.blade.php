@@ -31,13 +31,8 @@
                                     <label for="image">File</label>
                                 </div>
                                 <div class="custom-file">
-                                    <input 
-                                        type="file" 
-                                        class="custom-file-input" 
-                                        name="image" 
-                                        id="image"
-                                    >
-                                    <label class="custom-file-label" id="fileLabel" for="customFile">Choose file</label>
+                                    <input type="file" class="custom-file-input" name="image" id="image">
+                                    <label class="custom-file-label" for="customFile" id="fileLabel">Choose file</label>
                                     @error('image')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
@@ -96,4 +91,4 @@
             </div>
         </div>
     </div>
-</div>  
+</div>

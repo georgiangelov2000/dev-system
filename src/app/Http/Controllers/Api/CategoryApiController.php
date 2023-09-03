@@ -15,7 +15,7 @@ class CategoryApiController extends Controller {
         
         $categoryQuery = $this->buildCategoriesQuery();
 
-        if ($supplier || $supplier == '0') {
+        if ($supplier) {
             $this->filterCategoriesBySupplier($categoryQuery, $supplier);
         }
         if($search) {
@@ -42,7 +42,7 @@ class CategoryApiController extends Controller {
     }
 
     private function buildCategoriesQuery() {
-        return Category::query()->with('subCategories');
+        return Category::query()->with('subCategories')->withCount('products');
     }
 
     private function filterCategoriesBySupplier($query, $supplier) {        

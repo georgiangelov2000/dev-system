@@ -298,8 +298,8 @@ $(function () {
                         detachPackage = `
                             <form onsubmit="detachOrder(event)" style='display:inline-block;' id='detach-form' action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method='PUT'>
                                 <input type='hidden' name='id' value='${row.id}'>
-                                <button type='submit' class='btn p-0' title='Delete'>
-                                    <i title="Detach order" class="fal fa-unlink text-danger"></i>
+                                <button type='submit' class='btn p-0' title="Detach package">
+                                    <i class="fa-light fa-boxes-packing text-danger"></i>
                                 </button>
                             </form>`;
                     }
@@ -348,10 +348,6 @@ $(function () {
             data.status = STATUS;
         } else {
             data.status = bootstrapOrderStatus.val();
-        }
-
-        if (typeof IS_PAID !== 'undefined') {
-            data.is_paid = IS_PAID;
         }
 
         if (typeof PACKAGE !== 'undefined') {

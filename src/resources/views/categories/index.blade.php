@@ -39,6 +39,7 @@
                                 <th>Name</th>
                                 <th>Description</th>
                                 <th>Subcategories</th>
+                                <th>Purchases</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -88,6 +89,7 @@
         let UPDATE_CATEGORY_ROUTE = "{{route('category.update',':id')}}";
         let STORE_CATEGORY_ROUTE = "{{route('category.store')}}";
         let SUBCATEGORY_ROUTE = "{{route('category.detach.subcategory',':id')}}";
+        const REMOVE_CATEGORY_IMAGE_ROUTE = "{{ route('category.delete.image',':id') }}"
     </script>
     @endpush
 

@@ -132,18 +132,18 @@
       @push('scripts')
         <script type="text/javascript" src="{{ mix('js/purchases/purchases.js') }}"></script>
         <script type='text/javascript'>
-            let PRODUCT_API_ROUTE = "{{ route('api.products') }}";
-            let CATEGORY_API_ROUTE = "{{ route('api.categories') }}";
-            let SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
-            let BRAND_API_ROUTE = "{{ route('api.brands') }}";
-            let PREVIEW_ROUTE = "{{ route('purchase.preview',':id') }}";
-            let REMOVE_PRODUCT_ROUTE = "{{ route('purchase.delete', ':id') }}";
-            let EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
-            let EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
-            let CATEGORY_ROUTE = "{{ route('api.subcategories') }}";
-            let CONFIG_URL = "{{config('app.url')}}";
-            let ORDERS = "{{route('purchase.orders',':id')}}";
-            let PAYMENT = "{{route('payment.purchase.edit',':id')}}";
+            const PRODUCT_API_ROUTE = "{{ route('api.products') }}";
+            const CATEGORY_API_ROUTE = "{{ route('api.categories') }}";
+            const SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
+            const BRAND_API_ROUTE = "{{ route('api.brands') }}";
+            const PREVIEW_ROUTE = "{{ route('purchase.preview',':id') }}";
+            const REMOVE_PRODUCT_ROUTE = "{{ route('purchase.delete', ':id') }}";
+            const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
+            const EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
+            const CATEGORY_ROUTE = "{{ route('api.subcategories') }}";
+            const CONFIG_URL = "{{config('app.url')}}";
+            const ORDERS = "{{route('purchase.orders',':id')}}";
+            const PAYMENT = "{{ route('payment.edit', [':payment', ':type']) }}";
         </script>
     @endpush
 

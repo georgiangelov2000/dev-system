@@ -341,6 +341,15 @@
                     </ul>
                 </li>
 
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-light fa-file-import"></i>
+                        <p>
+                           (XML,JSON) Import
+                        </p>
+                    </a>
+                </li>
+
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

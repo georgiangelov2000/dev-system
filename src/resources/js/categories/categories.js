@@ -1,8 +1,8 @@
 /* global Swal, CATEGORY_ROUTE */
-import { 
-    APIPOSTCALLER, 
-    APICallerWithoutData, 
-    APIDELETECALLER 
+import {
+    APIPOSTCALLER,
+    APICallerWithoutData,
+    APIDELETECALLER
 } from '../ajax/methods';
 import {
     swalText,
@@ -11,7 +11,7 @@ import {
     closeModal
 } from '../helpers/action_helpers';
 
-$(function(){
+$(function () {
 
     let table = $('#categoriesTable');
     //Global category variables
@@ -19,25 +19,23 @@ $(function(){
     let createModal = $('#createModal');
     let editModal = $('#editModal');
 
-    let submitForm = $('#submitForm');
-    let updateForm = $('#updateForm');
-
     let createForm = createModal.find('form');
     let editForm = editModal.find('form');
     let closeModalButton = $('.modalCloseBtn');
 
     $('.selectSubCategory,.selectAction')
-    .selectpicker('refresh')
-    .val('')
-    .trigger('change');
+        .selectpicker('refresh')
+        .val('')
+        .trigger('change');
 
     var dataT = table.DataTable({
         serverSide: true,
         ajax: {
             url: CATEGORY_ROUTE,
-            data: function(d) {
-                return $.extend({},d, {
-                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : ''
+            data: function (d) {
+                return $.extend({}, d, {
+                    "search": d.search.value,
+                    'order_dir': d.order[0].dir
                 });
             }
         },
@@ -46,8 +44,8 @@ $(function(){
                 orderable: false,
                 width: "1%",
                 render: function (data, type, row) {
-                    let checkbox = 
-                    `<div class='form-check'> 
+                    let checkbox =
+                        `<div class='form-check'> 
                         <input 
                             name = 'checkbox'
                             class='form-check-input' 
@@ -71,7 +69,7 @@ $(function(){
             {
                 width: '5%',
                 orderable: false,
-                class:'text-center',
+                class: 'text-center',
                 name: "image",
                 render: function (data, type, row) {
                     if (row.image_path) {
@@ -100,46 +98,60 @@ $(function(){
                 width: '25%',
                 orderable: false,
                 name: 'subcategories',
-                render: function(data,type,row) {
+                render: function (data, type, row) {
                     if (!row.sub_categories) {
                         return '';
                     }
                     const subcategoryNames = row.sub_categories.map((subcategory) => {
                         return `<span class="font-weight-bold">${subcategory.name}</span>`;
-                      });
+                    });
                     return subcategoryNames.join(', ');
                 }
             },
             {
                 orderable: false,
-                width: '15%',
+                name: "products_count",
+                class: "text-center",
+                render: function (data, type, row) {
+                    return `<span>${row.products_count}</span>`;
+                }
+            },
+            {
+                orderable: false,
+                width: '10%',
+                class: 'text-center',
                 render: function (data, type, row) {
 
-                const deleteFormTemplate = `
-                    <form style="display:inline-block;" id="delete-form" action="${REMOVE_CATEGORY_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
+                    const deleteFormTemplate = `
+                    <form style="display:inline-block;" action="${REMOVE_CATEGORY_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
                       <input type="hidden" name="_method" value="DELETE">
                       <input type="hidden" name="id" value="${row.id}">
                       <button type="submit" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteCategory(this);"><i class="fa-light fa-trash text-danger"></i></button>
                     </form>
                   `;
 
-                  const editButton = `<a data-id="${row.id}" class="btn editCategory p-1" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>`;
-                  const productsButton = `<a data-id="${row.id}" class="btn p-1" title="Products"><i class="fa-light fa-box-open text-primary"></i></a>`;
-                  const subCategories = `<button data-toggle="collapse" data-target="#subcategories_${row.id}" title="Sub categories" class="btn btn-outline-muted showSubCategories p-1"><i class="fa-light fa-list" aria-hidden="true"></i></button>`;
-              
-                  return `${subCategories} ${deleteFormTemplate} ${editButton} ${productsButton}`;
+                    const editButton = `<a data-id="${row.id}" class="btn editCategory p-1" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
+                    const subCategories = `<button data-toggle="collapse" data-target="#subcategories_${row.id}" title="Sub categories" class="btn btn-outline-muted showSubCategories p-1"><i class="fa-light fa-list" aria-hidden="true"></i></button>`;
+                    
+                    const removeImage = `
+                    <form style="display:inline-block;" action="${REMOVE_CATEGORY_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="id" value="${row.id}">
+                        <button 
+                            type="submit" 
+                            class="btn p-1" 
+                            title="Delete" 
+                            onclick="event.preventDefault(); deleteImage(this);">
+                            <i class="fa-light fa-image text-primary fa-lg"></i>
+                            </button>
+                    </form>`;
+                    return `${subCategories} ${deleteFormTemplate} ${editButton} ${removeImage}`;
                 }
             }
 
         ],
         order: [[1, 'asc']]
     });
-
-    let builtInDataTableSearch = $('#categoriesTable_filter input[type="search"]');
-
-    builtInDataTableSearch.bind('keyup',function(){
-        dataT.ajax.reload( null, false );
-    })
 
     $('tbody').on('click', '.showSubCategories', function () {
         var tr = $(this).closest('tr');
@@ -159,14 +171,13 @@ $(function(){
     function format(d) {
         // `d` is the original data object for the row
         let tableRows = "";
-    
+
         if (d.length > 0) {
             d.forEach(function (subcategory) {
-                
+
                 let deleteFormTemplate = `
                 <form 
                     style='display:inline-block;' 
-                    id='delete-form' 
                     action='${SUBCATEGORY_ROUTE.replace(':id', subcategory.id)}' 
                     method='POST'>
                     <input type='hidden' name='_method' value='DELETE'>
@@ -182,7 +193,7 @@ $(function(){
                     </button>
                 </form>
                 `;
-    
+
                 tableRows += '<tr>' +
                     '<td>' + subcategory.name + '</td>' +
                     '<td>' +
@@ -190,7 +201,7 @@ $(function(){
                     '</td>' +
                     '</tr>';
             });
-    
+
             return '<table class="subTable subcategories w-100" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
                 '<thead>' +
                 '<tr>' +
@@ -208,55 +219,36 @@ $(function(){
     }
 
     //ACTIONS
-    submitForm.on("click", function (e) {
-        e.preventDefault();
 
-        let actionUrl = createForm.attr('action');
-        let formData = new FormData(createForm[0]); // Use the form's DOM element
-
-        APIPOSTCALLER(actionUrl, formData,
-            function (response,xhr) {
-                const status = xhr;
-
-                if(status == 'success'){
-                    toastr['success'](response.message);
-                    createForm.trigger('reset');
-                    createModal.modal('toggle');
-                    table.DataTable().ajax.reload();
-                } else {
-                    toastr['error'](response.responseJSON.message);
-                    ajaxResponse(response.responseJSON, createModal);
-                }
-            },
-            function (error) {
-                toastr['error'](error.message)
-            }
-        );
+    $('input.custom-file-input').each(function () {
+        $(this).on('change', function () {
+            let fileName = $(this).val().split('\\').pop();
+            // Find the corresponding label for this input
+            let label = $(this).siblings('label.custom-file-label');
+            label.text(fileName || 'Choose file');
+        });
     });
 
-    updateForm.on("click", function (e) {
+    $('#submitForm, #updateForm').on("click", function (e) {
         e.preventDefault();
 
-        var actionUrl = editForm.attr('action');
-        var formData =  new FormData(editForm[0]);
-        console.log(formData);
+        const visibleModal = $('.modal:visible');
+        const modalForm = visibleModal.find('form');
+        const actionUrl = modalForm.attr('action');
+        const formData = new FormData(modalForm[0]);
 
         APIPOSTCALLER(actionUrl, formData,
-            function (response,xhr) {
-                const status = xhr;
-
-                if(status == 'success') {
+            (response, xhr) => {
+                if (xhr === 'success') {
                     toastr['success'](response.message);
-                    editForm.trigger('reset');
-                    editModal.modal('toggle');
-                    dataT.ajax.reload( null, false );
-                } else {
-                    toastr['error'](response.message);
-                    ajaxResponse(response.responseJSON, editModal);
+                    visibleModal.modal('toggle');
+                    modalForm.trigger('reset');
+                    dataT.ajax.reload(null, false);
                 }
             },
-            function (error) {
-                toastr['error'](error.message)
+            (error) => {
+                toastr['error'](response.responseJSON.message);
+                ajaxResponse(error.responseJSON.errors);
             }
         );
     });
@@ -294,14 +286,28 @@ $(function(){
         }
     });
 
-    //Window events
+    // WINDOW EVENTS
+
+    window.deleteImage = (e) => {
+        const form = $(e).closest('form');
+        const url = form.attr('action');
+
+        APIDELETECALLER(url,(response) => {
+            toastr['success'](response.message);
+            dataT.ajax.reload(null, false);
+        },(error) => {
+            toastr['error'](error.message);
+        })
+    }
+
+
     window.detachSubCategory = function (e) {
         let form = $(e).closest('form');
         let url = form.attr('action');
 
         APIDELETECALLER(url, function (response) {
             toastr['success'](response.message);
-            dataT.ajax.reload( null, false );
+            dataT.ajax.reload(null, false);
         }, function (error) {
             toastr['error'](error.message);
         });
@@ -310,39 +316,44 @@ $(function(){
     window.deleteCategory = function (e) {
         let form = $(e).closest('form');
         let url = form.attr('action');
-        let name = form.attr('data-name');        
+        let name = form.attr('data-name');
 
         let template = swalText(name);
 
         showConfirmationDialog('Selected items!', template, function () {
             APIDELETECALLER(url, function (response) {
                 toastr['success'](response.message);
-                dataT.ajax.reload( null, false );
+                dataT.ajax.reload(null, false);
             }, function (error) {
                 toastr['error'](error.message);
             });
-        });        
+        });
     };
 
-    window.editCategory = function(e) {
+    window.editCategory = function (e) {
         let id = $(e).attr('data-id');
-        APICallerWithoutData(EDIT_CATEGORY_ROUTE.replace(':id', id), function(data) {
+
+        const modal = $('#editModal');
+        const modalForm = modal.find('form');
+
+        APICallerWithoutData(EDIT_CATEGORY_ROUTE.replace(':id', id), function (data) {
             let category = data.category;
             let allSubCategories = data.allSubCategories;
             let relatedSubCategories = data.relatedSubCategory;
 
-            editModal.modal('show');
-            editForm.attr('action', UPDATE_CATEGORY_ROUTE.replace(':id', id));
-            editForm.find('input[name="name"]').val(category.name);
-            editForm.find('textarea[name="description"]').val(category.description);
-            editForm.find('img[id="icon"]').attr('src',category.image_path);
+            modal.modal('show');
+
+            modalForm.attr('action', UPDATE_CATEGORY_ROUTE.replace(':id', id));
+            modalForm.find('input[name="name"]').val(category.name);
+            modalForm.find('textarea[name="description"]').val(category.description);
+            modalForm.find('img[id="icon"]').attr('src', category.image_path);
 
             for (let index = 0; index < allSubCategories.length; index++) {
                 let idToCheck = allSubCategories[index].id;
-                let matchingSubCategory = relatedSubCategories.find(obj => obj == idToCheck ) ? 'selected' : "";
+                let matchingSubCategory = relatedSubCategories.find(obj => obj == idToCheck) ? 'selected' : "";
 
-                editModal.find('.bootstrap-select .selectSubCategory')
-                .append(`
+                modalForm.find('.bootstrap-select .selectSubCategory')
+                    .append(`
                 <option 
                     ${matchingSubCategory} 
                     value="${idToCheck}"
@@ -350,9 +361,9 @@ $(function(){
                     ${allSubCategories[index].name}
                 </option>`);
             }
-            editModal.find('.bootstrap-select .selectSubCategory').selectpicker('refresh');
+            modalForm.find('.bootstrap-select .selectSubCategory').selectpicker('refresh');
 
-        },function(error){
+        }, function (error) {
             toastr['error'](error.message);
         });
     }
@@ -374,15 +385,15 @@ $(function(){
             searchedIds.push($(this).attr('data-id'));
             searchedNames.push($(this).attr('data-name'));
         });
-        
+
         let template = swalText(searchedNames);
 
-        showConfirmationDialog('Selected items!',template,function(){
-            searchedIds.forEach(function(id,index){
-                APIDELETECALLER(REMOVE_CATEGORY_ROUTE.replace(':id',id),function(response){
+        showConfirmationDialog('Selected items!', template, function () {
+            searchedIds.forEach(function (id, index) {
+                APIDELETECALLER(REMOVE_CATEGORY_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);
-                    dataT.ajax.reload( null, false );
-                },function(error){
+                    dataT.ajax.reload(null, false);
+                }, function (error) {
                     toastr['error'](error.message);
                 });
             })

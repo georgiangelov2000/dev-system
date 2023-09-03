@@ -38,6 +38,7 @@
                                 </div>
                             </th>
                             <th>ID</th>
+                            <th>Image</th>
                             <th>Name</th>
                             <th>Puchases</th>
                             <th>Description</th>
@@ -62,6 +63,7 @@
     
         'formMethod' => 'post',
     
+        'isFileAvailable' => true,
         'isAvailableMultiple' => false,
     ])
 
@@ -76,6 +78,8 @@
         'title' => 'Edit Brand',
     
         'formMethod' => 'post',
+
+        'isFileAvailable' => true,
         'isAvailableMultiple' => false,
     ])
 
@@ -83,12 +87,12 @@
         <script type="text/javascript" src="{{ mix('js/brands/brands.js') }}"></script>
 
         <script type="text/javascript">
-            let BRAND_ROUTE = "{{ route('api.brands') }}";
-            let REMOVE_BRAND_ROUTE = "{{ route('brand.delete', ':id') }}";
-            let EDIT_BRAND_ROUTE = "{{ route('brand.edit', ':id') }}";
-            let UPDATE_BRAND_ROUTE = "{{ route('brand.update', ':id') }}";
-            let STORE_BRAND_ROUTE = "{{ route('brand.store') }}";
-            let BRAND_PURCHASES = "{{route('brand.purchases',':id')}}";
+            const BRAND_ROUTE = "{{ route('api.brands') }}";
+            const REMOVE_BRAND_ROUTE = "{{ route('brand.delete', ':id') }}";
+            const EDIT_BRAND_ROUTE = "{{ route('brand.edit', ':id') }}";
+            const UPDATE_BRAND_ROUTE = "{{ route('brand.update', ':id') }}";
+            const STORE_BRAND_ROUTE = "{{ route('brand.store') }}";
+            const REMOVE_BRAND_IMAGE_ROUTE = "{{ route('brand.delete.image',':id') }}"
         </script>
     @endpush
 

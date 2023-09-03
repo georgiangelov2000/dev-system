@@ -85,7 +85,7 @@ $(function () {
                 width: '1%',
                 render: function (data, type, row) {
                     if (row.payment) {
-                        return `<a href="${PAYMENT.replace(':id', row.payment.id)}">${row.payment.date_of_payment}</a>`
+                        return `<a href="${PAYMENT.replace(':payment', row.payment.id).replace(':type','purchase')}">${row.payment.date_of_payment}</a>`
                     } else {
                         return ``;
                     }

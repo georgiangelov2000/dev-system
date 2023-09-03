@@ -4,39 +4,22 @@ import {
     ajaxResponse,
     showConfirmationDialog,
     openModal,
-    submit
-
 } from '../helpers/action_helpers';
 
-$(function(){
+$(function () {
+    const table = $('#brandsTable');
 
-    $('.selectAction')
-    .selectpicker('refresh')
-    .val('')
-    .trigger('change');
-
-    let table = $('#brandsTable');
-    //Global category variables
-
-    let createModal = $('#createModal');
-    let editModal = $('#editModal');
-
-    let editForm = editModal.find('form');
-    let createBrand = $('.createBrand');
-
-
-    table.DataTable({
-        serverSide:true,
+    const dataTable = table.DataTable({
+        serverSide: true,
         ajax: {
             url: BRAND_ROUTE,
-            data: function(d) {
-                let orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
-                let orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
-
-                return $.extend({},d,{
+            data: function (d) {
+                const orderColumnIndex = d.order[0].column;
+                const orderColumnName = d.columns[orderColumnIndex].name;
+                return $.extend({}, d, {
                     "search": d.search.value,
-                    'order_column': orderColumnName, // send the column name being sorted
-                    'order_dir': d.order[0].dir // send the sorting direction (asc or desc)
+                    'order_column': orderColumnName,
+                    'order_dir': d.order[0].dir
                 });
             }
         },
@@ -45,11 +28,10 @@ $(function(){
                 orderable: false,
                 width: "5%",
                 render: function (data, type, row) {
-                    let checkbox = '<div div class="form-check">\n\
-                       <input name="checkbox" class="form-check-input" onchange="selectBrand(this)" data-id=' + row.id + ' data-name= ' + row.name + ' type="checkbox"> \n\
-                    </div>';
-
-                    return `${checkbox}`;
+                    const checkbox = `<div class="form-check">
+                        <input name="checkbox" class="form-check-input" onchange="selectBrand(this)" data-id=${row.id} data-name=${row.name} type="checkbox">
+                    </div>`;
+                    return checkbox;
                 }
             },
             {
@@ -57,7 +39,17 @@ $(function(){
                 name: "id",
                 ordering: true,
                 render: function (data, type, row) {
-                    return '<span class="font-weight-bold">' + row.id + '</span>';
+                    return `<span class="font-weight-bold">${row.id}</span>`;
+                }
+            },
+            {
+                width: '5%',
+                orderable: false,
+                class: 'text-center',
+                name: "image",
+                render: function (data, type, row) {
+                    const imageSrc = row.image_path ? row.image_path : 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png';
+                    return `<img class='rounded mx-auto w-100' src=${imageSrc} />`;
                 }
             },
             {
@@ -68,70 +60,84 @@ $(function(){
             {
                 orderable: false,
                 name: "purchases_count",
-                render: function(data,type,row){
-                    return `<span>${row.purchases_count}</span>`
+                render: function (data, type, row) {
+                    return `<span>${row.purchases_count}</span>`;
                 }
             },
             {
                 orderable: false,
                 name: "description",
-                render: function(data,type,row) {
-                    if(row.description !== null) {
-                        return `<span>${row.description}</span>`
-                    } else {
-                        return ''
-                    }
+                render: function (data, type, row) {
+                    return row.description !== null ? `<span>${row.description}</span>` : '';
                 }
             },
             {
                 orderable: false,
                 width: '15%',
                 render: function (data, type, row) {
-
                     const deleteFormTemplate = `
-                    <form style="display:inline-block;" data-name="${row.name}"  id="delete-form" action="${REMOVE_BRAND_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
+                    <form style="display:inline-block;" data-name="${row.name}" action="${REMOVE_BRAND_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
                       <input type="hidden" name="_method" value="DELETE">
                       <input type="hidden" name="id" value="${row.id}">
                       <button type="submit" data-name="${row.name}" data-id="${row.id}" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteBrand(this);"><i class="fa-light fa-trash text-danger"></i></button>
                     </form>
                   `;
+                    const editButton = `<a data-id=${row.id} class="btn p-1" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
 
-                    const editButton = '<a data-id=' + row.id + ' class="btn p-1" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>';
-                    const purchasesButton = '<a href=' + BRAND_PURCHASES.replace(':id',row.id) + ' data-id=' + row.id + ' class="btn p-1" title="Products"><i class="fa-light fa-cart-shopping text-primary"></i></a>';
-                    return `${deleteFormTemplate} ${editButton} ${purchasesButton}`;
+                    const removeImage = `
+                     <form style="display:inline-block;" action="${REMOVE_BRAND_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="id" value="${row.id}">
+                        <button 
+                            type="submit" 
+                            data-name="${row.name}" 
+                            data-id="${row.id}" 
+                            class="btn p-1" 
+                            title="Delete" 
+                            onclick="event.preventDefault(); deleteImage(this);">
+                            <i class="fa-light fa-image text-primary fa-lg"></i>
+                            </button>
+                     </form>`;
+
+                    return `${deleteFormTemplate} ${editButton} ${removeImage}`;
                 }
             }
         ],
         order: [[1, 'asc']]
     });
 
-    //ACTIONS
-    createBrand.on("click", function () {
-        openModal(createModal,STORE_BRAND_ROUTE);
+    // ACTIONS
+    $('.createBrand').on("click", () => openModal($('#createModal'), STORE_BRAND_ROUTE));
+
+    $('input.custom-file-input').each(function () {
+        $(this).on('change', function () {
+            const fileName = $(this).val().split('\\').pop();
+            const label = $(this).siblings('label.custom-file-label');
+            label.text(fileName || 'Choose file');
+        });
     });
 
-    $('#submitForm').on("click", function (e) {
-        e.preventDefault();
-        submit(e,createModal,table);
-    });
-
-    $('#updateForm').on("click", function (e) {
+    $('#submitForm, #updateForm').on("click", function (e) {
         e.preventDefault();
 
-        var actionUrl = editForm.attr('action');
-        var data = editForm.serialize();
+        const visibleModal = $('.modal:visible');
+        const modalForm = visibleModal.find('form');
+        const actionUrl = modalForm.attr('action');
+        const formData = new FormData(modalForm[0]);
 
-        APIPOSTCALLER(actionUrl, data,
-                function (response) {
+        APIPOSTCALLER(actionUrl, formData,
+            (response, xhr) => {
+                if (xhr === 'success') {
                     toastr['success'](response.message);
-                    editForm.trigger('reset');
-                    editModal.modal('toggle');
-                    table.DataTable().ajax.reload();
-                },
-                function (error) {
-                    toastr['error'](response.responseJSON.message);
-                    ajaxResponse(error.responseJSON.errors);
+                    visibleModal.modal('toggle');
+                    modalForm.trigger('reset');
+                    dataTable.ajax.reload(null, false);
                 }
+            },
+            (error) => {
+                toastr['error'](response.responseJSON.message);
+                ajaxResponse(error.responseJSON.errors);
+            }
         );
     });
 
@@ -144,72 +150,84 @@ $(function(){
         }
     });
 
-    // Window events
-    window.deleteBrand = function (e) {
+    // WINDOW EVENTS
+
+    window.deleteImage = (e) => {
         const form = $(e).closest('form');
         const url = form.attr('action');
-        const name = form.attr('data-name');        
 
+        APIDELETECALLER(url,(response) => {
+            toastr['success'](response.message);
+            dataTable.ajax.reload(null, false);
+        },(error) => {
+            toastr['error'](error.message);
+        })
+    }
+
+    window.deleteBrand = (e) => {
+        const form = $(e).closest('form');
+        const url = form.attr('action');
+        const name = form.attr('data-name');
         const template = swalText(name);
 
-        showConfirmationDialog('Selected items!', template, function () {
-            APIDELETECALLER(url, function (response) {
+        showConfirmationDialog('Selected items!', template, () => {
+            APIDELETECALLER(url, (response) => {
                 toastr['success'](response.message);
-                table.DataTable().ajax.reload();
-            }, function (error) {
+                dataTable.ajax.reload(null, false);
+            }, (error) => {
                 toastr['error'](error.message);
             });
-        });    
+        });
     };
 
-    window.editBrand = function (e) {
-        let id = $(e).attr('data-id');
+    window.editBrand = (e) => {
+        const id = $(e).attr('data-id');
+
+        const modal = $('#editModal');
+        const modalForm = modal.find('form');
+
         $.ajax({
             method: "GET",
             url: EDIT_BRAND_ROUTE.replace(':id', id),
             contentType: 'application/json',
-            success: function (data) {
+            success: (data) => {
                 $('#editModal').modal('show');
-                editForm.attr('action', UPDATE_BRAND_ROUTE.replace(':id', id));
-                editForm.find('input[name="name"]').val(data.name);
-                editForm.find('textarea[name="description"]').val(data.description);
+                modalForm.attr('action', UPDATE_BRAND_ROUTE.replace(':id', id));
+                modalForm.find('input[name="name"]').val(data.name);
+                modalForm.find('textarea[name="description"]').val(data.description);
+                modalForm.find('img[id="icon"]').attr('src', data.image_path);
             },
-            error: function (errors) {
+            error: (errors) => {
                 toastr['error'](errors.message);
             }
         });
     };
 
-    window.selectBrand = function (e) {
-        if ($('tbody input[type="checkbox"]:checked').length === 0) {
-            $('.actions').addClass('d-none');
-        } else {
-            $('.actions').removeClass('d-none');
-        }
+    window.selectBrand = (e) => {
+        $('.actions').toggleClass('d-none', $('tbody input[type="checkbox"]:checked').length === 0);
     };
 
     // Variable functions
-    let deleteMultipleBrands = function () {
-        let searchedIds = [];
-        let searchedNames = [];
+    const deleteMultipleBrands = () => {
+        const searchedIds = [];
+        const searchedNames = [];
 
         $('input:checked').map(function () {
             searchedIds.push($(this).attr('data-id'));
             searchedNames.push($(this).attr('data-name'));
         });
 
-        let template = swalText(searchedNames);
+        const template = swalText(searchedNames);
 
-        showConfirmationDialog('Selected Items!',template,function(){
-            searchedIds.forEach(function(id,index){
-                APIDELETECALLER(REMOVE_BRAND_ROUTE.replace(':id',id),function(response){
+        showConfirmationDialog('Selected Items!', template, () => {
+            searchedIds.forEach(function (id, index) {
+                APIDELETECALLER(REMOVE_BRAND_ROUTE.replace(':id', id), (response) => {
                     toastr['success'](response.message);
-                    table.DataTable().ajax.reload();
-                },function(error){
+                    dataTable.ajax.reload(null, false);
+                }, (error) => {
                     toastr['error'](error.message);
                 });
-            })
-        })
+            });
+        });
     };
-
 });

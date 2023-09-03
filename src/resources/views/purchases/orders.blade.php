@@ -58,7 +58,7 @@
         const PRODUCT_ID = "{{$purchase->id}}"
         const ORDER_API_ROUTE = "{{route('api.orders')}}";
         const CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}"
-        const PAYMENT_API = "{{route('payment.edit.order',':id')}}"
+        const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
         const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
         const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}";
         const ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";

@@ -10,7 +10,6 @@ mix.js('resources/js/categories/categories.js', 'public/js/categories'),
 mix.js('resources/js/subcategories/subcategories.js', 'public/js/categories'),
 
 mix.js('resources/js/brands/brands.js', 'public/js/brands'),
-mix.js('resources/js/brands/purchases.js', 'public/js/brands'),
 
 mix.js('resources/js/helpers/action_helpers.js', 'public/helpers/js'),
 mix.js('resources/js/helpers/render_helpers.js', 'public/js/helpers'),
