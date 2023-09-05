@@ -26,7 +26,6 @@ class PurchaseApiController extends Controller
         $order_dir = isset($request->order_dir) ? $request->order_dir : null;
         $column_name = isset($request->order_column) ? $request->order_column : null;
         $limit  = isset($request->limit) ? $request->limit : null;
-        $is_paid = isset($request->is_paid) && !$request->is_paid ? false : true;
         $out_of_stock = isset($request->out_of_stock) ? $request->out_of_stock : null;
         $offset = $request->input('start', 0);
 
@@ -41,7 +40,6 @@ class PurchaseApiController extends Controller
             'code',
             'status',
             'created_at',
-            'is_paid',
             'initial_quantity',
             'expected_date_of_payment',
             'original_price',
@@ -99,9 +97,6 @@ class PurchaseApiController extends Controller
         if ($single_total_price) {
             $purchaseQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
         }
-        if (!$is_paid) {
-            $purchaseQuery->where('is_paid', 0);
-        }
         if (!is_null($out_of_stock)) {
             if(boolval($out_of_stock) === true) {
                 $purchaseQuery->where('quantity', '<=', 0);
@@ -116,29 +111,12 @@ class PurchaseApiController extends Controller
             );
         }
 
-        $relations = [...$relations, ...['orders:id,status,is_paid', 'payment:id,purchase_id,date_of_payment']];
-        $purchaseQuery->with($relations);
-
-        $purchaseQuery
-            ->withCount([
-                'orders as paid_orders_count' => function ($query) {
-                    $query->where('status', 1)
-                        ->where('is_paid', 1);
-                },
-                'orders as overdue_orders_count' => function ($query) {
-                    $query->where('status', 4)
-                        ->where('is_paid', 1);
-                },
-                'orders as pending_orders_count' => function ($query) {
-                    $query->where('status', 2)
-                        ->where('is_paid', 0);
-                },
-                'orders as refund_orders_count' => function ($query) {
-                    $query->where('status', 5)
-                        ->where('is_paid', 2);
-                }
-            ]);
-
+        $relations = [...$relations, ...['payment:id,purchase_id,date_of_payment']];
+        $purchaseQuery->with($relations)->withCount([
+            'orders',
+            // Add other relationships you want to count here
+        ]);
+        
         $filteredRecords = $purchaseQuery->count();
         $result = $purchaseQuery->get();
         $totalRecords = Purchase::count();

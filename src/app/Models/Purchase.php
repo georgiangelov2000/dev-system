@@ -45,7 +45,6 @@ class Purchase extends Model {
         'brands',
         'total_price',
         'initial_quantity',
-        'is_paid',
         'status',
         'discount',
         'expected_date_of_payment',

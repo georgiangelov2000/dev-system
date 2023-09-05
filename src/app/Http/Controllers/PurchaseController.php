@@ -10,18 +10,20 @@ use App\Models\SubCategory;
 use App\Helpers\FunctionsHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class PurchaseController extends Controller
 {
 
     private $staticDataHelper;
 
+    private $helper;
+
     private $dir = 'public/images/products';
 
-    public function __construct(LoadStaticData $staticDataHelper)
+    public function __construct(LoadStaticData $staticDataHelper, FunctionsHelper $helper)
     {
         $this->staticDataHelper = $staticDataHelper;
+        $this->helper = $helper;
     }
 
     public function index()
@@ -31,14 +33,8 @@ class PurchaseController extends Controller
 
     public function create()
     {
-        $suppliers = $this->staticDataHelper->callSupliers();
-        $brands = $this->staticDataHelper->callBrands();
-        $categories = $this->staticDataHelper->loadCallCategories();
-        return view('purchases.create', [
-            'suppliers' => $suppliers,
-            'brands' => $brands,
-            'categories' => $categories
-        ]);
+        $data = $this->loadStaticData();
+        return view('purchases.create', $data);
     }
 
     public function store(PurchaseRequest $request)
@@ -48,55 +44,8 @@ class PurchaseController extends Controller
         try {
             $data = $request->validated();
 
-            $file = isset($data['image']) ? $data['image'] : false;
-            $price = $data['price'];
-            $quantity = $data['quantity'];
-            $discount = $data['discount_percent'];
-            $subcategories = isset($data['subcategories']) && !empty($data['subcategories']) ? $data['subcategories'] : null;
-            $brands = isset($data['brands']) && !empty($data['brands']) ? $data['brands'] : null;
-            $category = $data['category_id'];
-            $imagePath = Storage::url($this->dir);
-
-            $discountPrice = FunctionsHelper::calculatedDiscountPrice($price, $discount);
-            $totalPrice = FunctionsHelper::calculatedFinalPrice($discountPrice, $quantity);
-            $originalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
-
-            $purchase = Purchase::create([
-                "name" => $data['name'],
-                "supplier_id" => $data['supplier_id'],
-                "quantity" => $quantity,
-                "initial_quantity" => $quantity,
-                "notes" => $data["notes"] ?? "",
-                "price" => $price,
-                'discount_price' => $discountPrice,
-                "code" => $data["code"],
-                "total_price" => $totalPrice,
-                'original_price' => $originalPrice,
-                'expected_date_of_payment' => date('Y-m-d', strtotime($data['expected_date_of_payment'])),
-                'delivery_date' => date('Y-m-d', strtotime($data['delivery_date'])),
-            ]);
-
-            if ($category) {
-                $purchase->categories()->sync([$category]);
-            }
-
-            if ($subcategories !== null) {
-                $purchase->subcategories()->sync($subcategories);
-            }
-
-            if ($brands !== null) {
-                $purchase->brands()->sync($brands);
-            }
-
-            if ($file) {
-                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
-                Storage::putFileAs($this->dir, $file, $hashed_image);
-
-                $purchase->images()->create([
-                    'path' => $imagePath,
-                    'name' => $hashed_image
-                ]);
-            }
+            $this->purchaseProcessing($data);
+            
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -104,92 +53,23 @@ class PurchaseController extends Controller
         }
         return redirect()->route('purchase.index')->with('success', 'Purchase has been created');
     }
-
     public function edit(Purchase $purchase)
     {
         $relatedProductData = $this->fetchRelatedProductData($purchase);
+        $data = $this->loadStaticData();
+        $is_available = $purchase->payment === null ? true : false;
 
-        $brands = $this->staticDataHelper::callBrands();
-        $suppliers = $this->staticDataHelper::callSupliers();
-        $categories = $this->staticDataHelper::loadCallCategories();
-        $is_available = $purchase->status == null  && $purchase->is_paid == false && $purchase->payment == null ? true : false;
-
-        return view('purchases.edit', compact(
-            'purchase',
-            'relatedProductData',
-            'suppliers',
-            'brands',
-            'suppliers',
-            'categories',
-            'is_available'
-        ));
+        return view('purchases.edit', compact('purchase', 'relatedProductData','is_available'), $data);
     }
 
     public function update(Purchase $purchase, PurchaseRequest $request)
     {
-        $data = $request->validated();
         DB::beginTransaction();
-
+    
         try {
-
-            $file = isset($data['image']) ? $data['image'] : false;
-            $subcategories = isset($data['subcategories']) && !empty($data['subcategories']) ? $data['subcategories'] : null;
-            $brands = isset($data['brands']) && !empty($data['brands']) ? $data['brands'] : null;
-            $category = $data['category_id'];
-            $imagePath = Storage::url($this->dir);
-
-            if ($category) {
-                $purchase->categories()->sync([$category]);
-            }
-
-            if ($subcategories !== null) {
-                $purchase->subcategories()->sync($subcategories);
-            }
-
-            if ($brands !== null) {
-                $purchase->brands()->sync($brands);
-            }
-
-            if ($file) {
-                $hashed_image = Str::random(10) . '.' . $file->getClientOriginalExtension();
-                Storage::putFileAs($this->dir, $file, $hashed_image);
-
-                $purchase->images()->create([
-                    'path' => $imagePath,
-                    'name' => $hashed_image
-                ]);
-            }
-
-            $attributes = [
-                'name' => $data['name'],
-                'supplier_id' => $data['supplier_id'],
-                'notes' => $data['notes'] ?? '',
-                'code' => $data['code'],
-            ];
-            if($purchase->status === null && boolval($purchase->is_paid) === false && $purchase->payment === null) {
-                $price = $data['price'];
-                $quantity = $data['quantity'];
-                $discount = $data['discount_percent'];
-            
-                $discountPrice = FunctionsHelper::calculatedDiscountPrice($price, $discount);
-                $totalPrice = FunctionsHelper::calculatedFinalPrice($discountPrice, $quantity);
-                $originalPrice = FunctionsHelper::calculatedFinalPrice($price, $quantity);
-                
-                $attributes = array_merge($attributes,[
-                    'quantity' => $quantity,
-                    'discount_percent' => $discount,
-                    'inital_quantity' => $quantity,
-                    'price' => $price,
-                    'discount_price' => $discountPrice,
-                    'total_price' => $totalPrice,
-                    'original_price' => $originalPrice,
-                    'expected_date_of_payment' => date('Y-m-d', strtotime($data['expected_date_of_payment'])),
-                    'delivery_date' => date('Y-m-d', strtotime($data['delivery_date'])),
-                ]);
-
-            }
-            
-            $purchase->update($attributes);
+            $data = $request->validated();
+    
+            $this->purchaseProcessing($data,$purchase);
 
             DB::commit();
         } catch (\Exception $e) {
@@ -335,5 +215,127 @@ class PurchaseController extends Controller
     public function orders(Purchase $purchase)
     {
         return view('purchases.orders', compact('purchase'));
+    }
+
+    // Private methods
+
+    private function loadStaticData()
+    {
+        $suppliers = $this->staticDataHelper->callSupliers();
+        $brands = $this->staticDataHelper->callBrands();
+        $categories = $this->staticDataHelper->loadCallCategories();
+
+        return [
+            'suppliers' => $suppliers,
+            'brands' => $brands,
+            'categories' => $categories
+        ];
+    }
+
+    private function purchaseProcessing(array $data, $purchase = null)
+    {
+        $prices = null;
+
+        // Check if $data['image'] exists and set it to $file
+        $file = $data['image'] ?? null;
+
+        // Check if $data['subcategories'] and $data['brands'] exist and are not empty
+        $subCategories = $data['subcategories'] ?? null;
+        $brands = $data['brands'] ?? null;
+
+        if ($subCategories !== null) {
+            $subCategories = $this->getNonEmptyArray($subCategories);
+        }
+
+        if ($brands !== null) {
+            $brands = $this->getNonEmptyArray($brands);
+        }
+
+        $purchase = $purchase ? $purchase : new Purchase;
+
+        $isNewPurchase = !$purchase->exists; // Check if it's a new purchase
+        $status = $isNewPurchase ? $this->checkForValidStatus(6) : $this->checkForValidStatus($purchase->status);
+
+        // Update purchase or create Purchase;
+        $purchase->name = $data['name'];
+        $purchase->supplier_id = $data['supplier_id'];
+        $purchase->notes = $data['notes'] ?? '';
+
+        if( ($purchase && $status === 6) || $isNewPurchase){
+            // Calculate prices
+            $prices = $this->calculatePrices($data['price'], $data['discount_percent'], $data['quantity']);        
+            
+            // Update quantities
+            $purchase->quantity = $data['quantity'];
+            $purchase->initial_quantity = $data['quantity'];
+
+            // Update prices
+            $purchase->price = $data['price'];
+            $purchase->total_price = $prices['total_price'];
+            $purchase->original_price = $prices['original_price'];
+            $purchase->discount_price = $prices['discount_price'];
+
+            // Update code
+            $purchase->code = $data['code'];
+
+            // Update dates
+            $purchase->expected_date_of_payment = now()->parse($data['expected_date_of_payment']);
+            $purchase->delivery_date = now()->parse($data['delivery_date']);
+            $purchase->status = $status;
+        }
+
+        $purchase->save();
+        
+        if ($data['category_id']) {
+            $purchase->categories()->sync([$data['category_id']]);
+        }
+
+        if ($subCategories) {
+            $purchase->subcategories()->sync($subCategories);
+        }
+
+        if ($brands) {
+            $purchase->brands()->sync($brands);
+        }
+        
+        if ($file) {
+            $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
+            Storage::putFileAs($this->dir, $file, $hashed_image);
+
+            $purchase->images()->create([
+                'path' => $this->getImagePath(),
+                'name' => $hashed_image,
+            ]);
+        }
+        
+    }
+
+    private function calculatePrices($price, $discount, $quantity): array
+    {
+
+        $discountPrice = $this->helper->calculatedDiscountPrice($price, $discount);
+        $totalPrice = $this->helper->calculatedFinalPrice($discountPrice, $quantity);
+        $originalPrice = $this->helper->calculatedFinalPrice($price, $quantity);
+
+        return [
+            'discount_price' => $discountPrice,
+            'total_price' => $totalPrice,
+            'original_price' => $originalPrice
+        ];
+    }
+
+    private function getNonEmptyArray($value): ?array
+    {
+        return is_array($value) ? array_filter($value) : null;
+    }
+
+    private function getImagePath(): string
+    {
+        return Storage::url($this->dir);
+    }
+    
+    private function checkForValidStatus (int $status):int {
+        $statuses = config('statuses.purchase_statuses');
+        return array_key_exists($status,$statuses) ? $status : null;
     }
 }

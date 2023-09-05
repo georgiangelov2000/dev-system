@@ -300,9 +300,9 @@ $(function () {
                     } else if (row.status === 5) {
                         status = "Refunded";
                         iconClass = "fal fa-undo-alt"; // Light FontAwesome icon for Refunded
-                    } else {
-                        status = "Unpaid";
-                        iconClass = "fal fa-exclamation-triangle"; // Light FontAwesome icon for Unpaid or any default icon
+                    } else if(row.status === 6){
+                        status = "Delivered";
+                        iconClass = "fal fa-shipping-fast"; // Light FontAwesome icon for Unpaid or any default icon
                     }
 
                     return `<div title="${status}" class="status">

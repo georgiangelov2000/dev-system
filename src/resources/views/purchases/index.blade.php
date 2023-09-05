@@ -94,6 +94,21 @@
                         </div>
                     </div>     
                 </div>  
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="font-weight-bold">Legend:</h6>
+                    </div>
+                    <div class="col-12">
+                        <span> - Purchases that have associated payments cannot be deleted.</span>
+                    </div>
+                    <div class="col-12">
+                        <span> - After creating a purchase, you are required to make a payment to your supplier.
+                            <a href="{{ route('payment.create','purchase') }}" class="d-inline-block">
+                                <p>Purchase payments</p>
+                            </a>
+                        </span>
+                    </div>
+                </div>
                 <table id="purchasedProducts" class="table table-hover table-sm dataTable no-footer">
                     <thead>
                         <th></th>
@@ -110,12 +125,11 @@
                         <th>Price</th>
                         <th>Disc.price</th>
                         <th>Tot.price</th>
-                        <th>Orig.price</th>
+                        <th>Regular.price</th>
                         <th>Quantity</th>
                         <th>Init.quantity</th>
                         <th>Discount</th>
                         <th>Stock</th>
-                        {{-- <th>Purchases</th> --}}
                         <th>Supplier</th>
                         <th>Category</th>
                         <th>Subcategories</th>

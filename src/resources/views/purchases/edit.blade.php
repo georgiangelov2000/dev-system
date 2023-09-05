@@ -125,19 +125,23 @@
                                         </div>
                                         <div class="form-group">
                                             <label for="name">Generate unique code</label>
-                                            <div class="input-group">
-                                                <input type="text"
-                                                    class="form-control @error('code')  is-invalid @enderror" id="code"
-                                                    name="code" value='{{ e($purchase->code) }}'
-                                                    placeholder="Generate code">
-                                                <span class="input-group-append">
-                                                    <button type="button"
-                                                        class="btn btn-primary btn-flat generateCode">Generate</button>
-                                                </span>
-                                            </div>
-                                            @error('code')
-                                                <span class="text-danger">{{ $message }}</span>
-                                            @enderror
+                                            @if ($is_available)
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                        class="form-control @error('code')  is-invalid @enderror"
+                                                        id="code" name="code" value='{{ e($purchase->code) }}'
+                                                        placeholder="Generate code">
+                                                    <span class="input-group-append">
+                                                        <button type="button"
+                                                            class="btn btn-primary btn-flat generateCode">Generate</button>
+                                                    </span>
+                                                </div>
+                                                @error('code')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            @else
+                                                <p class="input-group-text col-12">{{ $purchase->code }}</p>
+                                            @endif
                                         </div>
                                         <div class="form-group">
                                             <label>Delivery date:</label>
@@ -336,6 +340,7 @@
         </div>
 
     </div>
+
 
     @push('scripts')
         <script type="text/javascript" src="{{ mix('js/purchases/form.js') }}"></script>
