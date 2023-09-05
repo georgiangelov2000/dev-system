@@ -20,7 +20,7 @@ $(function () {
     let createdRange;
 
     // Set the default status array
-    let statusArray = [0];
+    let statusArray = [6];
 
     let dataTable = table.DataTable({
         serverSide: true,
@@ -218,18 +218,6 @@ $(function () {
                 class:'text-center',
                 render: function (data, type, row) {
                     return '<span>' + moment(row.expected_date_of_payment).format('YYYY-MM-DD') + '</span>';
-                }
-            },
-            {
-                width: '2%',
-                orderable: false,
-                name: "is_paid",
-                render: function (data, type, row) {
-                    if (row.is_paid) {
-                        return '<span class="text-success">Yes</span>';
-                    } else {
-                        return '<span class="text-danger">No</span>';
-                    }
                 }
             },
         ],

@@ -31,7 +31,7 @@
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div> --}}
                 </div>
-                <form id="paymentPurchases" class="col-12" action="{{route('payment.store.purchase')}}" method="POST">
+                <form id="paymentPurchases" class="col-12" action="{{route('payment.store','purchase')}}" method="POST">
                     @csrf
 
                     <table id="purchases" class="table table-hover table-sm">
@@ -56,7 +56,6 @@
                             <th>Paid total price</th>
                             <th>Date of payment</th>
                             <th>Exp.date of payment</th>
-                            <th>Paid</th>
                         </thead>
                     </table>
                     <div class="row submitWrapper"></div>
