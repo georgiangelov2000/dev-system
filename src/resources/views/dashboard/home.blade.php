@@ -205,12 +205,46 @@
                         </div>
                         <div class="col-md-12 col-sm-12 col-xs-12 mb-5 d-flex">
                             <div class="col-md-6 col-sm-6 col-xs-6">
-                                <div class="border-0 pt-0 pb-0">
-                                    <h6 class="mb-0">Sales</h6>
+                                <h6 class="mb-3">
+                                    Top Selling Drivers
+                                </h6>
+                                <div class="card-body p-0">
+                                    <ul class="products-list product-list-in-card pl-2 pr-2">
+                                        @if (array_key_exists('top_selling_drivers', $dashboard))
+                                            @if (count($dashboard['top_selling_drivers']))
+                                                @foreach ($dashboard['top_selling_drivers'] as $item)
+                                                    <li class="item">
+                                                        <div class="product-img">
+                                                            <img src="{{ $item['image'] }}" alt="User Image"
+                                                                class="img-size-50">
+                                                        </div>
+                                                        <div class="product-info">
+                                                            <a href="javascript:void(0)"
+                                                                class="product-title">{{ $item['username'] }}
+                                                                <span
+                                                                    class="badge badge-warning float-right">${{ $item['total_price'] }}</span>
+                                                                <br>
+                                                                <span class="badge badge-warning float-right">Amount:
+                                                                    {{ $item['total_quantity'] }}</span>
+                                                                    <br>
+                                                                <span class="badge badge-warning float-right">Count:
+                                                                    {{ $item['orders_count'] }}</span>
+                                                            </a>
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            @endif
+                                        @else
+                                        @endif
+                                    </ul>
                                 </div>
-                                <canvas id="myChart"></canvas>
+
+                                <div class="card-footer text-center">
+                                    <a href="javascript:void(0)" class="uppercase">View All Users</a>
+                                </div>
+
                             </div>
-                            <div class="col-md-6 col-sm-6 col-xs-6 p-0">
+                            <div class="col-md-6 col-sm-6 col-xs-6">
                                 <h6 class="mb-3">
                                     Top Selling Products
                                 </h6>
@@ -221,12 +255,12 @@
                                                 @foreach ($dashboard['top_selling_products'] as $item)
                                                     <li class="item">
                                                         <div class="product-img">
-                                                            <img src="{{ $item['image'] }}" alt="Product Image"
+                                                            <img src="{{ $item['first_image'] }}" alt="Product Image"
                                                                 class="img-size-50">
                                                         </div>
                                                         <div class="product-info">
                                                             <a href="javascript:void(0)"
-                                                                class="product-title">{{ $item['product_name'] }}
+                                                                class="product-title">{{ $item['name'] }}
                                                                 <span
                                                                     class="badge badge-warning float-right">${{ $item['total_price'] }}</span>
                                                                 <br>
@@ -234,7 +268,7 @@
                                                                     {{ $item['total_quantity'] }}</span>
                                                             </a>
                                                             <span class="product-description">
-                                                                {{ $item['product_code'] }}
+                                                                {{ $item['code'] }}
                                                             </span>
                                                         </div>
                                                     </li>
@@ -262,7 +296,7 @@
                                             <tr>
                                                 <th>Icon</th>
                                                 <th>Category</th>
-                                                <th>Amount</th>
+                                                <th>Counts</th>
                                                 <th class="text-center">Price</th>
                                             </tr>
                                         </thead>
@@ -333,10 +367,10 @@
                                                                     class="product-title font-weight-bold">{{ $item['name'] }}</a>
                                                             </td>
                                                             <td>
-                                                                <b>{{ $item['purchases_count'] }}</b>
+                                                                <b>{{ $item['total_quantity'] }}</b>
                                                             </td>
                                                             <td class="text-center">
-                                                                <b>{{ $item['purchases_sum_total_price'] }}</b> USD
+                                                                <b>{{ $item['total_price'] }}</b> USD
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -381,10 +415,10 @@
                                                                     class="product-title font-weight-bold">{{ $item['name'] }}</a>
                                                             </td>
                                                             <td>
-                                                                <b>{{ $item['orders_count'] }}</b>
+                                                                <b>{{ $item['total_quantity'] }}</b>
                                                             </td>
                                                             <td class="text-center">
-                                                                <b>{{ $item['orders_sum_total_sold_price'] }}</b> USD
+                                                                <b>{{ $item['total_price'] }}</b> USD
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -400,35 +434,5 @@
             </div>
         </div>
         @push('scripts')
-            <script type="text/javascript">
-                const ctx = document.getElementById('myChart');
-
-                // Data for each month (example data)
-                const monthlyData = [12, 19, 3, 5, 2, 3, 8, 15, 9, 7, 20, 10]; // Replace with your data
-
-                const monthNames = [
-                    'January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'
-                ];
-
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: monthNames,
-                        datasets: [{
-                            label: '# of Votes',
-                            data: monthlyData,
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            </script>
         @endpush
     @endsection

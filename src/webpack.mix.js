@@ -7,7 +7,7 @@ mix.js('resources/js/users/users.js', 'public/js/users'),
 mix.js('resources/js/users/form.js', 'public/js/users'),
 
 mix.js('resources/js/categories/categories.js', 'public/js/categories'),
-mix.js('resources/js/subcategories/subcategories.js', 'public/js/categories'),
+mix.js('resources/js/subcategories/subcategories.js', 'public/js/subcategories'),
 
 mix.js('resources/js/brands/brands.js', 'public/js/brands'),
 

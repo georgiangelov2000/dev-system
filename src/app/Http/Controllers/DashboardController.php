@@ -5,164 +5,210 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\User;
 use App\Models\Order;
-use App\Models\OrderPayment;
 use App\Models\Purchase;
 use App\Models\Package;
 use App\Models\Settings;
 use App\Models\Supplier;
 use App\Models\Category;
-use App\Models\PurchaseImage;
+use Illuminate\Support\Facades\DB;
 use stdClass;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        $data = $this->getData();
+
         return view('dashboard.home', [
-            'dashboard' => $this->getStats()
+            'dashboard' => $this->getStats($data)
         ]);
     }
 
-    public function getStats()
+    public function getStats(array $data)
     {
-
         $result = new stdClass;
 
-        $companyInformation = Settings::where('type', 1)->first();
+        $result->company = $data['company'];
+        $result->server_information = $this->getServerInformation();
+        $result->customers = $data['customers'];
+        $result->drivers = $data['drivers'];
+        $result->orders = $data['orders'];
+        $result->purchases = $data['purchases'];
+        $result->packages = $data['packages'];
+        $result->suppliers = $data['suppliers'];
+        $result->top_selling_products = $data['top_selling_products'];
+        $result->top_categories = $data['top_categories'];
+        $result->top_suppliers = $data['top_suppliers'];
+        $result->top_customers = $data['top_customers'];
+        $result->top_selling_drivers = $data['top_selling_drivers'];
 
-        if ($companyInformation) {
-            $settings = json_decode($companyInformation->settings, true);
-            $result->company = $settings;
-        }
-        $result->server_information = $this->serverInformation();
-
-        $result->customers = Customer::count();
-        $result->drivers = User::where('role_id', 2)->count();
-        $result->orders = Order::count();
-        $result->purchases = Purchase::count();
-        $result->packages = Package::count();
-        $result->suppliers = Supplier::count();
-        $result->top_selling_products = $this->topSellingProducts();
-        $result->top_categories = $this->topData()[0];
-        $result->top_suppliers = $this->topData()[1];
-        $result->top_customers = $this->topData()[2];
-
-        $res = json_decode(json_encode($result), true);
-
-        return $res;
+        return json_decode(json_encode($result), true);
     }
 
-
-    private function serverInformation()
+    private function getData()
     {
-        $serverName = request()->server();
-        $server = [];
+        $paidStatuses = [1, 3, 4];
 
-        $server['web_server'] = $serverName['SERVER_SOFTWARE'];
-        $server['http_user_agent'] = $serverName['HTTP_USER_AGENT'];
-        $server['gateway_interface'] = $serverName['GATEWAY_INTERFACE'];
-        $server['server_protocol'] = $serverName['SERVER_PROTOCOL'];
-        $server['php_version'] = $serverName['PHP_VERSION'];
-        $server['php_url'] = $serverName['PHP_URL'];
-        $server['os'] = php_uname('s');
-        $server['ar'] = php_uname('m');
+        $customersCount = Customer::count();
+        $driversCount = User::where('role_id', 2)->count();
+        $ordersCount = Order::count();
+        $purchasesCount = Purchase::count();
+        $packagesCount = Package::count();
+        $suppliersCount = Supplier::count();
 
-        return $server;
+        $purchasesQuery = $this->getPurchaseQuery($paidStatuses);
+        $categoryQuery = $this->getTopCategoriesQuery();
+        $suppliersQuery = $this->getTopSuppliersQuery($paidStatuses);
+        $customersQuery = $this->getTopCustomerQuery($paidStatuses);
+        $userQuery = $this->getTopSellingDrivers($paidStatuses);
+
+        return [
+            'company' => $this->companyInformation(),
+            'customers' => $customersCount,
+            'drivers' => $driversCount,
+            'orders' => $ordersCount,
+            'purchases' => $purchasesCount,
+            'packages' => $packagesCount,
+            'suppliers' => $suppliersCount,
+            'top_selling_products' => $purchasesQuery,
+            'top_categories' => $categoryQuery,
+            'top_suppliers' => $suppliersQuery,
+            'top_customers' => $customersQuery,
+            'top_selling_drivers' => $userQuery
+        ];
     }
 
-    private function topSellingProducts()
+    private function getPurchaseQuery(array $paidStatuses)
     {
-        // $allowedStatuses = [1, 2, 3, 4];
-
-        // $query = OrderPayment::with('order:id,purchase_id', 'order.purchase')
-        //     ->whereIn('payment_status', $allowedStatuses)
-        //     ->whereHas('order', function ($query) use ($allowedStatuses) {
-        //         $query->whereIn('status', $allowedStatuses);
-        //     })
-        //     ->get();
-
-        // $productDetails = [];
-        // $productLimit = 6; // Maximum number of products
-
-        // foreach ($query as $orderPayment) {
-        //     $productId = $orderPayment->order->product_id;
-
-        //     $productName = $orderPayment->order->purchase->name; // Replace with your actual product name column
-
-        //     if (!isset($productDetails[$productName])) {
-        //         $productDetails[$productName] = [
-        //             'description' => $orderPayment->order->purchase->description, // Replace with your actual product description column
-        //             'quantity' => 0,
-        //             'total_price' => 0,
-        //         ];
-        //     }
-
-        //     $quantity = $orderPayment->quantity;
-        //     $totalPrice = $orderPayment->price;
-
-        //     $productDetails[$productName]['quantity'] += $quantity;
-        //     $productDetails[$productName]['total_price'] += $totalPrice;
-        //     $productDetails[$productName]['formatted_total_price'] = number_format($productDetails[$productName]['total_price'], 2, '.', ',');
-
-        //     // Check if the product limit is reached
-        //     if (count($productDetails) >= $productLimit) {
-        //         break;
-        //     }
-        // }
-
-        // return $productDetails;
-
-        $productLimit = 6; // Maximum number of products
-
-        $productDetails = OrderPayment::join('orders', 'order_payments.order_id', '=', 'orders.id')
-            ->join('purchases', 'orders.purchase_id', '=', 'purchases.id')
-            ->whereIn('order_payments.payment_status', [1, 2, 3, 4])
-            ->whereIn('orders.status', [1, 2, 3, 4])
-            ->selectRaw('purchases.id as purchase_id, purchases.name as product_name, purchases.code as product_code,
-            SUM(order_payments.quantity) as total_quantity,
-            SUM(order_payments.price) as total_price')
-            ->groupBy('purchases.id', 'purchases.name', 'purchases.code')
-            ->orderByDesc('total_quantity')
-            ->limit($productLimit)
+        return Purchase::select('id', 'name', 'code')
+            ->addSelect(DB::raw("(SELECT SUM(payments.price) FROM order_payments AS payments 
+                             WHERE payments.order_id IN 
+                                 (SELECT id FROM orders 
+                                  WHERE orders.purchase_id = purchases.id 
+                                  AND orders.status IN (" . implode(',', $paidStatuses) . ")
+                                 ) 
+                                 AND payments.payment_status IN (" . implode(',', $paidStatuses) . ")
+                            ) AS total_price"))
+            ->addSelect(DB::raw("(SELECT SUM(payments.quantity) FROM order_payments AS payments 
+                            WHERE payments.order_id IN 
+                                (SELECT id FROM orders 
+                                 WHERE orders.purchase_id = purchases.id 
+                                 AND orders.status IN (" . implode(',', $paidStatuses) . ")
+                                ) 
+                                AND payments.payment_status IN (" . implode(',', $paidStatuses) . ")
+                           ) AS total_quantity"))
+            ->addSelect(DB::raw("(SELECT CONCAT(purchases_images.path, '/', purchases_images.name) FROM purchases_images 
+                            WHERE purchases_images.purchase_id = purchases.id 
+                            ORDER BY purchases_images.id 
+                            LIMIT 1) AS first_image"))
+            ->whereHas('orders', function ($query) use ($paidStatuses) {
+                $query->whereIn('status', $paidStatuses);
+            })
+            ->take(4)
             ->get();
-
-        foreach ($productDetails as $product) {
-            $image = PurchaseImage::where('purchase_id', $product->purchase_id)->first();
-            $product->image = $image->path . '/' . $image->name;
-        }
-
-        return $productDetails;
     }
 
-    private function topData()
+    private function getTopCategoriesQuery()
     {
-        $categoryQuery = Category::withCount('products')
+        return Category::withCount('products')
             ->withSum('products', 'total_price')
             ->whereHas('products')
             ->orderBy('products_count', 'desc')
             ->limit(4)
             ->get();
+    }
 
-        $supplierQuery = Supplier::select('id', 'name', 'email','image_path')
-            ->withCount('purchases')
-            ->withSum('purchases', 'total_price')
-            ->whereHas('purchases')
-            ->orderBy('purchases_count', 'desc')
-            ->limit(4)
+    private function getTopSuppliersQuery(array $paidStatuses)
+    {
+        return Supplier::select('id', 'name', 'image_path')
+            ->addSelect(DB::raw("(SELECT SUM(payments.price) FROM purchases AS p
+                            JOIN purchase_payments AS payments ON p.id = payments.purchase_id
+                            WHERE p.supplier_id = suppliers.id 
+                            AND payments.payment_status IN (" . implode(',', $paidStatuses) . ")) AS total_price"))
+            ->addSelect(DB::raw("(SELECT SUM(payments.quantity) FROM purchases AS p
+                            JOIN purchase_payments AS payments ON p.id = payments.purchase_id
+                            WHERE p.supplier_id = suppliers.id 
+                            AND payments.payment_status IN (" . implode(',', $paidStatuses) . ")) AS total_quantity"))
+            ->addSelect(DB::raw("(SELECT COUNT(*) FROM purchases AS p
+                            WHERE p.supplier_id = suppliers.id 
+                            AND p.status IN (" . implode(',', $paidStatuses) . ")) AS purchases_count"))
+            ->whereHas('purchases', function ($query) use ($paidStatuses) {
+                $query->whereIn('status', $paidStatuses);
+            })
+            ->take(4)
+            ->get();
+    }
+
+    private function getTopCustomerQuery(array $paidStatuses)
+    {
+        return Customer::select('id', 'name', 'image_path')
+            ->addSelect(DB::raw("(SELECT SUM(payments.price) FROM orders AS p
+                        JOIN order_payments AS payments ON p.id = payments.order_id
+                        WHERE p.customer_id = customers.id 
+                        AND payments.payment_status IN (" . implode(',', $paidStatuses) . ")) AS total_price"))
+            ->addSelect(DB::raw("(SELECT SUM(payments.quantity) FROM orders AS p
+                        JOIN order_payments AS payments ON p.id = payments.order_id
+                        WHERE p.customer_id = customers.id 
+                        AND payments.payment_status IN (" . implode(',', $paidStatuses) . ")) AS total_quantity"))
+            ->addSelect(DB::raw("(SELECT COUNT(*) FROM orders AS p
+                        WHERE p.customer_id = customers.id 
+                        AND p.status IN (" . implode(',', $paidStatuses) . ")) AS orders_count"))
+            ->whereHas('orders', function ($query) use ($paidStatuses) {
+                $query->whereIn('status', $paidStatuses);
+            })
+            ->take(4)
+            ->get();
+    }
+
+    private function getTopSellingDrivers(array $paidStatuses)
+    {
+        $userQuery = User::select('id', 'role_id', 'username', 'image')
+            ->where('role_id', 2)
+            ->addSelect(DB::raw("(SELECT SUM(payments.price) FROM orders AS p
+                        JOIN order_payments AS payments ON p.id = payments.order_id
+                        WHERE p.user_id = users.id 
+                        AND payments.payment_status IN (" . implode(',', $paidStatuses) . ")) AS total_price"))
+            ->addSelect(DB::raw("(SELECT SUM(payments.quantity) FROM orders AS p
+                        JOIN order_payments AS payments ON p.id = payments.order_id
+                        WHERE p.user_id = users.id 
+                        AND payments.payment_status IN (" . implode(',', $paidStatuses) . ")) AS total_quantity"))
+            ->addSelect(DB::raw("(SELECT COUNT(*) FROM orders AS p
+                        WHERE p.user_id = users.id 
+                        AND p.status IN (" . implode(',', $paidStatuses) . ")) AS orders_count"))
+            ->whereHas('orders', function ($query) use ($paidStatuses) {
+                $query->whereIn('status', $paidStatuses);
+            })
+            ->take(4)
             ->get();
 
-        $customerQuery = Customer::select('id', 'name', 'email','image_path')
-            ->withCount('orders')
-            ->withSum('orders', 'total_sold_price')
-            ->whereHas('orders')
-            ->orderBy('orders_count', 'desc')
-            ->limit(4)
-            ->get();
+        return $userQuery;
+    }
 
-        return [
-            $categoryQuery,
-            $supplierQuery,
-            $customerQuery
+    private function companyInformation()
+    {
+        $companyInformation = Settings::where('type', 1)->first();
+
+        if ($companyInformation) {
+            $settings = json_decode($companyInformation->settings, true);
+        }
+
+        return $settings;
+    }
+
+    private function getServerInformation()
+    {
+        $serverName = request()->server();
+        $server = [
+            'web_server' => $serverName['SERVER_SOFTWARE'],
+            'http_user_agent' => $serverName['HTTP_USER_AGENT'],
+            'gateway_interface' => $serverName['GATEWAY_INTERFACE'],
+            'server_protocol' => $serverName['SERVER_PROTOCOL'],
+            'php_version' => $serverName['PHP_VERSION'],
+            'php_url' => $serverName['PHP_URL'],
+            'os' => php_uname('s'),
+            'ar' => php_uname('m'),
         ];
+
+        return $server;
     }
 }

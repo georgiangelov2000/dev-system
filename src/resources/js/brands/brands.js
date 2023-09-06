@@ -75,6 +75,8 @@ $(function () {
                 orderable: false,
                 width: '15%',
                 render: function (data, type, row) {
+                    let removeImage = '';
+
                     const deleteFormTemplate = `
                     <form style="display:inline-block;" data-name="${row.name}" action="${REMOVE_BRAND_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
                       <input type="hidden" name="_method" value="DELETE">
@@ -84,20 +86,22 @@ $(function () {
                   `;
                     const editButton = `<a data-id=${row.id} class="btn p-1" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
 
-                    const removeImage = `
-                     <form style="display:inline-block;" action="${REMOVE_BRAND_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <input type="hidden" name="id" value="${row.id}">
-                        <button 
-                            type="submit" 
-                            data-name="${row.name}" 
-                            data-id="${row.id}" 
-                            class="btn p-1" 
-                            title="Delete" 
-                            onclick="event.preventDefault(); deleteImage(this);">
-                            <i class="fa-light fa-image text-primary fa-lg"></i>
-                            </button>
-                     </form>`;
+                    if(row.image_path) {
+                        removeImage = `
+                        <form style="display:inline-block;" action="${REMOVE_BRAND_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
+                           <input type="hidden" name="_method" value="DELETE">
+                           <input type="hidden" name="id" value="${row.id}">
+                           <button 
+                               type="submit" 
+                               data-name="${row.name}" 
+                               data-id="${row.id}" 
+                               class="btn p-1" 
+                               title="Delete" 
+                               onclick="event.preventDefault(); deleteImage(this);">
+                               <i class="fa-light fa-image text-danger fa-lg"></i>
+                               </button>
+                        </form>`;   
+                    }
 
                     return `${deleteFormTemplate} ${editButton} ${removeImage}`;
                 }

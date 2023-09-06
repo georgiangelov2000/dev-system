@@ -14,7 +14,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="row">
+                <div class="row">paid
                     <div class="col-3">
                         <div class="form-group actions d-none">
                             <label>Actions</label>
@@ -62,7 +62,7 @@
         ])
 
         @push('scripts')
-            <script type="text/javascript" src="{{ mix('js/subcategories.js') }}"></script>
+            <script type="text/javascript" src="{{ mix('js/subcategories/subcategories.js') }}"></script>
             <script type="text/javascript">
                 const SUB_CATEGORY_API_ROUTE = "{{ route('api.subcategories') }}"
                 const STORE_SUB_CATEGORY_ROUTE = "{{route('subcategory.store')}}";

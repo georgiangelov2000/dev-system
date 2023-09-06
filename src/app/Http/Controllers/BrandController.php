@@ -100,7 +100,7 @@ class BrandController extends Controller
         try {
             // Remove the leading /storage from the image_path
             $imagePath = str_replace('/storage', '', $brand->image_path);
-    
+            
             // Check if the image path exists in storage
             if (Storage::disk('public')->exists($imagePath)) {
                 // If it exists, delete the image
