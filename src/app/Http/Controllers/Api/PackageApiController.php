@@ -56,32 +56,16 @@ class PackageApiController extends Controller
                 ->where('expected_delivery_date', '>=', $date1_formatted)
                 ->where('expected_delivery_date', '<=', $date2_formatted);
         }
-        if($no_paid_orders) {
+        if ($no_paid_orders) {
             $packageQuery->whereHas('orders', function ($query) {
-                $query->whereIn('status',[6])->where('is_paid', false);
+                $query->whereIn('status', [6])
+                    ->doesntHave('orderPayments'); // Check that the order doesn't have a payment relationship
             });
-        }
+        }        
         if($select_json) {
             return response()->json($packageQuery->get());
         }
-        $packageQuery->withCount([
-            'orders as paid_orders_count' => function($query) {
-                $query->where('status',1)
-                ->where('is_paid',1);
-            },
-            'orders as overdue_orders_count' => function($query) {
-                $query->where('status',4)
-                ->where('is_paid',1);
-            },
-            'orders as pending_orders_count' => function($query) {
-                $query->where('status',2)
-                ->where('is_paid',0);
-            },
-            'orders as refund_orders_count' => function($query) {
-                $query->where('status',5)
-                ->where('is_paid',2);
-            }
-        ])->withCount('orders');
+        $packageQuery->withCount('orders');
         
 
         $filteredRecords = $packageQuery->count();

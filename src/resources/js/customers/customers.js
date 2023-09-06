@@ -158,8 +158,10 @@ $(function () {
                     let overdueOrders = row.overdue_orders_count;
                     let pendingOrders = row.pending_orders_count;
                     let refundOrders = row.refund_orders_count;
+                    let orderedOrders = row.ordered_orders_count;
 
                     return `<div>
+                        <span class="text-muted">${orderedOrders} orders</span> /
                         <span class="text-success">${paidOrders} paid</span> /
                         <span class="text-danger">${overdueOrders} overdue</span> /
                         <span class="text-primary">${pendingOrders} pending</span> /
@@ -173,10 +175,12 @@ $(function () {
                 class:'text-center',
                 render: function (data, type, row) {
                     let deleteButton = '';
+
                     if (!row.orders_count) {
                         deleteButton = '<a data-id=' + row.id + ' onclick="deleteCurrentCustomer(this)" data-name=' + row.name + ' class="btn p-1" title="Delete"><i class="fa-light fa-trash text-danger"></i></a>';
                     }
-                    let editButton = '<a data-id=' + row.id + ' href="' + CUSTOMER_EDIT_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+
+                    let editButton = '<a data-id=' + row.id + ' href="' + CUSTOMER_EDIT_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>';
                     let massEdit = '<a data-id=' + row.id + ' href="' + CUSTOMER_ORDERS_ROUTE.replace(':id', row.id) + '" class="btn p-1" title="Mass edit"> <i class="fa-light fa-pen-to-square text-primary" aria-hidden="true"></i>  </a>';
                     return `${deleteButton} ${editButton} ${massEdit}`;
                 }

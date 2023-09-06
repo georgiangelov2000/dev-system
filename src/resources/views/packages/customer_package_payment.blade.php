@@ -39,7 +39,7 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <form class="form-row" id="packagePayment" method="post" action="{{route('payment.store.order')}}">
+                        <form class="form-row" id="packagePayment" method="post" action="{{route('payment.store','order')}}">
                             @csrf
                             <div class="col-12">
                                 <table id="orders" class="table table-hover table-sm">

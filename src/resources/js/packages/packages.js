@@ -128,20 +128,13 @@ $(function () {
                 }
             },
             {
-                width: '17%',
+                width: '5%',
                 orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
-                    let paidOrders = row.paid_orders_count;
-                    let overdueOrders = row.overdue_orders_count;
-                    let pendingOrders = row.pending_orders_count;
-                    let refundOrders = row.refund_orders_count;
+                    let orders = row.orders_count;
 
-                    return `<div>
-                        <span class="text-success">${paidOrders} paid</span> /
-                        <span class="text-danger">${overdueOrders} overdue</span> /
-                        <span class="text-primary">${pendingOrders} pending</span> /
-                        <span class="text-dark">${refundOrders} refund</span>
-                    </div>`
+                    return `<span >${orders}</span>`;
                 }
             },
             {
@@ -158,7 +151,7 @@ $(function () {
             },
             {
                 orderable: false,
-                width: "10%",
+                width: "20%",
                 name: 'expired',
                 class: 'text-center',
                 render: function (data, type, row) {
@@ -204,7 +197,7 @@ $(function () {
             },
             {
                 orderable: false,
-                width: '50%',
+                width: '52%',
                 name: 'actions',
                 class: 'text-center',
                 render: function (data, type, row) {

@@ -59,22 +59,21 @@ class CustomerApiController extends Controller
         ->with(['state:id,country_id,name','country:id,name,country_code,short_name'])
         ->withCount([
             'orders as paid_orders_count' => function($query) {
-                $query->where('status',1)
-                ->where('is_paid',1);
-            },
-            'orders as overdue_orders_count' => function($query) {
-                $query->where('status',4)
-                ->where('is_paid',1);
+                $query->where('status',1);
             },
             'orders as pending_orders_count' => function($query) {
-                $query->where('status',2)
-                ->where('is_paid',0);
+                $query->where('status',2);
+            },
+            'orders as overdue_orders_count' => function($query) {
+                $query->where('status',4);
             },
             'orders as refund_orders_count' => function($query) {
-                $query->where('status',5)
-                ->where('is_paid',2);
-            }
-        ]);
+                $query->where('status',5);
+            },
+            'orders as ordered_orders_count' => function($query) {
+                $query->where('status',6);
+            },
+        ])->withCount('orders');
     }
 
     private function customerByCountry($country, $query) {

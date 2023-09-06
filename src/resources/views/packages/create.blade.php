@@ -24,9 +24,16 @@
                         </div>
 
                         <div class="form-group col-3">
-                            <label for="tracking_number">Tracking number</label>
-                            <input type="text" name="tracking_number" placeholder="Tracking number" id="tracking_number"
-                                class="form-control" />
+                            <label for="order_status">Tracking number</label>
+
+                            <div class="input-group mb-3">
+                                <input type="text" name="tracking_number" class="form-control"
+                                    placeholder="Enter or generate tracking number">
+                                <span class="input-group-append">
+                                    <button type="button" id="generateCode"
+                                        class="btn btn-primary btn-flat">Generate</button>
+                                </span>
+                            </div>
                             @error('tracking_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -90,33 +97,27 @@
                             @enderror
                         </div>
 
-                            <div class="form-group col-3 mb-0">
-                                <label for="package_notes">Package notes</label>
-                                <textarea maxlength="100" name="package_notes" class="form-control" id="package_notes" cols="3" rows="3"></textarea>
-                                <small id="emailHelp" class="form-text text-muted">
-                                    Field for staff members to include any notes or special instructions related to the package
-                                </small>
-                                @error('package_notes')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-    
-                            <div class="form-group col-3 mb-0">
-                                <label for="customer_notes">Customer notes</label>
-                                <textarea maxlength="100" 
-                                    name="customer_notes" 
-                                    class="form-control" 
-                                    id="customer_notes" 
-                                    cols="3" 
-                                    rows="3"
-                                > </textarea>
-                                <small id="emailHelp" class="form-text text-muted">
-                                    Field for customers to include any notes or special requests related to the package
-                                </small>
-                                @error('customer_notes')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
+                        <div class="form-group col-3 mb-0">
+                            <label for="package_notes">Package notes</label>
+                            <textarea maxlength="100" name="package_notes" class="form-control" id="package_notes" cols="3" rows="3"></textarea>
+                            <small id="emailHelp" class="form-text text-muted">
+                                Field for staff members to include any notes or special instructions related to the package
+                            </small>
+                            @error('package_notes')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group col-3 mb-0">
+                            <label for="customer_notes">Customer notes</label>
+                            <textarea maxlength="100" name="customer_notes" class="form-control" id="customer_notes" cols="3" rows="3"> </textarea>
+                            <small id="emailHelp" class="form-text text-muted">
+                                Field for customers to include any notes or special requests related to the package
+                            </small>
+                            @error('customer_notes')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
 
                         <div class="form-group col-12">
                             <label for="purchase_id">Search orders</label>
@@ -193,6 +194,6 @@
         let CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
         let ORDER_API_ROUTE = "{{ route('api.orders') }}"
         let SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
-        let ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
+        let ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";
     </script>
 @endpush

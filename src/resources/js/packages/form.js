@@ -5,6 +5,7 @@ $(function () {
 
   let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
   let bootstrapOrder = $('.bootstrap-select .purchaseFilter');
+  let generateCodeBtn = $('#generateCode');
 
   $('.datepicker').datepicker({
     format: 'yyyy-mm-dd'
@@ -28,6 +29,23 @@ $(function () {
       { width: "5%", targets: 10, class: "text-center" },
     ]
   });
+
+    // Utility function to generate a random tracking number
+    function generateRandomTrackingNumber(length) {
+      let charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let randomString = '';
+      for (let i = 0; i < length; i++) {
+        let randomIndex = Math.floor(Math.random() * charset.length);
+        randomString += charset[randomIndex];
+      }
+      return randomString;
+    }
+  
+    // Event handler for generating tracking number
+    generateCodeBtn.on('click', function () {
+      let randomTrackingNumber = generateRandomTrackingNumber(20);
+      $('input[name="tracking_number"]').val(randomTrackingNumber);
+    });
 
   // Action filters
   $('.selectCustomer input[type="text"]').on('keyup', function () {

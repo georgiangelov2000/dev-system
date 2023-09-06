@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+use Illuminate\Support\Facades\Storage;
 
 class FunctionsHelper
 {
@@ -51,5 +52,10 @@ class FunctionsHelper
         }
 
         return [$startTimestamp, $endTimestamp];
+    }
+
+    public static function getImagePath($path): string
+    {
+        return Storage::url($path);
     }
 }

@@ -62,24 +62,30 @@
             </div>
             <table id="ordersTable" class="table table-hover table-sm dataTable no-footer">
                 <thead>
-                    <th></th>
-                    <th>ID</th>
-                    <th>Payment</th>
-                    <th>Customer</th>
-                    <th>Product</th>
-                    <th title="Quantity">Qty</th>
-                    <th title="Single price">Unit Price</th>
-                    <th title="Official price">Official Price</th>
-                    <th title="Original price">Orig. Price</th>                            
-                    <th>Discount</th>
-                    <th>Date of sale</th>
-                    <th>Expired</th>
-                    <th>Delay Payment</th>
-                    <th>Payment date</th>
-                    <th>Package</th>
-                    <th class="text-center">Status</th>
-                    <th>Paid</th>
-                    <th>Actions</th>
+                    <tr>
+                        <th>
+                            <div class="form-check">
+                                <input class="form-check-input selectAll" type="checkbox">
+                                <label class="form-check-label" for="flexCheckDefault"></label>
+                            </div>
+                        </th>
+                        <th>ID</th>
+                        <th>Payment</th>
+                        <th>Customer</th>
+                        <th>Purchase</th>
+                        <th title="Quantity">Qty</th>
+                        <th title="Unut price">Unit Price</th>
+                        <th title="Discount unit price">Disc.unit price</th>
+                        <th title="Official price">Official Price</th>
+                        <th title="Regular price">Regular price</th>                            
+                        <th>Discount</th>
+                        <th>Date of sale</th>
+                        <th>Expired</th>
+                        <th>Delay Payment</th>
+                        <th>Payment date</th>
+                        <th>Package</th>
+                        <th class="text-center">Status</th>
+                        <th>Actions</th>
                 </thead>
             </table>
         </div>
@@ -97,7 +103,8 @@
         const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit', ':id') }}";
         const CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
         const PACKAGE = "{{ $package->id }}"
-        const PAYMENT_API = "{{route('payment.edit.order',':id')}}"
+        const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
         const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
+        const ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";
     </script>
 @endpush
