@@ -120,7 +120,8 @@
     @push('scripts')
         <script type="text/javascript" src="{{ mix('js/payments/customer_payments.js') }}"></script>
         <script type="text/javascript">
-            const ORDER_PAYMENT_API = "{{ route('api.order.payments') }}";
+            const ORDER_PAYMENT_API = "{{ route('api.payments') }}";
+            const TYPE = "order";
             const ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";
             const ORDER_PAYMENT_EDIT_ROUTE = "{{ route('payment.edit', [':payment', ':type']) }}";
             const ORDER_PAYMENT_DELETE_ROUTE = "{{ route('payment.delete', [':payment', ':type']) }}";

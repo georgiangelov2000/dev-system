@@ -1,5 +1,5 @@
-import { APICaller,APIDELETECALLER } from '../ajax/methods';
-import { handleErrors,swalText,showConfirmationDialog } from '../helpers/action_helpers';
+import { APICaller, APIDELETECALLER } from '../ajax/methods';
+import { handleErrors, swalText, showConfirmationDialog } from '../helpers/action_helpers';
 $(function () {
   $('.selectCustomer').selectpicker('refresh').val('').trigger('change')
 
@@ -134,15 +134,16 @@ $(function () {
       ajax: {
         url: ORDER_PAYMENT_API,
         data: function (data) {
-          data.customer = bootstrapSelectCustomer.val();
+          data.user = bootstrapSelectCustomer.val();
           data.date = dateRangePicker.val();
+          data.type = TYPE
         },
         dataSrc: function (response) {
 
-          let customer = response.customer;
-          let sum = response.sum;
-          let date = response.date ? response.date : '';
-          let amountDue = date ? `Amount Due: ${date}` : ''
+          const customer = response.user;
+          const sum = response.sum;
+          const date = response.date ? response.date : '';
+          const amountDue = date ? `Amount Due: ${date}` : ''
 
           $('h4[data-target="name"]').text(customer.name);
           $('h4[data-target="date"]').text(date);
@@ -155,7 +156,7 @@ $(function () {
           $('span[data-target="zip"]').text(customer.zip);
           $('#amountDueTable td[data-td-target="sum"]').text('€' + sum);
           $('#amountDueTable td[data-td-target="records"]').text(response.data.length);
-          $('img[id="customerImage"]').attr('src',customer.image_path);
+          $('img[id="customerImage"]').attr('src', customer.image_path);
           return response.data;
         }
       },
@@ -191,56 +192,36 @@ $(function () {
         {
           name: 'payment_method',
           render: function (data, type, row) {
-            let status;
-            if (row.payment_method === 1) {
-              status = "Cash";
-            }
-            else if (row.payment_method === 2) {
-              status = "Bank Transfer";
-            }
-            else if (row.payment_method === 3) {
-              status = "Credit Card";
-            }
-            else if (row.payment_method === 4) {
-              status = "Cheque";
-            }
-            else if (row.payment_method === 5) {
-              status = "Online Payment";
-            } else {
-              status = "";
-            }
+            const paymentMethods = {
+              1: "Cash",
+              2: "Bank Transfer",
+              3: "Credit Card",
+              4: "Cheque",
+              5: "Online Payment"
+            };
+
+            const status = paymentMethods[row.payment_method] || "";
             return `<span>${status}</span>`;
           }
         },
         {
           name: 'payment_status',
           render: function (data, type, row) {
-            let status;
-            let iconClass;
+            const paymentStatuses = {
+              1: { label: "Paid", iconClass: "fal fa-check-circle" },
+              2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
+              3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+              4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
+              5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
+              6: { label: "Ordered", iconClass: "fal fa-shopping-cart" }
+            };
 
-            if (row.payment_status === 1) {
-              status = "Paid";
-              iconClass = "fal fa-check-circle"; // Light FontAwesome icon for Paid
-            } else if (row.payment_status === 2) {
-              status = "Pending";
-              iconClass = "fal fa-hourglass-half"; // Light FontAwesome icon for Pending
-            } else if (row.payment_status === 3) {
-              status = "Partially Paid";
-              iconClass = "fal fa-money-bill-alt"; // Light FontAwesome icon for Partially Paid
-            } else if (row.payment_status === 4) {
-              status = "Overdue";
-              iconClass = "fal fa-exclamation-circle"; // Light FontAwesome icon for Overdue
-            } else if (row.payment_status === 5) {
-              status = "Refunded";
-              iconClass = "fal fa-undo-alt"; // Light FontAwesome icon for Refunded
-            } else if (row.payment_status === 6) {
-              status = "Ordered";
-              iconClass = "fal fa-shopping-cart"; // Light FontAwesome icon for Unpaid or any default icon
-            }
+            const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
 
-            return `<div title="${status}" class="status">
-              <span class="icon"><i class="${iconClass}"></i></span>
-            </div>`;
+            return `
+              <div title="${statusData.label}" class="status">
+                <span class="icon"><i class="${statusData.iconClass}"></i></span>
+              </div>`;
           }
         },
         {

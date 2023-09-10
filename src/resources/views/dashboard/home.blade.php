@@ -224,12 +224,16 @@
                                                                 <span
                                                                     class="badge badge-warning float-right">${{ $item['total_price'] }}</span>
                                                                 <br>
+                                                                
                                                                 <span class="badge badge-warning float-right">Amount:
                                                                     {{ $item['total_quantity'] }}</span>
                                                                     <br>
                                                                 <span class="badge badge-warning float-right">Count:
                                                                     {{ $item['orders_count'] }}</span>
                                                             </a>
+                                                            <span class="product-description">
+                                                                {{ $item['phone'] }}
+                                                            </span>
                                                         </div>
                                                     </li>
                                                 @endforeach
@@ -240,13 +244,13 @@
                                 </div>
 
                                 <div class="card-footer text-center">
-                                    <a href="javascript:void(0)" class="uppercase">View All Users</a>
+                                    <a  href="{{ route('user.index') }}" class="uppercase">View All Users</a>
                                 </div>
 
                             </div>
                             <div class="col-md-6 col-sm-6 col-xs-6">
                                 <h6 class="mb-3">
-                                    Top Selling Products
+                                    Top Selling Purchases
                                 </h6>
                                 <div class="card-body p-0">
                                     <ul class="products-list product-list-in-card pl-2 pr-2">
@@ -266,6 +270,9 @@
                                                                 <br>
                                                                 <span class="badge badge-warning float-right">Amount:
                                                                     {{ $item['total_quantity'] }}</span>
+                                                                <br>
+                                                                <span class="badge badge-warning float-right">Count:
+                                                                    {{ $item['orders_count'] }}</span>
                                                             </a>
                                                             <span class="product-description">
                                                                 {{ $item['code'] }}
@@ -280,7 +287,7 @@
                                 </div>
 
                                 <div class="card-footer text-center">
-                                    <a href="javascript:void(0)" class="uppercase">View All Products</a>
+                                    <a href="{{ route('purchase.index') }}" class="uppercase">View All Products</a>
                                 </div>
 
                             </div>

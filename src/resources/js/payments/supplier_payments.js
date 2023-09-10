@@ -78,12 +78,13 @@ $(function () {
                                 <tr>
                                     <th>ID</th>
                                     <th>Purchase</th>
-                                    <th>Paid price</th>
-                                    <th>Paid Quantity</th>
+                                    <th>Code</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Method</th>
+                                    <th>Status</th>
+                                    <th>Reference</th>
                                     <th>Date of payment</th>
-                                    <th>Payment method</th>
-                                    <th>Payment reference</th>
-                                    <th>Payment status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -92,6 +93,9 @@ $(function () {
                 </div>
     
             <div class="row justify-content-end">
+                <div class="col-6">
+                    <img class="img-fluid w-25 rounded" id="supplierImage" src=""  />
+                </div>
                 <div class="col-6">
                     <p class="lead" data-target="lead-date"></p>
                     <div class="table-responsive">
@@ -129,28 +133,29 @@ $(function () {
             ajax: {
                 url: SUPPLIER_PAYMENTS_API,
                 data: function (data) {
-                    data.supplier = bootstrapSelectSupplier.val();
+                    data.user = bootstrapSelectSupplier.val();
                     data.date = dateRangePicker.val();
+                    data.type = TYPE
                 },
                 dataSrc: function (response) {
 
-                    let supplierData = response.supplier;
-                    let sum = response.sum;
-                    let date = response.date ? response.date : '';
-                    let amountDue = date ? `Amount Due: ${date}` : ''
+                    const supplier = response.user;
+                    const sum = response.sum;
+                    const date = response.date ? response.date : '';
+                    const amountDue = date ? `Amount Due: ${date}` : ''
 
-                    $('h4[data-target="name"]').text(supplierData.name);
+                    $('h4[data-target="name"]').text(supplier.name);
                     $('h4[data-target="date"]').text(date);
                     $('p[data-target="lead-date"]').text(amountDue);
-                    $('span[data-target="address"]').text(supplierData.address);
-                    $('span[data-target="phone"]').text(supplierData.phone);
-                    $('span[data-target="email"]').text(supplierData.email);
-                    $('span[data-target="country"]').text(supplierData.country.name);
-                    $('span[data-target="city"]').text(supplierData.state.name);
-                    $('span[data-target="zip"]').text(supplierData.zip);
+                    $('span[data-target="address"]').text(supplier.address);
+                    $('span[data-target="phone"]').text(supplier.phone);
+                    $('span[data-target="email"]').text(supplier.email);
+                    $('span[data-target="country"]').text(supplier.country.name);
+                    $('span[data-target="city"]').text(supplier.state.name);
+                    $('span[data-target="zip"]').text(supplier.zip);
                     $('#amountDueTable td[data-td-target="sum"]').text('€' + sum);
                     $('#amountDueTable td[data-td-target="records"]').text(response.data.length);
-
+                    $('img[id="supplierImage"]').attr('src', supplier.image_path);
                     return response.data;
                 }
             },
@@ -159,8 +164,17 @@ $(function () {
                 {
                     name: 'name',
                     orderable: false,
+                    class:'text-center',
                     render: function (data, type, row) {
                         return `<span>${row.purchase.name}</span>`;
+                    }
+                },
+                {
+                    name: 'code',
+                    orderable: false,
+                    class:'text-center',
+                    render: function (data, type, row) {
+                        return `<span>${row.purchase.code}</span>`;
                     }
                 },
                 {
@@ -178,19 +192,55 @@ $(function () {
                     }
                 },
                 {
+                    name: 'payment_method',
+                    render: function (data, type, row) {
+                        const paymentMethods = {
+                            1: "Cash",
+                            2: "Bank Transfer",
+                            3: "Credit Card",
+                            4: "Cheque",
+                            5: "Online Payment"
+                        };
+
+                        const status = paymentMethods[row.payment_method] || "";
+                        return `<span>${status}</span>`;
+                    }
+                },
+                {
+                    name: 'payment_status',
+                    render: function (data, type, row) {
+                        const paymentStatuses = {
+                            1: { label: "Paid", iconClass: "fal fa-check-circle" },
+                            2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
+                            3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+                            4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
+                            5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
+                            6: { label: "Ordered", iconClass: "fal fa-shopping-cart" }
+                        };
+
+                        const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
+
+                        return `
+                            <div title="${statusData.label}" class="status">
+                                <span class="icon"><i class="${statusData.iconClass}"></i></span>
+                            </div>`;
+                    }
+                },
+                { 
+                    data: 'payment_reference',
+                    orderable: false 
+                },
+                {
                     name: 'date_of_payment',
                     render: function (data, type, row) {
                         return `<span>${row.date_of_payment}</span>`;
                     }
                 },
-                { data: 'payment_method', orderable: false },
-                { data: 'payment_reference', orderable: false },
-                { data: 'payment_status', orderable: false },
                 {
                     orderable: false,
                     render: function (data, type, row) {
                         let edit = `
-                        <a title="Edit" class="btn p-0" href="${SUPPLIER_PAYMENT_EDIT.replace(':payment', row.id).replace(':type','purchase')}">
+                        <a title="Edit" class="btn p-0" href="${PURCHASE_PAYMENT_EDIT.replace(':payment', row.id).replace(':type', 'purchase')}">
                             <i class="fa-light fa-pen text-primary"></i>
                         </a>
                         `;
@@ -200,7 +250,17 @@ $(function () {
                             <i class="fa-light fa-file-invoice text-primary"></i> 
                         </a>`;
 
-                        return `${edit} ${invoice}`;
+                        let deleteForm = `
+                        <form data-name=${row.date_of_payment}  style='display:inline-block;' id='delete-form' action="${PURCHASE_PAYMENT_DELETE_ROUTE.replace(":payment", row.id).replace(':type', 'purchase')}" method='POST'>
+                                            <input type='hidden' name='_method' value='DELETE'>
+                                            <input type='hidden' name='id' value='${row.id}'>
+                                            <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deletePayment(this);'>
+                                                <i class='fa-light fa-trash text-primary'></i>
+                                            </button>
+                                        </form>
+                        `;
+
+                        return `${edit} ${invoice} ${deleteForm}`;
                     }
                 }
             ]

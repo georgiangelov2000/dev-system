@@ -245,7 +245,8 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
+
+                {{-- <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa-light fa-bar-chart" aria-hidden="true"></i>
                         <p>
@@ -255,17 +256,17 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('summary.customer') }}" class="nav-link">
+                            <a href="{{ route('summary.index','customer') }}" class="nav-link">
                                 <p>Customer summary</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('summary.supplier') }}" class="nav-link">
+                            <a href="{{ route('summary.index','supplier') }}" class="nav-link">
                                 <p>Supplier summary</p>
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -304,7 +305,7 @@
                     </ul>
                 </li>
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fal fa-analytics"></i>
                         <p>
@@ -319,7 +320,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -341,14 +342,14 @@
                     </ul>
                 </li>
 
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa-light fa-file-import"></i>
                         <p>
                            (XML,JSON) Import
                         </p>
                     </a>
-                </li>
+                </li> --}}
 
             </ul>
         </nav>
