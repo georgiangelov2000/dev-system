@@ -11,68 +11,70 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="alert alert-warning alert-dismissible col-10">
-                    <h5><i class="icon fas fa-ban"></i> Alert!</h5>
-                    For orders with statuses such as Overdue, Paid, Refunded,Pending, Partially Paid, you will not be able
-                    to make changes. These orders already have payment records and are marked as paid
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <h6 class="font-weight-bold">Legend:</h6>
+                    </div>
+                    <div class="col-12">
+                        <span>- You can update orders with status ordered</span>
+                    </div>
                 </div>
 
-                <form id="massUpdateOrders" method="POST" action="{{ route('order.mass.update') }}">
+                <form method="POST" onsubmit="updateOrders(event)">
                     @csrf
-                    <input type="hidden" name="_method" value="PUT">
+                    
+                    <div class="row table-responsive">
+                        <table id="ordersTable" class="table table-hover table-sm dataTable no-footer">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <div class="form-check">
+                                            <input class="form-check-input selectAll" type="checkbox">
+                                            <label class="form-check-label" for="flexCheckDefault"></label>
+                                        </div>
+                                    </th>
+                                    <th>ID</th>
+                                    <th>Image</th>
+                                    <th>Customer</th>
+                                    <th>Driver</th>
+                                    <th>Product</th>
+                                    <th>Amount</th>
+                                    <th>Unit Price</th>
+                                    <th>Disc.unit price</th>
+                                    <th>Official Price</th>
+                                    <th>Refular price</th>
+                                    <th>Discount</th>
+                                    <th>Date of sale</th>
+                                    <th>Expired</th>
+                                    <th>Package</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                    <table id="ordersTable" class="table table-hover table-sm dataTable no-footer">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <div class="form-check">
-                                        <input class="form-check-input selectAll" type="checkbox">
-                                        <label class="form-check-label" for="flexCheckDefault"></label>
-                                    </div>
-                                </th>
-                                <th>ID</th>
-                                <th>Payment</th>
-                                <th>Customer</th>
-                                <th>Product</th>
-                                <th title="Quantity">Qty</th>
-                                <th title="Single price">Unit Price</th>
-                                <th title="Discount unit price">Disc.unit price</th>
-                                <th title="Official price">Official Price</th>
-                                <th title="Original price">Orig. Price</th>
-                                <th>Discount</th>
-                                <th>Date of sale</th>
-                                <th>Expired</th>
-                                <th>Delay Payment</th>
-                                <th>Payment date</th>
-                                <th>Package</th>
-                                <th class="text-center">Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="row">
                         <div class="form-group col-12 mb-0">
                             <h6>Options</h6>
                             <hr class="mt-2 mb-2">
                         </div>
-                        <div class="col-12 d-flex flex-wrap p-0">
-                            <div class="form-group col-2">
-                                <label for="price">Price</label>
-                                <input type="text" class="form-control" name="price" id="price">
+                        <div class="col-12 d-flex  flex-wrap p-0">
+                            <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
+                                <label for="price">Single price</label>
+                                <input type="text" class="form-control" name="single_sold_price" id="single_sold_price" placeholder="Enter a numeric value (e.g., 1.00)" />
                             </div>
-                            <div class="form-group col-2">
-                                <label for="discount_percent">Discount %</label>
-                                <input type="number" class="form-control" name="discount_percent" id="discount_percent">
-                            </div>
-                            <div class="form-group col-2">
+                            <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                                 <label for="sold_quantity">Quantity</label>
-                                <input type="number" class="form-control" name="sold_quantity" id="sold_quantity">
+                                <input type="number" class="form-control" name="sold_quantity" id="sold_quantity" min="0" placeholder="Enter a integer value (e.g.,1,2)">
                             </div>
-                            <div class="form-group col-2">
+                            <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
+                                <label for="discount_percent">Discount %</label>
+                                <input type="number" class="form-control" name="discount_percent" id="discount_percent" min="0"  placeholder="Enter a integer value (e.g.,1,2)">
+                            </div>
+                            <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                                 <label for="package_id">Packages</label>
                                 <select class="form-control" name="package_id" id="package_id">
                                     <option value="">Please select</option>
@@ -83,7 +85,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="form-group col-2">
+                            <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                                 <label for="date_of_sale">Date of sale</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -98,29 +100,41 @@
                                         data-date-format="mm/dd/yyyy">
                                 </div>
                             </div>
+                            <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
+                                <label for="package_id">Assign to driver</label>
+                                <select class="form-control" name="user_id" id="user_id">
+                                    <option value="">Please select</option>
+                                    @foreach ($drivers as $driver)
+                                        <option value="{{$driver->id}}">
+                                            {{$driver->username}}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group col-xl-2 col-lg-2 col-md-12 col-sm-12">
+                            <button class="btn btn-primary w-100">
+                                Save changes
+                            </button>
                         </div>
                     </div>
-
-                    <button id="massUpdateButton" class="btn btn-primary" type="submit">
-                        Save changes
-                    </button>
                 </form>
             </div>
         </div>
     </div>
     @push('scripts')
-        <script type="text/javascript" src="{{ mix('js/orders/orders.js') }}"></script>
+        <script type="text/javascript" src="{{ mix('js/customers/mass_edit_orders.js') }}"></script>
         <script type="text/javascript">
-            const ORDER_API_ROUTE = "{{ route('api.orders') }}";
             const CUSTOMER = "{{ $customer->id }}";
+            const USER_EDIT = "{{ route('user.edit',':id') }}"
+            const ORDER_API_ROUTE = "{{ route('api.orders') }}";
+            const MASS_UPDATE_ORDERS = "{{route('order.mass.update')}}"
             const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
-            const ORDER_UPDATE_STATUS = "{{ route('order.status', ':id') }}";
-            const ORDER_DELETE_ROUTE = "{{ route('order.delete', ':id') }}";
-            const ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";
             const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
             const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit', ':id') }}";
             const PACKAGE_EDIT_ROUTE = "{{ route('package.edit', ':id') }}"
             const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
+            const CONFIG_URL = "{{config('app.url')}}";
             const STATUS = [6];
         </script>
     @endpush

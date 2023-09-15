@@ -33,9 +33,9 @@ class PackageApiController extends Controller
         if ($search) {
             $packageQuery->where('package_name', 'LIKE', '%' . $search . '%');
         }
-        // if($is_it_delivered) {
-
-        // }
+        if($is_it_delivered) {
+            $packageQuery->where('is_delivered',1);
+        }
         if($package) {
             $packageQuery->where('package_type',$package);
         }
@@ -58,8 +58,7 @@ class PackageApiController extends Controller
         }
         if ($no_paid_orders) {
             $packageQuery->whereHas('orders', function ($query) {
-                $query->whereIn('status', [6])
-                    ->doesntHave('orderPayments'); // Check that the order doesn't have a payment relationship
+                $query->whereIn('status', [6]);
             });
         }        
         if($select_json) {

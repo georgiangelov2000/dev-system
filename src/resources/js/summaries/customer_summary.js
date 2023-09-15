@@ -1,7 +1,7 @@
 import { APIPOSTCALLER } from '../ajax/methods';
 
 $(function () {
-    
+
     $('.selectCustomer, .orderFilter').selectpicker('refresh').val('').trigger('change')
 
     $('input[name="datetimes"]').daterangepicker({
@@ -21,7 +21,6 @@ $(function () {
     let dateRangePicker = $('input[name="datetimes"]');
     let dateRangeCol = $('.dateRange');
     let bootstrapSelectCustomer = $('.bootstrap-select .selectCustomer');
-    let bootstrapSelectOrderFilters = $('.bootstrap-select .orderFilter');
     let form = $('#filterForm');
 
     disabledOption.on('click', function () {
@@ -39,203 +38,144 @@ $(function () {
     form.on('submit', function (e) {
         e.preventDefault();
         let customer = bootstrapSelectCustomer.selectpicker('val');
-        let orderFilter = bootstrapSelectOrderFilters.selectpicker('val');
         let date = dateRangePicker.val();
+
+        let formData = {
+            'type': 'customer',
+            'user': customer,
+            'date': date,
+        };
+
 
         $('#loader').show();
 
-        APIPOSTCALLER(SUMMARY, { "customer": customer, 'date': date, 'order_filter': orderFilter }, function (response) {
-            let respData = response;
-
-            summaryTemplate(respData);
-
-            $('#loader').hide();
-        }, function (error) {
-            console.log(error);
-        })
+        $.ajax({
+            type: "POST",
+            url: SUMMARY,
+            data: formData,
+            success: function (response, xhr) {
+                // Call the summaryTemplate function with the response data
+                summaryTemplate(response);
+                $('#loader').hide();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
 
     })
 
 
-    const summaryTemplate = function (data) {
-    
+    const summaryTemplate = (data) => {
         const summaryContainer = $('#summary-container');
-
-        if(Object.keys(data.products).length !== 0) {
-            const tableClass = 'table-summary';
-    
-            let template = '';
-        
-            template += '<div class="summary">';;
-    
-            for (const key in data.products) {
-    
-                template += `${renderPackageData(data.products[key],key)}`;
-                const product = data.products[key];
-                
-                if (product.status) {           
-    
-                    const statuses = Object.keys(product.status);
-    
-                    statuses.forEach((status) => {
-    
-                        const statusData = product.status[status];
-                        const products = statusData.products;
-                        
-                        if (products.length > 0) {
-                            template+=`
-                                ${renderStatusData(statusData,status)}
-                                <div style="background-color:rgb(244, 246, 249);" class="p-4 rounded m-2">
-                                    <table class="${tableClass} table table-sm table-bordered table-without-border table-hover col-6">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Single sold price</th>
-                                                <th>Total sold price</th>
-                                                <th>Regular price</th>
-                                                <th>Sold quantity</th>
-                                                <th>Single markup</th>
-                                                <th>Total markup</th>
-                                                <th>Discount %</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${renderProductTable(products)}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            `;
-                        }
-                    });
-                }
-            }
-        
-            template += '</div>';
-        
-            summaryContainer.html(template);
-        
-            const dataTables = $(`.${tableClass}`);
-            
-            for (let i = 0; i < dataTables.length; i++) {
-                new DataTable(dataTables[i], {
-                    dom: 'Bfrtip',
-                    ordering: false,
-                    buttons: [
-                        {
-                          extend: 'copy',
-                          class: 'btn btn-outline-secondary',
-                          exportOptions: {
-                            columns: [1,2,3,4,5,6,7]
-                          }
-                        },
-                        {
-                          extend: 'csv',
-                          class: 'btn btn-outline-secondary',
-                          exportOptions: {
-                            columns: [1,2,3,4,5,6,7]
-                          }
-                        },
-                        {
-                          extend: 'excel',
-                          class: 'btn btn-outline-secondary',
-                          exportOptions: {
-                            columns: [1,2,3,4,5,6,7] 
-                          }
-                        },
-                        {
-                          extend: 'pdf',
-                          class: 'btn btn-outline-secondary',
-                          exportOptions: {
-                            columns: [1,2,3,4,5,6,7]
-                          }
-                        },
-                        {
-                          extend: 'print',
-                          class: 'btn btn-outline-secondary',
-                          exportOptions: {
-                            columns: [1,2,3,4,5,6,7]
-                          }
-                        }
-                      ],
-                });
-            }
-        } else {
-            summaryContainer.html( 
-            `<span class="text-danger">
-                No orders found for the current customer! Please try again
-            </span>`); 
+        let template = '';
+        if (data !== null) {
+            template += `
+            ${headTemplate(data)}`;
         }
 
-    }
-    
-    const renderPackageData = (productData,packageKey) => {
-        return `
-        <h6 title="Package" class="mb-0 mt-2">
-                <strong class="badge bg-primary">
-                    ${packageKey}
-                </strong>
-        </h6> 
-        <div class="mb-2">
-            <div>
-                <span>Orders count:</span>
-                <strong> ${productData.orders_count}</strong>
-            </div>
-            <div>
-                <span>Total sales: </span>
-                <strong class="text-success"> + ${productData.sum}</strong>
-            </div>
-            <div>
-                <span>Paid sales: </span>
-                <strong class="text-success"> + ${productData.paid_sales_total_price}</strong>
-            </div>
-        </div>
-        `;
-    }
-    
-    const renderStatusData = (statusData,status) => {
-        return `
-            <div class="col">
-                <h6 title="Status" class="mb-0">
-                    <strong class="badge bg-secondary">
-                        ${status} (${statusData.products.length})
-                    </strong>
-                </h6> 
-                <div>
-                    <span>Orders count:</span>
-                    <strong> ${statusData.orders_count}</strong>
+        summaryContainer.html(template);
+
+    };
+
+    const headTemplate = function (data) {
+        let html = '';
+        let groupedTemplate = '';
+        let groupedSummary = data.summary;
+        let iconWrapper = ""
+
+
+        if (groupedSummary) {
+            for (const key in groupedSummary) {
+                let nestedObject = groupedSummary[key];
+
+                if(key == 'paid') {
+                    iconWrapper = `
+                    <span class="info-box-icon bg-success">
+                    <i class="fal fa-check-circle"></i>
+                    </span>
+                    `
+                }
+                else if(key == 'overdue') {
+                    iconWrapper = `
+                    <span class="info-box-icon bg-warning">
+                        <i class="fal fa-exclamation-circle"></i>
+                    </span>
+                    `
+                }
+                else if(key === 'pending') {
+                    iconWrapper = `
+                    <span class="info-box-icon bg-primary">
+                        <i class="fal fa-hourglass-half"></i>
+                    </span>`;
+                }
+                else if(key === 'ordered') {
+                    iconWrapper = `
+                    <span class="info-box-icon bg-secondary">
+                        <i class="fal fa-shopping-cart"></i>
+                    </span>`;
+                }
+
+                groupedTemplate += `
+                    <div class="col-md-2 col-sm-6 col-12">
+                        <div class="info-box">
+                            ${iconWrapper}
+                            <div class="info-box-content">
+                                <span class="info-box-text">
+                                  <span class="font-weight-bold">Status:</span><span>${key.toUpperCase()}</span>
+                                </span>
+                                <div class="d-flex align-items-center">
+                                    <span>Price:</span>
+                                    <span class="info-box-number mt-0">${nestedObject['price']}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span>Count:</span>
+                                    <span class="info-box-number mt-0">${nestedObject['counts']}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+            }
+        }
+
+        html += `
+            <div class="row justify-content-between align-items-end">
+                <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 d-flex flex-wrap align-items-center justify-content-between">
+                    <h4 data-target="name" class="mb-0">${data.name}</h4>
+                    <h4 data-target="date" class="float-right"></h4>
                 </div>
-                <div>
-                    <span>Total sales:</span>
-                    <strong class="text-success">${statusData.sum} </strong> 
+                <div class="col-md-3 col-sm-3 col-lg-3 col-xl-3 d-flex flex-wrap align-items-center justify-content-end">
+                    <img class="img-fluid w-25 rounded" id="customerImage" src="${data.image_path}">
                 </div>
             </div>
+            <hr class="w-100 m-1">
+            <div class="row invoice-info mb-3">
+                <div class="col-md-2 col-sm-6 col-12">
+                    <div class="info-box">
+                            <span class="info-box-icon bg-info">
+                                <i class="fa-light fa-info"></i>
+                            </span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">
+                                <span class="font-weight-bold">Status:</span><span>ALL</span>
+                            </span>
+                            <div class="d-flex align-items-center">
+                                <span>Price:</span>
+                                <span class="info-box-number mt-0">${data.total_price}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span>Count:</span>
+                                <span class="info-box-number mt-0">${data.counts}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ${groupedTemplate}
+            </div>
         `;
-    }
-    
-    const renderProductTable = (products) => {
-        let tableHtml = '';
-    
-        products.forEach((product) => {
-            tableHtml += `
-                <tr data_id="${product.id}" data_price="${product.total_sold_price}">
-                    <td>${product.name}</td>
-                    <td>€ ${product.single_sold_price}</td>
-                    <td>€ ${product.total_sold_price}</td>
-                    <td>€ ${product.regular_price}</td>
-                    <td>${product.sold_quantity}</td>
-                    <td>€ ${product.single_markup}</td>
-                    <td>€ ${product.total_markup}</td>
-                    <td>${product.discount}</td>
-                    <td>
-                        <a title='Preview' href="${PREVIEW_ROUTE.replace(':id', product.main_product_id)}" class='btn p-0'><i class='fa fa-light fa-eye text-info' aria-hidden='true'></i></a>
-                    </td>
-                </tr>
-            `;
-        });
-    
-        return tableHtml;
+
+        return html;
     }
 
 });

@@ -30,7 +30,7 @@ class PurchaseRequest extends FormRequest
             "brands" => "nullable|array",
             "delivery_date" => ($method == 'POST' || ($method == 'PUT' && !$hasPaymentRelation)) ? 'required|date' : 'nullable|date',
             'expected_date_of_payment' => ($method == 'POST' || ($method == 'PUT' && !$hasPaymentRelation)) ? 'required|date' : 'nullable|date',
-            'discount_percent' => ($method == 'POST' || ($method == 'PUT' && !$hasPaymentRelation)) ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
+            'discount_percent' => ($method == 'POST' || ($method == 'PUT' && !$hasPaymentRelation)) ? 'required|integer|min:0' : 'nullable|integer|min:0',
             'price' => ($method == 'POST' || ($method == 'PUT' && !$hasPaymentRelation)) ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
             'quantity' => ($method == 'POST' || ($method == 'PUT' && !$hasPaymentRelation)) ? 'required|integer|min:0' : 'nullable|integer|min:0',
         ];

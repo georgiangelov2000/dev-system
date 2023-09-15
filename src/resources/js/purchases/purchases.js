@@ -282,34 +282,22 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    let status;
-                    let iconClass;
-
-                    if (row.status === 1) {
-                        status = "Paid";
-                        iconClass = "fal fa-check-circle"; // Light FontAwesome icon for Paid
-                    } else if (row.status === 2) {
-                        status = "Pending";
-                        iconClass = "fal fa-hourglass-half"; // Light FontAwesome icon for Pending
-                    } else if (row.status === 3) {
-                        status = "Partially Paid";
-                        iconClass = "fal fa-money-bill-alt"; // Light FontAwesome icon for Partially Paid
-                    } else if (row.status === 4) {
-                        status = "Overdue";
-                        iconClass = "fal fa-exclamation-circle"; // Light FontAwesome icon for Overdue
-                    } else if (row.status === 5) {
-                        status = "Refunded";
-                        iconClass = "fal fa-undo-alt"; // Light FontAwesome icon for Refunded
-                    } else if(row.status === 6){
-                        status = "Delivered";
-                        iconClass = "fal fa-shipping-fast"; // Light FontAwesome icon for Unpaid or any default icon
-                    }
-
-                    return `<div title="${status}" class="status">
-                    <span class="icon"><i class="${iconClass}"></i></span>
-                </div>`;
+                    const statusMap = {
+                        1: { label: "Paid", iconClass: "fal fa-check-circle" },
+                        2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
+                        3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+                        4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
+                        5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
+                        6: { label: "Delivered", iconClass: "fal fa-shipping-fast" }
+                    };
+            
+                    const statusInfo = statusMap[row.status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
+            
+                    return `<div title="${statusInfo.label}" class="status">
+                        <span class="icon"><i class="${statusInfo.iconClass}"></i></span>
+                    </div>`;
                 }
-            },
+            },            
             {
                 width: '8%',
                 orderable: false,
@@ -352,7 +340,7 @@ $(function () {
 
                     let editButton = `
                     <a href=${EDIT_PRODUCT_ROUTE.replace(':id', row.id)} data-id=${row.id} class="btn p-0" title="Edit">
-                        <i class="fa-light fa-pencil text-warning"></i>
+                        <i class="fa-light fa-pencil text-primary"></i>
                     </a>
                 `;
 

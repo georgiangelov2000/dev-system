@@ -61,20 +61,19 @@ class SupplierApiController extends Controller {
             'image_path'
         ])->withCount([
             'purchases as paid_purchases_count' => function($query) {
-                $query->where('status',1)
-                ->where('is_paid',1);
-            },
-            'purchases as overdue_purchases_count' => function($query) {
-                $query->where('status',4)
-                ->where('is_paid',1);
+                $query->where('status',1);
             },
             'purchases as pending_purchases_count' => function($query) {
-                $query->where('status',2)
-                ->where('is_paid',0);
+                $query->where('status',2);
+            },
+            'purchases as overdue_purchases_count' => function($query) {
+                $query->where('status',4);
             },
             'purchases as refund_purchases_count' => function($query) {
-                $query->where('status',5)
-                ->where('is_paid',2);
+                $query->where('status',5);
+            },
+            'purchases as delivered_purchases_count' => function($query) {
+                $query->where('status',6);
             }
         ]);
 

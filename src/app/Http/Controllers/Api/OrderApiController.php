@@ -10,7 +10,7 @@ class OrderApiController extends Controller
 {
     public function getData(Request $request)
     {   
-        $relations = ['customer:id,name','purchase:id,name','orderPayments','purchase.images','user:id,username'];
+        $relations = ['customer:id,name','purchase:id,name','purchase.images','orderPayments','purchase.images','user:id,username'];
 
         $id = isset($request->id) && $request->id ? $request->id : null;
         $customer = isset($request->customer) && $request->customer ? $request->customer : null;
@@ -23,7 +23,6 @@ class OrderApiController extends Controller
         $order = isset($request->order_id) && $request->order_id ? $request->order_id : null;
         $product = isset($request->product_id) && $request->product_id ? $request->product_id : null;
         $withoutPackage = isset($request->without_package) ? boolval($request->without_package) : null;
-        $isPaid = isset($request->is_paid) ? boolval($request->is_paid) : true;
 
         $offset = $request->input('start', 0);  
         $limit = $request->input('length', 10);
@@ -43,7 +42,6 @@ class OrderApiController extends Controller
             'discount_percent',
             'date_of_sale',
             'status',
-            'is_paid',
             'package_extension_date',
             'user_id',
             'created_at',
@@ -55,9 +53,6 @@ class OrderApiController extends Controller
         }
         if($id) {
             $orderQuery->where('id', $id);
-        }
-        if(!$isPaid){
-            $orderQuery->where('is_paid',0);
         }
         if($package) {
             $orderQuery->whereHas('packages', function ($query) use ($package) {
@@ -105,6 +100,7 @@ class OrderApiController extends Controller
         foreach ($result as $key => $order) {
             $order->package = $order->packages->first() ? $order->packages->first()->package_name : '';
             $order->package_id = $order->packages->first() ? $order->packages->first()->id : '';
+            $order->image = $order->purchase->images->first();
         }
 
         if($select_json) {

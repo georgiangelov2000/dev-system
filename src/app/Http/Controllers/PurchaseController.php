@@ -8,6 +8,7 @@ use App\Models\Purchase;
 use App\Http\Requests\PurchaseRequest;
 use App\Models\SubCategory;
 use App\Helpers\FunctionsHelper;
+use App\Http\Requests\PurchaseMassEditRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -45,7 +46,7 @@ class PurchaseController extends Controller
             $data = $request->validated();
 
             $this->purchaseProcessing($data);
-            
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -59,17 +60,17 @@ class PurchaseController extends Controller
         $data = $this->loadStaticData();
         $is_available = $purchase->payment === null ? true : false;
 
-        return view('purchases.edit', compact('purchase', 'relatedProductData','is_available'), $data);
+        return view('purchases.edit', compact('purchase', 'relatedProductData', 'is_available'), $data);
     }
 
     public function update(Purchase $purchase, PurchaseRequest $request)
     {
         DB::beginTransaction();
-    
+
         try {
             $data = $request->validated();
-    
-            $this->purchaseProcessing($data,$purchase);
+
+            $this->purchaseProcessing($data, $purchase);
 
             DB::commit();
         } catch (\Exception $e) {
@@ -85,70 +86,23 @@ class PurchaseController extends Controller
         return view('purchases.preview', compact('purchase'));
     }
 
-    public function massEditUpdate(Request $request)
+    public function massEditUpdate(PurchaseMassEditRequest $request)
     {
-        $validated = $request->validate([
-            'purchase_ids' => 'required|array',
-            'quantity' => 'nullable|integer',
-            'price' => 'nullable|integer',
-            'category_id' => 'nullable|integer',
-            'brand_ids' => 'nullable|array',
-            'sub_category_ids' => 'nullable|array'
-        ]);
-
-        $purchaseIds = $validated['purchase_ids'];
-        $requestedQuantity = $validated['quantity'] ?? null;
-        $requestedPrice = $validated['price'] ?? null;
-        $requestedCategoryId = $validated['category_id'] ?? null;
-        $brandIds = $validated['brand_ids'] ?? [];
-        $subCategoryIds = $validated['sub_category_ids'] ?? [];
-
         DB::beginTransaction();
 
         try {
-            foreach ($purchaseIds as $purchaseId) {
-                $purchase = Purchase::find($purchaseId);
-
-                if ($purchase) {
-                    if ($requestedQuantity !== null && $requestedPrice !== null) {
-                        $purchase->quantity = $requestedQuantity;
-                        $purchase->initial_quantity = $requestedQuantity;
-                        $purchase->price = $requestedPrice;
-                    } elseif ($requestedQuantity !== null) {
-                        $purchase->quantity = $requestedQuantity;
-                        $purchase->initial_quantity = $requestedQuantity;
-                    } elseif ($requestedPrice !== null) {
-                        $purchase->price = $requestedPrice;
-                    }
-
-                    if ($requestedCategoryId !== null) {
-                        $purchase->categories()->sync([$requestedCategoryId]);
-                    }
-                    if (!empty($subCategoryIds)) {
-                        $purchase->subcategories()->sync($subCategoryIds);
-                    }
-                    if (!empty($brandIds)) {
-                        $purchase->brands()->sync($brandIds);
-                    }
-
-                    $purchase->total_price = FunctionsHelper::calculatedFinalPrice($purchase->price, $purchase->quantity);
-
-                    $orders_quantity = $purchase->orders->sum('sold_quantity');
-
-                    $final_purchase_quantity = ($purchase->initial_quantity - $orders_quantity);
-
-                    $purchase->quantity = $final_purchase_quantity;
-
-                    $purchase->save();
-                }
+            $validated = $request->validated();
+            
+            foreach ($validated['purchases'] as $purchaseId) {
+                $this->purchaseMassEditProcessing($validated, $purchaseId);
             }
-
             DB::commit();
-            return response()->json(['message' => 'Purchases has been updated'], 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Purchases has not been updated'], 500);
         }
+
+        return response()->json(['message' => 'Purchases has been updated'], 200);
     }
     public function fetchRelatedProductData($purchaseModel)
     {
@@ -234,25 +188,13 @@ class PurchaseController extends Controller
 
     private function purchaseProcessing(array $data, $purchase = null)
     {
+        
         $prices = null;
 
         // Check if $data['image'] exists and set it to $file
         $file = $data['image'] ?? null;
 
-        // Check if $data['subcategories'] and $data['brands'] exist and are not empty
-        $subCategories = $data['subcategories'] ?? null;
-        $brands = $data['brands'] ?? null;
-
-        if ($subCategories !== null) {
-            $subCategories = $this->getNonEmptyArray($subCategories);
-        }
-
-        if ($brands !== null) {
-            $brands = $this->getNonEmptyArray($brands);
-        }
-
         $purchase = $purchase ? $purchase : new Purchase;
-
         $isNewPurchase = !$purchase->exists; // Check if it's a new purchase
         $status = $isNewPurchase ? $this->checkForValidStatus(6) : $this->checkForValidStatus($purchase->status);
 
@@ -261,10 +203,11 @@ class PurchaseController extends Controller
         $purchase->supplier_id = $data['supplier_id'];
         $purchase->notes = $data['notes'] ?? '';
 
-        if( ($purchase && $status === 6) || $isNewPurchase){
+        if (($purchase && $status === 6) || $isNewPurchase) {
+
             // Calculate prices
-            $prices = $this->calculatePrices($data['price'], $data['discount_percent'], $data['quantity']);        
-            
+            $prices = $this->calculatePrices($data['price'], $data['discount_percent'], $data['quantity']);
+
             // Update quantities
             $purchase->quantity = $data['quantity'];
             $purchase->initial_quantity = $data['quantity'];
@@ -285,19 +228,19 @@ class PurchaseController extends Controller
         }
 
         $purchase->save();
-        
-        if ($data['category_id']) {
-            $purchase->categories()->sync([$data['category_id']]);
+
+        if(array_key_exists('category_id',$data) && !empty($data['category_id'])) {
+            $purchase->categories()->sync($data['category_id']);
         }
 
-        if ($subCategories) {
-            $purchase->subcategories()->sync($subCategories);
+        if(array_key_exists('subcategories',$data) && !empty($data['subcategories'])) {
+            $purchase->subcategories()->sync($data['subcategories']);
         }
 
-        if ($brands) {
-            $purchase->brands()->sync($brands);
+        if(array_key_exists('brands',$data) && !empty($data['brands'])) {
+            $purchase->brands()->sync($data['brands']);
         }
-        
+
         if ($file) {
             $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
             Storage::putFileAs($this->dir, $file, $hashed_image);
@@ -307,7 +250,50 @@ class PurchaseController extends Controller
                 'name' => $hashed_image,
             ]);
         }
+    }
+
+    private function purchaseMassEditProcessing(array $data, $id) {
+        $purchase = Purchase::find($id);
         
+        if($data['quantity'] && is_int(intval($data['quantity']))) {
+            $purchase->quantity = $data['quantity'];
+            $purchase->initial_quantity = $data['quantity'];
+        }
+        if (is_numeric($data['price'])) {
+            $purchase->price = $data['price'];
+        }
+        
+        if($data['discount_percent'] && is_int(intval($data['discount_percent'])) ) {
+            $purchase->discount_percent = $data['discount_percent'];
+        }
+
+        $prices = $this->calculatePrices(
+            $purchase->price,
+            $purchase->discount_percent,
+            $purchase->quantity
+        );
+
+        $purchase->total_price = $prices['total_price'];
+        $purchase->original_price = $prices['original_price'];
+        $purchase->discount_price = $prices['discount_price'];
+
+        $ordersQuantity = $purchase->orders->sum('sold_quantity');
+        $finalQuantity = ($purchase->initial_quantity - $ordersQuantity);
+        $purchase->quantity = $finalQuantity;
+
+        $purchase->save();
+
+        if(array_key_exists('category_id',$data) && !empty($data['category_id'])) {
+            $purchase->categories()->sync($data['category_id']);
+        }
+
+        if(array_key_exists('sub_category_ids',$data) && !empty($data['sub_category_ids'])) {
+            $purchase->subcategories()->sync($data['sub_category_ids']);
+        }
+
+        if(array_key_exists('brands',$data) && !empty($data['brands'])) {
+            $purchase->brands()->sync($data['brands']);
+        }
     }
 
     private function calculatePrices($price, $discount, $quantity): array
@@ -324,18 +310,14 @@ class PurchaseController extends Controller
         ];
     }
 
-    private function getNonEmptyArray($value): ?array
-    {
-        return is_array($value) ? array_filter($value) : null;
-    }
-
     private function getImagePath(): string
     {
         return Storage::url($this->dir);
     }
-    
-    private function checkForValidStatus (int $status):int {
+
+    private function checkForValidStatus(int $status): int
+    {
         $statuses = config('statuses.purchase_statuses');
-        return array_key_exists($status,$statuses) ? $status : null;
+        return array_key_exists($status, $statuses) ? $status : null;
     }
 }

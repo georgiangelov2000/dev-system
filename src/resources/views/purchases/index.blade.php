@@ -85,10 +85,8 @@
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select name="status" id="" class="form-control selectType" multiple>
-                                @foreach (config('statuses.order_statuses') as $key => $status)
-                                    @if($key !== 6)
-                                        <option value="{{ $key }}">{{ $status }}</option>
-                                    @endif
+                                @foreach (config('statuses.purchase_statuses') as $key => $status)
+                                    <option value="{{ $key }}">{{ $status }}</option>
                                 @endforeach
                             </select>
                         </div>

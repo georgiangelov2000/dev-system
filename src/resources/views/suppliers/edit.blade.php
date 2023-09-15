@@ -106,7 +106,7 @@
                             <label for="country">Categories</label>
                             <select multiple="" class="form-control selectMultiple" name="categories[]"
                                 data-actions-box="true" data-dropup-auto="false" multiple
-                                data-selected-text-format="count > 5">
+                                data-selected-text-format="count > 4">
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}"
                                         {{ in_array($category->id, $related_categories) ? 'selected' : '' }}>
@@ -125,7 +125,7 @@
                                     placeholder="Enter address" />
                                 <span class="input-group-append">
                                     <button type="button" id="searchAddress"
-                                        class="btn btn-info btn-flat">Search</button>
+                                        class="btn btn-primary btn-flat">Search</button>
                                 </span>
                             </div>
                             @error('address')

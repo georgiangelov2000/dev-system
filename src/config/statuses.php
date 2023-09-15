@@ -8,6 +8,13 @@ return [
         5 => 'Refunded',
         6 => 'Ordered',
     ],
+    'payment_statuses' => [
+        1 => 'Paid',
+        2 => 'Pending',
+        3 => 'Partially Paid',
+        4 => 'Overdue',
+        5 => 'Refunded',
+    ],
     "purchase_statuses" => [
         1 => 'Paid',
         2 => 'Pending',
@@ -37,13 +44,6 @@ return [
         4 => 'Cheque',
         5 => 'Online Payment'
     ],
-    'payment_statuses' => [
-        1 => 'Paid',
-        2 => 'Pending',
-        3 => 'Partially Paid',
-        4 => 'Overdue',
-        5 => 'Refunded',
-    ],
     'stock_statuses' => [
         0 => 'In stock',
         1 => 'Out of stock',
@@ -59,7 +59,7 @@ return [
     ],
     'settings_type' => [
         1 => 'Company Information',
-    ]
+    ],
 ]
 
 ?>

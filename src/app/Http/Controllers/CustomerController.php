@@ -9,6 +9,7 @@ use App\Models\Package;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\FunctionsHelper;
 use App\Helpers\LoadStaticData;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 
@@ -106,7 +107,9 @@ class CustomerController extends Controller
             ->where('is_it_delivered', 0)
             ->get();
 
-        return view('customers.massEditOrders', compact('customer', 'packages'));
+        $drivers = User::select('id','username')->where('role_id',2)->get();
+
+        return view('customers.mass_edit_orders', compact('customer', 'packages', 'drivers'));
     }
 
     // Private methods;

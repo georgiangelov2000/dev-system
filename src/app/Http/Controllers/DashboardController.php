@@ -101,6 +101,9 @@ class DashboardController extends Controller
                             WHERE purchases_images.purchase_id = purchases.id 
                             ORDER BY purchases_images.id 
                             LIMIT 1) AS first_image"))
+            ->addSelect(DB::raw("(SELECT COUNT(*) FROM orders AS p
+                            WHERE p.purchase_id = purchases.id 
+                            AND p.status IN (" . implode(',', $paidStatuses) . ")) AS orders_count"))
             ->whereHas('orders', function ($query) use ($paidStatuses) {
                 $query->whereIn('status', $paidStatuses);
             })
@@ -162,7 +165,7 @@ class DashboardController extends Controller
 
     private function getTopSellingDrivers(array $paidStatuses)
     {
-        $userQuery = User::select('id', 'role_id', 'username', 'image')
+        $userQuery = User::select('id', 'role_id', 'username', 'image','phone')
             ->where('role_id', 2)
             ->addSelect(DB::raw("(SELECT SUM(payments.price) FROM orders AS p
                         JOIN order_payments AS payments ON p.id = payments.order_id
@@ -178,6 +181,9 @@ class DashboardController extends Controller
             ->whereHas('orders', function ($query) use ($paidStatuses) {
                 $query->whereIn('status', $paidStatuses);
             })
+            ->orderBy('total_price', 'DESC')
+            ->orderBy('total_quantity', 'DESC')
+            ->orderBy('orders_count', 'DESC')
             ->take(4)
             ->get();
 

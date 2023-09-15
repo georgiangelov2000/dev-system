@@ -97,11 +97,15 @@ $(function () {
                 data: "name"
             },
             {
-                width: '10%',
                 orderable: false,
-                class:'text-center',
                 name: "email",
-                data: "email",
+                render: function(data,type,row) {
+                    let email = '';
+                    if(row.email) {
+                        email = `<a href="mailto:${row.email}">${row.email}</a>`
+                    }
+                    return email;
+                }
             },
             {
                 width: '10%',

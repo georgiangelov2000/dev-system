@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddImagePathToBrandsTable extends Migration
+class AddPackageIdColumnToOrdersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddImagePathToBrandsTable extends Migration
      */
     public function up()
     {
-        Schema::table('brands', function (Blueprint $table) {
-            $table->string('image_path')->nullable();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->unsignedBigInteger('package_id');
         });
     }
 
@@ -25,8 +25,8 @@ class AddImagePathToBrandsTable extends Migration
      */
     public function down()
     {
-        Schema::table('brands', function (Blueprint $table) {
-            $table->dropColumn('image_path');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('package_id');
         });
     }
 }

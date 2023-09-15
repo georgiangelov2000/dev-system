@@ -35,8 +35,8 @@
                         </div>
                         <div class="form-group col-6">
                             <label for="quantity">Quantity</label>
-                            <input type="number" placeholder="Enter quantity"
-                                class="form-control @error('quantity')  is-invalid @enderror" id="quantity" name="quantity"
+                            <input type="number"
+                                class="form-control @error('quantity')  is-invalid @enderror" min="0" id="quantity" name="quantity" placeholder="Enter a integer value (e.g.,1,2)"
                                 value='{{ old('quantity') ? e(old('quantity')) : '' }}'>
                             @error('quantity')
                                 <span class="text-danger">{{ $message }}</span>
@@ -44,8 +44,8 @@
                         </div>
                         <div class="form-group col-6">
                             <label for="price">Price</label>
-                            <input type="text" class="form-control @error('price')  is-invalid @enderror" id="price"
-                                name="price" value='{{ old('price') ? e(old('price')) : '' }}' placeholder="Enter price">
+                            <input type="text" class="form-control @error('price')  is-invalid @enderror" id="price" 
+                                name="price" value='{{ old('price') ? e(old('price')) : '' }}' placeholder="Enter a numeric value (e.g., 1.00)">
                             @error('price')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -59,7 +59,7 @@
                                     id="discount_percent"
                                     name="discount_percent" 
                                     min="0"
-                                    value="0"
+                                    placeholder="Enter a integer value (e.g.,1,2)"
                                     value='{{ old('discount_percent') ? e(old('discount_percent')) : '' }}' 
                                     >
                                 @error('discount_percent')

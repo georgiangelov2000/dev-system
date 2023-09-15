@@ -142,7 +142,7 @@ $(function () {
                             class="btn p-1" 
                             title="Delete" 
                             onclick="event.preventDefault(); deleteImage(this);">
-                            <i class="fa-light fa-image text-primary fa-lg"></i>
+                            <i class="fa-light fa-image text-danger fa-lg"></i>
                             </button>
                     </form>`;
                     return `${subCategories} ${deleteFormTemplate} ${editButton} ${removeImage}`;

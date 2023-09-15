@@ -67,7 +67,13 @@ $(document).ready(function () {
             {
                 orderable: false,
                 name: "email",
-                data: "email",
+                render: function(data,type,row) {
+                    let email = '';
+                    if(row.email) {
+                        email = `<a href="mailto:${row.email}">${row.email}</a>`
+                    }
+                    return email;
+                }
             },
             {
                 width: '5%',
@@ -85,7 +91,13 @@ $(document).ready(function () {
                 width: '7%',
                 orderable: false,
                 name: "website",
-                data: "website"
+                render: function(data,type,row) {
+                    let website = '';
+                    if(row.website) {
+                        website = `<a href="${row.website}">${row.website}</a>`;
+                    }
+                    return website;
+                }
             },
             {
                 width: '6%',
@@ -137,12 +149,14 @@ $(document).ready(function () {
                     let overduePurchases = row.overdue_purchases_count;
                     let pendingPurchases = row.pending_purchases_count;
                     let refundPurchases = row.refund_purchases_count;
+                    let deliveredPurchases = row.delivered_purchases_count;
 
                     return `<div>
                         <span class="text-success">${paidPurchases} paid</span> /
                         <span class="text-danger">${overduePurchases} overdue</span> /
                         <span class="text-primary">${pendingPurchases} pending</span> /
-                        <span class="text-dark">${refundPurchases} refund</span>
+                        <span class="text-dark">${refundPurchases} refund</span> /
+                        <span>${deliveredPurchases} delivered</span>
                     </div>`
                 }
             },
@@ -161,7 +175,7 @@ $(document).ready(function () {
                         </form>\ ";
                     }
 
-                    let editButton = '<a data-id=' + row.id + ' href=' + EDIT_SUPPLIER_ROUTE.replace(":id", row.id) + ' class="btn p-0" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+                    let editButton = '<a data-id=' + row.id + ' href=' + EDIT_SUPPLIER_ROUTE.replace(":id", row.id) + ' class="btn p-0" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>';
                     let massEdit = '<a data-id=' + row.id + ' href='+MASS_EDIT_PURCHASES.replace(":id",row.id)+' class="btn p-0" title="Mass edit"><i class="fa-light fa-pen-to-square text-primary"></i></a>';
                     let categories = "<button data-toggle='collapse' data-target='#categories_" + row.id + "' title='Categories' class='btn btn-outline-muted showCategories p-0'><i class='fa-light fa-list' aria-hidden='true'></i></button>";
                     return `${categories} ${deleteFormTemplate} ${editButton} ${massEdit}`;

@@ -8,6 +8,8 @@ $(function () {
     const bootstrapSubCategory = $('select[name="sub_category_ids"]');
     const bootstrapCategory = $('select[name="category_id"]');
 
+    const statuses = [6];
+
     let dataTable = table.DataTable({
         serverSide: true,
         ordering: false,
@@ -17,9 +19,7 @@ $(function () {
                 return $.extend({}, d, {
                     'supplier': SUPPLIER_ID,
                     'search': d.search.value,
-                    'out_of_stock': 0,
-                    'is_paid':0,
-                    'status': 0
+                    'status': statuses
                 });
             }
         },
@@ -182,43 +182,28 @@ $(function () {
                 }
             },
             {
-                width:'1%',
-                orderable:false,
-                name:'is_paid',
-                render:function(data,type,row) {
-                    if ( (row.is_paid === 1) && (row.status === 1 || row.status === 4)  ) {
-                        return '<span class="text-success">Yes</span>';
-                    } else if ( (row.is_paid === 3) && (row.status === 3) ) {
-                        return '<span class="text-warning">Refund</span>';
-                    } else {
-                        return '<span class="text-danger">No</span>';
-                    }
-                }
-            },
-            {
                 width: '5%',
                 orderable: false,
-                class:'text-center',
+                name: "status",
+                class: "text-center",
                 render: function (data, type, row) {
-                    if (row.status === 1) {
-                        return '<img style="height:40px;" class="w-50" title="Paid" src = "/storage/images/static/succesfully.png" /> '
-                    }
-                    else if (row.status === 2) {
-                        return '<img style="height:40px;" class="w-50" title= "Pending" src = "/storage/images/static/pending.png" /> '
-                    }
-                    else if (row.status === 3) {
-                        return '<img style="height:40px;" class="w-50" title="Partially Paid" src = "/storage/images/static/partially-payment.png" /> '
-                    }
-                    else if (row.status === 4) {
-                        return '<img style="height:40px;" class="w-50" title="Overdue" src = "/storage/images/static/overdue.png" /> '
-                    }
-                    else if (row.status === 5) {
-                        return '<img style="height:40px;" class="w-50" title="Refunded" src = "/storage/images/static/ordered.png" /> '
-                    } else {
-                        return '<img style="height:40px;" class="w-50" title="Unpaid" src = "/storage/images/static/unpaid.png" />';
-                    }
+                    const statusMap = {
+                        1: { label: "Paid", iconClass: "fal fa-check-circle" },
+                        2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
+                        3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+                        4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
+                        5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
+                        6: { label: "Delivered", iconClass: "fal fa-shipping-fast" }
+                    };
+            
+                    const statusInfo = statusMap[row.status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
+            
+                    return `<div title="${statusInfo.label}" class="status">
+                        <span class="icon"><i class="${statusInfo.iconClass}"></i></span>
+                    </div>`;
                 }
-            },
+            }
+            
         ]
     });
 
@@ -277,9 +262,10 @@ $(function () {
 
         let price = formData.price;
         let quantity = formData.quantity;
-        let brandIds = formData.brand_id;
+        let brands = Array.isArray(formData.brand_id) ? formData.brand_id : (formData.brand_id ? [formData.brand_id] : []);
         let category = formData.category_id;
-        let subCategoryIds = Array.isArray(formData.sub_category_ids) ? formData.sub_category_ids : [];
+        let subCategoryIds = Array.isArray(formData.sub_category_ids) ? formData.sub_category_ids : (formData.sub_category_ids ? [formData.sub_category_ids] : []);
+        let discount_percent = formData.discount_percent;
 
         let searchedIds = [];
 
@@ -294,23 +280,20 @@ $(function () {
                 url: action,
                 method: method,
                 data: {
-                    'purchase_ids': searchedIds,
-                    'price': price,
-                    'quantity': quantity,
-                    'category_id': category,
-                    'brand_ids': brandIds,
-                    'sub_category_ids':subCategoryIds
+                    'purchases': searchedIds,
+                    'price':price,
+                    'quantity':quantity,
+                    'category_id':category,
+                    'brands':brands,
+                    'sub_category_ids':subCategoryIds,
+                    'discount_percent':discount_percent
                 },
                 success: function (response) {
                     toastr['success'](response.message);
-
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
-
+                    dataTable.ajax.reload(null, false);
                 },
                 error: function (xhr, status, error) {
-                    toastr['error'](response.message);
+                    toastr['error'](xhr.responseJSON.message);
                 }
             })
 

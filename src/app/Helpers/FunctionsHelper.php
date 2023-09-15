@@ -1,34 +1,35 @@
 <?php
 
 namespace App\Helpers;
+
 use Illuminate\Support\Facades\Storage;
 
 class FunctionsHelper
 {
     public static function calculatedDiscountPrice($price, $discount)
     {
-        $discountAmount = 0;
-        $finalPrice = 0;
 
         if (($price && $discount) && (is_numeric($price) && is_numeric($discount))) {
-            $discountAmount = (($price * $discount) / 100);
-            $finalPrice = ($price - $discountAmount);
+            $finalPrice = $price - (($price * $discount) / 100);
         } else {
             $finalPrice = $price;
         }
 
-        return $finalPrice;
+        return number_format($finalPrice, 2);
     }
 
     public static function calculatedFinalPrice($finalSingleSoldPrice, $quantity)
     {
-        $finalPrice = 0;
 
         if (($finalSingleSoldPrice && $quantity) && (is_numeric($finalSingleSoldPrice) && is_numeric($quantity))) {
             $finalPrice = ($finalSingleSoldPrice * $quantity);
+        } else {
+            $finalPrice = 0;
         }
 
-        return $finalPrice;
+        $finalPrice = number_format($finalPrice, 2);
+
+        return number_format($finalPrice, 2);
     }
 
     public static function dateRangeConverter($data)
