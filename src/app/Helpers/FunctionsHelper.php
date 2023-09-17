@@ -18,19 +18,21 @@ class FunctionsHelper
         return number_format($finalPrice, 2);
     }
 
-    public static function calculatedFinalPrice($finalSingleSoldPrice, $quantity)
+    public static function calculatedFinalPrice($price, $quantity)
     {
+        // Remove commas from the price if they exist
+        $price = str_replace(',', '', $price);
 
-        if (($finalSingleSoldPrice && $quantity) && (is_numeric($finalSingleSoldPrice) && is_numeric($quantity))) {
-            $finalPrice = ($finalSingleSoldPrice * $quantity);
+        if (is_numeric($price) && is_numeric($quantity)) {
+            $finalPrice = ($price * $quantity);
         } else {
             $finalPrice = 0;
         }
 
-        $finalPrice = number_format($finalPrice, 2);
-
-        return number_format($finalPrice, 2);
+        // Format the final price with two decimal places using a period as the decimal separator
+        return number_format($finalPrice, 2, '.', '');
     }
+
 
     public static function dateRangeConverter($data)
     {

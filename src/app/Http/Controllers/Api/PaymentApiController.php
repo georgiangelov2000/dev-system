@@ -72,9 +72,9 @@ class PaymentApiController extends Controller
     {
         $paymentQuery = PurchasePayment::query()
         ->with(
-            ['purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,status,is_paid', 'invoice']
+            ['purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,status', 'invoice']
         );
-
+        
         if ($id) {
             $paymentQuery->whereHas('purchase', function ($query) use ($id) {
                 $query->where('supplier_id', $id);

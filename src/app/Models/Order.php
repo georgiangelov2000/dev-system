@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Customer;
 use App\Models\Purchase;
 use App\Models\User;
+use App\Models\Package;
 use App\Models\OrderPayment;
 
 class Order extends Model
@@ -67,12 +68,7 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function packages()
-    {
-        return $this->belongsToMany(Package::class, 'packages_orders', 'order_id', 'package_id');
-    }
-
-    public function orderPayments(){
+    public function payment(){
         return $this->hasOne(OrderPayment::class);
     }
 }

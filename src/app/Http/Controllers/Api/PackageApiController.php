@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 
 class PackageApiController extends Controller
 {
-    public function getData(Request $request) {
+    public function getData(Request $request)
+    {
         $package = isset($request->package) ? $request->package : null;
         $delivery = isset($request->delivery) ? $request->delivery : null;
         $customer = isset($request->customer) ? $request->customer : null;
@@ -23,8 +24,8 @@ class PackageApiController extends Controller
 
         $offset = $request->input('start', 0);
         $packageQuery = Package::query();
-        
-        if($limit) {
+
+        if ($limit) {
             $packageQuery->skip($offset)->take($limit);
         }
         if ($column_name && $order_dir) {
@@ -33,21 +34,21 @@ class PackageApiController extends Controller
         if ($search) {
             $packageQuery->where('package_name', 'LIKE', '%' . $search . '%');
         }
-        if($is_it_delivered) {
-            $packageQuery->where('is_delivered',1);
+        if ($is_it_delivered) {
+            $packageQuery->where('is_delivered', 1);
         }
-        if($package) {
-            $packageQuery->where('package_type',$package);
+        if ($package) {
+            $packageQuery->where('package_type', $package);
         }
-        if($delivery) {
-            $packageQuery->where('delivery_method',$delivery);
+        if ($delivery) {
+            $packageQuery->where('delivery_method', $delivery);
         }
-        if($customer) {
+        if ($customer) {
             $packageQuery->whereHas('orders', function ($query) use ($customer) {
                 $query->where('customer_id', $customer);
             });
         }
-        if($delivery_date) {
+        if ($delivery_date) {
             $dates = explode(" - ", $delivery_date);
             $date1_formatted = date('Y-m-d 23:59:59', strtotime($dates[0]));
             $date2_formatted = date('Y-m-d 23:59:59', strtotime($dates[1]));
@@ -60,36 +61,23 @@ class PackageApiController extends Controller
             $packageQuery->whereHas('orders', function ($query) {
                 $query->whereIn('status', [6]);
             });
-        }        
-        if($select_json) {
+        }
+        if ($select_json) {
             return response()->json($packageQuery->get());
         }
-        $packageQuery->withCount('orders');
-        
+
+        $packageQuery->withCount([
+            'orders as paid_orders_count' => function ($query) {
+                $query->where('status', 1);
+            },
+            'orders as overdue_orders_count' => function ($query) {
+                $query->where('status', 4);
+            },
+        ])->withCount('orders');
 
         $filteredRecords = $packageQuery->count();
         $result = $packageQuery->skip($offset)->take($limit)->get();
-        
-        foreach ($result as $key => $package) {
-            $package->package_type = array_key_exists($package->package_type, config('statuses.package_types')) ? config('statuses.package_types.' . $package->package_type) : $package->package_type;
-            $package->delivery_method = array_key_exists($package->delivery_method, config('statuses.delivery_methods')) ? config('statuses.delivery_methods.' . $package->delivery_method) : $package->delivery_method;
-            $package->is_it_delivered = array_key_exists($package->is_it_delivered, config('statuses.is_paid_statuses')) ? config('statuses.is_paid_statuses.' . $package->is_it_delivered) : $package->is_it_delivered;
 
-            $ordersCount = $package->orders_count;
-
-            $paidOrders = ($package->paid_orders_count + $package->overdue_orders_count);
-
-            if($ordersCount > 0) {
-                $paidPercentage = ($paidOrders / $ordersCount) * 100;
-            } else {
-                $paidPercentage = 0;
-            }
-
-            $paidPercentage = round($paidPercentage, 2);
-
-            $package->paid_percentage = $paidPercentage;
-        }
-        
         $totalRecords = Package::count();
 
         return response()->json(

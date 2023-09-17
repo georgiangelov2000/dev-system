@@ -8,6 +8,14 @@
             </div>
         </div>
         <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h6 class="font-weight-bold">Legend:</h6>
+                </div>
+                <div class="col-12">
+                    <span>- You can update purchases with status delivered</span>
+                </div>
+            </div>
             <form method="PUT" onsubmit="updatePurchases(event)">
                 @csrf
                 <table id="massEditPurchases" class="table table-hover table-sm dataTable no-footer">
@@ -21,17 +29,16 @@
                         <th>ID</th>
                         <th>Image</th>
                         <th>Name</th>
-                        <th>Unit price</th>
-                        <th>Unit disc price</th>
-                        <th>Tot.price</th>
-                        <th>Orig.price</th>
+                        <th>Price</th>
+                        <th>Discount price</th>
+                        <th>Total price</th>
+                        <th>Regular price</th>
                         <th>Quantity</th>
-                        <th>Initial Quantity</th>
+                        <th>Init.quantity</th>
                         <th>Discount</th>
                         <th>Categories</th>
                         <th>Sub categories</th>
                         <th>Brands</th>
-                        <th>Paid</th>
                         <th class="text-center">Status</th>
                     </thead>
                 </table>
@@ -44,12 +51,34 @@
                     <div class="col-12 d-flex flex-wrap p-0">
                         <div class="form-group col-2">
                             <label for="price">Single price</label>
-                            <input type="text" class="form-control" name="price" id="price">
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                name="price" 
+                                id="price"
+                                placeholder="Enter a numeric value (e.g., 1.00)"
+                            />
                         </div>
                         <div class="form-group col-2">
                             <label for="quantity">Quantity</label>
-                            <input type="number" class="form-control" name="quantity"
-                                id="quantity">
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                name="quantity"
+                                id="quantity"
+                                min="0"
+                                placeholder="Enter a integer value (e.g.,1,2)"
+                            />
+                        </div>
+                        <div class="form-group col-2">
+                            <label for="quantity">Discount%</label>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                name="discount_percent"
+                                id="discount_percent"
+                                placeholder="Enter a integer value (e.g.,1,2)"
+                            />
                         </div>
                         <div class="form-group col-2">
                             <label for="category_id">Categories</label>
@@ -78,8 +107,7 @@
                             </select>
                         </div>
                         <div class="form-group col-2">
-                            <label for="" class="mb-4"></label>
-                            <button id="massEditSubmit" class="btn btn-primary w-100">Submit</button>
+                            <button id="massEditSubmit" class="btn btn-primary w-100">Save changes</button>
                         </div>
                     </div>
                 </div>

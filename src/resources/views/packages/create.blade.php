@@ -132,16 +132,17 @@
                         <thead>
                             <tr>
                                 <th>Actions</th>
-                                <th>Image</th>
-                                <th>Customer</th>
-                                <th>Purchase</th>
-                                <th title="Quantity">Quantity</th>
-                                <th>Unit price</th>
-                                <th>Disc unit price</th>
-                                <th>Original price</th>
-                                <th>Regular price</th>
-                                <th>Discount %</th>
+                                <th>ID</th>
+                                <th>Tracking number</th>
+                                <th>Name</th>
                                 <th>Date of sale</th>
+                                <th>Unit price</th>
+                                <th>Discount unit price</th>
+                                <th>Official price</th>
+                                <th>Regular price</th>
+                                <th>Discount</th>
+                                <th>Amount</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -191,9 +192,11 @@
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/packages/form.js') }}"></script>
     <script type="text/javascript">
-        let CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
-        let ORDER_API_ROUTE = "{{ route('api.orders') }}"
-        let SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
-        let ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";
+        const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
+        const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit',':id') }}";
+        const PURCHASE_EDIT_ROUTE = "{{ route('purchase.edit',':id') }}";
+        const ORDER_API_ROUTE = "{{ route('api.orders') }}";
+        const SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
+        const ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";
     </script>
 @endpush

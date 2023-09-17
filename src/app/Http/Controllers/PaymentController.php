@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\Supplier;
 use App\Http\Requests\PaymentRequest;
@@ -13,49 +14,58 @@ use App\Models\PurchasePayment;
 use App\Models\Settings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PaymentController extends Controller
 {
+    private $types = ['order', 'purchase'];
+
+    private $indexMapping = [];
+
+    private $editMapping = [];
+
+    private $paymentStatuses;
+
+    private $paymentMethods;
+
+    const DEFAULT_STATUS = 6;
+
+    public function __construct()
+    {
+        $this->indexMapping = [
+            'order' => [
+                'customers' => Customer::select('id', 'name')->get()
+            ],
+            'purchase' => [
+                'suppliers' => Supplier::select('id', 'name')->get()
+            ]
+        ];
+
+        $this->editMapping = [
+            'order' => OrderPayment::query(),
+            'purchase' => PurchasePayment::query(),
+        ];
+
+        $this->paymentStatuses = config('statuses.payment_statuses');
+        $this->paymentMethods  = config('statuses.payment_methods_statuses');
+    }
+
     public function index($type)
     {
-        return $this->getView(null, $type);
-    }
-
-    public function create($type)
-    {
-        return $this->getView(null, $type, 'create');
-    }
-
-    public function edit(string $payment, string $type)
-    {
-        return $this->getView($payment, $type, 'edit');
-    }
-
-    public function store(PaymentRequest $request, $type)
-    {
-        DB::beginTransaction();
-
-        try {
-            $data = $request->validated();
-            if (isset($data['id']) && count($data['id'])) {
-                foreach ($data['id'] as $key => $id) {
-                    $this->processPayment(
-                        $request->method(),
-                        $type,
-                        $id,
-                        $data['price'][$key],
-                        $data['quantity'][$key],
-                        $data['date_of_payment'][$key]
-                    );
-                }
-            }
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['message' => 'Payment has not been created'], 500);
+        if (in_array($type, $this->types)) {
+            return $this->getView($type);
+        } else {
+            throw new NotFoundHttpException;
         }
-        return response()->json(['message' => 'Payment has been created'], 200);
+    }
+
+    public function edit($payment, $type)
+    {
+        if (in_array($type, $this->types)) {
+            return $this->getView($type, $payment);
+        } else {
+            throw new NotFoundHttpException;
+        }
     }
 
     public function update(PaymentRequest $request, $payment, $type)
@@ -63,22 +73,20 @@ class PaymentController extends Controller
         DB::beginTransaction();
 
         try {
+            $builder = $this->editMapping[$type]->findOrFail($payment);
+
+            if ($builder instanceof OrderPayment) {
+                $relation = 'order';
+            } elseif ($builder instanceof PurchasePayment) {
+                $relation = 'purchase';
+            }
+
             $data = $request->validated();
 
-            $this->processPayment(
-                $request->method(),
-                $type,
-                $payment,
-                $data['price'],
-                $data['quantity'],
-                $data['date_of_payment'],
-                $data['payment_method'],
-                $data['payment_reference'],
-                $data['payment_status'],
-            );
+            $this->paymentProcessing($data, $builder, $relation);
 
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollback();
             return back()->withInput()->with('error', 'Payment has not been updated');
         }
@@ -89,165 +97,94 @@ class PaymentController extends Controller
     public function delete($payment, $type)
     {
         DB::beginTransaction();
-
+    
         try {
-            $relations = [];
-
-            if ($type === 'order') {
-                array_push($relations, 'order', 'invoice');
-                $payment = OrderPayment::find($payment);
-            } elseif ($type === 'purchase') {
-                array_push($relations, 'purchase', 'invoice');
-                $payment = PurchasePayment::find($payment);
-            }
-
-            if (!$payment) {
-                return response()->json(['message' => 'Payment not found'], 400);
-            }
-
-            // Load related models
-            $payment->load($relations);
-            
-            // Delete the invoice relation
-            $invoice = $payment->invoice;
-            if ($invoice) {
-                $invoice->delete();
-            }
-
-            // Update the status of the associated purchase or order
-            $relatedModel = $payment->{$type};
+            $builder = $this->editMapping[$type]->findOrFail($payment);
+    
+            $relatedModel = $builder->{$type};
+    
             if ($relatedModel) {
-                $relatedModel->status = 6; // Set the status to 6 (or your desired status)
+                $relatedModel->status = self::DEFAULT_STATUS;
                 $relatedModel->save();
             }
-
+    
             // Delete the payment
-            $payment->delete();
-
+            $builder->delete();
+    
             DB::commit();
-
-            return response()->json(['message' => 'Payment has been deleted'], 200);
-        } catch (\Exception $e) {
+    
+            if ($relatedModel) {
+                return response()->json(['message' => 'Payment has been deleted'], 200);
+            } else {
+                return response()->json(['message' => $type . ': Not found'], 404);
+            }
+        } catch (Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Payment could not be deleted'], 500);
         }
     }
+        
 
     // Private methods
-    private function getView(?string $payment = null, string $type, ?string $viewType = null): View
+    private function getView(string $type, ?string $payment = null)
     {
-        $data = $this->getData($payment, $type);
-        $view = $viewType !== null ? view($type . 's.' . $viewType . '_payment', $data) : view('payments.' . $type . '_payments', $data);
-        return $view;
-    }
+        if (array_key_exists($type, $this->indexMapping) && !$payment) {
+            $data = $this->indexMapping[$type];
+            $view = view('payments.' . $type . '_payments', $data);
+        } elseif (array_key_exists($type, $this->editMapping) && $payment) {
+            $relations = [];
+            $builder = $this->editMapping[$type]->where('id', $payment)->first();
 
-    private function getData(?string $payment = null, string $type): array
-    {
-        $relations = [];
-        $data = [];
-
-
-        if ($type === 'order') {
-            $payment !== null  ? array_push($relations, 'order.customer', 'invoice') : [];
-            $query = $payment !== null ? OrderPayment::findOrFail($payment) : Customer::has('orders')->select('id', 'name');
-        } elseif ($type === 'purchase') {
-            $payment !== null ? array_push($relations, 'purchase.supplier', 'invoice') : [];
-            $query = $payment !== null ? PurchasePayment::findOrFail($payment) : Supplier::has('purchases')->select('id', 'name');
-        }
-
-        if ($payment !== null) {
-
-            $jsonEncoded = Settings::where('type', 1)->first();
-            $jsonDecoded = json_decode($jsonEncoded->settings, true);
-            $data['settings'] = $jsonDecoded;
-            $data['payment'] = $query->load($relations);
-        } else {
-            $data[$type === 'order' ? 'customers' : 'suppliers'] = $query->get();
-        }
-
-        return $data;
-    }
-
-    private function processPayment(
-        string $method,
-        string $type,
-        string $id,
-        string $price,
-        string $quantity,
-        string $date_of_payment,
-        ?string $payment_method = null,
-        ?string $payment_reference = null,
-        ?string $payment_status = null
-    ) {
-
-        $relationName = ($type === 'order') ? 'order' : 'purchase';
-        $modelFounder = $this->getModelFounder($type, $id, $method);
-
-
-        if ($method !== 'PUT') {
-            $newRelation = $this->getNewModelRelation($type);
-        }
-
-        if ($modelFounder instanceof OrderPayment || $modelFounder instanceof PurchasePayment) {
-            $relation = $modelFounder->$relationName;
-            $relation->status = $payment_status;
-            $relation->save();
-
-            $modelFounder->price = $price;
-            $modelFounder->quantity = $quantity;
-            $modelFounder->date_of_payment = date('Y-m-d', strtotime($date_of_payment));
-            $modelFounder->payment_method = $payment_method;
-            $modelFounder->payment_reference = $payment_reference;
-            $modelFounder->payment_status = $payment_status;
-
-            $modelFounder->save();
-
-            $modelFounder->invoice()->update([
-                'price' => $modelFounder->price,
-                'quantity' => $modelFounder->quantity
-            ]);
-
-            return $modelFounder;
-        } else {
-            $modelFounder->status = 2;
-            $modelFounder->save();
-
-            if ($newRelation instanceof OrderPayment) {
-                $newRelation->order_id = $id;
-            } elseif ($newRelation instanceof PurchasePayment) {
-                $newRelation->purchase_id = $id;
+            if ($builder instanceof OrderPayment) {
+                array_push($relations, 'order.customer', 'invoice');
+            } elseif ($builder instanceof PurchasePayment) {
+                array_push($relations, 'purchase.supplier', 'invoice');
             }
+            $builder->load($relations);
 
-            $newRelation->price = $price;
-            $newRelation->quantity = $quantity;
-            $newRelation->date_of_payment = date('Y-m-d', strtotime($date_of_payment));
+            $data['payment'] = $builder;
+            $data['settings'] = $this->settings();
 
-            $newRelation->save();
-
-            $newRelation->invoice()->create([
-                'price' => $newRelation->price,
-                'quantity' => $newRelation->quantity
-            ]);
+            $view = view($type . 's.' . 'edit' . '_payment', $data);
         }
+
+        return $view ?? throw new NotFoundHttpException;;
     }
 
-    private function getModelFounder(string $type, string $id, ?string $method)
+    private function settings()
     {
-        if ($type === 'order') {
-            return ($method === 'PUT') ? OrderPayment::findOrFail($id) : Order::findOrFail($id);
-        } elseif ($type === 'purchase') {
-            return ($method === 'PUT') ? PurchasePayment::findOrFail($id) : Purchase::findOrFail($id);
-        }
+        $jsonEncoded = Settings::where('type', 1)->first();
+        $jsonDecoded = json_decode($jsonEncoded->settings, true);
 
-        return null;
+        return $jsonDecoded;
     }
 
-    private function getNewModelRelation(string $type)
-    {
-        if ($type === 'order') {
-            return  new OrderPayment();
-        } elseif ($type === 'purchase') {
-            return  new PurchasePayment();
+    private function paymentProcessing(
+        array $data,
+        $builder,
+        $relation
+    ) {
+        $relation = $builder->$relation;
+
+        if (isset($data['payment_status']) && array_key_exists($data['payment_status'], $this->paymentStatuses)) {
+            $relation->status = $data['payment_status'];
+            $builder->payment_status = $data['payment_status'];
+            $relation->save();
         }
+
+        if (isset($data['payment_method']) && array_key_exists($data['payment_method'], $this->paymentMethods)) {
+            $builder->payment_method = $data['payment_method'];
+        }
+
+        $builder->price = $data['price'];
+        $builder->quantity = $data['quantity'];
+        $builder->date_of_payment = now()->parse($data['date_of_payment']);
+        $builder->payment_reference = $data['payment_reference'];
+        $builder->save();
+
+        $builder->invoice()->update([
+            'price' => $builder->price,
+            'quantity' => $builder->quantity
+        ]);
     }
 }

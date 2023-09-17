@@ -246,28 +246,6 @@
                     </ul>
                 </li>
 
-                {{-- <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-bar-chart" aria-hidden="true"></i>
-                        <p>
-                            Summaries
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('summary.index','customer') }}" class="nav-link">
-                                <p>Customer summary</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('summary.index','supplier') }}" class="nav-link">
-                                <p>Supplier summary</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li> --}}
-
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa-light fa-credit-card"></i>
@@ -279,48 +257,16 @@
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
                             <a href="{{ route('payment.index','order') }}" class="nav-link">
-                                <p>Order payments overview</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('payment.index','purchase') }}" class="nav-link">
-                                <p>Purchase payments overview</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('payment.create','order') }}" class="nav-link">
                                 <p>Order payments</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('payment.create','purchase') }}" class="nav-link">
+                            <a href="{{ route('payment.index','purchase') }}" class="nav-link">
                                 <p>Purchase payments</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('package.create.customer.payment') }}" class="nav-link">
-                                <p>Package payments</p>
                             </a>
                         </li>
                     </ul>
                 </li>
-
-                {{-- <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fal fa-analytics"></i>
-                        <p>
-                            Reports
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('report.index') }}" class="nav-link">
-                                <p>Company reports</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li> --}}
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -335,21 +281,9 @@
                             <a href="{{ route('settings.get') }}" class="nav-link">
                                 <p>Company info</p>
                             </a>
-                            {{-- <a href="{{ route('settings.email') }}" class="nav-link">
-                                <p>Send E-mails</p>
-                            </a> --}}
                         </li>
                     </ul>
                 </li>
-
-                {{-- <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-file-import"></i>
-                        <p>
-                           (XML,JSON) Import
-                        </p>
-                    </a>
-                </li> --}}
 
             </ul>
         </nav>

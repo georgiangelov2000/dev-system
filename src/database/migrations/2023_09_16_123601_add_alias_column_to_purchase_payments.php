@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPackageIdColumnToOrdersTable extends Migration
+class AddAliasColumnToPurchasePayments extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddPackageIdColumnToOrdersTable extends Migration
      */
     public function up()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('package_id')->default(0);
+        Schema::table('purchase_payments', function (Blueprint $table) {
+            $table->string('alias');
         });
     }
 
@@ -25,8 +25,8 @@ class AddPackageIdColumnToOrdersTable extends Migration
      */
     public function down()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('package_id');
+        Schema::table('purchase_payments', function (Blueprint $table) {
+            $table->dropColumn('alias');
         });
     }
 }

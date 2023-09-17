@@ -21,10 +21,13 @@ class PurchaseController extends Controller
 
     private $dir = 'public/images/products';
 
+    private $statuses;
+
     public function __construct(LoadStaticData $staticDataHelper, FunctionsHelper $helper)
     {
         $this->staticDataHelper = $staticDataHelper;
         $this->helper = $helper;
+        $this->statuses = config('statuses.purchase_statuses');
     }
 
     public function index()
@@ -58,9 +61,23 @@ class PurchaseController extends Controller
     {
         $relatedProductData = $this->fetchRelatedProductData($purchase);
         $data = $this->loadStaticData();
-        $is_available = $purchase->payment === null ? true : false;
+        $orderAmount = $purchase->orders->sum('sold_quantity');
 
-        return view('purchases.edit', compact('purchase', 'relatedProductData', 'is_available'), $data);
+        $isEditable = array_key_exists($purchase->status, $this->statuses) && $purchase->status === 6 ? true : false;
+        $status = array_key_exists($purchase->status, $this->statuses) ? $this->statuses[$purchase->status] : '';
+
+
+        return view(
+            'purchases.edit',
+            compact(
+                'purchase',
+                'orderAmount',
+                'relatedProductData',
+                'isEditable',
+                'status'
+            ),
+            $data
+        );
     }
 
     public function update(Purchase $purchase, PurchaseRequest $request)
@@ -92,7 +109,7 @@ class PurchaseController extends Controller
 
         try {
             $validated = $request->validated();
-            
+
             foreach ($validated['purchases'] as $purchaseId) {
                 $this->purchaseMassEditProcessing($validated, $purchaseId);
             }
@@ -188,7 +205,6 @@ class PurchaseController extends Controller
 
     private function purchaseProcessing(array $data, $purchase = null)
     {
-        
         $prices = null;
 
         // Check if $data['image'] exists and set it to $file
@@ -205,18 +221,29 @@ class PurchaseController extends Controller
 
         if (($purchase && $status === 6) || $isNewPurchase) {
 
-            // Calculate prices
-            $prices = $this->calculatePrices($data['price'], $data['discount_percent'], $data['quantity']);
+            // Update amount
+            if ($data['quantity'] > 0) {
+                $purchase->quantity = $data['quantity'];
+                $purchase->initial_quantity = $data['quantity'];
+            }
 
-            // Update quantities
-            $purchase->quantity = $data['quantity'];
-            $purchase->initial_quantity = $data['quantity'];
+            // Check order amount
+            $ordersQuantity = $purchase->orders->sum('sold_quantity');
+            if ($purchase->initial_quantity < $ordersQuantity) {
+                throw new \Exception("Insufficient purchase quantity. The total order quantity exceeds the available purchase quantity.");
+            };
+            $finalQuantity = ($purchase->initial_quantity - $ordersQuantity);
+            $purchase->quantity = $finalQuantity;
+
+            // Calculate prices
+            $prices = $this->calculatePrices($data['price'], $data['discount_percent'], $purchase->initial_quantity);
 
             // Update prices
             $purchase->price = $data['price'];
             $purchase->total_price = $prices['total_price'];
             $purchase->original_price = $prices['original_price'];
             $purchase->discount_price = $prices['discount_price'];
+            $purchase->discount_percent = $data['discount_percent'];
 
             // Update code
             $purchase->code = $data['code'];
@@ -229,43 +256,65 @@ class PurchaseController extends Controller
 
         $purchase->save();
 
-        if(array_key_exists('category_id',$data) && !empty($data['category_id'])) {
+        $alias = now()->parse($data['delivery_date'])->format('F j, Y');
+        $alias = str_replace([' ', ','], ['_', ''], $alias);
+        $alias = strtolower($alias);
+
+        $paymentData = [
+            'alias' => $alias,
+            'quantity' => $purchase->initial_quantity,
+            'price' => $purchase->total_price,
+            'date_of_payment' => $purchase->expected_date_of_payment
+        ];
+
+        $payment = $purchase->payment()->updateOrCreate([], $paymentData);
+
+        $payment->invoice()->updateOrCreate([], [
+            'price' => $payment->price,
+            'quantity' => $payment->quantity
+        ]);
+
+        if (array_key_exists('category_id', $data) && !empty($data['category_id'])) {
             $purchase->categories()->sync($data['category_id']);
         }
 
-        if(array_key_exists('subcategories',$data) && !empty($data['subcategories'])) {
+        if (array_key_exists('subcategories', $data) && !empty($data['subcategories'])) {
             $purchase->subcategories()->sync($data['subcategories']);
         }
 
-        if(array_key_exists('brands',$data) && !empty($data['brands'])) {
+        if (array_key_exists('brands', $data) && !empty($data['brands'])) {
             $purchase->brands()->sync($data['brands']);
         }
 
         if ($file) {
             $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
             Storage::putFileAs($this->dir, $file, $hashed_image);
-
-            $purchase->images()->create([
-                'path' => $this->getImagePath(),
-                'name' => $hashed_image,
-            ]);
+            $purchase->image_path = $this->getImagePath() . '/' . $hashed_image;
         }
     }
 
-    private function purchaseMassEditProcessing(array $data, $id) {
+    private function purchaseMassEditProcessing(array $data, $id)
+    {
         $purchase = Purchase::find($id);
-        
-        if($data['quantity'] && is_int(intval($data['quantity']))) {
+
+        if ($data['quantity'] && is_int(intval($data['quantity']))) {
             $purchase->quantity = $data['quantity'];
             $purchase->initial_quantity = $data['quantity'];
         }
         if (is_numeric($data['price'])) {
             $purchase->price = $data['price'];
         }
-        
-        if($data['discount_percent'] && is_int(intval($data['discount_percent'])) ) {
+
+        if ($data['discount_percent'] && is_int(intval($data['discount_percent']))) {
             $purchase->discount_percent = $data['discount_percent'];
         }
+
+        $ordersQuantity = $purchase->orders->sum('sold_quantity');
+        if ($purchase->initial_quantity < $ordersQuantity) {
+            throw new \Exception("Insufficient purchase quantity. The total order quantity exceeds the available purchase quantity.");
+        };
+        $finalQuantity = ($purchase->initial_quantity - $ordersQuantity);
+        $purchase->quantity = $finalQuantity;
 
         $prices = $this->calculatePrices(
             $purchase->price,
@@ -277,28 +326,37 @@ class PurchaseController extends Controller
         $purchase->original_price = $prices['original_price'];
         $purchase->discount_price = $prices['discount_price'];
 
-        $ordersQuantity = $purchase->orders->sum('sold_quantity');
-        $finalQuantity = ($purchase->initial_quantity - $ordersQuantity);
-        $purchase->quantity = $finalQuantity;
-
         $purchase->save();
 
-        if(array_key_exists('category_id',$data) && !empty($data['category_id'])) {
+        $paymentData = [
+            'alias' => $purchase->delivery_date->format('F j, Y'),
+            'quantity' => $purchase->quantity->format('F j, Y'),
+            'price' => $purchase->price->format('F j, Y'),
+            'date_of_payment' => $purchase->expected_date_of_payment
+        ];
+
+        $payment = $purchase->payment()->updateOrCreate([], $paymentData);
+
+        $payment->invoice()->updateOrCreate([], [
+            'price' => $payment->price,
+            'quantity' => $payment->quantity
+        ]);
+
+        if (array_key_exists('category_id', $data) && !empty($data['category_id'])) {
             $purchase->categories()->sync($data['category_id']);
         }
 
-        if(array_key_exists('sub_category_ids',$data) && !empty($data['sub_category_ids'])) {
+        if (array_key_exists('sub_category_ids', $data) && !empty($data['sub_category_ids'])) {
             $purchase->subcategories()->sync($data['sub_category_ids']);
         }
 
-        if(array_key_exists('brands',$data) && !empty($data['brands'])) {
+        if (array_key_exists('brands', $data) && !empty($data['brands'])) {
             $purchase->brands()->sync($data['brands']);
         }
     }
 
     private function calculatePrices($price, $discount, $quantity): array
     {
-
         $discountPrice = $this->helper->calculatedDiscountPrice($price, $discount);
         $totalPrice = $this->helper->calculatedFinalPrice($discountPrice, $quantity);
         $originalPrice = $this->helper->calculatedFinalPrice($price, $quantity);

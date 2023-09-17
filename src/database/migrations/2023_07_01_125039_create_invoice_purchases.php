@@ -20,7 +20,11 @@ class CreateInvoicePurchases extends Migration
             $table->date('invoice_date')->nullable();
             $table->unsignedDecimal('price')->default(0);
             $table->unsignedInteger('quantity')->default(0);
-            $table->tinyInteger('status')->default(2)->comment('1: Paid,2: Not paid');
+
+            // Add foreign key constraint with ON DELETE CASCADE
+            $table->foreign('purchase_payment_id')
+                ->references('id')->on('purchase_payments')
+                ->onDelete('cascade'); // This line enables cascade deleting
         });
     }
 

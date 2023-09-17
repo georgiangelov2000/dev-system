@@ -2,12 +2,13 @@ import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 
 $(function () {
-    $('.selectAction, .selectType, .selectCustomer, select[name="package_id"], .selectDriver').selectpicker();
+    $('.selectAction, .selectType, .selectCustomer, .selectPackage, .selectDriver').selectpicker();
 
     const bootstrapCustomer = $('.bootstrap-select .selectCustomer');
     const bootstrapSelectDriver = $('.bootstrap-select .selectDriver');
     const bootstrapOrderStatus = $('.bootstrap-select .selectType');
     const bootstrapSelectAction = $('.bootstrap-select .selectAction');
+    const bootstrapSelectPackage = $('.bootstrap-select .selectPackage');
 
     $('input[name="datetimes"]').daterangepicker({
         autoUpdateInput: false,
@@ -27,7 +28,7 @@ $(function () {
     $('.datepicker').datepicker({
         format: 'mm/dd/yyyy'
     });
-    
+
     let table = $('#ordersTable');
     let buttons = mapButtons([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
@@ -48,7 +49,7 @@ $(function () {
                 render: function (data, type, row) {
                     let checkbox = '';
 
-                    if (row.is_paid == false && row.status === 'Ordered') {
+                    if (row.status === 6) {
                         checkbox =
                             '<div div class="form-check">\n\
                             <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
@@ -72,13 +73,14 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '1%',
+                class:'text-center',
                 orderable: false,
                 render: function (data, type, row) {
                     let payment;
 
-                    if (row.order_payments) {
-                        payment = `<a href=${PAYMENT_EDIT.replace(':payment', row.order_payments.id).replace(':type', 'order')}>${row.order_payments.date_of_payment}</a>`
+                    if (row.payment) {
+                        payment = `<a href=${PAYMENT_EDIT.replace(':payment', row.payment.id).replace(':type', 'order')}>${row.payment.alias}</a>`
                     } else {
                         payment = ''
                     }
@@ -95,7 +97,7 @@ $(function () {
                 }
             },
             {
-                width: '7%',
+                width: '10%',
                 orderable: false,
                 name: "purchase",
                 class: "text-center",
@@ -106,20 +108,23 @@ $(function () {
             {
                 width: '1%',
                 orderable: false,
+                class: "text-center",
                 name: "sold_quantity",
                 data: "sold_quantity"
             },
             {
                 width: '7%',
                 orderable: false,
+                class:'text-center',
                 name: "single_sold_price",
                 render: function (data, type, row) {
                     return `<span>€${row.single_sold_price}</span>`
                 }
             },
             {
-                width: '8%',
+                width: '10%',
                 orderable: false,
+                class:'text-center',
                 name: "discount_single_sold_price",
                 render: function (data, type, row) {
                     return `<span>€${row.discount_single_sold_price}</span>`
@@ -128,6 +133,7 @@ $(function () {
             {
                 width: '7%',
                 orderable: false,
+                class:'text-center',
                 name: "total_sold_price",
                 render: function (data, type, row) {
                     return `<span>€${row.total_sold_price}</span>`
@@ -136,6 +142,7 @@ $(function () {
             {
                 width: '7%',
                 orderable: false,
+                class:'text-center',
                 name: "original_sold_price",
                 render: function (data, type, row) {
                     return `<span>€${row.original_sold_price}</span>`
@@ -144,6 +151,7 @@ $(function () {
             {
                 width: '5%',
                 orderable: false,
+                class:'text-center',
                 name: "discount_percent",
                 render: function (data, type, row) {
                     return `<span>${row.discount_percent}%</span>`;
@@ -164,6 +172,7 @@ $(function () {
             {
                 width: '5%',
                 orderable: false,
+                class:'text-center',
                 name: 'expired',
                 render: function (data, type, row) {
                     const date = row.package_extension_date ? moment(row.package_extension_date) : moment(row.date_of_sale);
@@ -195,61 +204,30 @@ $(function () {
             {
                 width: '8%',
                 orderable: false,
-                render: function (data, type, row) {
-                    const dateOfSale = row.package_extension_date ? moment(row.package_extension_date) : moment(row.date_of_sale);
-                    let delayMessage = '';
-
-                    if (row.order_payments) {
-                        const dateOfPayment = moment(row.order_payments.date_of_payment);
-                        const delayInDays = dateOfPayment.diff(dateOfSale, 'days');
-
-                        switch (row.status) {
-                            case 1:
-                                if (row.order_payments.payment_status === 1) {
-                                    delayMessage = 'Order was paid on time.';
-                                }
-                                break;
-                            case 2:
-                                if (row.order_payments.payment_status === 2) {
-                                    delayMessage = 'Please complete your payment to proceed.';
-                                }
-                                break;
-                            case 4:
-                                if (row.order_payments.payment_status === 4) {
-                                    delayMessage = `Payment is delayed by ${delayInDays} day(s)`;
-                                }
-                                break;
-                            case 5:
-                                if (row.order_payments.payment_status === 5) {
-                                    delayMessage = 'The order is refunded';
-                                }
-                                break;
-                        }
-                    }
-
-                    return delayMessage;
-                }
-            },
-            {
-                width: '8%',
-                orderable: false,
+                class:'text-center',
                 name: 'payment.date_of_payment',
                 render: function (data, type, row) {
                     let date = '';
 
-                    if (row.order_payments) {
-                        date = row.order_payments.date_of_payment;
+                    if (row.payment) {
+                        date = row.payment.date_of_payment;
                     }
 
                     return date;
                 }
             },
             {
-                width: '5%',
+                width: '8%',
                 orderable: false,
+                class:'text-center',
                 name: 'package',
                 render: function (data, type, row) {
-                    return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id', row.package_id)}>${row.package}</a>`;
+                    console.log(row.package);
+                    if (row.package) {
+                        return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id', row.package.id)}>${row.package.package_name}</a>`;
+                    } else {
+                        return '';
+                    }
                 }
             },
             {
@@ -304,7 +282,7 @@ $(function () {
                             </form>`;
                     }
 
-                    buttons.push(`<a href="${ORDER_EDIT_ROUTE.replace(':id', row.id)}" class="btn p-0" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>`);
+                    buttons.push(`<a href="${ORDER_EDIT_ROUTE.replace(':id', row.id)}" class="btn p-0" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>`);
 
                     if (statusInfo.text === 'Ordered') {
                         deleteFormTemplate = `
@@ -358,6 +336,10 @@ $(function () {
             data.product_id = PRODUCT_ID;
         }
 
+        if (bootstrapSelectPackage.val()) {
+            data.package = bootstrapSelectPackage.val();
+        }
+
         return data;
     }
 
@@ -370,6 +352,10 @@ $(function () {
     })
 
     bootstrapOrderStatus.bind('changed.bs.select', function () {
+        dataTable.ajax.reload(null, false);
+    })
+
+    bootstrapSelectPackage.bind('changed.bs.select', function () {
         dataTable.ajax.reload(null, false);
     })
 
@@ -400,28 +386,50 @@ $(function () {
         })
     })
 
-    $('.selectDriver input[type="text"]').on('keyup', function () {
+    $('.selectPackage input[type="text"]').on('keyup', function () {
 
         let text = $(this).val();
-        bootstrapSelectDriver.empty();
+        bootstrapSelectPackage.empty();
+
+        APICaller(PACKAGE_API_ROUTE, {
+            'search': text,
+            'select_json': 1,
+        }, function (response) {
+            let packages = response;
+            if (packages.length > 0) {
+                bootstrapSelectPackage.append('<option value="">All</option>');
+                $.each(packages, function ($key, pack) {
+                    bootstrapSelectPackage.append(`<option value="${pack.id}"> ${pack.package_name} </option>`)
+                })
+            }
+            bootstrapSelectPackage.selectpicker('refresh');
+        }, function (error) {
+            console.log(error);
+        })
+    })
+
+    $('.selectDriver input[type="text"]').on('keyup', function () {
+        let text = $(this).val();
+        bootstrapSelectPackage.empty();
 
         APICaller(USER_API_ROUTE, {
             'search': text,
             'role_id': 2,
             'no_datatable_draw': 1,
         }, function (response) {
-            let drivers = response;
-            if (drivers.length > 0) {
-                bootstrapSelectDriver.append('<option value="" style="display:none;"></option>');
-                $.each(drivers, function ($key, driver) {
-                    bootstrapSelectDriver.append(`<option value="${driver.id}"> ${driver.username} </option>`)
+            let packages = response;
+            if (packages.length > 0) {
+                bootstrapSelectPackage.append('<option value="" style="display:none;"></option>');
+                $.each(packages, function ($key, pack) {
+                    bootstrapSelectPackage.append(`<option value="${pack.id}"> ${pack.package_name} </option>`)
                 })
             }
-            bootstrapSelectDriver.selectpicker('refresh');
+            bootstrapSelectPackage.selectpicker('refresh');
         }, function (error) {
             console.log(error);
         })
     })
+
 
     $(document).on('change', ".selectAll", function () {
         if (this.checked) {
@@ -535,74 +543,5 @@ $(function () {
             $('.actions').removeClass('d-none');
         }
     };
-
-    //Reusable functionallity for mass update on orders
-    let form = $('#massUpdateOrders');
-
-    form.on('submit', function (e) {
-        e.preventDefault();
-        let form = e.target;
-        let method = e.target.getAttribute('method');
-        let action = e.target.getAttribute('action');
-        let data = $(form).serialize();
-        let formData = {};
-
-        data.split('&').forEach(function (keyValue) {
-            let pair = keyValue.split('=');
-            let key = decodeURIComponent(pair[0]);
-            let value = decodeURIComponent(pair[1] || '');
-
-            if (formData[key]) {
-                if (Array.isArray(formData[key])) {
-                    formData[key].push(value);
-                } else {
-                    formData[key] = [formData[key], value];
-                }
-            } else {
-                formData[key] = value;
-            }
-        });
-
-        let price = formData.price;
-        let discount = formData.discount_percent;
-        let quantity = formData.sold_quantity;
-        let package_id = formData.package_id;
-        let date_of_sale = formData.date_of_sale;
-
-        let searchedIds = [];
-
-        $('tbody input[type="checkbox"]:checked').map(function () {
-            searchedIds.push($(this).attr('data-id'));
-        });
-
-        if (searchedIds.length > 0) {
-            $.ajax({
-                url: action,
-                method: 'POST',
-                data: {
-                    'order_id': searchedIds,
-                    'price': price,
-                    'sold_quantity': quantity,
-                    'discount_percent': discount,
-                    'date_of_sale': date_of_sale,
-                    'package_id': package_id
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    'X-HTTP-Method-Override': 'PUT' // Set the X-HTTP-Method-Override header
-                },
-                success: function (response) {
-                    toastr['success'](response.message);
-                    dataTable.ajax.reload(null, false);
-                },
-                error: function (xhr, status, error) {
-                    toastr['error'](response.message);
-                }
-            })
-        } else {
-            toastr['error']("Please select orders");
-        }
-
-    });
 
 });

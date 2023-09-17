@@ -3,48 +3,43 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class OrderRequest extends FormRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
     public function rules()
     {
-        return [
-            'customer_id' => 'required|integer',
-            'user_id' => 'required|integer',
-            'date_of_sale' => 'required|date',
-            'tracking_number' => 'required|string',
-            
+        $method = $this->method();
+        $order = $this->order ?? null;
+        
+        $statusIsAllowed = in_array($order->status, [1, 2, 3, 4, 5]);
+        
+        $rules = [
+            'customer_id' => 'required|string',
+            'user_id' => 'required|string',
+            'package_id' => 'nullable',
             'purchase_id' => 'required',
             'purchase_id.*' => 'numeric',
-        
-            'sold_quantity' => 'required',
-            'sold_quantity.*' => 'numeric|min:1',
-        
-            'single_sold_price' => 'required',
-            'single_sold_price.*' => 'numeric|min:0',
-        
-            'discount_percent' => 'required',
-            'discount_percent.*' => 'numeric|min:0',        
+            'tracking_number' => $statusIsAllowed && $method === 'PUT' ? 'nullable|string' : 'required|string',
+            'sold_quantity' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required',
+            'sold_quantity.*' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:1' : 'required|numeric|min:1',
+            'single_sold_price.*' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:1',
+            'single_sold_price' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
+            'discount_percent.*' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
+            'discount_percent' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
+            'date_of_sale' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required|date',
         ];
-    }
 
-    public function __get($key)
-    {
-        return $this->validated()[$key] ?? null;
+        return $rules;
     }
 
     public function messages()
     {
         return [
-            'product_id.required' => 'The product ID field is required.',
-            'product_id.array' => 'The product ID must be an array.',
-            'product_id.*.required' => 'Product ID field is required.',
-            'product_id.*.numeric' => 'Product ID must be a numeric value.',
+            'purchase_id.required' => 'The product ID field is required.',
+            'purchase_id.array' => 'The product ID must be an array.',
+            'purchase_id.*.required' => 'Product ID field is required.',
+            'purchase_id.*.numeric' => 'Product ID must be a numeric value.',
             'sold_quantity.required' => 'The sold quantity field is required.',
             'sold_quantity.array' => 'The sold quantity must be an array.',
             'sold_quantity.*.required' => 'Sold quantity field is required.',

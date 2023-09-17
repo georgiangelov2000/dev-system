@@ -11,7 +11,7 @@ class PurchaseApiController extends Controller
 
     public function getData(Request $request)
     {
-        $relations = ['categories', 'subcategories', 'brands', 'images', 'supplier:id,name'];
+        $relations = ['categories', 'subcategories', 'brands', 'supplier:id,name'];
 
         $supplier = isset($request->supplier) ? $request->supplier : null;
         $id = isset($request->id) ? $request->id : null;
@@ -39,12 +39,12 @@ class PurchaseApiController extends Controller
             'total_price',
             'code',
             'status',
-            'created_at',
             'initial_quantity',
             'expected_date_of_payment',
             'original_price',
             'discount_percent',
-            'discount_price'
+            'discount_price',
+            'image_path',
         );
 
         if ($limit) {
@@ -111,7 +111,7 @@ class PurchaseApiController extends Controller
             );
         }
 
-        $relations = [...$relations, ...['payment:id,purchase_id,date_of_payment']];
+        $relations = [...$relations, ...['payment:id,purchase_id,alias']];
         $purchaseQuery->with($relations)->withCount([
             'orders',
             // Add other relationships you want to count here

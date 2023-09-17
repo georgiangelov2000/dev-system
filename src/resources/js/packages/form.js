@@ -16,7 +16,7 @@ $(function () {
   let dataTable = table.DataTable({
     ordering: false,
     columnDefs: [
-      { width: "1%", targets: 0, class:'text-center' },
+      { width: "1%", targets: 0, class: 'text-center' },
       { width: "5%", targets: 1, class: "text-center" },
       { width: "5%", targets: 2, class: "text-center" },
       { width: "5%", targets: 3, class: "text-center" },
@@ -27,25 +27,26 @@ $(function () {
       { width: "5%", targets: 8, class: "text-center" },
       { width: "5%", targets: 9, class: "text-center" },
       { width: "5%", targets: 10, class: "text-center" },
+      { width: "5%", targets: 11, class: "text-center" },
     ]
   });
 
-    // Utility function to generate a random tracking number
-    function generateRandomTrackingNumber(length) {
-      let charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let randomString = '';
-      for (let i = 0; i < length; i++) {
-        let randomIndex = Math.floor(Math.random() * charset.length);
-        randomString += charset[randomIndex];
-      }
-      return randomString;
+  // Utility function to generate a random tracking number
+  function generateRandomTrackingNumber(length) {
+    let charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let randomString = '';
+    for (let i = 0; i < length; i++) {
+      let randomIndex = Math.floor(Math.random() * charset.length);
+      randomString += charset[randomIndex];
     }
-  
-    // Event handler for generating tracking number
-    generateCodeBtn.on('click', function () {
-      let randomTrackingNumber = generateRandomTrackingNumber(20);
-      $('input[name="tracking_number"]').val(randomTrackingNumber);
-    });
+    return randomString;
+  }
+
+  // Event handler for generating tracking number
+  generateCodeBtn.on('click', function () {
+    let randomTrackingNumber = generateRandomTrackingNumber(20);
+    $('input[name="tracking_number"]').val(randomTrackingNumber);
+  });
 
   // Action filters
   $('.selectCustomer input[type="text"]').on('keyup', function () {
@@ -79,6 +80,7 @@ $(function () {
 
   })
 
+  // Select picker handlers
   bootstrapCustomer.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
     bootstrapOrder.empty();
 
@@ -86,13 +88,12 @@ $(function () {
       'customer': bootstrapCustomer.val(),
       'select_json': 1,
       'without_package': 1,
-      'is_paid': 0,
       'status': [6]
     }, function (response) {
       let orders = response;
       let ordersLength = orders.length;
 
-      if(!ordersLength) {
+      if (!ordersLength) {
         toastr['error']('No orders found. Please try again later.');
       } else {
         toastr['success'](`${ordersLength} ${ordersLength > 1 ? "orders" : 'order'} was fetched.`);
@@ -108,35 +109,6 @@ $(function () {
     })
   });
 
-  function overview() {
-    let tbody = table.find('tbody tr[data-id]');
-    let totalSum = 0;
-    
-    tbody.each(function () {
-      let row = $(this);
-      let totalSoldPriceCell = row.find('td[data-price]').attr('data-price');
-    
-      // Parse the value as a floating-point number
-      let priceValue = parseFloat(totalSoldPriceCell);
-    
-      // Check if the value is a valid number and then accumulate the total
-      if (!isNaN(priceValue)) {
-        totalSum += priceValue;
-      }
-    });
-        
-    $('.ordersCount').html(tbody.length);
-    $('.packagePrice').html(totalSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-  }
-
-  overview();
-
-  window.removeRow = function (button) {
-    let row = $(button).closest('tr');
-    table.row(row).remove().draw();
-    overview();
-  };
-
   bootstrapOrder.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
     let id = $(this).val();
     bootstrapOrder.empty().selectpicker('refresh');
@@ -145,11 +117,10 @@ $(function () {
       "id": id,
       'select_json': 1,
     }, function (response) {
+
       let order = response[0];
 
-      let id = order.id;
-
-      let row = table.find(`tr[data-id="${id}"]`);
+      let row = table.find(`tr[data-id="${order.id}"]`);
 
       if (row.length) {
         toastr['error']('This order is already in the table. Please select a different order.');
@@ -162,35 +133,57 @@ $(function () {
     })
 
     function renderData(data) {
-      console.log(data);
 
-      let images = '';
+      // let images = '';
 
-      if (data.purchase.images.length > 0) {
-        let imageTags = data.purchase.images.map((element) => {
-          return `<img src="${element.path}/${element.name}" />`;
-        });
-        images = imageTags.join('');
-      }
+      // if (data.purchase.images.length > 0) {
+      //   let imageTags = data.purchase.images.map((element) => {
+      //     return `<img src="${element.path}/${element.name}" />`;
+      //   });
+      //   images = imageTags.join('');
+      // }
 
-        let template = `
+      const statusMap = {
+        1: { text: "Paid", iconClass: "fal fa-check-circle" },
+        2: { text: "Pending", iconClass: "fal fa-hourglass-half" },
+        3: { text: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+        4: { text: "Overdue", iconClass: "fal fa-exclamation-circle" },
+        5: { text: "Refunded", iconClass: "fal fa-undo-alt" },
+        6: { text: "Ordered", iconClass: "fal fa-shopping-cart" }
+      };
+
+      const statusInfo = statusMap[data.status] || { text: "Unknown", iconClass: "fal fa-question" };
+      
+      let template = `
         <tr data-id="${data.id}">
-            <input type="hidden" value='${data.id}' name="order_id[]" />
           <td>
             <button class="text-danger btn p-0" onclick="removeRow(this)" type="button">
               <i class="fa-light fa-trash text-danger"></i>
             </button>
           </td>
-          <td>${images}</td>
-          <td>${data.customer.name}</td>
-          <td>${data.purchase.name}</td>
-          <td>${data.sold_quantity}</td>
-          <td>€${data.single_sold_price}</td>
+          <td>
+            ${data.id}
+            <input type="hidden" value='${data.id}' name="order_id[]" />
+          </td>
+          <td>${data.tracking_number}</td>
+          <td>
+            <a href='${PURCHASE_EDIT_ROUTE.replace(':id', data.purchase.id)}'>${data.purchase.name}</a>
+          </td>
+          <td>${data.date_of_sale}</td>
           <td>€${data.discount_single_sold_price}</td>
-          <td data-price="${data.total_sold_price}">€${data.total_sold_price}</td>
+          <td>€${data.single_sold_price}</td>
+          <td>
+            <input 
+              type="hidden" 
+              name="total_sold_price" 
+              value="${data.total_sold_price}" 
+            />
+            €${data.total_sold_price}
+          </td>
           <td>€${data.original_sold_price}</td>
           <td>${data.discount_percent}</td>
-          <td>${data.date_of_sale}</td>
+          <td>${data.sold_quantity}</td>
+          <td><i title="${statusInfo.text}" class="${statusInfo.iconClass}"></i></td>
         </tr>
       `;
 
@@ -199,5 +192,35 @@ $(function () {
     }
 
   });
+
+  function overview() {
+    let tbody = table.find('tbody tr[data-id]');
+    let totalSum = 0;
+    
+    tbody.each(function () {
+
+      let row = $(this);
+      let totalSoldPriceCell = row.find('input[name="total_sold_price"]').val();
+      
+      // Parse the value as a floating-point number
+      let priceValue = parseFloat(totalSoldPriceCell);
+
+      // Check if the value is a valid number and then accumulate the total
+      if (!isNaN(priceValue)) {
+        totalSum += priceValue;
+      }
+    });
+
+    $('.ordersCount').html(tbody.length);
+    $('.packagePrice').html(totalSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  }
+
+  overview();
+
+  window.removeRow = function (button) {
+    let row = $(button).closest('tr');
+    table.row(row).remove().draw();
+    overview();
+  };
 
 })

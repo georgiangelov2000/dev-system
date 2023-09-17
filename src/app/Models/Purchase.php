@@ -51,7 +51,8 @@ class Purchase extends Model {
         'original_price',
         'discount_percent',
         'discount_price',
-        'delivery_date'
+        'delivery_date',
+        'image_path'
     ];
 
     public function categories() {
@@ -64,10 +65,6 @@ class Purchase extends Model {
 
     public function brands() {
         return $this->belongsToMany(Brand::class, 'purchases_brands');
-    }
-
-    public function images() {
-        return $this->hasMany(PurchaseImage::class, 'purchase_id');
     }
     
     public function supplier() {

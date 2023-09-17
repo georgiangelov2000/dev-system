@@ -15,7 +15,7 @@
                             <i class="fa-solid fa-filter"></i> Filters
                         </p>
                     </div>
-                    <div class="col-3 actions d-none">
+                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3 actions d-none">
                         <div class="form-group">
                             <label>Actions</label>
                             <select class="form-control selectAction">
@@ -24,7 +24,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3">
                         <div class="form-group">
                             <label>Customers</label>
                             <select class="form-control selectCustomer" data-live-search="true">
@@ -32,7 +32,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3">
                         <div class="form-group">
                             <label>Drivers</label>
                             <select class="form-control selectDriver" name="driver" data-live-search="true">
@@ -40,11 +40,19 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                        <div class="form-group">
+                            <label>Packages</label>
+                            <select class="form-control selectPackage" name="package_id" data-live-search="true">
+                                <option value=''>All</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-xl-3 col-lg-3 col-md-3 col-sm-3">
                         <label for="customRange1">Date of sale</label>
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div>
-                    <div class="form-group col-3">
+                    <div class="form-group col-xl-3 col-lg-3 col-md-3 col-sm-3">
                         <label for="">Status</label>
                         <select name="status" id="" class="form-control selectType" multiple>
                             @foreach (config('statuses.order_statuses') as $key => $status)
@@ -78,35 +86,36 @@
                         <span>When you delete order, the order's quantity will be returned to the current product</span>
                     </div>
                 </div>
-                <table id="ordersTable" class="table  table-hover table-sm dataTable no-footer">
-                    <thead>
-                        <tr>
-                            <th>
-                                <div class="form-check">
-                                    <input class="form-check-input selectAll" type="checkbox">
-                                    <label class="form-check-label" for="flexCheckDefault"></label>
-                                </div>
-                            </th>
-                            <th>ID</th>
-                            <th>Payment</th>
-                            <th>Customer</th>
-                            <th>Purchase</th>
-                            <th title="Quantity">Qty</th>
-                            <th title="Unut price">Unit Price</th>
-                            <th title="Discount unit price">Disc.unit price</th>
-                            <th title="Official price">Official Price</th>
-                            <th title="Regular price">Regular price</th>                            
-                            <th>Discount</th>
-                            <th>Date of sale</th>
-                            <th>Expired</th>
-                            <th>Delay Payment</th>
-                            <th>Payment date</th>
-                            <th>Package</th>
-                            <th class="text-center">Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                </table>
+                <div class="row table-responsive">
+                    <table id="ordersTable" class="table  table-hover table-sm dataTable no-footer">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="form-check">
+                                        <input class="form-check-input selectAll" type="checkbox">
+                                        <label class="form-check-label" for="flexCheckDefault"></label>
+                                    </div>
+                                </th>
+                                <th>ID</th>
+                                <th>Payment</th>
+                                <th>Customer</th>
+                                <th>Purchase</th>
+                                <th>Amount</th>
+                                <th title="Unut price">Unit Price</th>
+                                <th title="Discount unit price">Discount unit price</th>
+                                <th title="Official price">Official Price</th>
+                                <th title="Regular price">Regular price</th>                            
+                                <th>Discount</th>
+                                <th>Date of sale</th>
+                                <th>Expired</th>
+                                <th>Payment date</th>
+                                <th>Package</th>
+                                <th class="text-center">Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -116,6 +125,7 @@
         <script type="text/javascript">
             const ORDER_API_ROUTE = "{{ route('api.orders') }}";
             const USER_API_ROUTE = "{{ route('api.users') }}";
+            const PACKAGE_API_ROUTE = "{{route('api.packages')}}"
             const CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
             const ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";
             const ORDER_DELETE_ROUTE = "{{route('order.delete',':id')}}";

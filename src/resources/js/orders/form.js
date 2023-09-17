@@ -1,7 +1,8 @@
 import { APICaller } from '../ajax/methods';
+import { handleErrors } from '../helpers/action_helpers';
 
 $(function () {
-  $('.selectCustomer,.selectUser,.selectType,.productFilter').selectpicker();
+  $('.selectCustomer,.selectUser,.selectType,.productFilter,.selectPackage').selectpicker();
 
   $('.datepicker').datepicker({
     format: 'mm/dd/yyyy'
@@ -10,6 +11,7 @@ $(function () {
   let bootstrapCustomer = $('.bootstrap-select .selectCustomer');
   let bootstrapProduct = $('.bootstrap-select .productFilter');
   let bootstrapSelectUser = $('.bootstrap-select .selectUser');
+  let bootstrapSelectPackage = $('.bootstrap-select .selectPackage');
 
   let table = $('.productOrderTable');
   let submitBtn = $('#orderForm button[type="submit"]');
@@ -41,16 +43,16 @@ $(function () {
     ordering: false,
     columns: [
       { class: 'text-center', width: '1%' },
-      { class: 'text-center', width: '5%' },
-      { class: 'text-center', width: '5%' },
-      { class: 'text-center', width: '5%' },
       { class: 'text-center', width: '1%' },
       { class: 'text-center', width: '5%' },
+      { class: 'text-center', width: '3%' },
+      { class: 'text-center', width: '1%' },
+      { class: 'text-center', width: '3%' },
       { class: 'text-center', width: '5%' },
-      { class: 'text-center', width: '5%' },
-      { class: 'text-center', width: '5%' },
-      { class: 'text-center', width: '5%' },
-      { class: 'text-center', width: '5%' },
+      { class: 'text-center', width: '3%' },
+      { class: 'text-center', width: '7%' },
+      { class: 'text-center', width: '7%' },
+      { class: 'text-center', width: '7%' },
       { class: 'text-center', width: '5%' },
       { class: 'text-center', width: '5%' },
     ],
@@ -68,6 +70,7 @@ $(function () {
     APICaller(CUSTOMER_API_ROUTE, { 'search': text }, function (response) {
       let customers = response.data;
       if (customers.length > 0) {
+        bootstrapCustomer.append('<option value="" style="display:none;"></option>');
         $.each(customers, function ($key, customer) {
           bootstrapCustomer.append(`<option value="${customer.id}"> ${customer.name} </option>`)
         })
@@ -76,6 +79,32 @@ $(function () {
     }, function (error) {
       console.log(error);
     })
+  })
+
+  $('.selectPackage input[type="text"]').on('keyup', function () {
+    let text = $(this).val();
+    bootstrapSelectPackage.empty();
+
+    if (text === '') {
+      bootstrapSelectPackage.selectpicker('refresh');
+      return;
+    }
+
+    APICaller(PACKAGE_API_ROUTE, {
+      'select_json': 1,
+      'is_it_delivered': 0
+    }, function (response) {
+      let packages = response;
+
+      if (packages.length > 0) {
+        bootstrapSelectPackage.append('<option value="" style="display:none;"></option>');
+        $.each(packages, function ($key, purchase) {
+          bootstrapSelectPackage.append(`<option value="${purchase.id}"> ${purchase.package_name} </option>`)
+        })
+      }
+      bootstrapSelectPackage.selectpicker('refresh');
+    })
+
   })
 
   $('.productFilter input[type="text"]').on('keyup', function () {
@@ -119,7 +148,7 @@ $(function () {
     APICaller(USER_API_ROUTE, {
       'search': text,
       'role_id': 2,
-      'no_datatable_draw':1,
+      'no_datatable_draw': 1,
     }, function (response) {
       let users = response;
       if (users.length > 0) {
@@ -247,7 +276,7 @@ $(function () {
               </button>
             </td>
             <td>${images}</td>
-            <td>${data.name}</td>
+            <td><a href="${PURCHASE_ROUTE.replace(":id", data.id)}">${data.name}</a></td>
             <td>€${data.price}</td>
             <td>${data.quantity}</td>
             <td>${categoryNames}</td>
@@ -262,8 +291,8 @@ $(function () {
                   max='${data.quantity}'
                   min="1" 
                   class='form-control form-control-sm' 
-                  value="0" 
                   onkeyup="handleOrderQuantity(this)" 
+                  placeholder="Integer value (e.g.,1,2)"
                 />
                 <span name="sold_quantity.${counter - 1}" class="text-danger"></span>
               </div>
@@ -275,9 +304,9 @@ $(function () {
                   name="single_sold_price[]"
                   data-manipulation-name="single_sold_price"
                   class='form-control form-control-sm' 
-                  value="0"
                   min="0"
                   onkeyup="handleSinglePrice(this)" 
+                  placeholder="Numeric value (e.g., 1.00)"
                 />
                 <span name="single_sold_price.${counter - 1}" class="text-danger"></span>
               </div>
@@ -285,13 +314,13 @@ $(function () {
             <td> 
               <div class="form-group col-12">
                 <input 
-                  type='text' 
-                  value="0"
+                  type='number' 
                   min="0"
                   class='form-control form-control-sm' 
                   data-manipulation-name="discount_percent"
                   name="discount_percent[]"
-                  onkeyup="handleDiscountChange(this)" 
+                  onkeyup="handleDiscountChange(this)"
+                  placeholder="Integer value (e.g.,1,2)"
                 />
                 <span name="discount_percent.${counter - 1}" class="text-danger"></span>
               </div>
@@ -311,29 +340,28 @@ $(function () {
   //Send HTTP POST
   submitBtn.click(function (event) {
     event.preventDefault();
+
     let form = $('#orderForm');
     let url = form.attr('action');
-    let formData = form.serialize();
-    console.log(formData);
+    let method = form.attr('method');
+
+    let formData = $(form).serializeArray().reduce((acc, obj) => {
+      acc[obj.name] = obj.value;
+      return acc;
+    }, {});
+    
     $.ajax({
-      type: 'POST',
+      type: method,
       url: url,
       data: formData,
       success: function (response) {
-        console.log(response);
         toastr['success'](response.message);
       },
       error: function (xhr, status, error) {
-        console.log(error);
         if (xhr.status === 422) {
           toastr['error'](xhr.responseJSON.message);
           var errors = xhr.responseJSON.errors;
-          $.each(errors, function (field, fieldErrors) {
-            console.log(field);
-            var errorSpan = $('span[name="' + field + '"]');
-            console.log(errorSpan);
-            errorSpan.text(fieldErrors[0]);
-          });
+          handleErrors(errors);
         }
       },
     });

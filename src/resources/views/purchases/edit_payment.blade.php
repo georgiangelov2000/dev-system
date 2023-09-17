@@ -120,9 +120,9 @@
                         </div>
                     </div>
                     <div class="col-6 text-right">
-                        @if ($payment->purchase->supplier->image)
+                        @if ($payment->purchase->supplier->image_path)
                             <img class="w-25 m-0"
-                                src="{{ $payment->purchase->supplier->image->path . '/' . $payment->purchase->supplier->image->name }}" />
+                                src="{{$payment->purchase->supplier->image_path}}" />
                         @endif
                     </div>
                 </div>
@@ -133,7 +133,7 @@
                         <thead>
                             <tr>
                                 <th>Payment date</th>
-                                <th>Total price</th>
+                                <th>Final price</th>
                                 <th>Quantity</th>
                                 <th>Payment method</th>
                                 <th>Payment status</th>
@@ -162,7 +162,7 @@
                             <tr>
                                 <th>Product</th>
                                 <th>Single price</th>
-                                <th>Total price</th>
+                                <th>Final price</th>
                                 <th>Quantity</th>
                                 <th>Category</th>
                                 <th>Code</th>
@@ -179,7 +179,7 @@
                                     ${{ $payment->purchase->total_price }}
                                 </td>
                                 <td>
-                                    ${{ $payment->purchase->initial_quantity }}
+                                    {{ $payment->purchase->initial_quantity }}
                                 </td>
                                 <td>
                                     {{ $payment->purchase->categories->first()->name }}

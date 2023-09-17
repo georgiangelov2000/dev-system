@@ -122,10 +122,10 @@
                         <th>Name</th>
                         <th>Price</th>
                         <th>Disc.price</th>
-                        <th>Tot.price</th>
-                        <th>Regular.price</th>
-                        <th>Quantity</th>
-                        <th>Init.quantity</th>
+                        <th>Final price</th>
+                        <th>Regular price</th>
+                        <th>Amount</th>
+                        <th>Init.amount</th>
                         <th>Discount</th>
                         <th>Stock</th>
                         <th>Supplier</th>
@@ -133,7 +133,6 @@
                         <th>Subcategories</th>
                         <th>Brands</th>
                         <th>Status</th>
-                        <th title="Expected date of payment">EDT</th>
                         <th>Actions</th>
                     </thead>
                 </table>

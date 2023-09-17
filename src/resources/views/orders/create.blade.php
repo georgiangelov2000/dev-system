@@ -16,7 +16,7 @@
 
                     <div class="row flex-wrap">
 
-                        <div class="form-group col-3 mb-0">
+                        <div class="form-group col-xl-2 col-lg-4 col-md-4 col-sm-4 mb-0">
                             <label for="customer_id">Customer</label>
                             <select id="customer_id" name="customer_id" class="form-control selectCustomer"
                                 data-live-search="true">
@@ -24,7 +24,7 @@
                             <span name="customer_id" class="text-danger"></span>
                         </div>
 
-                        <div class="form-group col-3 mb-0">
+                        <div class="form-group col-xl-2 col-lg-4 col-md-4 col-sm-4 mb-0">
                             <label for="user_id">Assign to driver</label>
                             <select id="user_id" name="user_id" class="form-control selectUser"
                                 data-live-search="true">
@@ -32,7 +32,15 @@
                             <span name="user_id" class="text-danger"></span>
                         </div>
 
-                        <div class="form-group col-3 mb-0">
+                        <div class="form-group col-xl-2 col-lg-4 col-md-4 col-sm-4 mb-0">
+                            <label for="package_id">Assign to Package</label>
+                            <select id="package_id" name="package_id" class="form-control selectPackage"
+                                data-live-search="true">
+                            </select>
+                            <span name="package_id" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-xl-3 col-lg-4 col-md-4 col-sm-4 mb-0">
                             <label>Date of sale:</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -45,7 +53,7 @@
                             <span name="date_of_sale" class="text-danger"></span>
                         </div>
 
-                        <div class="form-group col-3 mb-0">
+                        <div class="form-group col-xl-3 col-lg-4 col-md-4 col-sm-4 mb-0">
                             <label for="order_status">Tracking number</label>
                             <div class="input-group mb-3">
                                 <input 
@@ -73,23 +81,25 @@
 
                     </div>
 
-                    <table class="table table-hover table-sm productOrderTable ">
-                        <thead>
-                            <th>Actions</th>
-                            <th>Image</th>
-                            <th>Product</th>
-                            <th>Unit price</th>
-                            <th>Qty</th>
-                            <th>Category</th>
-                            <th>Sub categories</th>
-                            <th>Brands</th>
-                            <th>Order qty</th>
-                            <th>Order unit price</th>
-                            <th>Order discount %</th>
-                            <th>Order original price</th>
-                            <th>Order regular price</th>
-                        </thead>
-                    </table>
+                    <div class="row table-responsive">
+                        <table class="table table-hover table-sm productOrderTable ">
+                            <thead>
+                                <th>Actions</th>
+                                <th>Image</th>
+                                <th>Purchase</th>
+                                <th>Unit price</th>
+                                <th>Amount</th>
+                                <th>Category</th>
+                                <th>Sub categories</th>
+                                <th>Brands</th>
+                                <th>Order amount</th>
+                                <th>Order unit price</th>
+                                <th>Order discount %</th>
+                                <th>Order original price</th>
+                                <th>Order regular price</th>
+                            </thead>
+                        </table>
+                    </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
@@ -102,9 +112,11 @@
         <script type="text/javascript" src="{{ mix('js/orders/form.js') }}"></script>
         <script type="text/javascript">
             const ORDER_INDEX_ROUTE = "{{route('order.index')}}";
+            const PURCHASE_ROUTE = "{{ route('purchase.edit',':id') }}"
             const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
             const PRODUCT_API_ROUTE = "{{ route('api.products') }}";
             const USER_API_ROUTE = "{{route('api.users')}}";
+            const PACKAGE_API_ROUTE  = "{{ route('api.packages') }}";
         </script>
     @endpush
 

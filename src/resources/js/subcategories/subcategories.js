@@ -108,7 +108,7 @@ $(function () {
                     </form>
                   `;
 
-                    const editButton = `<a onclick="editSubCategory(this)" data-id="${row.id}" class="btn editSubCategory" title="Edit"><i class="fa-light fa-pencil text-warning"></i></a>`;
+                    const editButton = `<a onclick="editSubCategory(this)" data-id="${row.id}" class="btn editSubCategory" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
 
                     return `${editButton} ${deleteFormTemplate}`;
                 }

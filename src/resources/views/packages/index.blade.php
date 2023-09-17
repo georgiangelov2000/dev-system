@@ -104,8 +104,8 @@
                             <th>Method</th>
                             <th>Balance</th>
                             <th>Orders</th>
-                            <th>Exp.delivery date</th>
-                            <th>Off.delivery date</th>
+                            <th>Expected delivery date</th>
+                            <th>Official delivery date</th>
                             <th>Delay</th>
                             <th>Delivered</th>
                             <th>Actions</th>

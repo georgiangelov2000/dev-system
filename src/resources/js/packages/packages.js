@@ -73,21 +73,39 @@ $(function () {
             },
             {
                 orderable: false,
+                class:'text-center',
                 width: "10%",
                 name: 'package_name',
                 data: 'package_name',
             },
             {
                 orderable: false,
-                width: "15%",
-                name: 'tracking_number',
-                data: 'tracking_number',
+                width:'10%',
+                class:'text-center',
+                name:'tracking_number',
+                data:'tracking_number',
             },
             {
                 orderable: false,
                 width: "1%",
                 name: 'package_type',
-                data: 'package_type',
+                render: function (data, type, row) {
+                    let badge = '';
+                    switch (row.package_type) {
+                        case 1:
+                            badge = 'Standart'
+                            break;
+                        case 2:
+                            badge = 'Express'
+                            break;
+                        case 3:
+                            badge = 'Overnight'
+                            break;
+                        default:
+                            badge = 'Invalid status please check the system!';
+                    }
+                    return `<span>${badge}</span>`
+                }
             },
             {
                 orderable: false,
@@ -95,27 +113,44 @@ $(function () {
                 name: 'delivery_method',
                 class: 'text-center',
                 render: function (data, type, row) {
-                    if (row.delivery_method === 'Air') {
-                        return '<i title="Air" class="fa-light fa-plane"></i>';
-                    } else if (row.delivery_method === 'Ground') {
-                        return '<i title="Ground" class="fa-light fa-truck"></i>'
-                    } else if (row.delivery_method === 'Sea') {
-                        return '<i title="Sea" class="fa-light fa-water"></i>';
+                    let badgeIcon = '';
+                    switch (row.delivery_method) {
+                        case 1:
+                            badgeIcon = '<i title="Ground" class="fa-light fa-truck"></i>';
+                            break;
+                        case 2:
+                            badgeIcon = '<i title="Air" class="fa-light fa-plane"></i>';
+                            break;
+                        case 3:
+                            badgeIcon = '<i title="Sea" class="fa-light fa-water"></i>';
+                            break;
+                        default:
+                            badgeIcon = 'Invalid method please check the system!';
+                            break;
                     }
+
+                    return `${badgeIcon}`;
                 },
             },
             {
                 width: '10%',
                 orderable: false,
                 render: function (data, type, row) {
-                    let paidPercentage = row.paid_percentage;
+                    let paidPercentage = 0;
+
+                    let ordersCount = row.orders_count;
+                    let paidOrdersCount = (row.overdue_orders_count + row.paid_orders_count);
+
+                    paidPercentage = (paidOrdersCount / ordersCount) * 100;
+
+                    paidPercentage = Math.round(paidPercentage, 2);
 
                     let progressHTML = `
-                        <div class="progress" title=${paidPercentage}>
+                        <div class="progress" title="${paidPercentage}% paid orders">
                             <div 
                                 class="bg-success progress-bar progress-bar-striped progress-bar-animated" 
                                 role="progressbar" 
-                                aria-valuenow="${paidPercentage}" 
+                                aria-valuenow="${paidPercentage}%" 
                                 aria-valuemin="0" 
                                 aria-valuemax="100" 
                                 style="width: ${paidPercentage}%"
@@ -124,13 +159,13 @@ $(function () {
                             </div>
                     `;
 
-                    return progressHTML;
+                    return `${progressHTML}`;
                 }
             },
             {
                 width: '5%',
                 orderable: false,
-                class:'text-center',
+                class: 'text-center',
                 render: function (data, type, row) {
                     let orders = row.orders_count;
 
@@ -139,7 +174,8 @@ $(function () {
             },
             {
                 orderable: false,
-                width: "10%",
+                width: "15%",
+                class:'text-center',
                 name: 'expected_delivery_date',
                 data: 'expected_delivery_date',
             },
@@ -155,31 +191,31 @@ $(function () {
                 name: 'expired',
                 class: 'text-center',
                 render: function (data, type, row) {
-                  let expectedDeliveryDate = moment(row.expected_delivery_date);
-                  let officialDeliveryDate = moment(row.delivery_date);
-                  let currentDate = moment();
-                  let delayInDays;
-                  let delayMessage = '';
-              
-                  if (officialDeliveryDate.isValid() && expectedDeliveryDate.isValid()) {
-                    delayInDays = officialDeliveryDate.diff(expectedDeliveryDate, 'days');
+                    let expectedDeliveryDate = moment(row.expected_delivery_date);
+                    let officialDeliveryDate = moment(row.delivery_date);
+                    let currentDate = moment();
+                    let delayInDays;
+                    let delayMessage = '';
 
-                    if (delayInDays > 0) {
-                      delayMessage = 'Package has been delivered with a delay of ' + delayInDays + ' day(s).';
+                    if (officialDeliveryDate.isValid() && expectedDeliveryDate.isValid()) {
+                        delayInDays = officialDeliveryDate.diff(expectedDeliveryDate, 'days');
+
+                        if (delayInDays > 0) {
+                            delayMessage = 'Package has been delivered with a delay of ' + delayInDays + ' day(s).';
+                        } else {
+                            delayMessage = 'Package was delivered on time.';
+                        }
                     } else {
-                      delayMessage = 'Package was delivered on time.';
-                    }
-                  } else {
-                    delayInDays = expectedDeliveryDate.diff(currentDate, 'days');
+                        delayInDays = expectedDeliveryDate.diff(currentDate, 'days');
 
-                    if (delayInDays > 0) {
-                      delayMessage = 'Package has not been delivered with a delay of ' + delayInDays + ' day(s).';
-                    } else {
-                      delayMessage = 'Expected Delivery Date is ' + moment().to(expectedDeliveryDate);
+                        if (delayInDays > 0) {
+                            delayMessage = 'Package has not been delivered with a delay of ' + delayInDays + ' day(s).';
+                        } else {
+                            delayMessage = 'Expected Delivery Date is ' + moment().to(expectedDeliveryDate);
+                        }
                     }
-                  }
 
-                  return delayMessage;
+                    return delayMessage;
                 }
             },
             {
@@ -204,11 +240,11 @@ $(function () {
                     let deliveredBtn = '';
                     let deleteFormTemplate = '';
 
-                    let editButton = '<a href=' + PACKAGE_EDIT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-warning"></i></a>';
+                    let editButton = '<a href=' + PACKAGE_EDIT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>';
 
                     let delieveryDropdown = `
                     <div class="dropdown d-inline">
-                        <button class="btn text-info p-0" title="Change method" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn text-primary p-0" title="Change method" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa-light fa-truck-ramp"></i>
                         </button>
                         <div id="changeDelieveryMethod" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -222,7 +258,7 @@ $(function () {
                     </div>
                 `;
 
-                    let orders = `<a href="${PACKGE_MASS_DELETE_ORDERS.replace(":id", row.id)}" class="btn p-1" title="Orders"><i class="text-success fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
+                    let orders = `<a href="${PACKGE_MASS_DELETE_ORDERS.replace(":id", row.id)}" class="btn p-1" title="Orders"><i class="text-primary fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
 
                     let packageDropdown = `
                     <div class="dropdown d-inline">
@@ -235,13 +271,13 @@ $(function () {
                                 <button type="button" order-id=${row.id} value="1" class="dropdown-item change-package-type-btn">Standart</button>
                                 <button type="button" order-id=${row.id} value="2" class="dropdown-item change-package-type-btn">Express</button>
                                 <button type="button" order-id=${row.id} value="3" class="dropdown-item change-package-type-btn">Overnight</button>
-                            </form>
+                            </form>success
                         </div>
                     </div>
                     `;
-                    
+
                     if (!row.is_it_delivered) {
-                        deliveredBtn = `<button data-id=${row.id} title="Mark as delivered" class="btn p-0 text-success delivered-btn" type="button"><i class="fa-light fa-check"></i></button>`;
+                        deliveredBtn = `<button data-id=${row.id} title="Mark as delivered" class="btn p-0 text-primary delivered-btn" type="button"><i class="fa-light fa-check"></i></button>`;
                         deleteFormTemplate = "\
                         <form style='display:inline-block;' action=" + PACKAGE_DELETE_ROUTE.replace(':id', row.id) + " id='delete-form' method='POST' data-name='" + row.package_name + "' >\
                             <input type='hidden' name='_method' value='DELETE'>\
@@ -251,7 +287,7 @@ $(function () {
                         "
                     }
 
-                    return ` ${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${delieveryDropdown} ${deliveredBtn}`;
+                    return `${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${delieveryDropdown} ${deliveredBtn}`;
                 }
             }
         ],

@@ -28,6 +28,7 @@ class PurchaseRequest extends FormRequest
             "subcategories" => "nullable|array",
             "notes" => "nullable|string",
             "brands" => "nullable|array",
+            "image_path" => "nullable",
             "delivery_date" => ($method == 'POST' || ($method == 'PUT' && !$hasPaymentRelation)) ? 'required|date' : 'nullable|date',
             'expected_date_of_payment' => ($method == 'POST' || ($method == 'PUT' && !$hasPaymentRelation)) ? 'required|date' : 'nullable|date',
             'discount_percent' => ($method == 'POST' || ($method == 'PUT' && !$hasPaymentRelation)) ? 'required|integer|min:0' : 'nullable|integer|min:0',

@@ -35,8 +35,8 @@
                         </div>
                         <div class="form-group col-6">
                             <label for="quantity">Quantity</label>
-                            <input type="number"
-                                class="form-control @error('quantity')  is-invalid @enderror" min="0" id="quantity" name="quantity" placeholder="Enter a integer value (e.g.,1,2)"
+                            <input type="number" class="form-control @error('quantity')  is-invalid @enderror"
+                                min="0" id="quantity" name="quantity" placeholder="Enter a integer value (e.g.,1,2)"
                                 value='{{ old('quantity') ? e(old('quantity')) : '' }}'>
                             @error('quantity')
                                 <span class="text-danger">{{ $message }}</span>
@@ -44,8 +44,9 @@
                         </div>
                         <div class="form-group col-6">
                             <label for="price">Price</label>
-                            <input type="text" class="form-control @error('price')  is-invalid @enderror" id="price" 
-                                name="price" value='{{ old('price') ? e(old('price')) : '' }}' placeholder="Enter a numeric value (e.g., 1.00)">
+                            <input type="text" class="form-control @error('price')  is-invalid @enderror" id="price"
+                                name="price" value='{{ old('price') ? e(old('price')) : '' }}'
+                                placeholder="Enter a numeric value (e.g., 1.00)">
                             @error('price')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -53,15 +54,10 @@
                         <div class="form-group col-6 mb-0">
                             <div class="form-group">
                                 <label for="discount_percent">Discount %</label>
-                                <input 
-                                    type="number" 
-                                    class="form-control @error('discount_percent')  is-invalid @enderror" 
-                                    id="discount_percent"
-                                    name="discount_percent" 
-                                    min="0"
+                                <input type="number" class="form-control @error('discount_percent')  is-invalid @enderror"
+                                    id="discount_percent" name="discount_percent" min="0"
                                     placeholder="Enter a integer value (e.g.,1,2)"
-                                    value='{{ old('discount_percent') ? e(old('discount_percent')) : '' }}' 
-                                    >
+                                    value='{{ old('discount_percent') ? e(old('discount_percent')) : '' }}'>
                                 @error('discount_percent')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -73,7 +69,8 @@
                                         id="code" name="code" value='{{ old('code') ? e(old('code')) : '' }}'
                                         placeholder="Generate code">
                                     <span class="input-group-append">
-                                        <button type="button" class="btn btn-primary btn-flat generateCode">Generate</button>
+                                        <button type="button"
+                                            class="btn btn-primary btn-flat generateCode">Generate</button>
                                     </span>
                                 </div>
                                 @error('code')
@@ -146,7 +143,8 @@
                                             <i class="far fa-calendar-alt"></i>
                                         </span>
                                     </div>
-                                    <input type="text" class="form-control datepicker" name="expected_date_of_payment">
+                                    <input type="text" class="form-control datepicker"
+                                        name="expected_date_of_payment">
                                 </div>
                                 @error('expected_date_of_payment')
                                     <span class="text-danger">{{ $message }}</span>
@@ -163,8 +161,7 @@
                         <div class="row w-100 mb-2">
                             <div class="col-12 d-none imagePreview">
                                 <div class="position-relative">
-                                    <img id="preview-image" alt="Preview"
-                                        class="img-fluid w-100 h-100 m-0">
+                                    <img id="preview-image" alt="Preview" class="img-fluid w-100 h-100 m-0">
                                     <div class="ribbon-wrapper ribbon-lg">
                                         <div class="ribbon bg-success text-lg">
                                             Preview
@@ -178,12 +175,46 @@
             </form>
         </div>
     </div>
-
+    <div class="card card-default cardTemplate mt-2 mb-2">
+        <div class="card-footer rounded bg-white p-0">
+            <div class="row">
+                <div class="col-lg-3 col-xl-3 col-md-3 col-sm-3">
+                    <div class="description-block border-right">
+                        <h5 id="final_price" class="description-header">0</h5>
+                        <span class="description-text">Final price</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-xl-3 col-md-3 col-sm-3">
+                    <div class="description-block border-right">
+                        <h5 id="original_price" class="description-header">0</h5>
+                        <span class="description-text">Regular price</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-xl-2 col-md-2 col-sm-2">
+                    <div class="description-block border-right">
+                        <h5 id="amount" class="description-header">0</h5>
+                        <span class="description-text">Amount</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-xl-2 col-md-2 col-sm-2">
+                    <div class="description-block border-right">
+                        <h5 id="discount_price" class="description-header">0</h5>
+                        <span class="description-text">Unit discount price</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-xl-2 col-md-2 col-sm-2">
+                    <div class="description-block">
+                        <h5 id="unit_price" class="description-header unitPrice">0</h5>
+                        <span class="description-text">Unit price</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     @push('scripts')
         <script type="text/javascript" src="{{ mix('js/purchases/form.js') }}"></script>
         <script type="text/javascript">
-            let CATEGORY_ROUTE = "{{ route('api.categories') }}";
+            const CATEGORY_ROUTE = "{{ route('api.categories') }}";
         </script>
     @endpush
-
 @endsection

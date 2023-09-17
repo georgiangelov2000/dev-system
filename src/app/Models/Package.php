@@ -45,7 +45,7 @@ class Package extends Model
 
     public function orders()
     {
-        return $this->belongsToMany(Order::class, 'packages_orders');
+        return $this->hasMany(Order::class);
     }
 
     public function customer(){

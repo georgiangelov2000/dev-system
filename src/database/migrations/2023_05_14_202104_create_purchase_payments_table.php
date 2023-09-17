@@ -20,8 +20,13 @@ class CreatePurchasePaymentsTable extends Migration
             $table->unsignedDecimal('price', 8, 2)->default(0);
             $table->tinyInteger('payment_method')->nullable()->comment('1: Cash, 2: Bank Transfer, 3: Credit Card, 4: Cheque, 5: Online Payment');
             $table->string('payment_reference')->default('N/A');
-            $table->tinyInteger('payment_status')->nullable()->comment('1: Pending, 2: Paid, 3: Partially Paid, 4: Overdue, 5: Refunded, 6: Other');
+            $table->tinyInteger('payment_status')->nullable()->comment('1: Pending, 2: Paid, 3: Partially Paid, 4: Overdue, 5: Refunded')->default(1);
             $table->date('date_of_payment');
+
+            // Add foreign key constraint with ON DELETE CASCADE
+            $table->foreign('purchase_id')
+                ->references('id')->on('purchases')
+                ->onDelete('cascade'); // This line enables cascade deleting
         });
     }
 

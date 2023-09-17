@@ -14,7 +14,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="row">paid
+                <div class="row">
                     <div class="col-3">
                         <div class="form-group actions d-none">
                             <label>Actions</label>

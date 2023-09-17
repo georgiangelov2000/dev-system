@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 class PackageController extends Controller
 {
     private $staticDataHelper;
+    const IS_IT_DELIVERED = 0;
 
     public function __construct(LoadStaticData $staticDataHelper)
     {
@@ -34,29 +35,11 @@ class PackageController extends Controller
 
     public function store(PackageRequest $request)
     {
-        $data = $request->validated();
         DB::beginTransaction();
 
         try {
-            $orderIds = $data['order_id'];
-
-            $package = Package::create([
-                'package_name' => $data['package_name'],
-                'tracking_number' => $data['tracking_number'],
-                'package_type' => $data['package_type'],
-                'delivery_method' => $data['delivery_method'],
-                'expected_delivery_date' => date('Y-m-d', strtotime($data['expected_delivery_date'])),
-                'package_notes' => $data['package_notes'] ?? '',
-                'customer_notes' => $data['customer_notes'] ?? '',
-                'is_it_delivered' => 0,
-            ]);
-
-            $package->orders()->attach($orderIds);
-
-            Order::whereIn('id', $orderIds)->update([
-                'package_extension_date' => date('Y-m-d', strtotime($data['expected_delivery_date'])),
-            ]);
-
+            $data = $request->validated();
+            $this->packageProcessing($data);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -72,31 +55,14 @@ class PackageController extends Controller
         return view('packages.edit', compact('package'));
     }
 
-    public function update(PackageRequest $request, Package $package)
+    public function update(Package $package, PackageRequest $request)
     {
-        $data = $request->validated();
-        
+
         DB::beginTransaction();
 
         try {
-            $orderIds = $data['order_id'];
-
-            $package->update([
-                'package_name' => $data['package_name'],
-                'tracking_number' => $data['tracking_number'],
-                'package_type' => $data['package_type'],
-                'delivery_method' => $data['delivery_method'],
-                'expected_delivery_date' => date('Y-m-d', strtotime($data['expected_delivery_date'])),
-                'package_notes' => $data['package_notes'] ?? '',
-                'customer_notes' => $data['customer_notes'] ?? '',
-            ]);
-
-            $package->orders()->sync($orderIds);
-
-            Order::whereIn('id', $orderIds)->update([
-                'package_extension_date' => date('Y-m-d', strtotime($data['expected_delivery_date'])),
-            ]);
-
+            $data = $request->validated();
+            $this->packageProcessing($data, $package);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -106,17 +72,17 @@ class PackageController extends Controller
         return redirect()->route('package.index')->with('success', 'Package updated successfully');
     }
 
-    public function updateSpecificColumns(Package $package,Request $request)
+    public function updateSpecificColumns(Package $package, Request $request)
     {
         $specificColumns = $request->only([
-            'delivery_method', 
+            'delivery_method',
             'package_type',
             'delivery_date'
         ]);
 
         try {
 
-            if(isset($specificColumns['delivery_date'])) {
+            if (isset($specificColumns['delivery_date'])) {
                 $specificColumns['delivery_date'] = date('Y-m-d', strtotime($specificColumns['delivery_date']));
                 $specificColumns['is_it_delivered'] = 1;
             }
@@ -124,34 +90,33 @@ class PackageController extends Controller
             $package->update($specificColumns);
             DB::commit();
 
-            return response()->json(['message' => 'Package has been updated'],200);
+            return response()->json(['message' => 'Package has been updated'], 200);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Package has not been updated'], 500);
         }
-
     }
 
-    public function createPayment() {
-        $customers = Customer::select('id','name')
-        ->whereHas('orders.packages')
-        ->get();
-        
-        return view('packages.customer_package_payment',[
+    public function createPayment()
+    {
+        $customers = Customer::select('id', 'name')
+            ->whereHas('orders.packages')
+            ->get();
+
+        return view('packages.customer_package_payment', [
             'customers' => $customers,
         ]);
     }
 
-    public function orders(Package $package) {
+    public function orders(Package $package)
+    {
         $package->load('orders');
-        return view('packages.orders',compact('package'));
+        return view('packages.orders', compact('package'));
     }
 
     public function delete(Package $package)
     {
-
         DB::beginTransaction();
-
         try {
             $package->delete();
             DB::commit();
@@ -160,5 +125,41 @@ class PackageController extends Controller
             return response()->json(['message' => 'Package has not beed deleted'], 500);
         }
         return response()->json(['message' => 'Package has been deleted'], 200);
+    }
+
+    // Private methods
+    private function packageProcessing(array $data, $package = null)
+    {
+        $methods = config('statuses.delivery_methods');
+        $types = config('statuses.package_types');
+
+        if (!array_key_exists($data['package_type'], $types)) {
+            throw new \Exception("Invalid package type"); // You can provide a custom message here
+        }
+
+        if (!array_key_exists($data['delivery_method'], $methods)) {
+            throw new \Exception("Invalid delivery method"); // You can provide a custom message here
+        }
+
+        $package = $package ? $package : new Package;
+        $isNewPackage = !$package->exists; // Check if it's a new packge
+
+        $package->package_name = $data['package_name'];
+        $package->tracking_number = $data['tracking_number'];
+        $package->package_type = $data['package_type'];
+        $package->delivery_method = $data['delivery_method'];
+        $package->expected_delivery_date = now()->parse($data['expected_delivery_date']);
+        $package->package_notes = $data['package_notes'] ?? '';
+        $package->customer_notes = $data['customer_notes'] ?? '';
+        $package->is_it_delivered = $isNewPackage ? self::IS_IT_DELIVERED : $package->is_it_delivered;
+
+        $package->save();
+
+        if (!empty($data['order_id'])) {
+            Order::whereIn('id', $data['order_id'])->update([
+                'package_extension_date' => $package->expected_delivery_date,
+                'package_id' => $package->id
+            ]);
+        }
     }
 }

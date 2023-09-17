@@ -1,5 +1,6 @@
 import { APICaller, APIDELETECALLER } from '../ajax/methods';
 import { handleErrors, swalText, showConfirmationDialog } from '../helpers/action_helpers';
+
 $(function () {
   $('.selectCustomer').selectpicker('refresh').val('').trigger('change')
 
@@ -21,6 +22,15 @@ $(function () {
   let btnFilter = $('#filter');
   let modalInvoice = $('#modalInvoice');
   let submitForm = $('#submitForm');
+
+  const paymentStatuses = {
+    1: { label: "Paid", iconClass: "fal fa-check-circle" },
+    2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
+    3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+    4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
+    5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
+    6: { label: "Ordered", iconClass: "fal fa-shopping-cart" }
+  };
 
   let dataTable;
   let supplierData;
@@ -83,6 +93,7 @@ $(function () {
                           <th>Status</th>
                           <th>Reference</th>
                           <th>Date of payment</th>
+                          <th>Delay</th>
                           <th>Actions</th>
                       </tr>
                   </thead>
@@ -207,15 +218,6 @@ $(function () {
         {
           name: 'payment_status',
           render: function (data, type, row) {
-            const paymentStatuses = {
-              1: { label: "Paid", iconClass: "fal fa-check-circle" },
-              2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
-              3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
-              4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
-              5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
-              6: { label: "Ordered", iconClass: "fal fa-shopping-cart" }
-            };
-
             const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
 
             return `
@@ -234,6 +236,34 @@ $(function () {
           name: 'date_of_payment',
           render: function (data, type, row) {
             return `<span>${row.date_of_payment ? row.date_of_payment : ''}</span>`
+          }
+        },
+        {
+          orderable: false,
+          render: function (data, type, row) {
+            const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
+
+            if (['Paid', 'Partially Paid', 'Overdue'].includes(statusData.label)) {
+              const purchaseExpectedDateOfPayment = moment(row.order.package_extenstion_date ? row.order.package_extenstion_date : row.order.date_of_sale);
+              const dateOfPayment = moment(row.date_of_payment);
+
+              // Calculate the delay in days
+              const delayInDays = dateOfPayment.diff(purchaseExpectedDateOfPayment, 'days');
+
+              if (delayInDays > 0) {
+                // Payment is delayed
+                return `<span class="text-danger">${delayInDays} days overdue</span>`;
+              } else if (delayInDays < 0) {
+                // Payment was made before the expected date
+                return `<span class="text-success">${-delayInDays} days early</span>`;
+              } else {
+                // Payment was made on the expected date
+                return `<span class="text-info">On time</span>`;
+              }
+            } else {
+              // For other payment statuses, return an empty string or other content as needed
+              return '';
+            }
           }
         },
         {

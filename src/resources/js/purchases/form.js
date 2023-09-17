@@ -20,7 +20,7 @@ $(function () {
 
         APICaller(CATEGORY_ROUTE, { "supplier": supplier }, function (response) {
             if (response.data.length > 0) {
-                    selectCategory.append('<option>Select category</option>');
+                selectCategory.append('<option>Select category</option>');
                 $.each(response.data, function (key, value) {
                     selectCategory.append('<option value=' + value.id + '>' + value.name + '</option>');
                 });
@@ -85,31 +85,45 @@ $(function () {
         }
     }
 
-    window.deleteImage = function(event) {
-        event.preventDefault();
+    $('input[name="quantity"], input[name="price"], input[name="discount_percent"]').on('keyup', function () {
+        calculation(
+            parseFloat($('input[name="quantity"]').val()) || 0,
+            parseFloat($('input[name="price"]').val()) || 0,
+            parseFloat($('input[name="discount_percent"]').val()) || 0
+        );
+    });
 
-        let form = event.target;
-        let data = $(form).serialize();
-        let formData = Object.fromEntries(new URLSearchParams(data));
-        let url = form.getAttribute('action');
-        let method = form.getAttribute('method');
+    function calculation(amount, price, discountPercent) {
 
-        $.ajax({
-            url:url,
-            method:method,
-            data: {
-                _method: 'DELETE',
-                id: parseInt(formData.id),
-            },
-            success:function(response){
-                form.closest('.productImage').remove();
-                toastr['success'](response.message);
-            },
-            error:function(error){
-                toastr['error'](error.message);
+        if ($('p[name="order_amount"]') && $('p[name="initial_quantity"]')) {
+            let orderAmount = parseInt($('p[name="order_amount"]').text() || 0);
+
+            if (amount < orderAmount) {
+                let warningTemplate = `<p class='text-danger'>Insufficient purchase quantity. The total order quantity exceeds the available purchase quantity.</p>`;
+                $('#warning').removeClass('d-none').html(warningTemplate);
+                return false;
+            } else {
+                $('#warning').addClass('d-none');
             }
-        })
+
+        }
+
+        let originalPrice = price * amount;
+        let finalPrice = originalPrice - ((originalPrice * discountPercent) / 100);
+        let unitDiscountPrice = price - ((price * discountPercent) / 100);
+
+        $('#final_price').text(finalPrice.toFixed(2));
+        $('#original_price').text(originalPrice.toFixed(2));
+        $('#discount_price').text(unitDiscountPrice.toFixed(2));
+        $('#unit_price').text(price.toFixed(2));
+        $('#amount').text(amount);
 
     }
+
+    calculation(
+        parseFloat($('p[name="initial_quantity"]').text()) || 0,
+        parseFloat($('input[name="price"]').val().replace(',', '.')) || 0,
+        parseFloat($('input[name="discount_percent"]').val()) || 0
+    );
 
 });

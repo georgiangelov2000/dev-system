@@ -10,8 +10,6 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PackageController;
-use App\Http\Controllers\CustomerSummaryController;
-use App\Http\Controllers\SupplierSummaryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
@@ -95,7 +93,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/edit/{customer}', [CustomerController::class, 'edit'])->name('edit');
         Route::put('/update/{customer}', [CustomerController::class, 'update'])->name('update');
         Route::get('/delete/{customer}', [CustomerController::class, 'delete'])->name('delete');
-        Route::get('/orders/{customer}', [CustomerController::class, 'customerOrders'])->name('orders');
+        Route::get('/mass/edit/orders/{customer}', [CustomerController::class, 'customerOrders'])->name('mass.edit.orders');
     });
 
     Route::prefix('orders')->name('order.')->group(function () {
@@ -104,16 +102,14 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/store', [OrderController::class, 'store'])->name('store');
         Route::delete('/delete/{order}', [OrderController::class, 'delete'])->name('delete');
         Route::put('/update/{order}', [OrderController::class, 'update'])->name('update');
-        Route::put('/mass/update', [OrderController::class, 'massUpdate'])->name('mass.update');
+        Route::post('/mass/edit', [OrderController::class, 'massUpdate'])->name('mass.update');
         Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
         Route::put('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
     });
 
     Route::prefix('summary')->name('summary.')->group(function () {
-        Route::get('/customers', [CustomerSummaryController::class, 'index'])->name('customer');
-        Route::get('/suppliers', [SupplierSummaryController::class, 'index'])->name('supplier');
-        Route::post('/take/customers', [CustomerSummaryController::class, 'summary'])->name('take.customer');
-        Route::post('/take/suppliers', [SupplierSummaryController::class, 'summary'])->name('take.supplier');
+        Route::get('/{type}', [SummaryController::class, 'index'])->name('index');
+        Route::post('/take', [SummaryController::class, 'summary'])->name('take');
     });
 
     Route::prefix('reports')->name('report.')->group(function () {
@@ -139,10 +135,8 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('payments')->name('payment.')->group(function () {
-        Route::get('/customers/{type}', [PaymentController::class, 'index'])->name('index');
-        Route::get('/create/{type}', [PaymentController::class, 'create'])->name('create');
+        Route::get('/{type}', [PaymentController::class, 'index'])->name('index');
         Route::get('/edit/{payment}/{type}', [PaymentController::class, 'edit'])->name('edit');
-        Route::post('/store/{type}', [PaymentController::class, 'store'])->name('store');
         Route::put('/update/{payment}/{type}', [PaymentController::class, 'update'])->name('update');
         Route::delete('/delete/{payment}/{type}', [PaymentController::class, 'delete'])->name('delete');        
     });

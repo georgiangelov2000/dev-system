@@ -119,6 +119,7 @@
                             <textarea name="package_notes" class="form-control" id="package_notes" cols="3" rows="3" maxlength="255">{{ $package->package_notes }}</textarea>
                             <small id="emailHelp" class="form-text text-muted">
                                 Field for staff members to include any notes or special instructions related to the package
+                                <b>Max lenght: 255 characters</b>
                             </small>
                         </div>
 
@@ -127,6 +128,7 @@
                             <textarea name="customer_notes" class="form-control" id="customer_notes" cols="3" rows="3" maxlength="255">{{ $package->customer_notes }}</textarea>
                             <small id="emailHelp" class="form-text text-muted">
                                 Field for customers to include any notes or special requests related to the package
+                                <b>Max lenght: 255 characters</b>
                             </small>
                         </div>
 
@@ -141,7 +143,7 @@
 
                     </div>
 
-                    <table class="table table-striped table-hover productOrderTable ">
+                    <table class="table table-hover table-sm productOrderTable ">
                         <thead>
                             <tr>
                                 <th>Actions</th>
@@ -152,16 +154,17 @@
                                 <th>Unit price</th>
                                 <th>Discount unit price</th>
                                 <th>Official price</th>
-                                <th>Original price</th>
+                                <th>Regular price</th>
                                 <th>Discount</th>
-                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($package->orders as $order)
-                                <tr name="package">
+                                <tr data-id="{{ $order->id }}">
                                     <td>
-                                        @if ($order->status !== 1 && $order->is_paid !== 1)
+                                        @if ($order->status === 6)
                                             <button onclick='removeRow(this)' class='btn p-0'>
                                                 <i class='fa-light fa-trash text-danger'></i>
                                             </button>
@@ -175,18 +178,23 @@
                                         {{ $order->tracking_number }}
                                     </td>
                                     <td>
-                                        {{ $order->purchase->name }}
+                                       <a href="{{route('purchase.edit',$order->purchase->id)}}">{{ $order->purchase->name }}</a>
                                     </td>
                                     <td>
                                         {{ $order->date_of_sale }}
                                     </td>
                                     <td>
-                                        {{$order->discount_single_sold_price}}
+                                        €{{$order->discount_single_sold_price}}
                                     </td>
-                                    <td name="single-sold-price">
+                                    <td>
                                         €{{ $order->single_sold_price }}
                                     </td>
-                                    <td name="total-sold-price">
+                                    <td>
+                                        <input 
+                                            type="hidden" 
+                                            name="total_sold_price" 
+                                            value="{{$order->total_sold_price}}"
+                                        />
                                         €{{ $order->total_sold_price }}
                                     </td>
                                     <td>
@@ -198,11 +206,31 @@
                                     <td>
                                         {{$order->sold_quantity}}
                                     </td>
-                                    {{-- <td>
-                                        @if($order->status === 1 && $order->is_paid === 1 && $order->orderPayments)
-                                            <span class="text-success">Yes</span>
-                                        @endif
-                                    </td> --}}
+                                    <td>
+                                        @switch($order->status)
+                                            @case('1')
+                                                <i title="Paid" class="fal fa-check-circle"></i>
+                                                @break
+                                            @case('2')
+                                                <i title="Pending" class="fal fa-hourglass-half"></i>
+                                                @break
+                                            @case('3')
+                                                <i title="Partially Paid" class="fal fa-money-bill-alt"></i>
+                                                @break
+                                            @case('4')
+                                                <i title="Overdue" class="fal fa-exclamation-circle"></i>
+                                                @break
+                                            @case('5')
+                                                <i title="Refunded" class="fal fa-undo-alt"></i>
+                                                @break
+                                            @case('6')
+                                                <i title="Ordered" class="fal fa-shopping-cart"></i>
+                                                @break
+                                            {{-- Add more cases for other statuses as needed --}}
+                                            @default
+                                                <!-- Default case: no icon for unknown statuses -->
+                                        @endswitch
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -250,8 +278,10 @@
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/packages/form.js') }}"></script>
     <script type="text/javascript">
-        let CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
-        let ORDER_API_ROUTE = "{{ route('api.orders') }}"
-        let CUSTOMER = "{{ $package->customer_id }}"
+        const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
+        const ORDER_API_ROUTE = "{{ route('api.orders') }}"
+        const CUSTOMER = "{{ $package->customer_id }}"
+        const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit',':id') }}";
+        const PURCHASE_EDIT_ROUTE = "{{ route('purchase.edit',':id') }}";
     </script>
 @endpush
