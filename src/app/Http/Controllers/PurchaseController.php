@@ -164,25 +164,6 @@ class PurchaseController extends Controller
         return response()->json(['message' => 'Purchase has been deleted'], 200);
     }
 
-    public function deleteGalleryImage(Purchase $purchase, Request $request)
-    {
-        DB::beginTransaction();
-
-        try {
-            $image = $purchase->images()->find($request->id);
-            if ($image) {
-                Storage::delete($this->dir . DIRECTORY_SEPARATOR . $image->name);
-                $image->delete();
-            }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['message' => 'Image has not been deleted'], 500);
-        }
-
-        return response()->json(['message' => 'Image has been deleted'], 200);
-    }
-
     public function orders(Purchase $purchase)
     {
         return view('purchases.orders', compact('purchase'));

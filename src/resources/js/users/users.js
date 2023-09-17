@@ -140,7 +140,7 @@ $(function () {
                 width: '1%',
                 class:'text-center',
                 render: function (data, type, row) {
-                    let pdfLink = row.pdf_file_path ? `<a class='truncated-link' href="${row.pdf_file_path}" target="_blank">${row.pdf_file_path}</a>` : '';
+                    let pdfLink = row.pdf_file_path ? `<a class='truncated-link' href="${row.pdf_file_path}" target="_blank">Overview</a>` : '';
                     return `${pdfLink}`;
                 }
             },

@@ -47,14 +47,18 @@ $(function () {
             },
             {
                 width: '1%',
+                class:'text-center',
                 orderable: false,
                 render: function (data, type, row) {
-                    if (row.image) {
-                        let imagePath = CONFIG_URL + row.image.path + "/" + row.image.name;
-                        return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${imagePath}" />`;
+                    let payment;
+
+                    if (row.payment) {
+                        payment = `<a href=${PAYMENT_EDIT.replace(':payment', row.payment.id).replace(':type', 'order')}>${row.payment.alias}</a>`
                     } else {
-                        `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;
+                        payment = ''
                     }
+
+                    return payment;
                 }
             },
             {
@@ -69,6 +73,7 @@ $(function () {
                 width:'1%',
                 orderable:false,
                 name:'user',
+                class: "text-center",
                 render: function(data,type,row) {
                     let user = '';
                     if(row.user) {
@@ -97,6 +102,7 @@ $(function () {
                 width: '7%',
                 orderable: false,
                 name: "single_sold_price",
+                class: "text-center",
                 render: function (data, type, row) {
                     return `<span>€${row.single_sold_price}</span>`
                 }
@@ -105,6 +111,7 @@ $(function () {
                 width: '8%',
                 orderable: false,
                 name: "discount_single_sold_price",
+                class: "text-center",
                 render: function (data, type, row) {
                     return `<span>€${row.discount_single_sold_price}</span>`
                 }
@@ -113,6 +120,7 @@ $(function () {
                 width: '7%',
                 orderable: false,
                 name: "total_sold_price",
+                class: "text-center",
                 render: function (data, type, row) {
                     return `<span>€${row.total_sold_price}</span>`
                 }
@@ -121,6 +129,7 @@ $(function () {
                 width: '7%',
                 orderable: false,
                 name: "original_sold_price",
+                class: "text-center",
                 render: function (data, type, row) {
                     return `<span>€${row.original_sold_price}</span>`
                 }
@@ -129,6 +138,7 @@ $(function () {
                 width: '5%',
                 orderable: false,
                 name: "discount_percent",
+                class: "text-center",
                 render: function (data, type, row) {
                     return `<span>${row.discount_percent}%</span>`;
                 }
@@ -136,6 +146,7 @@ $(function () {
             {
                 width: '6%',
                 orderable: false,
+                class: "text-center",
                 render: function (data, type, row) {
                     if (row.package_extension_date) {
                         return `<span>${moment(row.package_extension_date).format('YYYY-MM-DD')}</span>`
@@ -149,6 +160,7 @@ $(function () {
                 width: '5%',
                 orderable: false,
                 name: 'expired',
+                class: "text-center",
                 render: function (data, type, row) {
                     const date = row.package_extension_date ? moment(row.package_extension_date) : moment(row.date_of_sale);
                     const currentDate = moment();
@@ -180,8 +192,13 @@ $(function () {
                 width: '5%',
                 orderable: false,
                 name: 'package',
+                class: "text-center",
                 render: function (data, type, row) {
-                    return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id', row.package_id)}>${row.package}</a>`;
+                    if (row.package) {
+                        return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id', row.package.id)}>${row.package.package_name}</a>`;
+                    } else {
+                        return '';
+                    }
                 }
             },
             {

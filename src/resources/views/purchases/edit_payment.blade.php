@@ -22,7 +22,7 @@
                                 value="{{ $payment->price }}">
                         </div>
                         <div class="form-group col-12">
-                            <label for="quantity">Quantity</label>
+                            <label for="quantity">Amount</label>
                             <input name="quantity" type="text" class="form-control" max="{{ $payment->quantity }}"
                                 value="{{ $payment->quantity }}">
                             @error('quantity')
@@ -134,7 +134,7 @@
                             <tr>
                                 <th>Payment date</th>
                                 <th>Final price</th>
-                                <th>Quantity</th>
+                                <th>Amount</th>
                                 <th>Payment method</th>
                                 <th>Payment status</th>
                                 <th>Payment reference</th>
@@ -163,7 +163,8 @@
                                 <th>Product</th>
                                 <th>Single price</th>
                                 <th>Final price</th>
-                                <th>Quantity</th>
+                                <th>Amount</th>
+                                <th>Discount %</th>
                                 <th>Category</th>
                                 <th>Code</th>
                         </thead>
@@ -180,6 +181,9 @@
                                 </td>
                                 <td>
                                     {{ $payment->purchase->initial_quantity }}
+                                </td>
+                                <td>
+                                    {{ $payment->purchase->discount_percent }}
                                 </td>
                                 <td>
                                     {{ $payment->purchase->categories->first()->name }}
@@ -200,7 +204,7 @@
                                 <th>Invoice number</th>
                                 <th>Invoice date</th>
                                 <th>Invoice price</th>
-                                <th>Invoice quantity</th>
+                                <th>Invoice amount</th>
                             </tr>
                         </thead>
                         <tbody>

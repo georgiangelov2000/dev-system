@@ -222,7 +222,6 @@ $(function () {
                 class:'text-center',
                 name: 'package',
                 render: function (data, type, row) {
-                    console.log(row.package);
                     if (row.package) {
                         return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id', row.package.id)}>${row.package.package_name}</a>`;
                     } else {

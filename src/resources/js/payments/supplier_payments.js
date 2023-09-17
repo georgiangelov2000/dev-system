@@ -90,7 +90,7 @@ $(function () {
                                     <th>Purchase</th>
                                     <th>Code</th>
                                     <th>Price</th>
-                                    <th>Quantity</th>
+                                    <th>Amount</th>
                                     <th>Method</th>
                                     <th>Status</th>
                                     <th>Reference</th>
@@ -171,8 +171,9 @@ $(function () {
                 }
             },
             columns: [
-                { orderable: true, data: 'id' },
+                { width: '1%', orderable: true, data: 'id' },
                 {
+                    width: '15%',
                     name: 'name',
                     orderable: false,
                     class: 'text-center',
@@ -181,6 +182,7 @@ $(function () {
                     }
                 },
                 {
+                    width: '5%',
                     name: 'code',
                     orderable: false,
                     class: 'text-center',
@@ -189,6 +191,8 @@ $(function () {
                     }
                 },
                 {
+                    width: '1%',
+                    class: 'text-center',
                     name: 'price',
                     orderable: false,
                     render: function (data, type, row) {
@@ -196,6 +200,8 @@ $(function () {
                     }
                 },
                 {
+                    width: '1%',
+                    class:'text-center',
                     name: 'quantity',
                     orderable: false,
                     render: function (data, type, row) {
@@ -203,6 +209,8 @@ $(function () {
                     }
                 },
                 {
+                    width: '1%',
+                    class:'text-center',
                     name: 'payment_method',
                     orderable: false,
                     render: function (data, type, row) {
@@ -219,6 +227,8 @@ $(function () {
                     }
                 },
                 {
+                    width: '1%',
+                    class: 'text-center',
                     name: 'payment_status',
                     orderable: false,
                     render: function (data, type, row) {
@@ -232,17 +242,23 @@ $(function () {
                     }
                 },
                 {
+                    width: '5%',
                     data: 'payment_reference',
+                    class: 'text-center',
                     orderable: false
                 },
                 {
+                    width: '5%',
                     name: 'date_of_payment',
+                    class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         return `<span>${row.date_of_payment}</span>`;
                     }
                 },
                 {
+                    width: '5%',
+                    class:'text-center',
                     orderable: false,
                     render: function (data, type, row) {
                         const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
@@ -271,6 +287,8 @@ $(function () {
                     }
                 },
                 {
+                    width: '5%',
+                    class:'text-center',
                     orderable: false,
                     render: function (data, type, row) {
 

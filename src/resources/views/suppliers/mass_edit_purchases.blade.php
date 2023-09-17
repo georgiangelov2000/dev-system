@@ -31,10 +31,10 @@
                         <th>Name</th>
                         <th>Price</th>
                         <th>Discount price</th>
-                        <th>Total price</th>
+                        <th>Final price</th>
                         <th>Regular price</th>
-                        <th>Quantity</th>
-                        <th>Init.quantity</th>
+                        <th>Amount</th>
+                        <th>Initial amount</th>
                         <th>Discount</th>
                         <th>Categories</th>
                         <th>Sub categories</th>

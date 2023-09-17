@@ -41,36 +41,12 @@ $(function () {
                 }
             },
             {
-                width: '2%',
+                width: '1%',
                 orderable: false,
                 name: "image",
-                class:'text-center',
                 render: function (data, type, row) {
-                    if (row.images && row.images.length > 1) {
-                        // Generate carousel HTML with multiple images
-                        let carouselItems = row.images.map((image, index) => {
-                            let isActive = index === 0 ? 'active' : ''; // Set first image as active
-                            return `<div class="carousel-item ${isActive}">
-                                        <img class="d-block w-100" src="${CONFIG_URL + image.path + "/" + image.name}" alt="Slide ${index + 1}">
-                                    </div>`;
-                        }).join('');
-
-                        return `<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
-                                    <div class="carousel-inner">
-                                        ${carouselItems}
-                                    </div>
-                                    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="sr-only">Previous</span>
-                                    </a>
-                                    <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="sr-only">Next</span>
-                                    </a>
-                                </div>`;
-                    } else if (row.images && row.images.length === 1) {
-                        let imagePath = CONFIG_URL + row.images[0].path + "/" + row.images[0].name;
-                        return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${imagePath}" />`;
+                    if (row.image_path) {
+                        return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${row.image_path}" />`;
 
                     } else {
                         return `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;

@@ -115,12 +115,14 @@ $(function () {
             },
             {
                 width: '12%',
+                class:'text-center',
                 orderable: false,
                 name: "name",
                 data: "name"
             },
             {
                 width: '6%',
+                class:'text-center',
                 name: "price",
                 orderable: true,
                 render: function (data, type, row) {
@@ -130,6 +132,7 @@ $(function () {
             {
                 width: '6%',
                 name: "discount_price",
+                class:'text-center',
                 orderable: true,
                 render: function (data, type, row) {
                     return `<span>€${row.discount_price}</span>`
@@ -138,6 +141,7 @@ $(function () {
             {
                 width: '7%',
                 name: 'total_price',
+                class:'text-center',
                 orderable: true,
                 render: function (data, type, row) {
                     return `<span>€${row.total_price}</span>`
@@ -146,6 +150,7 @@ $(function () {
             {
                 width: '10%',
                 name: 'original_price',
+                class:'text-center',
                 orderable: true,
                 render: function (data, type, row) {
                     return `<span>€${row.original_price}</span>`

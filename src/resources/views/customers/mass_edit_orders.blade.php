@@ -34,13 +34,13 @@
                                         </div>
                                     </th>
                                     <th>ID</th>
-                                    <th>Image</th>
+                                    <th>Payment</th>
                                     <th>Customer</th>
                                     <th>Driver</th>
                                     <th>Product</th>
                                     <th>Amount</th>
                                     <th>Unit Price</th>
-                                    <th>Disc.unit price</th>
+                                    <th>Discount unit price</th>
                                     <th>Official Price</th>
                                     <th>Refular price</th>
                                     <th>Discount</th>
@@ -134,7 +134,6 @@
             const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit', ':id') }}";
             const PACKAGE_EDIT_ROUTE = "{{ route('package.edit', ':id') }}"
             const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
-            const CONFIG_URL = "{{config('app.url')}}";
             const STATUS = [6];
         </script>
     @endpush

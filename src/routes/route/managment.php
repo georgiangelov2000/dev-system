@@ -83,7 +83,6 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/update/{purchase}', [PurchaseController::class, 'update'])->name('update');
         Route::put('/mass/edit', [PurchaseController::class, 'massEditUpdate'])->name('mass.update');
         Route::delete('/delete/{purchase}', [PurchaseController::class, 'delete'])->name('delete');
-        Route::delete('/delete/image/{purchase}', [PurchaseController::class, 'deleteGalleryImage'])->name('delete.image');
     });
 
     Route::prefix('customers')->name('customer.')->group(function () {
@@ -105,16 +104,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/mass/edit', [OrderController::class, 'massUpdate'])->name('mass.update');
         Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
         Route::put('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
-    });
-
-    Route::prefix('summary')->name('summary.')->group(function () {
-        Route::get('/{type}', [SummaryController::class, 'index'])->name('index');
-        Route::post('/take', [SummaryController::class, 'summary'])->name('take');
-    });
-
-    Route::prefix('reports')->name('report.')->group(function () {
-        Route::get('/', [ReportsController::class, 'index'])->name('index');
-        Route::post('/take', [ReportsController::class, 'takeReport'])->name('take');
     });
 
     Route::prefix('packages')->name('package.')->group(function () {

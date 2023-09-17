@@ -20,7 +20,11 @@ class CreateInvoiceOrders extends Migration
             $table->date('invoice_date')->nullable();
             $table->unsignedDecimal('price')->default(0);
             $table->unsignedInteger('quantity')->default(0);
-            $table->tinyInteger('status')->comment('1: Projecting, 2: Paid,3: Not paid');
+
+            // Add foreign key constraint with ON DELETE CASCADE
+            $table->foreign('order_payment_id')
+                ->references('id')->on('order_payments')
+                ->onDelete('cascade'); // This line enables cascade deleting
         });
     }
 
