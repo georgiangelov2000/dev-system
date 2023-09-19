@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration {
             $table->string('last_name');
             $table->date('birth_date')->nullable();
             $table->string('middle_name')->nullable();
-            $table->tinyInteger('female')->default(0);
+            $table->tinyInteger('gender')->default(0);
             $table->boolean('is_active')->default(true);
             $table->string('phone')->nullable();
             $table->text('address')->nullable();

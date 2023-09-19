@@ -11,8 +11,11 @@ class OrderRequest extends FormRequest
     {
         $method = $this->method();
         $order = $this->order ?? null;
-        
-        $statusIsAllowed = in_array($order->status, [1, 2, 3, 4, 5]);
+        $statusIsAllowed = [];
+
+        if($order) {
+            $statusIsAllowed = in_array($order->status, [1, 2, 3, 4, 5]);
+        }
         
         $rules = [
             'customer_id' => 'required|string',
@@ -23,10 +26,10 @@ class OrderRequest extends FormRequest
             'tracking_number' => $statusIsAllowed && $method === 'PUT' ? 'nullable|string' : 'required|string',
             'sold_quantity' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required',
             'sold_quantity.*' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:1' : 'required|numeric|min:1',
+            'single_sold_price' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required',
             'single_sold_price.*' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:1',
-            'single_sold_price' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
+            'discount_percent' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required',
             'discount_percent.*' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
-            'discount_percent' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
             'date_of_sale' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required|date',
         ];
 

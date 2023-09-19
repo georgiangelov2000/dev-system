@@ -28,6 +28,11 @@ class CreateOrdersTable extends Migration
             $table->string('tracking_number');
             $table->tinyInteger('status')->comment('1: Paid, 2: Pending, 3: Partially Paid, 4: Overdue, 5: Refunded, 6: Ordered');
             $table->timestamps();
+
+            // Add foreign key constraint with ON DELETE CASCADE
+            $table->foreign('purchase_id')
+                ->references('id')->on('purchases')
+                ->onDelete('cascade'); // This line enables cascade deleting
         });
     }
 

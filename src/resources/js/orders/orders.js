@@ -91,6 +91,7 @@ $(function () {
             {
                 width: '5%',
                 orderable: false,
+                class: 'text-center',
                 name: "customer",
                 render: function (data, type, row) {
                     return '<a target="_blank" href="' + CUSTOMER_EDIT_ROUTE.replace(':id', row.customer.id) + '" >' + row.customer.name + '</a>';

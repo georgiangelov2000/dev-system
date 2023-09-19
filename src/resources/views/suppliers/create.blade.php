@@ -112,7 +112,7 @@
                                     placeholder="Enter address" />
                                 <span class="input-group-append">
                                     <button type="button" id="searchAddress"
-                                        class="btn btn-info btn-flat">Search</button>
+                                        class="btn btn-primary btn-flat">Search</button>
                                 </span>
                             </div>
                             @error('address')
@@ -144,7 +144,7 @@
                             <div class="col-12 d-none imagePreview">
                                 <div class="position-relative">
                                     <img id="preview-image" alt="Preview"
-                                        class="img-fluid cardWidgetImage card card-widget widget-user w-100 m-0">
+                                        class="img-fluid card card-widget widget-user w-100 m-0">
                                     <div class="ribbon-wrapper ribbon-lg">
                                         <div class="ribbon bg-success text-lg">
                                             Preview

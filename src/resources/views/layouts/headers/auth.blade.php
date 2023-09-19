@@ -1,19 +1,27 @@
 @php
-    use App\Models\Settings;
-    use App\Helpers\RedisCacheHelper;
+use App\Models\Settings;
+use App\Helpers\RedisCacheHelper;
 
-    $jsonSettings = Settings::where('type', 1)->first()->settings;
+$settingsModel = Settings::where('type', 1)->first();
 
+if ($settingsModel) {
+    $jsonSettings = $settingsModel->settings;
+    
     $cacheKey = 'json_settings_' . md5('cxsiSPG6angFxFYY');
+    
     $cachedData = RedisCacheHelper::get($cacheKey);
-
+    
     if (!$cachedData) {
         // Cache miss, data is not in cache
         RedisCacheHelper::put($cacheKey, $jsonSettings, 3600); // Store the data in cache
         $cachedData = $jsonSettings; // Update $cachedData with the actual data
     }
-
+    
     $res = json_decode($cachedData, true);
+} else {
+    // Handle the case where no settings were found (e.g., show an error message)
+    $res = [];
+}
 @endphp
 
 

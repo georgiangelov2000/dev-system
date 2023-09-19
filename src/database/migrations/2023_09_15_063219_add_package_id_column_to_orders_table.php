@@ -14,7 +14,7 @@ class AddPackageIdColumnToOrdersTable extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('package_id')->default(0);
+            $table->unsignedBigInteger('package_id')->nullable();
         });
     }
 

@@ -87,6 +87,7 @@ $(function () {
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Image</th>
                                     <th>Purchase</th>
                                     <th>Code</th>
                                     <th>Price</th>
@@ -172,6 +173,19 @@ $(function () {
             },
             columns: [
                 { width: '1%', orderable: true, data: 'id' },
+                {
+                    width: '1%',
+                    orderable: false,
+                    name: "image",
+                    render: function (data, type, row) {
+                        if (row.purchase.image_path) {
+                            return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${row.purchase.image_path}" />`;
+    
+                        } else {
+                            return `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;
+                        }
+                    }
+                },
                 {
                     width: '15%',
                     name: 'name',

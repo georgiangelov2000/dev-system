@@ -70,7 +70,8 @@ class OrderController extends Controller
                         $package_id = $data['package_id'];
                     }
 
-                    $order = [
+                    // Create an Order object
+                    $order = Order::create([
                         'customer_id' => $data['customer_id'][$key],
                         'user_id' => $data['user_id'][$key],
                         'purchase_id' => $id,
@@ -87,12 +88,12 @@ class OrderController extends Controller
                         'status' => self::DELIVERED_STATUS,
                         'created_at' => now(),
                         'updated_at' => now()
-                    ];
+                    ]);
 
-                    $orders[] = $order;
+                    // Call the createOrUpdatePayment method with the Order object
+                    $this->createOrUpdatePayment($order);
                 }
             }
-            Order::insert($orders);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -235,7 +236,7 @@ class OrderController extends Controller
             }
 
             $newSingleSoldPrice = $order->single_sold_price;
-            $newDiscPerc = $order->discount_percent;
+            $newDiscountPercentage = $order->discount_percent;
             $newSoldQua = $order->sold_quantity;
 
             // Find related purchase
@@ -256,7 +257,7 @@ class OrderController extends Controller
 
             $prices = $this->calculatePrices(
                 $newSingleSoldPrice,
-                $newDiscPerc,
+                $newDiscountPercentage,
                 $newSoldQua
             );
 
@@ -269,28 +270,7 @@ class OrderController extends Controller
 
         $order->save();
 
-        $alias = $order->package_extension_date
-            ? now()->parse($order->package_extension_date)->format('F j, Y')
-            : now()->parse($order->date_of_sale)->format('F j, Y');
-
-        $alias = str_replace([' ', ','], ['_', ''], $alias);
-        $alias = strtolower($alias);
-
-        $paymentData = [
-            'alias' => $alias,
-            'quantity' => $order->sold_quantity,
-            'price' => $order->total_sold_price,
-            'date_of_payment' => $order->package_extension_date
-                ? $order->package_extension_date
-                : $order->date_of_sale
-        ];
-
-        $payment = $order->payment()->updateOrCreate([], $paymentData);
-
-        $payment->invoice()->updateOrCreate([], [
-            'price' => $payment->price,
-            'quantity' => $payment->quantity
-        ]);
+        $this->createOrUpdatePayment($order);
     }
 
     private function calculatePrices($price, $discount, $quantity): array
@@ -305,5 +285,40 @@ class OrderController extends Controller
             'total_price' => $totalPrice,
             'original_price' => $originalPrice
         ];
+    }
+
+    private function createOrUpdatePayment($order)
+    {
+        $alias = $this->getAlias($order);
+
+        $paymentData = [
+            'alias' => $alias,
+            'quantity' => $order->sold_quantity,
+            'price' => $order->total_sold_price,
+            'date_of_payment' => $this->getDateOfPayment($order)
+        ];
+
+        $payment = $order->payment()->updateOrCreate([], $paymentData);
+
+        $payment->invoice()->updateOrCreate([], [
+            'price' => $payment->price,
+            'quantity' => $payment->quantity
+        ]);
+    }
+
+    private function getAlias($order)
+    {
+        $aliasDate = $order->package_extension_date
+            ? now()->parse($order->package_extension_date)->format('F j, Y')
+            : now()->parse($order->date_of_sale)->format('F j, Y');
+
+        return strtolower(str_replace([' ', ','], ['_', ''], $aliasDate));
+    }
+
+    private function getDateOfPayment($order)
+    {
+        return $order->package_extension_date
+            ? $order->package_extension_date
+            : $order->date_of_sale;
     }
 }

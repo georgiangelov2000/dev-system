@@ -245,13 +245,10 @@ $(function () {
   };
 
   function renderData(data) {
-    let images = '';
+    let image = '';
 
-    if (data.images.length > 0) {
-      const imageTags = data.images.map((element) => {
-        return `<img src="${element.path}/${element.name}" />`;
-      });
-      images = imageTags.join('');
+    if (data.image_path) {
+        image = `<img src="${data.image_path}" />`;
     }
 
     let subcategoryNames = data.subcategories.length > 0
@@ -275,7 +272,7 @@ $(function () {
                 <i class="fa-light fa-trash text-danger"></i>
               </button>
             </td>
-            <td>${images}</td>
+            <td>${image}</td>
             <td><a href="${PURCHASE_ROUTE.replace(":id", data.id)}">${data.name}</a></td>
             <td>€${data.price}</td>
             <td>${data.quantity}</td>

@@ -34,7 +34,7 @@ class UserApiController extends Controller
             'gender',
             'phone',
             'address',
-            'image',
+            'photo',
             'pdf_file_path'
         )->with($relations);
 

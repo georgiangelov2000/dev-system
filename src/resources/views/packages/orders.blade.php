@@ -73,15 +73,14 @@
                         <th>Payment</th>
                         <th>Customer</th>
                         <th>Purchase</th>
-                        <th title="Quantity">Qty</th>
+                        <th>Amount</th>
                         <th title="Unut price">Unit Price</th>
-                        <th title="Discount unit price">Disc.unit price</th>
+                        <th title="Discount unit price">Discount unit price</th>
                         <th title="Official price">Official Price</th>
                         <th title="Regular price">Regular price</th>                            
                         <th>Discount</th>
                         <th>Date of sale</th>
                         <th>Expired</th>
-                        <th>Delay Payment</th>
                         <th>Payment date</th>
                         <th>Package</th>
                         <th class="text-center">Status</th>

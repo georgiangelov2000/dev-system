@@ -143,16 +143,11 @@ class PurchaseController extends Controller
         DB::beginTransaction();
 
         try {
-            if ($purchase->payment()->exists()) {
-                return response()->json(['message' => 'Payment already exists for this purchase'], 500);
-            }
+            $imagePath = str_replace('/storage', '', $purchase->image_path);
 
-            if (!empty($purchase->images)) {
-                $image_names = $purchase->images()->pluck('name');
-
-                foreach ($image_names as $key => $images) {
-                    Storage::delete($this->dir . DIRECTORY_SEPARATOR . $images);
-                }
+            // Check if the image path exists and delete it
+            if ($purchase->image_path && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
             }
 
             $purchase->delete();
@@ -235,25 +230,15 @@ class PurchaseController extends Controller
             $purchase->status = $status;
         }
 
+        if ($file) {
+            $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
+            Storage::putFileAs($this->dir, $file, $hashed_image);
+            $purchase->image_path = $this->getImagePath() . '/' . $hashed_image;
+        }
+        
         $purchase->save();
 
-        $alias = now()->parse($data['delivery_date'])->format('F j, Y');
-        $alias = str_replace([' ', ','], ['_', ''], $alias);
-        $alias = strtolower($alias);
-
-        $paymentData = [
-            'alias' => $alias,
-            'quantity' => $purchase->initial_quantity,
-            'price' => $purchase->total_price,
-            'date_of_payment' => $purchase->expected_date_of_payment
-        ];
-
-        $payment = $purchase->payment()->updateOrCreate([], $paymentData);
-
-        $payment->invoice()->updateOrCreate([], [
-            'price' => $payment->price,
-            'quantity' => $payment->quantity
-        ]);
+        $this->createOrUpdatePayment($purchase);
 
         if (array_key_exists('category_id', $data) && !empty($data['category_id'])) {
             $purchase->categories()->sync($data['category_id']);
@@ -267,11 +252,6 @@ class PurchaseController extends Controller
             $purchase->brands()->sync($data['brands']);
         }
 
-        if ($file) {
-            $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
-            Storage::putFileAs($this->dir, $file, $hashed_image);
-            $purchase->image_path = $this->getImagePath() . '/' . $hashed_image;
-        }
     }
 
     private function purchaseMassEditProcessing(array $data, $id)
@@ -309,19 +289,7 @@ class PurchaseController extends Controller
 
         $purchase->save();
 
-        $paymentData = [
-            'alias' => $purchase->delivery_date->format('F j, Y'),
-            'quantity' => $purchase->quantity->format('F j, Y'),
-            'price' => $purchase->price->format('F j, Y'),
-            'date_of_payment' => $purchase->expected_date_of_payment
-        ];
-
-        $payment = $purchase->payment()->updateOrCreate([], $paymentData);
-
-        $payment->invoice()->updateOrCreate([], [
-            'price' => $payment->price,
-            'quantity' => $payment->quantity
-        ]);
+        $this->createOrUpdatePayment($purchase);
 
         if (array_key_exists('category_id', $data) && !empty($data['category_id'])) {
             $purchase->categories()->sync($data['category_id']);
@@ -358,5 +326,34 @@ class PurchaseController extends Controller
     {
         $statuses = config('statuses.purchase_statuses');
         return array_key_exists($status, $statuses) ? $status : null;
+    }
+
+    private function createOrUpdatePayment($purchase)
+    {
+
+        $alias = $this->getAlias($purchase);
+
+        $paymentData = [
+            'alias' => $alias,
+            'quantity' => $purchase->initial_quantity,
+            'price' => $purchase->total_price,
+            'date_of_payment' => $purchase->expected_date_of_payment
+        ];
+
+        $payment = $purchase->payment()->updateOrCreate([], $paymentData);
+
+        $payment->invoice()->updateOrCreate([], [
+            'price' => $payment->price,
+            'quantity' => $payment->quantity
+        ]);
+    }
+
+    private function getAlias($purchase)
+    {
+        $alias = now()->parse($purchase->delivery_date)->format('F j, Y');
+        $alias = str_replace([' ', ','], ['_', ''], $alias);
+        $alias = strtolower($alias);
+
+        return $alias;
     }
 }

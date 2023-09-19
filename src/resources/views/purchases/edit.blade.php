@@ -132,7 +132,7 @@
                         </div>
                         <div class="form-group col-6">
                             <div class="form-group">
-                                <label id="order_amount">Order amount</label>
+                                <label id="order_amount">Orders amount</label>
                                 <p name="order_amount" class="input-group-text col-12">{{ $orderAmount }}</p>
                             </div>
                             <div class="form-group">

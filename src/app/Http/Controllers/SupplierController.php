@@ -60,7 +60,7 @@ class SupplierController extends Controller
             $file = isset($data['image']) ? $data['image'] : false;
             $categories = isset($data['categories']) ? $data['categories'] : [];
             $imagePath = Storage::url($this->dir);
-            
+
             $supplier = new Supplier;
             $supplier->name = $data['name'];
             $supplier->email = $data['email'];
@@ -73,20 +73,22 @@ class SupplierController extends Controller
             $supplier->notes = isset($data['notes']) ? $data['notes'] : "";
             $supplier->website = isset($data['website']) ? $data['website'] : "";
 
+            if ($file) {
+                $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
+                Storage::putFileAs($this->dir, $file, $hashed_image);
+                $supplier->image_path = $imagePath . '/' . $hashed_image;
+            }
+
+            $supplier->save();
+
             if (isset($categories) && count($categories)) {
                 $supplier->categories()->sync($categories);
             }
 
-            if ($file) {
-                $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
-                Storage::putFileAs($this->dir, $file, $hashed_image);
-                $supplier->image_path = $imagePath.'/'.$hashed_image;
-            }
-
-            $supplier->save();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
+            dd($e->getMessage());
             return back()->withInput()->with('error', 'Supplier has not been created');
         }
 
@@ -145,10 +147,10 @@ class SupplierController extends Controller
                         Storage::delete($current_image);
                     }
                     Storage::putFileAs($this->dir, $file, $hashed_image);
-                    $supplier->image_path = $imagePath .'/'. $hashed_image;
+                    $supplier->image_path = $imagePath . '/' . $hashed_image;
                 } else {
                     Storage::putFileAs($this->dir, $file, $hashed_image);
-                    $supplier->image_path = $imagePath .'/'. $hashed_image;
+                    $supplier->image_path = $imagePath . '/' . $hashed_image;
                 }
             }
 
@@ -167,16 +169,11 @@ class SupplierController extends Controller
     {
         DB::beginTransaction();
         try {
+            $imagePath = str_replace('/storage', '', $supplier->image_path);
 
-            if ($supplier->purchases->count() > 0) {
-                return response()->json(['message' => 'Supplier has related purchases'], 500);
-            }            
-
-            if ($supplier->image_path) {
-                $current_image = $this->dir . DIRECTORY_SEPARATOR . $supplier->image_path;
-                if (Storage::exists($current_image)) {
-                    Storage::delete($current_image);
-                };
+            // Check if the image path exists and delete it
+            if ($supplier->image_path && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
             }
 
             $supplier->delete();

@@ -37,8 +37,8 @@ $(function () {
                 class:'text-center',
                 render: function (data, type, row) {
 
-                    if (row.image) {
-                        return `<img class="rounded mx-auto w-100" src="${row.image}" />`
+                    if (row.photo) {
+                        return `<img class="rounded mx-auto w-100" src="${row.photo}" />`
                     } else {
                         return "<img class='rounded mx-auto w-100' src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png'/>";
                     }
