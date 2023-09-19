@@ -18,6 +18,24 @@ export function APIPOSTCALLER(url, data, callback) {
     });
 }
 
+export function APIPUTCALLER(url, data, callback) {
+    $.ajax({
+        type: "PUT",
+        url: url,
+        data: data,
+        success: function (response, xhr) {
+            if (typeof callback === 'function') {
+                callback(response, xhr);
+            }
+        },
+        error: function (error) {
+            if (typeof callback === 'function') {
+                callback(error);
+            }
+        }
+    });
+}
+
 export function APICaller(url,data,callback){
     if (typeof data === 'function') {
       callback = data;

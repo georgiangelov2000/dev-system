@@ -97,7 +97,7 @@ class OrderApiController extends Controller
             });
         }
         if ($withoutPackage) {
-            $orderQuery->where('package_id',0);
+            $orderQuery->whereNull('package_id');
         }
         if ($select_json) {
             return response()->json($orderQuery->get());

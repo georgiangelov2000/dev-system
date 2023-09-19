@@ -15,10 +15,13 @@ class PackageController extends Controller
 {
     private $staticDataHelper;
     const IS_IT_DELIVERED = 0;
-
+    private $methods = [];
+    private $types = [];
     public function __construct(LoadStaticData $staticDataHelper)
     {
         $this->staticDataHelper = $staticDataHelper;
+        $this->methods = config('statuses.delivery_methods');
+        $this->types = config('statuses.package_types');
     }
     public function index()
     {
@@ -79,33 +82,29 @@ class PackageController extends Controller
             'package_type',
             'delivery_date'
         ]);
-
+        
         try {
-
-            if (isset($specificColumns['delivery_date'])) {
-                $specificColumns['delivery_date'] = date('Y-m-d', strtotime($specificColumns['delivery_date']));
-                $specificColumns['is_it_delivered'] = 1;
+            
+            if (isset($specificColumns['delivery_date']) && $specificColumns['delivery_date'] > $package['expected_delivery_date']) {
+                $package->delivery_date = date('Y-m-d', strtotime($specificColumns['delivery_date']));
+                $package->is_it_delivered = 1;
             }
+            if (array_key_exists('delivery_method', $this->methods)) {
+                $package->delivery_method = $specificColumns['delivery_method'] = $this->methods[$specificColumns['delivery_method']];
+            }
+            if (array_key_exists('package_type', $this->types)) {
+                $package->package_type = $specificColumns['package_type'] = $this->types[$specificColumns['package_type']];
+            }
+            
+            $package->save();
 
-            $package->update($specificColumns);
             DB::commit();
-
-            return response()->json(['message' => 'Package has been updated'], 200);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Package has not been updated'], 500);
         }
-    }
 
-    public function createPayment()
-    {
-        $customers = Customer::select('id', 'name')
-            ->whereHas('orders.packages')
-            ->get();
-
-        return view('packages.customer_package_payment', [
-            'customers' => $customers,
-        ]);
+        return response()->json(['message' => 'Package has been updated'], 200);
     }
 
     public function orders(Package $package)
@@ -122,7 +121,7 @@ class PackageController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Package has not beed deleted'], 500);
+            return response()->json(['message' => 'Package has not been deleted'], 500);
         }
         return response()->json(['message' => 'Package has been deleted'], 200);
     }
@@ -130,19 +129,16 @@ class PackageController extends Controller
     // Private methods
     private function packageProcessing(array $data, $package = null)
     {
-        $methods = config('statuses.delivery_methods');
-        $types = config('statuses.package_types');
-
-        if (!array_key_exists($data['package_type'], $types)) {
+        if (!array_key_exists($data['package_type'], $this->types)) {
             throw new \Exception("Invalid package type"); // You can provide a custom message here
         }
 
-        if (!array_key_exists($data['delivery_method'], $methods)) {
+        if (!array_key_exists($data['delivery_method'], $this->methods)) {
             throw new \Exception("Invalid delivery method"); // You can provide a custom message here
         }
 
         $package = $package ? $package : new Package;
-        $isNewPackage = !$package->exists; // Check if it's a new packge
+        $isNewPackage = !$package->exists; // Check if it's a new package
 
         $package->package_name = $data['package_name'];
         $package->tracking_number = $data['tracking_number'];

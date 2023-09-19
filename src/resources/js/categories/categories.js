@@ -20,7 +20,6 @@ $(function () {
     let editModal = $('#editModal');
 
     let createForm = createModal.find('form');
-    let editForm = editModal.find('form');
     let closeModalButton = $('.modalCloseBtn');
 
     $('.selectSubCategory,.selectAction')

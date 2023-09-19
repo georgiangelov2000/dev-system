@@ -1,5 +1,5 @@
 import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
-import { showConfirmationDialog, openModal, swalText, closeModal, submit } from '../helpers/action_helpers';
+import { showConfirmationDialog, openModal, swalText, closeModal, submit, update } from '../helpers/action_helpers';
 
 $(function () {
 
@@ -7,9 +7,21 @@ $(function () {
         format: 'yyyy-mm-dd'
     });
 
+    const statusMap = {
+        1: { label: "Standart" },
+        2: { label: "Express" },
+        3: { label: "Overnight" },
+    };
+
+    const methods = {
+        1: { label: "Ground", iconClass: '<i title="Ground" class="fa-light fa-truck"></i>' },
+        2: { label: "Air", iconClass: '<i title="Air" class="fa-light fa-plane"></i>' },
+        3: { label: "Sea", iconClass: '<i title="Sea" class="fa-light fa-water"></i>' },
+    }
+
     let table = $('#packagesTable');
 
-    $('.selectPackageType, .selectDelieveryMethod, .selectCustomer, .selectAction')
+    $('.selectPackageType, .selectDeliveryMethod, .selectCustomer, .selectAction')
         .selectpicker('refresh')
         .val('')
         .trigger('change');
@@ -20,8 +32,7 @@ $(function () {
     let deliveryRange;
 
     let bootstrapPackageType = $('.bootstrap-select .selectPackageType');
-
-    let bootstrapDelieveryMethod = $('.bootstrap-select .selectDelieveryMethod');
+    let bootstrapDeliveryMethod = $('.bootstrap-select .selectDeliveryMethod');
     let bootstrapSelectCustomer = $('.bootstrap-select .selectCustomer');
 
     $('input[name="datetimes"]').daterangepicker({
@@ -41,7 +52,7 @@ $(function () {
                 return $.extend({}, d, {
                     "search": d.search.value,
                     'package': bootstrapPackageType.val(),
-                    'delivery': bootstrapDelieveryMethod.val(),
+                    'delivery': bootstrapDeliveryMethod.val(),
                     'customer': bootstrapSelectCustomer.val(),
                     'delivery_date': deliveryRange,
                     'order_column': orderColumnName, // send the column name being sorted
@@ -73,38 +84,25 @@ $(function () {
             },
             {
                 orderable: false,
-                class:'text-center',
+                class: 'text-center',
                 width: "10%",
                 name: 'package_name',
                 data: 'package_name',
             },
             {
                 orderable: false,
-                width:'10%',
-                class:'text-center',
-                name:'tracking_number',
-                data:'tracking_number',
+                width: '10%',
+                class: 'text-center',
+                name: 'tracking_number',
+                data: 'tracking_number',
             },
             {
                 orderable: false,
                 width: "1%",
                 name: 'package_type',
                 render: function (data, type, row) {
-                    let badge = '';
-                    switch (row.package_type) {
-                        case 1:
-                            badge = 'Standart'
-                            break;
-                        case 2:
-                            badge = 'Express'
-                            break;
-                        case 3:
-                            badge = 'Overnight'
-                            break;
-                        default:
-                            badge = 'Invalid status please check the system!';
-                    }
-                    return `<span>${badge}</span>`
+                    const statusInfo = statusMap[row.package_type] || { label: "Unknown" };
+                    return `<span>${statusInfo.label}</span>`
                 }
             },
             {
@@ -113,23 +111,8 @@ $(function () {
                 name: 'delivery_method',
                 class: 'text-center',
                 render: function (data, type, row) {
-                    let badgeIcon = '';
-                    switch (row.delivery_method) {
-                        case 1:
-                            badgeIcon = '<i title="Ground" class="fa-light fa-truck"></i>';
-                            break;
-                        case 2:
-                            badgeIcon = '<i title="Air" class="fa-light fa-plane"></i>';
-                            break;
-                        case 3:
-                            badgeIcon = '<i title="Sea" class="fa-light fa-water"></i>';
-                            break;
-                        default:
-                            badgeIcon = 'Invalid method please check the system!';
-                            break;
-                    }
-
-                    return `${badgeIcon}`;
+                    const statusInfo = methods[row.delivery_method] || { label: "Invalid method please check the system!" };
+                    return `${statusInfo.iconClass}`;
                 },
             },
             {
@@ -175,7 +158,7 @@ $(function () {
             {
                 orderable: false,
                 width: "15%",
-                class:'text-center',
+                class: 'text-center',
                 name: 'expected_delivery_date',
                 data: 'expected_delivery_date',
             },
@@ -240,14 +223,14 @@ $(function () {
                     let deliveredBtn = '';
                     let deleteFormTemplate = '';
 
-                    let editButton = '<a href=' + PACKAGE_EDIT_ROUTE.replace(':id', row.id) + ' data-id=' + row.id + 'class="btn p-1" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>';
+                    let editButton = `<a href="${PACKAGE_EDIT_ROUTE.replace(':id', row.id)}" data-id="${row.id}" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>`;
 
-                    let delieveryDropdown = `
+                    let deliveryDropdown = `
                     <div class="dropdown d-inline">
                         <button class="btn text-primary p-0" title="Change method" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa-light fa-truck-ramp"></i>
                         </button>
-                        <div id="changeDelieveryMethod" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <div id="changeDeliveryMethod" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <form method="POST" id="delivery-form">
                                 <input type="hidden" name="order_id" value="${row.id}">
                                 <button type="button" value="1" class="dropdown-item change-delivery-method-btn">Ground</button>
@@ -256,9 +239,9 @@ $(function () {
                             </form>
                         </div>
                     </div>
-                `;
+                    `;
 
-                    let orders = `<a href="${PACKGE_MASS_DELETE_ORDERS.replace(":id", row.id)}" class="btn p-1" title="Orders"><i class="text-primary fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
+                    let orders = `<a href="${PACKAGE_MASS_DELETE_ORDERS.replace(":id", row.id)}" class="btn p-1" title="Orders"><i class="text-primary fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
 
                     let packageDropdown = `
                     <div class="dropdown d-inline">
@@ -268,26 +251,26 @@ $(function () {
                         <div id="changePackageType" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <form method="POST" id="package-form">
                                 <input type="hidden" name="order_id" value="${row.id}">
-                                <button type="button" order-id=${row.id} value="1" class="dropdown-item change-package-type-btn">Standart</button>
-                                <button type="button" order-id=${row.id} value="2" class="dropdown-item change-package-type-btn">Express</button>
-                                <button type="button" order-id=${row.id} value="3" class="dropdown-item change-package-type-btn">Overnight</button>
-                            </form>success
+                                <button type="button" order-id="${row.id}" value="1" class="dropdown-item change-package-type-btn">Standart</button>
+                                <button type="button" order-id="${row.id}" value="2" class="dropdown-item change-package-type-btn">Express</button>
+                                <button type="button" order-id="${row.id}" value="3" class="dropdown-item change-package-type-btn">Overnight</button>
+                            </form>
                         </div>
                     </div>
                     `;
 
                     if (!row.is_it_delivered) {
-                        deliveredBtn = `<button data-id=${row.id} title="Mark as delivered" class="btn p-0 text-primary delivered-btn" type="button"><i class="fa-light fa-check"></i></button>`;
-                        deleteFormTemplate = "\
-                        <form style='display:inline-block;' action=" + PACKAGE_DELETE_ROUTE.replace(':id', row.id) + " id='delete-form' method='POST' data-name='" + row.package_name + "' >\
-                            <input type='hidden' name='_method' value='DELETE'>\
-                            <input type='hidden' name='id' value='" + row.id + "'>\
-                            <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentPackage(this);'><i class='fa-light fa-trash text-danger'></i></button>\
-                        </form>\
-                        "
+                        deliveredBtn = `<button data-id="${row.id}" title="Mark as delivered" class="btn p-0 text-primary deliveryBtnForm" type="button"><i class="fa-light fa-check"></i></button>`;
+                        deleteFormTemplate = `
+                        <form style='display:inline-block;' action="${PACKAGE_DELETE_ROUTE.replace(':id', row.id)}" id='delete-form' method='POST' data-name="${row.package_name}">
+                            <input type='hidden' name='_method' value='DELETE'>
+                            <input type='hidden' name='id' value='${row.id}'>
+                            <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentPackage(this);'><i class='fa-light fa-trash text-danger'></i></button>
+                        </form>
+                        `;
                     }
 
-                    return `${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${delieveryDropdown} ${deliveredBtn}`;
+                    return `${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${deliveryDropdown} ${deliveredBtn}`;
                 }
             }
         ],
@@ -304,13 +287,13 @@ $(function () {
         dataTable.ajax.reload();
     });
 
-    // Actions
+    // Actions for data tables
 
     bootstrapPackageType.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         dataTable.ajax.reload(null, false);
     })
 
-    bootstrapDelieveryMethod.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+    bootstrapDeliveryMethod.bind('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         dataTable.ajax.reload(null, false);
     });
 
@@ -324,9 +307,10 @@ $(function () {
 
     editSubmitButton.on('click', function (e) {
         e.preventDefault();
-        submit(e, editModal, table);
+        update(e, editModal, table);
     })
 
+    //Click event 
     $(document).on('click', '.change-delivery-method-btn', function (e) {
         e.preventDefault();
 
@@ -377,12 +361,11 @@ $(function () {
         });
     });
 
-
-    // Window actions
-
-    $(document).on('click', '.delivered-btn', function (e) {
+    $(document).on('click', '.deliveryBtnForm', function (e) {
         openModal(editModal, PACKAGE_UPDATE_ROUTE.replace(':id', $(this).data('id')));
     });
+
+    // Window actions
 
     window.selectPackage = function (e) {
         if ($('tbody input[type="checkbox"]:checked').length === 0) {

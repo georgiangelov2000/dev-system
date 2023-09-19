@@ -40,7 +40,7 @@
                     <div class="col-3">
                         <div class="form-group">
                             <label for="delivery_method">Method</label>
-                            <select class="form-control selectDelieveryMethod" name="" id="delivery_method">
+                            <select class="form-control selectDeliveryMethod" name="" id="delivery_method">
                                 <option value="">All</option>
                                 @foreach (config('statuses.delivery_methods') as $key => $delievery)
                                     <option value="{{$key}}">
@@ -121,7 +121,7 @@
         'title' => 'Delivered package',
         'labelOne' => 'Official delivered date',
         'inputOne' => 'delivery_date',
-        'formMethod' => 'POST',
+        'formMethod' => 'PUT',
         'inputType' => 'text',
         'isDatePicker' => true
     ])
@@ -133,7 +133,7 @@
             const PACKAGE_UPDATE_STATUS_ROUTE = "{{route('package.status',':id')}}";
             const PACKAGE_DELETE_ROUTE = "{{route('package.delete',':id')}}";
             const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}";
-            const PACKGE_MASS_DELETE_ORDERS = "{{route('package.orders',':id')}}";
+            const PACKAGE_MASS_DELETE_ORDERS = "{{route('package.orders',':id')}}";
             const PACKAGE_UPDATE_ROUTE = "{{route('package.status',':id')}}"
         </script>
     @endpush

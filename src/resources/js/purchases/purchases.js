@@ -4,6 +4,15 @@ import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_
 $(function () {
     let table = $('table#purchasedProducts');
 
+    const statusMap = {
+        1: { label: "Paid", iconClass: "fal fa-check-circle" },
+        2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
+        3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+        4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
+        5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
+        6: { label: "Delivered", iconClass: "fal fa-shipping-fast" }
+    };
+
     $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice, .selectStock, .selectType')
         .selectpicker('refresh')
         .trigger('change');
@@ -17,7 +26,7 @@ $(function () {
         }
     });
 
-    // selectpickers
+    // select pickers
     let bootstrapSelectSupplier = $('.bootstrap-select .selectSupplier');
     let bootstrapSelectCategory = $('.bootstrap-select .selectCategory');
     let bootstrapSelectSubCategory = $('.bootstrap-select .selectSubCategory');
@@ -265,15 +274,6 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    const statusMap = {
-                        1: { label: "Paid", iconClass: "fal fa-check-circle" },
-                        2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
-                        3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
-                        4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
-                        5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
-                        6: { label: "Delivered", iconClass: "fal fa-shipping-fast" }
-                    };
-            
                     const statusInfo = statusMap[row.status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
             
                     return `<div title="${statusInfo.label}" class="status">

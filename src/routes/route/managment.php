@@ -115,7 +115,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/edit/{package}', [PackageController::class, 'edit'])->name('edit');
         Route::put('/status/{package}', [PackageController::class, 'updateSpecificColumns'])->name('status');
         Route::get('/orders/{package}', [PackageController::class, 'orders'])->name('orders');
-        Route::get('/payment', [PackageController::class, 'createPayment'])->name('create.customer.payment');
     });
 
     Route::prefix('settings')->name('settings.')->group(function () {

@@ -1,6 +1,7 @@
 /* global Swal, CATEGORY_ROUTE */
 import {
     APIPOSTCALLER,
+    APIPUTCALLER
 } from '../ajax/methods';
 
 export function openModal(modal, url, data = null) {
@@ -42,6 +43,31 @@ export function submit(e, modal, table) {
     const data = form.serialize();
 
     APIPOSTCALLER(url, data, function (response,xhr) {
+        let status = xhr;
+        
+        if (status == 'success') {
+            toastr['success'](response.message);
+            form.trigger('reset');
+            modal.modal('toggle');
+            table.DataTable().ajax.reload();
+        } else {
+            toastr['error'](response.responseJSON.message);
+            ajaxResponse(response.responseJSON, modal);
+        }
+    },function(error) {
+        console.log(error)
+    });
+};
+
+export function update(e, modal, table) {
+    e.preventDefault();
+
+    const form = modal.find('form');
+    const url = form.attr('action');
+    const data = form.serialize();
+    console.log(data);
+
+    APIPUTCALLER(url, data, function (response,xhr) {
         let status = xhr;
         
         if (status == 'success') {
