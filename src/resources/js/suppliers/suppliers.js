@@ -3,7 +3,7 @@ import {
     APIDELETECALLER
 } from '../ajax/methods.js';
 
-import {swalText,showConfirmationDialog} from '../helpers/action_helpers.js';
+import { swalText, showConfirmationDialog } from '../helpers/action_helpers.js';
 
 $(document).ready(function () {
     let table = $('#suppliersTable');
@@ -13,17 +13,17 @@ $(document).ready(function () {
     const selectCategory = $('.bootstrap-select .selectCategory');
     const selectCountry = $('.bootstrap-select .selectCountry');
     const selectState = $('.bootstrap-select .selectState');
-    
+
     let dataTable = table.DataTable({
-        serverSide:true,
+        serverSide: true,
         ajax: {
             url: SUPPLIER_ROUTE_API_ROUTE,
-            data: function(d) {
-                return $.extend({},d, {
+            data: function (d) {
+                return $.extend({}, d, {
                     'country': selectCountry.val(),
-                    'category':selectCategory.val(),
-                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : '',
-                    'state':selectState.val()
+                    'category': selectCategory.val(),
+                    "search": d.search.value,
+                    'state': selectState.val()
                 });
             }
         },
@@ -47,9 +47,10 @@ $(document).ready(function () {
                 }
             },
             {
-                width: '10%',
+                width: '1%',
                 orderable: false,
                 name: "image",
+                class: 'text-center',
                 render: function (data, type, row) {
                     if (row.image_path) {
                         return "<img class='rounded mx-auto w-100' src=" + row.image_path + " />"
@@ -62,24 +63,27 @@ $(document).ready(function () {
                 width: '10%',
                 orderable: false,
                 name: "name",
-                data: "name"
+                data: "name",
+                class: "text-center"
             },
             {
                 orderable: false,
                 name: "email",
-                render: function(data,type,row) {
+                class: "text-center",
+                render: function (data, type, row) {
                     let email = '';
-                    if(row.email) {
+                    if (row.email) {
                         email = `<a href="mailto:${row.email}">${row.email}</a>`
                     }
                     return email;
                 }
             },
             {
-                width: '5%',
+                width: '10%',
                 orderable: false,
                 name: "phone",
-                data: "phone"
+                data: "phone",
+                class: "text-center"
             },
             {
                 width: '10%',
@@ -91,9 +95,9 @@ $(document).ready(function () {
                 width: '7%',
                 orderable: false,
                 name: "website",
-                render: function(data,type,row) {
+                render: function (data, type, row) {
                     let website = '';
-                    if(row.website) {
+                    if (row.website) {
                         website = `<a href="${row.website}">${row.website}</a>`;
                     }
                     return website;
@@ -110,7 +114,7 @@ $(document).ready(function () {
                 orderable: false,
                 name: "country",
                 render: function (data, type, row) {
-                    if(row.country) {
+                    if (row.country) {
                         return `<span title="${row.country.name}" class="flag-icon flag-icon-${row.country.short_name.toLowerCase()}"></span>`
                     } else {
                         return ``;
@@ -126,7 +130,7 @@ $(document).ready(function () {
                 }
             },
             {
-                width: '10%',
+                width: '15%',
                 orderable: false,
                 name: 'categories',
                 render: function (data, type, row) {
@@ -141,10 +145,10 @@ $(document).ready(function () {
                 }
             },
             {
-                width:'20%',
-                orderable:false,
-                class:'text-center',
-                render: function(data,type,row) {
+                width: '20%',
+                orderable: false,
+                class: 'text-center',
+                render: function (data, type, row) {
                     let paidPurchases = row.paid_purchases_count;
                     let overduePurchases = row.overdue_purchases_count;
                     let pendingPurchases = row.pending_purchases_count;
@@ -166,7 +170,7 @@ $(document).ready(function () {
                 render: function (data, type, row) {
                     let deleteFormTemplate = '';
 
-                    if(!row.purchases_count) {
+                    if (row.purchases_count <= 0) {
                         deleteFormTemplate = "\
                         <form method='POST' onsubmit='deleteCurrentSupplier(event)' style='display:inline-block'; id='delete-form' action=" + REMOVE_SUPPLIER_ROUTE.replace(':id', row.id) + " data-name=" + row.name + ">\
                             <input type='hidden' name='_method' value='DELETE'>\
@@ -176,7 +180,7 @@ $(document).ready(function () {
                     }
 
                     let editButton = '<a data-id=' + row.id + ' href=' + EDIT_SUPPLIER_ROUTE.replace(":id", row.id) + ' class="btn p-0" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>';
-                    let massEdit = '<a data-id=' + row.id + ' href='+MASS_EDIT_PURCHASES.replace(":id",row.id)+' class="btn p-0" title="Mass edit"><i class="fa-light fa-pen-to-square text-primary"></i></a>';
+                    let massEdit = '<a data-id=' + row.id + ' href=' + MASS_EDIT_PURCHASES.replace(":id", row.id) + ' class="btn p-0" title="Mass edit"><i class="fa-light fa-pen-to-square text-primary"></i></a>';
                     let categories = "<button data-toggle='collapse' data-target='#categories_" + row.id + "' title='Categories' class='btn btn-outline-muted showCategories p-0'><i class='fa-light fa-list' aria-hidden='true'></i></button>";
                     return `${categories} ${deleteFormTemplate} ${editButton} ${massEdit}`;
                 }
@@ -186,44 +190,36 @@ $(document).ready(function () {
         order: [[1, 'asc']]
     });
 
-    const builtInDataTableSearch = $('#suppliersTable_filter input[type="search"]');
-
     //ACTIONS
 
-    builtInDataTableSearch.bind('keyup',function(){
-        dataTable.ajax.reload( null, false );
-    })
-
-    selectCountry.bind('changed.bs.select',function(){
+    selectCountry.bind('changed.bs.select', function () {
         let countryId = $(this).val();
         dataTable.ajax.reload(null, false);
         selectState.empty();
-    
-        if(countryId !== '0') {
-            APICaller(STATE_ROUTE.replace(':id', countryId), function(response){
-                if(response.length > 0) {
-                    selectState.append('<option value="">All</option>');
-                    $.each(response, function (key, value) {
-                        selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
-                    });
-                } else {
-                    selectState.append('<option value="0" disabled>Nothing selected</option>');
-                }
-                selectState.selectpicker('refresh');
-            }, function(error){
-                console.log(error);
-            });
-        } else {
+
+        APICaller(LOCATION_API_ROUTE, { 'country_id': countryId }, function (response) {
+            let data = response;
+            if (data.length > 0) {
+                selectState.append('<option value="">All</option>');
+                $.each(data, function (key, value) {
+                    selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
+                });
+            } else {
+                selectState.append('<option value="0" disabled>Nothing selected</option>');
+            }
             selectState.selectpicker('refresh');
-        }
+        }, function (error) {
+            console.log(error);
+        });
+
     });
 
-    selectCategory.bind('changed.bs.select',function(){
-        dataTable.ajax.reload( null, false );
+    selectCategory.bind('changed.bs.select', function () {
+        dataTable.ajax.reload(null, false);
     })
 
-    selectState.bind('changed.bs.select',function(){
-        dataTable.ajax.reload( null, false );
+    selectState.bind('changed.bs.select', function () {
+        dataTable.ajax.reload(null, false);
     })
 
     $('tbody').on('click', '.showCategories', function () {
@@ -248,22 +244,22 @@ $(document).ready(function () {
             d.categories.forEach(function (category) {
 
                 tableRows += '<tr>' +
-                        '<td>' + category.name + '</td>' +
-                        '<td><button category-id=' + category.id + ' onclick=detachCategory(this) class="btn"><i class="fa-light fa-trash text-danger"></i></button></td>' +
-                        '</tr>';
+                    '<td>' + category.name + '</td>' +
+                    '<td><button category-id=' + category.id + ' onclick=detachCategory(this) class="btn"><i class="fa-light fa-trash text-danger"></i></button></td>' +
+                    '</tr>';
             });
 
             return '<table class="subTable categories w-100" cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
-                    '<thead>' +
-                    '<tr>' +
-                    '<th>Name</th>' +
-                    '<th>Actions</th>' +
-                    '</tr>' +
-                    '</thead>' +
-                    '<tbody>' +
-                    tableRows +
-                    '</tbody>' +
-                    '</table>';
+                '<thead>' +
+                '<tr>' +
+                '<th>Name</th>' +
+                '<th>Actions</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody>' +
+                tableRows +
+                '</tbody>' +
+                '</table>';
 
         } else {
             return false;
@@ -273,12 +269,12 @@ $(document).ready(function () {
     window.detachCategory = function (e) {
         let category = $(e).attr('category-id');
         let tr = $(e).closest('tr');
-        
-        APICaller(DETACH_CATEGORY.replace(':id', category),function(response){
+
+        APICaller(DETACH_CATEGORY.replace(':id', category), function (response) {
             tr.remove();
             toastr['success'](response.message);
-            dataTable.ajax.reload( null, false );
-        },function(error){
+            dataTable.ajax.reload(null, false);
+        }, function (error) {
             toastr['error'](error.message);
         })
     };
@@ -298,17 +294,17 @@ $(document).ready(function () {
 
         const template = swalText(name);
 
-        showConfirmationDialog('Selected suppliers!',template,function(){
-            APIDELETECALLER(action,function(response){
+        showConfirmationDialog('Selected suppliers!', template, function () {
+            APIDELETECALLER(action, function (response) {
 
-                if(response.status === 500) {
+                if (response.status === 500) {
                     toastr['error'](response.responseJSON.message);
                 } else {
                     toastr['success'](response.message);
                 }
-                
-                dataTable.ajax.reload( null, false );
-            },function(error){
+
+                dataTable.ajax.reload(null, false);
+            }, function (error) {
                 toastr['error'](error.message);
             })
         })
@@ -326,16 +322,16 @@ $(document).ready(function () {
 
         const template = swalText(searchedNames);
 
-        showConfirmationDialog('Selected suppliers',template,function(){
-            searchedIds.forEach(function(id,index){
-                APIDELETECALLER(REMOVE_SUPPLIER_ROUTE.replace(":id",id),function(response){
-                    if(response.status === 500) {
+        showConfirmationDialog('Selected suppliers', template, function () {
+            searchedIds.forEach(function (id, index) {
+                APIDELETECALLER(REMOVE_SUPPLIER_ROUTE.replace(":id", id), function (response) {
+                    if (response.status === 500) {
                         toastr['error'](response.responseJSON.message);
                     } else {
                         toastr['success'](response.message);
                     }
-                    dataTable.ajax.reload( null, false );
-                },function(error){
+                    dataTable.ajax.reload(null, false);
+                }, function (error) {
                     toastr['error'](error.message);
                 })
             })
@@ -357,7 +353,7 @@ $(document).ready(function () {
         }
     });
 
-     $('.bootstrap-select .selectAction').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+    $('.bootstrap-select .selectAction').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         switch ($(this).val()) {
             case 'delete':
                 deleteMultipleSupplier();

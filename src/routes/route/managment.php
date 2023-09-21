@@ -134,7 +134,4 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/order/update/{invoice}', [InvoiceController::class, 'updateOrderInvoice'])->name('update.order');
     });
 
-    Route::prefix('states')->name('state')->group(function () {
-        Route::get('/state/{countryId}', [SupplierController::class, 'getState']);
-    });
 }); 

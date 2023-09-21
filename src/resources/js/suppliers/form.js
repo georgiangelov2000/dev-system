@@ -1,41 +1,42 @@
-import { getStates } from './ajaxFunctions';
 import { initializeMap, setMapView } from '../ajax/leaflet';
+import { APICaller } from '../ajax/methods';
+
 
 $(document).ready(function () {
 
     $('.selectMultiple, .selectCountry, .selectState, .selectCategory')
-    .selectpicker();
+        .selectpicker();
 
     const bootstrapCountry = $('.bootstrap-select .selectCountry');
     const bootstrapState = $('.bootstrap-select .selectState');
     const searchAddress = $('#searchAddress');
     const addresses = $('.addresses');
-    $('#image').on('change',function(){
+    $('#image').on('change', function () {
         previewImage(this);
     })
 
     function previewImage(input) {
         if (input.files && input.files[0]) {
-          var reader = new FileReader();
-          
-          reader.onload = function(e) {
-            $('.imagePreview').removeClass('d-none');
-            $('#preview-image').attr('src', e.target.result);
-          }
-          
-          reader.readAsDataURL(input.files[0]);
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('.imagePreview').removeClass('d-none');
+                $('#preview-image').attr('src', e.target.result);
+            }
+
+            reader.readAsDataURL(input.files[0]);
         }
     }
 
     bootstrapCountry.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         let countryId = $(this).val();
-        let url = STATE_ROUTE.replace(":id", countryId);
         bootstrapState.empty();
-        
-        getStates(url, function (response) {
-            console.log(response);
-            if (response.length > 0) {
-                $.each(response, function (key, value) {
+
+        APICaller(LOCATION_API_ROUTE, { "country_id": countryId }, function (response) {
+            let data = response;
+
+            if (data.length) {
+                $.each(data, function (key, value) {
                     bootstrapState.append('<option value=' + value.id + '>' + value.name + '</option>');
                 });
             } else {
@@ -44,8 +45,7 @@ $(document).ready(function () {
             bootstrapState.selectpicker('refresh');
         }, function (error) {
             console.log(error);
-        });
-
+        })
     });
 
     searchAddress.on('click', function () {
@@ -87,6 +87,5 @@ $(document).ready(function () {
     }
 
     initializeMap()
-
 
 });

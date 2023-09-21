@@ -2,26 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FunctionsHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use App\Helpers\LoadStaticData;
+use App\Services\SupplierService;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class SupplierController extends Controller
 {
 
     private $staticDataHelper;
     private $dir = 'public/images/suppliers';
-
-    public function __construct(LoadStaticData $staticDataHelper)
-    {
+    private $helper;
+    private $supplierService;
+    /**
+     * Constructor to initialize class dependencies.
+     *
+     * @param LoadStaticData $staticDataHelper
+     * @param FunctionsHelper $helper
+     * @param SupplierService $supplierService
+     */
+    public function __construct(
+        LoadStaticData $staticDataHelper,
+        FunctionsHelper $helper,
+        SupplierService $supplierService
+    ) {
         $this->staticDataHelper = $staticDataHelper;
+        $this->helper = $helper;
+        $this->supplierService = $supplierService;
     }
 
+    /**
+     * Display the index view for suppliers.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         $countries = $this->staticDataHelper->callStatesAndCountries('countries');
@@ -35,6 +54,11 @@ class SupplierController extends Controller
         ]);
     }
 
+    /**
+     * Display the create view for a new supplier.
+     *
+     * @return \Illuminate\View\View
+     */
     public function create()
     {
         $countries = $this->staticDataHelper->callStatesAndCountries("countries");
@@ -43,58 +67,34 @@ class SupplierController extends Controller
         return view('suppliers.create', ["countries" => $countries, "categories" => $categories]);
     }
 
-    public function getState($countryId)
-    {
-        return response()->json(
-            $this->staticDataHelper->callStatesAndCountries($countryId, 'states')
-        );
-    }
-
+    /**
+     * Store a newly created supplier in the database.
+     *
+     * @param SupplierRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(SupplierRequest $request)
     {
-        $data = $request->validated();
-
         DB::beginTransaction();
 
         try {
-            $file = isset($data['image']) ? $data['image'] : false;
-            $categories = isset($data['categories']) ? $data['categories'] : [];
-            $imagePath = Storage::url($this->dir);
-
-            $supplier = new Supplier;
-            $supplier->name = $data['name'];
-            $supplier->email = $data['email'];
-            $supplier->phone = $data['phone'];
-            $supplier->address = $data['address'];
-            $supplier->website = $data['website'];
-            $supplier->zip = $data['zip'];
-            $supplier->country_id = $data['country_id'];
-            $supplier->state_id = $data['state_id'];
-            $supplier->notes = isset($data['notes']) ? $data['notes'] : "";
-            $supplier->website = isset($data['website']) ? $data['website'] : "";
-
-            if ($file) {
-                $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
-                Storage::putFileAs($this->dir, $file, $hashed_image);
-                $supplier->image_path = $imagePath . '/' . $hashed_image;
-            }
-
-            $supplier->save();
-
-            if (isset($categories) && count($categories)) {
-                $supplier->categories()->sync($categories);
-            }
-
+            $data = $request->validated();
+            $this->supplierProcessing($data);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             return back()->withInput()->with('error', 'Supplier has not been created');
         }
 
         return redirect()->route('supplier.index')->with('success', 'Supplier has been created');
     }
 
+    /**
+     * Display the edit view for a supplier.
+     *
+     * @param Supplier $supplier
+     * @return \Illuminate\View\View
+     */
     public function edit(Supplier $supplier)
     {
         $country = $supplier->country_id;
@@ -111,53 +111,25 @@ class SupplierController extends Controller
         ]);
     }
 
+    /**
+     * Update an existing supplier in the database.
+     *
+     * @param Supplier $supplier
+     * @param SupplierRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(Supplier $supplier, SupplierRequest $request)
     {
-
+        // Update an existing supplier in the database and handle any errors.
         DB::beginTransaction();
 
         try {
             $data = $request->validated();
-            $file = isset($data['image']) ? $data['image'] : false;
-            $categories = isset($data['categories']) ? $data['categories'] : false;
-            $imagePath = Storage::url($this->dir);
-
-            $supplier->name = $data['name'];
-            $supplier->email = $data['email'];
-            $supplier->phone = $data['phone'];
-            $supplier->address = $data['address'];
-            $supplier->website = $data['website'];
-            $supplier->zip = $data['zip'];
-            $supplier->country_id = $data['country_id'];
-            $supplier->state_id = $data['state_id'];
-            $supplier->notes = isset($data['notes']) ? $data['notes'] : "";
-            $supplier->website = isset($data['website']) ? $data['website'] : "";
-
-            if (isset($categories) && !empty($categories)) {
-                $supplier->categories()->sync($categories);
-            }
-
-            if ($file) {
-                $hashed_image = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
-                $current_image = null;
-
-                if ($supplier->image_path) {
-                    $current_image = $this->dir . DIRECTORY_SEPARATOR . $supplier->image_path;
-                    if (Storage::exists($current_image)) {
-                        Storage::delete($current_image);
-                    }
-                    Storage::putFileAs($this->dir, $file, $hashed_image);
-                    $supplier->image_path = $imagePath . '/' . $hashed_image;
-                } else {
-                    Storage::putFileAs($this->dir, $file, $hashed_image);
-                    $supplier->image_path = $imagePath . '/' . $hashed_image;
-                }
-            }
-
-            $supplier->save();
+            $this->supplierProcessing($data, $supplier);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
+            dd($e->getMessage());
             return back()->withInput()->with('error', 'Supplier has not been updated');
         }
 
@@ -165,17 +137,21 @@ class SupplierController extends Controller
         return redirect()->route('supplier.index')->with('success', 'Supplier has been updated');
     }
 
+    /**
+     * Delete a supplier from the database.
+     *
+     * @param Supplier $supplier
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function delete(Supplier $supplier)
     {
+        // Delete a supplier and handle any errors.
+
         DB::beginTransaction();
         try {
-            $imagePath = str_replace('/storage', '', $supplier->image_path);
-
-            // Check if the image path exists and delete it
-            if ($supplier->image_path && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+            if ($supplier->image_path) {
+                $this->helper->deleteImage($supplier);
             }
-
             $supplier->delete();
             DB::commit();
         } catch (\Exception $e) {
@@ -187,8 +163,15 @@ class SupplierController extends Controller
         return response()->json(['message' => 'Supplier has been deleted'], 200);
     }
 
+    /**
+     * Detach a category from a supplier.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function detachCategory($id)
     {
+        // Detach a category from a supplier and handle any errors.
         DB::beginTransaction();
 
         try {
@@ -207,5 +190,36 @@ class SupplierController extends Controller
         $categories = $supplier->categories()->get();
         $brands = $this->staticDataHelper->callBrands();
         return view('suppliers.mass_edit_purchases', ['supplier' => $supplier, 'categories' => $categories, 'brands' => $brands]);
+    }
+
+    /**
+     * Process supplier data and store/update it in the database.
+     *
+     * @param array $data
+     * @param Supplier|null $supplier
+     * @return void
+     */
+    private function supplierProcessing(array $data, $supplier = null)
+    {
+        $supplier = $supplier ? $supplier : new Supplier;
+
+        $supplier->name = $data['name'];
+        $supplier->email = $data['email'];
+        $supplier->phone = $data['phone'];
+        $supplier->address = $data['address'];
+        $supplier->website = $data['website'];
+        $supplier->zip = $data['zip'];
+        $supplier->country_id = $data['country_id'];
+        $supplier->state_id = $data['state_id'];
+        $supplier->notes = isset($data['notes']) ? $data['notes'] : "";
+        $supplier->website = isset($data['website']) ? $data['website'] : "";
+
+        if (isset($data['image'])) {
+            $this->helper->imageUploader($data['image'], $supplier, $this->dir);
+        }
+
+        $supplier->save();
+
+        $this->supplierService->syncCategories($data['categories'], $supplier);
     }
 }

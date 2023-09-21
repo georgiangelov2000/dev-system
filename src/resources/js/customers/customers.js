@@ -53,7 +53,7 @@ $(function () {
                 return $.extend({}, d, {
                     'country': selectCountry.val(),
                     'state': selectState.val(),
-                    "search": builtInDataTableSearch ? builtInDataTableSearch.val().toLowerCase() : '',
+                    "search": d.search.value,
                 });
             }
         },
@@ -79,7 +79,7 @@ $(function () {
             {
                 width: '5%',
                 orderable: false,
-                class:'text-center',
+                class: 'text-center',
                 name: "image",
                 render: function (data, type, row) {
                     if (row.image_path) {
@@ -92,16 +92,16 @@ $(function () {
             {
                 width: '10%',
                 orderable: false,
-                class:'text-center',
+                class: 'text-center',
                 name: "name",
                 data: "name"
             },
             {
                 orderable: false,
                 name: "email",
-                render: function(data,type,row) {
+                render: function (data, type, row) {
                     let email = '';
-                    if(row.email) {
+                    if (row.email) {
                         email = `<a href="mailto:${row.email}">${row.email}</a>`
                     }
                     return email;
@@ -156,7 +156,7 @@ $(function () {
             {
                 width: '19%',
                 orderable: false,
-                class:'text-center',
+                class: 'text-center',
                 render: function (data, type, row) {
                     let paidOrders = row.paid_orders_count;
                     let overdueOrders = row.overdue_orders_count;
@@ -176,7 +176,7 @@ $(function () {
             {
                 orderable: false,
                 width: '27%',
-                class:'text-center',
+                class: 'text-center',
                 render: function (data, type, row) {
                     let deleteButton = '';
 
@@ -194,13 +194,7 @@ $(function () {
         order: [[1, 'asc']]
     });
 
-    const builtInDataTableSearch = $('#customersTable_filter input[type="search"]');
-
     //ACTIONS
-
-    builtInDataTableSearch.bind('keyup', function () {
-        dataTable.ajax.reload(null, false);
-    })
 
     selectCountry.bind('changed.bs.select', function () {
         let countryId = $(this).val();

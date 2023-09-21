@@ -144,7 +144,7 @@
                             <div class="col-12 d-none imagePreview">
                                 <div class="position-relative">
                                     <img id="preview-image" alt="Preview"
-                                        class="img-fluid card card-widget widget-user w-100 m-0">
+                                        class="img-fluid w-100 m-0">
                                     <div class="ribbon-wrapper ribbon-lg">
                                         <div class="ribbon bg-success text-lg">
                                             Preview
@@ -164,6 +164,6 @@
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/suppliers/form.js') }}"></script>
     <script>
-        let STATE_ROUTE = "{{ route('state', ':id') }}";
+        const LOCATION_API_ROUTE = "{{ route('api.location') }}";
     </script>
 @endpush

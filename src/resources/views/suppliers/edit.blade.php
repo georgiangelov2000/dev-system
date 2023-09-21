@@ -87,7 +87,7 @@
                                 class="form-control @error('state_id')  is-invalid @enderror selectState">
                                 <option value="0">Select state</option>
                                 @foreach ($states as $state)
-                                    <option data-country="{{ $state->name }}" value="{{ $state->id }}"
+                                    <option value="{{ $state->id }}"
                                         {{ $supplier->state_id === $state->id ? 'selected' : '' }}>
                                         {{ $state->name }}
                                     </option>
@@ -176,6 +176,6 @@
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/suppliers/form.js') }}"></script>
     <script>
-        let STATE_ROUTE = "{{ route('state', ':id') }}";
+        const LOCATION_API_ROUTE = "{{ route('api.location') }}";
     </script>
 @endpush

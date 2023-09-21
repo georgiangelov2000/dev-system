@@ -83,15 +83,15 @@
 @push('scripts')
     <script type="text/javascript" src="{{mix('js/suppliers/suppliers.js')}}"></script>
     <script type="text/javascript">
-        let SUPPLIER_ROUTE_API_ROUTE = "{{route('api.suppliers')}}";
-        let REMOVE_SUPPLIER_ROUTE = "{{route('supplier.delete',':id')}}";
-        let EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
-        let UPDATE_SUPPLIER_ROUTE = "{{route('supplier.update',':id')}}";
-        let STORE_SUPPLIER_ROUTE = "{{route('supplier.store')}}";
-        let STATE_ROUTE = "{{route('state',':id')}}"; 
-        let DETACH_CATEGORY =  "{{route('supplier.detach.category',':id')}}"
-        let CONFIG_URL = "{{config('app.url')}}"
-        let MASS_EDIT_PURCHASES = "{{route('supplier.mass.edit.purchases',':id')}}"
+        const SUPPLIER_ROUTE_API_ROUTE = "{{route('api.suppliers')}}";
+        const REMOVE_SUPPLIER_ROUTE = "{{route('supplier.delete',':id')}}";
+        const EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
+        const UPDATE_SUPPLIER_ROUTE = "{{route('supplier.update',':id')}}";
+        const STORE_SUPPLIER_ROUTE = "{{route('supplier.store')}}";
+        const LOCATION_API_ROUTE = "{{ route('api.location') }}";
+        const DETACH_CATEGORY =  "{{route('supplier.detach.category',':id')}}"
+        const CONFIG_URL = "{{config('app.url')}}"
+        const MASS_EDIT_PURCHASES = "{{route('supplier.mass.edit.purchases',':id')}}"
     </script>
 @endpush
 
