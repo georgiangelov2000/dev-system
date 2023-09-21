@@ -55,7 +55,7 @@ $(function () {
     loadDataTable()
   });
   function loadDataTable() {
-    let template = `
+    let template = $(`
       <div class="p-3 mb-3">
 
         <div class="row">
@@ -76,6 +76,13 @@ $(function () {
               <span class="font-weight-bold">Country:</span> <span data-target="country"></span> <br>
               <span class="font-weight-bold">City:</span> <span data-target="city"></span> <br>
               <span class="font-weight-bold">Zip code:</span> <span data-target="zip"></span> <br>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group">
+            <label>Group by packages</label>
+            <select class="form-control selectPackage" data-live-search="true"></select>
           </div>
         </div>
 
@@ -135,7 +142,32 @@ $(function () {
           </div>
       </div>
 
-    </div>`;
+    </div>`);
+
+    template.find('.selectPackage').selectpicker();
+    let bootstrapSelectPackage = template.find('.selectPackage').parent().find('.bootstrap-select .selectPackage');
+    let bootstrapInputFinder = template.find('.selectPackage input[type="text"]');
+
+    bootstrapInputFinder.on('keyup', function () {
+      let text = $(this).val();
+      bootstrapSelectPackage.empty();
+
+      APICaller(PACKAGE_API_ROUTE, {
+        'search': text,
+        'select_json':1
+      }, function (response) {
+        let packages = response;
+        if (packages.length > 0) {
+          bootstrapSelectPackage.append('<option value="" style="display:none;"></option>');
+          $.each(packages, function ($key, pack) {
+            bootstrapSelectPackage.append(`<option value="${pack.id}"> ${pack.package_name} </option>`)
+          })
+        }
+        bootstrapSelectPackage.selectpicker('refresh');
+      }, function (error) {
+        console.log(error);
+      })
+    })
 
     $('#paymentTemplate').removeClass('d-none').html(template);
 
@@ -148,9 +180,9 @@ $(function () {
           data.user = bootstrapSelectCustomer.val();
           data.date = dateRangePicker.val();
           data.type = TYPE
+          data.package = bootstrapSelectPackage.val()
         },
         dataSrc: function (response) {
-
           const customer = response.user;
           const sum = response.sum;
           const date = response.date ? response.date : '';
@@ -169,7 +201,7 @@ $(function () {
           $('#amountDueTable td[data-td-target="records"]').text(response.data.length);
           $('img[id="customerImage"]').attr('src', customer.image_path);
           return response.data;
-        }
+        },
       },
       columns: [
         {
@@ -295,6 +327,9 @@ $(function () {
       ]
     });
 
+    bootstrapSelectPackage.bind('changed.bs.select', function () {
+      dataTable.ajax.reload(null, false);
+    })
   }
 
   // Window actions
@@ -366,5 +401,6 @@ $(function () {
     })
 
   })
+
 
 })

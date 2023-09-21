@@ -121,6 +121,8 @@ $(function () {
                 class: 'text-center',
                 render: function (data, type, row) {
 
+                    let removeImage = '';
+
                     const deleteFormTemplate = `
                     <form style="display:inline-block;" action="${REMOVE_CATEGORY_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
                       <input type="hidden" name="_method" value="DELETE">
@@ -132,18 +134,21 @@ $(function () {
                     const editButton = `<a data-id="${row.id}" class="btn editCategory p-1" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
                     const subCategories = `<button data-toggle="collapse" data-target="#subcategories_${row.id}" title="Sub categories" class="btn btn-outline-muted showSubCategories p-1"><i class="fa-light fa-list" aria-hidden="true"></i></button>`;
                     
-                    const removeImage = `
-                    <form style="display:inline-block;" action="${REMOVE_CATEGORY_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <input type="hidden" name="id" value="${row.id}">
-                        <button 
-                            type="submit" 
-                            class="btn p-1" 
-                            title="Delete" 
-                            onclick="event.preventDefault(); deleteImage(this);">
-                            <i class="fa-light fa-image text-danger fa-lg"></i>
-                            </button>
-                    </form>`;
+                    if(row.image_path) {
+                        removeImage = `
+                        <form style="display:inline-block;" action="${REMOVE_CATEGORY_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="id" value="${row.id}">
+                            <button 
+                                type="submit" 
+                                class="btn p-1" 
+                                title="Delete" 
+                                onclick="event.preventDefault(); deleteImage(this);">
+                                <i class="fa-light fa-image text-danger fa-lg"></i>
+                                </button>
+                        </form>`;
+                    }
+
                     return `${subCategories} ${deleteFormTemplate} ${editButton} ${removeImage}`;
                 }
             }
