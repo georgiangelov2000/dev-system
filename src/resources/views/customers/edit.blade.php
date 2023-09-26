@@ -79,7 +79,7 @@
                             <select class="form-control selectCountry" id="country" name="country_id">
                                 <option value="0">Select country</option>
                                 @foreach ($countries as $country)
-                                    <option data-country="{{ $country->name }}" value="{{ $country->id }}"
+                                    <option value="{{ $country->id }}"
                                         {{ $customer->country_id === $country->id ? 'selected' : '' }}>
                                         {{ $country->name }}
                                     </option>
@@ -92,7 +92,7 @@
                                 class="form-control @error('state_id')  is-invalid @enderror selectState">
                                 <option value="0">Select state</option>
                                 @foreach ($states as $state)
-                                    <option data-country="{{ $state->name }}" value="{{ $state->id }}"
+                                    <option value="{{ $state->id }}"
                                         {{ $customer->state_id === $state->id ? 'selected' : '' }}>
                                         {{ $state->name }}
                                     </option>
@@ -168,6 +168,6 @@
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/customers/form.js') }}"></script>
     <script>
-        let STATE_ROUTE = "{{ route('state', ':id') }}";
+        const LOCATION_API_ROUTE = "{{ route('api.location') }}";
     </script>
 @endpush

@@ -36,4 +36,21 @@ class Settings extends Model
         'type',
         'settings',
     ];
+
+    public static function getStruct(){
+        return [
+            'email' => null,
+            'name' => null,
+            'country' => null,
+            'state' =>  null,
+            'phone_number' => null,
+            'tax_number' => null,
+            'address' => null,
+            'website' => null,
+            'owner_name' => null,
+            'business_type' => null,
+            'registration_date' => date('Y-m-d'),
+            'image_path' => null
+        ];
+    }
 }

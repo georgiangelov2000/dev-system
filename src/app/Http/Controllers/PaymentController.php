@@ -4,87 +4,74 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
-use App\Models\Supplier;
 use App\Http\Requests\PaymentRequest;
-use App\Models\Purchase;
-use App\Models\Customer;
-use App\Models\Order;
 use App\Models\OrderPayment;
-use App\Models\PurchasePayment;
-use App\Models\Settings;
+use App\Services\PaymentService\PaymentService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Contracts\View\View;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\View\View; // Import the View class
 
 class PaymentController extends Controller
 {
-    private $types = ['order', 'purchase'];
-
-    private $indexMapping = [];
-
-    private $editMapping = [];
-
     private $paymentStatuses;
 
     private $paymentMethods;
 
+    private $paymentService;
+
     const DEFAULT_STATUS = 6;
 
-    public function __construct()
+    /**
+     * Constructor for the PaymentController.
+     *
+     * @param PaymentService $paymentService - The payment service for handling payments.
+     */
+    public function __construct(PaymentService $paymentService)
     {
-        $this->indexMapping = [
-            'order' => [
-                'customers' => Customer::select('id', 'name')->get()
-            ],
-            'purchase' => [
-                'suppliers' => Supplier::select('id', 'name')->get()
-            ]
-        ];
-
-        $this->editMapping = [
-            'order' => OrderPayment::query(),
-            'purchase' => PurchasePayment::query(),
-        ];
-
+        $this->paymentService = $paymentService;
         $this->paymentStatuses = config('statuses.payment_statuses');
         $this->paymentMethods  = config('statuses.payment_methods_statuses');
     }
 
-    public function index($type)
+    /**
+     * Calls paymentService to redirect to the respective view page.
+     *
+     * @param string $type - Type of payment ('order' or 'purchase').
+     * @return View|null - Returns a view or null if the type is not in the list.
+     */
+    public function index($type): ?View
     {
-        if (in_array($type, $this->types)) {
-            return $this->getView($type);
-        } else {
-            throw new NotFoundHttpException;
-        }
+        return $this->paymentService->redirectToView($type);
     }
 
+    /**
+     * Calls paymentService to redirect to the payment edit view.
+     *
+     * @param int $payment - Payment ID.
+     * @param string $type - Type of payment ('order' or 'purchase').
+     * @return View|null - Returns a view or null if the type is not in the list.
+     */
     public function edit($payment, $type)
     {
-        if (in_array($type, $this->types)) {
-            return $this->getView($type, $payment);
-        } else {
-            throw new NotFoundHttpException;
-        }
+        return $this->paymentService->redirectToView($type, $payment);
     }
 
+    /**
+     * Updates payment information after data validation.
+     *
+     * @param PaymentRequest $request - Payment request.
+     * @param int $payment - Payment ID.
+     * @param string $type - Type of payment ('order' or 'purchase').
+     * @return \Illuminate\Http\RedirectResponse - Redirects back to the previous page with a success or error message.
+     */
     public function update(PaymentRequest $request, $payment, $type)
     {
         DB::beginTransaction();
 
         try {
-            $builder = $this->editMapping[$type]->findOrFail($payment);
-
-            if ($builder instanceof OrderPayment) {
-                $relation = 'order';
-            } elseif ($builder instanceof PurchasePayment) {
-                $relation = 'purchase';
-            }
-
+            $builder = $this->paymentService->getInstance($payment, $type);
+            $relation = $builder instanceof OrderPayment ? 'order' : 'purchase';
             $data = $request->validated();
-
             $this->paymentProcessing($data, $builder, $relation);
-
             DB::commit();
         } catch (Exception $e) {
             DB::rollback();
@@ -94,25 +81,31 @@ class PaymentController extends Controller
         return redirect()->back()->with('success', 'Payment has been updated');
     }
 
+    /**
+     * Deletes the payment and, if the related model is available, sets its status to the default value.
+     *
+     * @param int $payment - Payment ID.
+     * @param string $type - Type of payment ('order' or 'purchase').
+     * @return \Illuminate\Http\JsonResponse - JSON response with status 200, 404, or 500 depending on the outcome.
+     */
     public function delete($payment, $type)
     {
         DB::beginTransaction();
-    
+
         try {
-            $builder = $this->editMapping[$type]->findOrFail($payment);
-    
+            $builder = $this->paymentService->getInstance($payment, $type);
+
             $relatedModel = $builder->{$type};
-    
+
             if ($relatedModel) {
                 $relatedModel->status = self::DEFAULT_STATUS;
                 $relatedModel->save();
             }
-    
+
             // Delete the payment
             $builder->delete();
-    
             DB::commit();
-    
+
             if ($relatedModel) {
                 return response()->json(['message' => 'Payment has been deleted'], 200);
             } else {
@@ -123,47 +116,17 @@ class PaymentController extends Controller
             return response()->json(['message' => 'Payment could not be deleted'], 500);
         }
     }
-        
 
-    // Private methods
-    private function getView(string $type, ?string $payment = null)
+
+    /**
+     * Processes payment data and saves it to the database.
+     *
+     * @param array $data - Array of payment data.
+     * @param mixed $builder - Payment model instance.
+     * @param string $relation - Related model ('order' or 'purchase').
+     */
+    private function paymentProcessing(array $data, $builder, $relation)
     {
-        if (array_key_exists($type, $this->indexMapping) && !$payment) {
-            $data = $this->indexMapping[$type];
-            $view = view('payments.' . $type . '_payments', $data);
-        } elseif (array_key_exists($type, $this->editMapping) && $payment) {
-            $relations = [];
-            $builder = $this->editMapping[$type]->where('id', $payment)->first();
-
-            if ($builder instanceof OrderPayment) {
-                array_push($relations, 'order.customer', 'invoice');
-            } elseif ($builder instanceof PurchasePayment) {
-                array_push($relations, 'purchase.supplier', 'invoice');
-            }
-            $builder->load($relations);
-
-            $data['payment'] = $builder;
-            $data['settings'] = $this->settings();
-
-            $view = view($type . 's.' . 'edit' . '_payment', $data);
-        }
-
-        return $view ?? throw new NotFoundHttpException;;
-    }
-
-    private function settings()
-    {
-        $jsonEncoded = Settings::where('type', 1)->first();
-        $jsonDecoded = json_decode($jsonEncoded->settings, true);
-
-        return $jsonDecoded;
-    }
-
-    private function paymentProcessing(
-        array $data,
-        $builder,
-        $relation
-    ) {
         $relation = $builder->$relation;
 
         if (isset($data['payment_status']) && array_key_exists($data['payment_status'], $this->paymentStatuses)) {

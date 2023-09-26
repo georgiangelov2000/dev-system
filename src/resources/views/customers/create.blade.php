@@ -152,7 +152,7 @@
 @push('scripts')
     <script type="text/javascript" src="{{ mix('js/customers/form.js') }}"></script>
     <script type="text/javascript">
-        let STATE_ROUTE = "{{ route('state', ':id') }}";
+        const LOCATION_API_ROUTE = "{{ route('api.location') }}";
     </script>
 @endpush
 

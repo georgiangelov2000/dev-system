@@ -87,18 +87,17 @@ class CustomerController extends Controller
         DB::beginTransaction();
 
         try {
-            $imageDeleted = $this->unlinkImage($customer->image_path);
-
-            if ($imageDeleted) {
-                $customer->delete();
+            if ($customer->image_path) {
+                $this->helper->deleteImage($customer);
             }
+            $customer->delete();
 
             DB::commit();
-            return response()->json(['message' => 'Customer has been deleted'], 200);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Customer has not been deleted', 'error' => $e->getMessage()], 500);
         }
+        return response()->json(['message' => 'Customer has been deleted'], 200);
     }
 
     public function customerOrders(Customer $customer)
@@ -107,7 +106,7 @@ class CustomerController extends Controller
             ->where('is_it_delivered', 0)
             ->get();
 
-        $drivers = User::select('id','username')->where('role_id',2)->get();
+        $drivers = User::select('id', 'username')->where('role_id', 2)->get();
 
         return view('customers.mass_edit_orders', compact('customer', 'packages', 'drivers'));
     }
@@ -115,8 +114,6 @@ class CustomerController extends Controller
     // Private methods;
     private function createOrUpdate(array $data, $customer = null)
     {
-        $file = $data['image'] ?? null;
-        
         $customer = $customer ?? new Customer;
 
         $customer->fill([
@@ -130,29 +127,11 @@ class CustomerController extends Controller
             'state_id' => $data['state_id'],
             'notes' => $data['notes'] ?? "",
         ]);
-        
-        if ($file) {
-            $hash = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
-            if ($customer->image_path) {
-                $this->unlinkImage($customer->image_path);
-            }
-            Storage::putFileAs($this->dir, $file, $hash);
-            $customer->image_path = $this->helper->getImagePath($this->dir) . '/' . $hash;
+
+        if (isset($data['image'])) {
+            $this->helper->imageUploader($data['image'], $customer, $this->dir);
         }
 
         $customer->save();
     }
-
-    private function unlinkImage($path): bool
-    {
-        $imagePath = str_replace('/storage', '', $path);
-
-        if (Storage::disk('public')->exists($imagePath) && Storage::disk('public')->delete($imagePath)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    
 }

@@ -76,11 +76,11 @@
 @push('scripts')
 <script type="text/javascript" src="{{mix('js/customers/customers.js')}}"></script>
     <script type="text/javascript">
-        let CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
-        let CUSTOMER_DELETE_ROUTE = "{{route('customer.delete',':id')}}";
-        let CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
-        let STATE_ROUTE = "{{ route('state', ':id') }}";
-        let CUSTOMER_ORDERS_ROUTE = "{{ route('customer.mass.edit.orders', ':id') }}";
+        const CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
+        const CUSTOMER_DELETE_ROUTE = "{{route('customer.delete',':id')}}";
+        const CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
+        const LOCATION_API_ROUTE = "{{ route('api.location') }}";
+        const CUSTOMER_ORDERS_ROUTE = "{{ route('customer.mass.edit.orders', ':id') }}";
     </script>
 @endpush
 @endsection

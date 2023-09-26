@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\Settings;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
@@ -102,13 +103,13 @@ class FunctionsHelper
         try {
             if ($file->isValid()) {
                 $hashedImage = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
-                
+
                 // Check if the model has an existing image path
                 if (isset($model->image_path)) {
 
                     // Get the stored file path without the '/storage' prefix
                     $storedFile = str_replace('/storage', '', $model->image_path);
-                    
+
                     // Check if the stored file exists and delete it if it does
                     if (Storage::disk('public')->exists($storedFile)) {
                         Storage::disk('public')->delete($storedFile);
@@ -135,7 +136,7 @@ class FunctionsHelper
     public static function deleteImage($model)
     {
         $storedFile = str_replace('/storage', '', $model->image_path);
-        
+
         // Check if the image path exists in storage
         if (Storage::disk('public')->exists($storedFile)) {
             // If it exists, delete the image
@@ -145,5 +146,21 @@ class FunctionsHelper
         }
 
         return false;
+    }
+
+    /**
+     * Return structured settings result
+     */
+    public static function settings()
+    {
+        $settingsInformation = Settings::where('type', 1)->first();
+
+        if ($settingsInformation) {
+            $result = json_decode($settingsInformation->settings, true);
+        } else {
+            $result = Settings::getStruct();
+        }
+
+        return $result;
     }
 }

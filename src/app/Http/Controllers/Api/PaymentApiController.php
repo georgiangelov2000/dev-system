@@ -15,13 +15,14 @@ class PaymentApiController extends Controller
     {
 
         $type = isset($request->type) && $request->type ? $request->type : null;
-        $id = isset($request->user) && $request->user ? $request->user : null;
         $date = isset($request->date) && $request->date ? $request->date : null;
-
+        $id = isset($request->user) && $request->user ? $request->user : null;
+        $package = isset($request->package) && $request->package ? $request->package : null;
+                
         list($dateStart, $dateEnd) = $this->formatDateRange($date);
 
         if ($type === 'order') {
-            $query =  $this->orderPayments($id, $dateStart, $dateEnd);
+            $query =  $this->orderPayments($id, $dateStart, $dateEnd,$package);
         } elseif ($type === 'purchase') {
             $query = $this->purchasePayments($id, $dateEnd, $dateEnd);
         } else {
@@ -39,8 +40,9 @@ class PaymentApiController extends Controller
         ]);
     }
 
-    private function orderPayments($id, $dateStart, $dateEnd): array
+    private function orderPayments($id, $dateStart, $dateEnd,$package): array
     {
+        
         $paymentQuery = OrderPayment::query()->with('order.purchase','invoice');
 
         if ($id) {
@@ -54,6 +56,12 @@ class PaymentApiController extends Controller
             $paymentQuery
                 ->where('date_of_payment', '>=', $dateStart)
                 ->where('date_of_payment', '<=', $dateEnd);
+        }
+
+        if($package) {
+            $paymentQuery->whereHas('order',function($query) use ($package) {
+                $query->where('package_id',$package);
+            });
         }
 
         $result = $paymentQuery->skip(0)->take(10)->get();

@@ -56,6 +56,7 @@
                                 <label for="discount_percent">Discount %</label>
                                 <input type="number" class="form-control @error('discount_percent')  is-invalid @enderror"
                                     id="discount_percent" name="discount_percent" min="0"
+                                    value="0"
                                     placeholder="Enter a integer value (e.g.,1,2)"
                                     value='{{ old('discount_percent') ? e(old('discount_percent')) : '' }}'>
                                 @error('discount_percent')

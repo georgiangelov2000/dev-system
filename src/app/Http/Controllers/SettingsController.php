@@ -60,7 +60,7 @@ class SettingsController extends Controller
                 $attributes['address'] = $data['address'];
                 $attributes['website'] = $data['website'];
                 $attributes['owner_name'] = $data['owner_name'];
-                $attributes['bussines_type'] = $data['bussines_type'];
+                $attributes['business_type'] = $data['bussines_type'];
                 $attributes['registration_date'] = date('Y-m-d', strtotime($data['registration_date']));
                 $attributes['image_path'] = null;
 
@@ -114,29 +114,4 @@ class SettingsController extends Controller
             return back()->withInput()->with('error', 'Settings has not been updated');
         }
     }
-
-    // public function emailForm()
-    // {
-    //     $company_email = CompanySettings::first()->email;
-
-    //     return view('settings.send_email_form',[
-    //         'company_email'=> $company_email
-    //     ]);
-    // }
-
-    // public function sendEmailForm(EmailFormRequest $request){
-    //     $data = $request->all();
-
-    //     $to = $data["client_email"];
-    //     $subject = $data["title"];
-    //     $message = $data["content"];
-
-    //     try {
-    //         Mail::to($to)->send(new EmailSender($subject, $message));
-    //         return response()->json(['message' => 'Email sent successfully']);
-    //     } catch (\Exception $e) {
-    //         dd($e->getMessage());
-    //         return response()->json(['message' => 'Failed to send email'], 500);
-    //     }
-    // }
 }

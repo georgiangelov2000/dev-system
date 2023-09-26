@@ -99,6 +99,7 @@ $(function () {
             {
                 orderable: false,
                 name: "email",
+                class: 'text-center',
                 render: function (data, type, row) {
                     let email = '';
                     if (row.email) {
@@ -111,18 +112,21 @@ $(function () {
                 width: '10%',
                 orderable: false,
                 name: "phone",
-                data: "phone"
+                data: "phone",
+                class: 'text-center'
             },
             {
-                width: '10%',
+                width: '15%',
                 orderable: false,
                 name: "address",
-                data: "address"
+                data: "address",
+                class: 'text-center',
             },
             {
                 width: '7%',
                 orderable: false,
                 name: "website",
+                class: 'text-center',
                 render: function (data, type, row) {
                     return `<a target="_blank" href="${row.website}">${row.website}<a>`
                 }
@@ -137,6 +141,7 @@ $(function () {
                 width: '5%',
                 orderable: false,
                 name: "country",
+                class: 'text-center',
                 render: function (data, type, row) {
                     if (row.country) {
                         return `<span title="${row.country.name}" class="flag-icon flag-icon-${row.country.short_name.toLowerCase()}"></span>`
@@ -149,6 +154,7 @@ $(function () {
                 width: '5%',
                 orderable: false,
                 name: 'state',
+                class: 'text-center',
                 render: function (data, type, row) {
                     return row.state ? row.state.name : "";
                 }
@@ -201,23 +207,20 @@ $(function () {
         dataTable.ajax.reload(null, false);
         selectState.empty();
 
-        if (countryId !== '0') {
-            APICaller(STATE_ROUTE.replace(':id', countryId), function (response) {
-                if (response.length > 0) {
-                    selectState.append('<option value="">All</option>');
-                    $.each(response, function (key, value) {
-                        selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
-                    });
-                } else {
-                    selectState.append('<option value="0" disabled>Nothing selected</option>');
-                }
-                selectState.selectpicker('refresh');
-            }, function (error) {
-                console.log(error);
-            });
-        } else {
+        APICaller(LOCATION_API_ROUTE, { 'country_id': countryId }, function (response) {
+            if (response.length > 0) {
+                selectState.append('<option value="">All</option>');
+                $.each(response, function (key, value) {
+                    selectState.append('<option value=' + value.id + '>' + value.name + '</option>');
+                });
+            } else {
+                selectState.append('<option value="0" disabled>Nothing selected</option>');
+            }
             selectState.selectpicker('refresh');
-        }
+        }, function (error) {
+            console.log(error);
+        });
+
     });
 
     selectState.bind('changed.bs.select', function () {

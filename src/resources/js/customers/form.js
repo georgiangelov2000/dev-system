@@ -1,10 +1,8 @@
-import { APICallerWithoutData } from '../ajax/methods';
+import { APICaller } from '../ajax/methods';
 import { initializeMap, setMapView } from '../ajax/leaflet';
 
 $(function () {
-    $('.selectCountry').selectpicker();
-    $('.selectState').selectpicker();
-    $('.selectCategory').selectpicker();
+    $('.selectCountry, .selectState, .selectCategory').selectpicker();
 
     const bootstrapCountry = $('.bootstrap-select .selectCountry');
     const bootstrapState = $('.bootstrap-select .selectState');
@@ -30,13 +28,13 @@ $(function () {
 
     bootstrapCountry.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         let countryId = $(this).val();
-        let url = STATE_ROUTE.replace(":id", countryId);
         bootstrapState.empty();
 
-        APICallerWithoutData(url, function (response) {
-            console.log(response);
-            if (response.length > 0) {
-                $.each(response, function (key, value) {
+        APICaller(LOCATION_API_ROUTE, { "country_id": countryId }, function (response) {
+            let data = response;
+
+            if (data.length) {
+                $.each(data, function (key, value) {
                     bootstrapState.append('<option value=' + value.id + '>' + value.name + '</option>');
                 });
             } else {
@@ -89,5 +87,5 @@ $(function () {
     }
 
     initializeMap()
-      
+
 });
