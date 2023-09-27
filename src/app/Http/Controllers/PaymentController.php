@@ -6,7 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Http\Requests\PaymentRequest;
 use App\Models\OrderPayment;
-use App\Services\PaymentService\PaymentService;
+use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View; // Import the View class
 

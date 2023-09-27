@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\PaymentService;
+namespace App\Services;
 
 use App\Helpers\FunctionsHelper;
 use App\Models\Customer;
