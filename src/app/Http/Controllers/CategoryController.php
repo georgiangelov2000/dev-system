@@ -214,17 +214,14 @@ class CategoryController extends Controller
     {
         // Create a new Category model if $category is null, otherwise update the existing one.
         $category = $category ? $category : new Category;
-        
-        // Get the uploaded image file.
-        $file = $data['image'];
 
         // Set the Category's name and description.
         $category->name = $data['name'];
         $category->description = $data['description'];
 
         // If an image file is provided, upload it and update the image_path attribute.
-        if (isset($file)) {
-            $this->helper->imageUploader($file, $category, $this->dir);
+        if (isset($data['image'])) {
+            $this->helper->imageUploader($data['image'], $category, $this->dir);
         }
 
         // Attach the selected subcategories to the Category.
