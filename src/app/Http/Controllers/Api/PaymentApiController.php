@@ -2,27 +2,35 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\FunctionsHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\OrderPayment;
 use App\Models\PurchasePayment;
 use App\Models\Supplier;
+
 use Illuminate\Http\Request;
 
 class PaymentApiController extends Controller
 {
+    protected $helper;
+
+    public function __construct(FunctionsHelper $helper)
+    {
+        $this->helper = $helper;
+    }
+
     public function getData(Request $request)
     {
-
         $type = isset($request->type) && $request->type ? $request->type : null;
         $date = isset($request->date) && $request->date ? $request->date : null;
         $id = isset($request->user) && $request->user ? $request->user : null;
         $package = isset($request->package) && $request->package ? $request->package : null;
-                
-        list($dateStart, $dateEnd) = $this->formatDateRange($date);
+
+        list ($dateStart, $dateEnd) = $this->helper->dateRange($date);
 
         if ($type === 'order') {
-            $query =  $this->orderPayments($id, $dateStart, $dateEnd,$package);
+            $query =  $this->orderPayments($id, $dateStart, $dateEnd, $package);
         } elseif ($type === 'purchase') {
             $query = $this->purchasePayments($id, $dateEnd, $dateEnd);
         } else {
@@ -40,10 +48,10 @@ class PaymentApiController extends Controller
         ]);
     }
 
-    private function orderPayments($id, $dateStart, $dateEnd,$package): array
+    private function orderPayments($id, $dateStart, $dateEnd, $package): array
     {
-        
-        $paymentQuery = OrderPayment::query()->with('order.purchase','invoice');
+
+        $paymentQuery = OrderPayment::query()->with('order.purchase', 'invoice');
 
         if ($id) {
             $paymentQuery->whereHas('order', function ($query) use ($id) {
@@ -58,9 +66,9 @@ class PaymentApiController extends Controller
                 ->where('date_of_payment', '<=', $dateEnd);
         }
 
-        if($package) {
-            $paymentQuery->whereHas('order',function($query) use ($package) {
-                $query->where('package_id',$package);
+        if ($package) {
+            $paymentQuery->whereHas('order', function ($query) use ($package) {
+                $query->where('package_id', $package);
             });
         }
 
@@ -69,7 +77,7 @@ class PaymentApiController extends Controller
         return [ // Return an associative array
             'data' => $result,
             'user' => $customer,
-            'date' => $this->formatDateRangeForResponse($dateStart, $dateEnd),
+            'date' => $this->helper->dateToString($dateStart, $dateEnd),
             'sum' => number_format($paymentQuery->sum('price'), 2, '.', ''),
             'recordsTotal' => $paymentQuery->count(),
             'recordsFiltered' => $paymentQuery->count(),
@@ -79,10 +87,10 @@ class PaymentApiController extends Controller
     private function purchasePayments($id, $dateStart, $dateEnd): array
     {
         $paymentQuery = PurchasePayment::query()
-        ->with(
-            ['purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,status', 'invoice']
-        );
-        
+            ->with(
+                ['purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,status,image_path', 'invoice']
+            );
+
         if ($id) {
             $paymentQuery->whereHas('purchase', function ($query) use ($id) {
                 $query->where('supplier_id', $id);
@@ -101,7 +109,7 @@ class PaymentApiController extends Controller
         return [ // Return an associative array
             'data' => $result,
             'user' => $supplier,
-            'date' => $this->formatDateRangeForResponse($dateStart, $dateEnd),
+            'date' => $this->helper->dateToString($dateStart, $dateEnd),
             'sum' => number_format($paymentQuery->sum('price'), 2, '.', ''),
             'recordsTotal' => $paymentQuery->count(),
             'recordsFiltered' => $paymentQuery->count(),
@@ -118,34 +126,4 @@ class PaymentApiController extends Controller
         return Supplier::with(['state:id,name', 'country:id,name,short_name'])->find($id);
     }
 
-    private function formatDateRange($date): ?array
-    {
-        if (!empty($date)) {
-            $dates = explode(" - ", $date);
-            $date1 = $dates[0];
-            $date2 = $dates[1];
-
-            $date1_formatted = date('Y-m-d 23:59:59', strtotime($date1));
-            $date2_formatted = date('Y-m-d 23:59:59', strtotime($date2));
-
-            if (strtotime($date1) !== false && strtotime($date2) !== false) {
-                return [
-                    $date1_formatted,
-                    $date2_formatted
-                ];
-            }
-        }
-
-        return null;
-    }
-
-    private function formatDateRangeForResponse($dateStart, $dateEnd): ?string
-    {
-        // Format the date range for the response
-        if ($dateStart && $dateEnd) {
-            return date('F j, Y', strtotime($dateStart)) . ' - ' . date('F j, Y', strtotime($dateEnd));
-        }
-
-        return null;
-    }
 }

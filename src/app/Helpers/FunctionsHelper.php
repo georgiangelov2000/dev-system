@@ -163,4 +163,33 @@ class FunctionsHelper
 
         return $result;
     }
+
+    public static function dateRange($date) {
+        if (!empty($date)) {
+            $dates = explode(" - ", $date);
+            $date1 = $dates[0];
+            $date2 = $dates[1];
+
+            $date1_formatted = date('Y-m-d 23:59:59', strtotime($date1));
+            $date2_formatted = date('Y-m-d 23:59:59', strtotime($date2));
+
+            if (strtotime($date1) !== false && strtotime($date2) !== false) {
+                return [
+                    $date1_formatted,
+                    $date2_formatted
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    public static function dateToString($dateStart,$dateEnd): ?string {
+        // Format the date range for the response
+        if ($dateStart && $dateEnd) {
+            return date('F j, Y', strtotime($dateStart)) . ' - ' . date('F j, Y', strtotime($dateEnd));
+        }
+
+        return null;
+    }
 }

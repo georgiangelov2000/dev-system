@@ -12,6 +12,7 @@ use App\Models\OrderPayment;
 
 class Order extends Model
 {
+
     use HasFactory;
 
     /**
@@ -51,6 +52,22 @@ class Order extends Model
         'package_extension_date'
     ];
 
+    public $specificFields = [
+        'date_of_sale', 'sold_quantity', 'single_sold_price', 'discount_percent', 'tracking_number'
+    ];
+
+    public $defaultFields = [
+        'customer_id', 'user_id', 'package_id', 'purchase_id'
+    ];
+
+    protected $statuses; // Declare statuses as a class property
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->statuses = config('statuses.order_statuses'); // Initialize statuses in the constructor
+    }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
@@ -61,15 +78,28 @@ class Order extends Model
         return $this->belongsTo(Purchase::class);
     }
 
-    public function package(){
+    public function package()
+    {   
         return $this->belongsTo(Package::class);
     }
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function payment(){
+    public function payment()
+    {
         return $this->hasOne(OrderPayment::class);
+    }
+
+    public function statusValidation()
+    {
+        return array_key_exists($this->status, $this->statuses) ? $this->status : null;
+    }
+
+    public function orderedStatus()
+    {
+        return array_key_exists($this->status, $this->statuses) && $this->status === 6 ? $this->status : null;
     }
 }

@@ -12,12 +12,11 @@ use App\Helpers\LoadStaticData;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-
 class CustomerController extends Controller
 {
     private $staticDataHelper;
     private $helper;
-    private $dir = 'public/images/customers';
+    private $dir = 'public/images/customers'; // Directory for customer images
 
     public function __construct(LoadStaticData $staticDataHelper, FunctionsHelper $helper)
     {
@@ -25,6 +24,11 @@ class CustomerController extends Controller
         $this->helper = $helper;
     }
 
+    /**
+     * Display the customer index view with countries and states data.
+     *
+     * @return \Illuminate\View\View
+     */
     public function index()
     {
         $countries = $this->staticDataHelper->callStatesAndCountries('states');
@@ -33,6 +37,11 @@ class CustomerController extends Controller
         return view('customers.index', compact('countries', 'states'));
     }
 
+    /**
+     * Display the customer creation view with countries and categories data.
+     *
+     * @return \Illuminate\View\View
+     */
     public function create()
     {
         $countries = $this->staticDataHelper->callStatesAndCountries('countries');
@@ -41,6 +50,12 @@ class CustomerController extends Controller
         return view('customers.create', compact('countries', 'categories'));
     }
 
+    /**
+     * Store a new customer in the database.
+     *
+     * @param CustomerRequest $request The validated customer request data.
+     * @return \Illuminate\Http\RedirectResponse A redirect response indicating the result of the store operation.
+     */
     public function store(CustomerRequest $request)
     {
         DB::beginTransaction();
@@ -57,6 +72,12 @@ class CustomerController extends Controller
         return redirect()->route('customer.index')->with('success', 'Customer has been created');
     }
 
+    /**
+     * Retrieve and display the customer edit view with data for editing.
+     *
+     * @param Customer $customer The customer to be edited.
+     * @return \Illuminate\View\View
+     */
     public function edit(Customer $customer)
     {
         $country = $customer->country_id;
@@ -66,6 +87,13 @@ class CustomerController extends Controller
         return view('customers.edit', compact('customer', 'countries', 'states'));
     }
 
+    /**
+     * Update an existing customer in the database.
+     *
+     * @param Customer $customer The customer to be updated.
+     * @param CustomerRequest $request The validated customer request data.
+     * @return \Illuminate\Http\RedirectResponse A redirect response indicating the result of the update operation.
+     */
     public function update(Customer $customer, CustomerRequest $request)
     {
         DB::beginTransaction();
@@ -82,6 +110,12 @@ class CustomerController extends Controller
         return redirect()->route('customer.index')->with('success', 'Customer has been updated');
     }
 
+    /**
+     * Delete a customer from the database, including its associated image if present.
+     *
+     * @param Customer $customer The customer to be deleted.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the result of the customer deletion operation.
+     */
     public function delete(Customer $customer)
     {
         DB::beginTransaction();
@@ -100,6 +134,12 @@ class CustomerController extends Controller
         return response()->json(['message' => 'Customer has been deleted'], 200);
     }
 
+    /**
+     * Display the customer orders view with available packages and drivers data.
+     *
+     * @param Customer $customer The customer for whom orders are being managed.
+     * @return \Illuminate\View\View
+     */
     public function customerOrders(Customer $customer)
     {
         $packages = Package::select('id', 'package_name', 'is_it_delivered')
@@ -112,6 +152,13 @@ class CustomerController extends Controller
     }
 
     // Private methods;
+
+    /**
+     * Create or update a customer record in the database.
+     *
+     * @param array $data The customer data to be processed.
+     * @param Customer|null $customer The customer to be updated (optional).
+     */
     private function createOrUpdate(array $data, $customer = null)
     {
         $customer = $customer ?? new Customer;
