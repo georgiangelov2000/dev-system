@@ -45,10 +45,10 @@ class PaymentService
      * @param string $type - Type of payment ('order' or 'purchase').
      * @return mixed - Returns a view or null if the type is not in the list.
      */
-    public function redirectToView($type)
+    public function redirectToView($type, $payment = null)
     {
         if (in_array($type, $this->types)) {
-            return $this->getView($type);
+            return $this->getView($type, $payment);
         }
     }
 
@@ -80,7 +80,7 @@ class PaymentService
 
             $view = view($type . 's.' . 'edit' . '_payment', $data);
         }
-
+        
         return $view;
     }
 
