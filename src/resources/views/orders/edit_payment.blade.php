@@ -10,46 +10,8 @@
             </div>
             <div class="card-body p-0">
                 <div class="col-12 d-flex flex-wrap">
-                    <div class="col-12 mt-4">
-                        <div class="col-12">
-                            <h6 class="font-weight-bold">Order Status Details:</h6>
-                        </div>
-                        <div class="col-12">
-                            <i class="fa-light fa-exclamation-circle" title="Payment Overdue"></i>
-                            <span class="legend-label"><b>Payment Overdue:</b></span>
-                            <span>If the payment date is later than the sale date, there's a delay in payment, and the order
-                                is marked as "Overdue." Please ensure timely payment to avoid processing delays.</span>
-                        </div>
-                        <div class="col-12">
-                            <i class="fa-light fa-exclamation-circle" title="Mark as Paid"></i>
-                            <span class="legend-label"><b>Mark as Paid:</b></span>
-                            <span>If your payment date is on time or earlier than the sale date, and the payment is
-                                successful, the order will be marked as "Paid." This means your payment has been received,
-                                and your order is being processed for delivery.</span>
-                        </div>
-                        <div class="col-12">
-                            <i class="fa-light fa-exclamation-circle" title="Mark as Not Paid"></i>
-                            <span class="legend-label"><b>Mark as Not Paid:</b></span>
-                            <span>If your payment status is "Pending," it means your payment has not been made yet. The
-                                order will be marked as "Not Paid," and processing will not proceed until the payment is
-                                completed.</span>
-                        </div>
-                        <div class="col-12">
-                            <i class="fa-light fa-info-circle" title="Mark with Custom Status"></i>
-                            <span class="legend-label"><b>Mark with Custom Status:</b></span>
-                            <span>If your payment status is "Refunded," it indicates a custom status for your order. The
-                                order will be marked accordingly, and if you have any specific refund-related queries,
-                                please contact our support team.</span>
-                        </div>
-                        <div class="col-12">
-                            <i class="fa-light fa-info-circle" title="Mark with Custom Status"></i>
-                            <span class="legend-label"><b>Mark with Custom Status:</b></span>
-                            <span>If your payment status is "Partially Paid," it corresponds to another custom status for
-                                your order. The order will be marked accordingly, indicating a partial payment has been
-                                received. Please complete the payment to avoid any delays in delivery.</span>
-                        </div>
-                    </div>
-                    <form action="{{ route('payment.update',[$payment->id,'order']) }}" class="col-12" method="POST">
+                    <form id="paymentForm" action="{{ route('payment.update', [$payment->id, 'order']) }}" class="col-12"
+                        method="POST">
                         @method('PUT')
                         @csrf
                         <div class="form-group col-12">
@@ -110,6 +72,19 @@
                                 @endforeach
                             </select>
                         </div>
+                        @if ($payment->payment_status === 3)
+                            <div class="form-group col-12" id="partiallyPaidPriceInput">
+                                <label for="partially_paid_price">Partially paid price</label>
+                                <input name="partially_paid_price" id="partially_paid_price" type="text" required="true"
+                                    value="{{ $payment->partially_paid_price }}" class="form-control" />
+                            </div>
+                        @else
+                            <div class="form-group col-12 d-none" id="partiallyPaidPriceInput">
+                                <label for="partially_paid_price">Partially paid price</label>
+                                <input name="partially_paid_price" id="partially_paid_price" type="text" required="true"
+                                    class="form-control" />
+                            </div>
+                        @endif
                         <div class="form-group col-12">
                             <label for="payment_reference">Payment reference</label>
                             <input class="form-control" name="payment_reference" type="text"
@@ -157,8 +132,7 @@
                     </div>
                     <div class="col-6 text-right">
                         @if ($payment->order->customer->image_path)
-                            <img class="w-25 m-0"
-                                src="{{ $payment->order->customer->image_path  }}" />
+                            <img class="w-25 m-0" src="{{ $payment->order->customer->image_path }}" />
                         @endif
                     </div>
                 </div>
@@ -180,9 +154,11 @@
                             <tr>
                                 <td>{{ $payment->date_of_payment }}</td>
                                 <td>${{ $payment->price }}</td>
-                                <td>{{$payment->quantity}}</td>
-                                <td>{{ isset(config('statuses.payment_methods_statuses')[$payment->payment_method]) ? config('statuses.payment_methods_statuses')[$payment->payment_method] : '' }}</td>
-                                <td>{{ isset(config('statuses.payment_statuses')[$payment->payment_status]) ? config('statuses.payment_statuses')[$payment->payment_status] : '' }}</td>
+                                <td>{{ $payment->quantity }}</td>
+                                <td>{{ isset(config('statuses.payment_methods_statuses')[$payment->payment_method]) ? config('statuses.payment_methods_statuses')[$payment->payment_method] : '' }}
+                                </td>
+                                <td>{{ isset(config('statuses.payment_statuses')[$payment->payment_status]) ? config('statuses.payment_statuses')[$payment->payment_status] : '' }}
+                                </td>
                                 <td>{{ $payment->payment_reference }}</td>
                             </tr>
                         </tbody>
@@ -210,24 +186,24 @@
                                 </td>
                                 <td>
                                     @php
-                                    // Convert the date strings to DateTime objects
-                                    $dateOfSale = new DateTime($payment->order->package_extension_date ?: $payment->order->date_of_sale);
-                                    $dateOfPayment = new DateTime($payment->date_of_payment);
-                                
-                                    // Calculate the delay in days (if any)
-                                    $delayInterval = $dateOfSale->diff($dateOfPayment);
-                                    $delayInDays = $delayInterval->format('%r%a');
-                                
-                                    // Check if there is a delay in payment
-                                    if ($delayInDays > 0) {
-                                        $delayMessage = 'Payment is delayed by ' . $delayInDays . ' day(s).';
-                                    } else {
-                                        $delayMessage = 'Order was paid on time.';
-                                    }
+                                        // Convert the date strings to DateTime objects
+                                        $dateOfSale = new DateTime($payment->order->package_extension_date ?: $payment->order->date_of_sale);
+                                        $dateOfPayment = new DateTime($payment->date_of_payment);
+                                        
+                                        // Calculate the delay in days (if any)
+                                        $delayInterval = $dateOfSale->diff($dateOfPayment);
+                                        $delayInDays = $delayInterval->format('%r%a');
+                                        
+                                        // Check if there is a delay in payment
+                                        if ($delayInDays > 0) {
+                                            $delayMessage = 'Payment is delayed by ' . $delayInDays . ' day(s).';
+                                        } else {
+                                            $delayMessage = 'Order was paid on time.';
+                                        }
                                     @endphp
-                                
-                                    {{$delayMessage}}
-                                </td>                            
+
+                                    {{ $delayMessage }}
+                                </td>
                                 <td>
                                     ${{ $payment->order->single_sold_price }}
                                 </td>
@@ -291,19 +267,6 @@
         </div>
     </div>
     @push('scripts')
-        <script type="text/javascript">
-            $(function() {
-                $('select[name="payment_method"],select[name="payment_status"]').selectpicker();
-
-                $('.datepicker').datepicker({
-                    format: 'yyyy-mm-dd'
-                });
-
-                $('#print').on('click', function() {
-                    window.print();
-                })
-
-            })
-        </script>
+        <script type="text/javascript" src="{{ mix('js/payments/form.js') }}"></script>
     @endpush
 @endsection

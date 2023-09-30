@@ -1,30 +1,3 @@
-@php
-use App\Models\Settings;
-use App\Helpers\RedisCacheHelper;
-
-$settingsModel = Settings::where('type', 1)->first();
-
-if ($settingsModel) {
-    $jsonSettings = $settingsModel->settings;
-    
-    $cacheKey = 'json_settings_' . md5('cxsiSPG6angFxFYY');
-    
-    $cachedData = RedisCacheHelper::get($cacheKey);
-    
-    if (!$cachedData) {
-        // Cache miss, data is not in cache
-        RedisCacheHelper::put($cacheKey, $jsonSettings, 3600); // Store the data in cache
-        $cachedData = $jsonSettings; // Update $cachedData with the actual data
-    }
-    
-    $res = json_decode($cachedData, true);
-} else {
-    // Handle the case where no settings were found (e.g., show an error message)
-    $res = [];
-}
-@endphp
-
-
 <nav class="main-header navbar navbar-expand header-navigation mb-3 navbar-white">
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -71,13 +44,8 @@ if ($settingsModel) {
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
-                    @if ($res && array_key_exists('image_path', $res))
-                        <img src="{{$res['image_path']}}"
-                            alt="Company logo" id="company-logo" />
-                    @else
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
                             alt="Company logo" id="company-logo" />
-                    @endif
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">

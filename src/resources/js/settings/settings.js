@@ -14,7 +14,7 @@ $(function () {
 
     selectCountry.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         let countryId = $(this).val();
-        let url = STATE_ROUTE.replace(":id", countryId);
+        let url = LOCATION_API_ROUTE.replace("country_id", countryId);
 
         APICallerWithoutData(url, function (response) {
             let options = "";

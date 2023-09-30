@@ -12,8 +12,6 @@ use Illuminate\View\View; // Import the View class
 
 class PaymentController extends Controller
 {
-    private $paymentStatuses;
-
     private $paymentMethods;
 
     private $paymentService;
@@ -28,7 +26,6 @@ class PaymentController extends Controller
     public function __construct(PaymentService $paymentService)
     {
         $this->paymentService = $paymentService;
-        $this->paymentStatuses = config('statuses.payment_statuses');
         $this->paymentMethods  = config('statuses.payment_methods_statuses');
     }
 
@@ -75,6 +72,7 @@ class PaymentController extends Controller
             DB::commit();
         } catch (Exception $e) {
             DB::rollback();
+            dd($e->getMessage()); 
             return back()->withInput()->with('error', 'Payment has not been updated');
         }
 
@@ -128,14 +126,14 @@ class PaymentController extends Controller
     private function paymentProcessing(array $data, $builder, $relation)
     {
         $relation = $builder->$relation;
-
-        if (isset($data['payment_status']) && array_key_exists($data['payment_status'], $this->paymentStatuses)) {
+        
+        if ($builder->statusValidation($data['payment_status'])) {
             $relation->status = $data['payment_status'];
             $builder->payment_status = $data['payment_status'];
             $relation->save();
         }
 
-        if (isset($data['payment_method']) && array_key_exists($data['payment_method'], $this->paymentMethods)) {
+        if ($builder->methodValidation($data['payment_method'])) {
             $builder->payment_method = $data['payment_method'];
         }
 
@@ -143,6 +141,7 @@ class PaymentController extends Controller
         $builder->quantity = $data['quantity'];
         $builder->date_of_payment = now()->parse($data['date_of_payment']);
         $builder->payment_reference = $data['payment_reference'];
+        $builder->partially_paid_price = $data['partially_paid_price'] ?? null;
         $builder->save();
 
         $builder->invoice()->update([

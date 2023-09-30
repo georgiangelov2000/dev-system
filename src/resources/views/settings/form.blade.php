@@ -48,7 +48,7 @@
                             <label for="country_id">Country</label>
                             <select class="form-control selectCountry" name="country_id" id="country_id">
                                 <option value="">Select option</option>
-                                @foreach ($countries as $item)
+                                @foreach ($data['countries'] as $item)
                                     <option {{ $settings['country'] === $item->name ? 'selected' : '' }}
                                         value="{{ $item->id }}">{{ $item->name }}</option>
                                 @endforeach
@@ -61,7 +61,7 @@
                         <div class="form-group col-6">
                             <label for="state_id">State</label>
                             <select class="form-control selectState" name="state_id" id="state_id">
-                                @foreach ($states as $state)
+                                @foreach ($data['states'] as $state)
                                     <option {{ $settings['state'] === $state->name ? 'selected' : '' }}
                                         value="{{ $state->id }}">{{ $state->name }}</option>
                                 @endforeach
@@ -223,7 +223,7 @@
     @push('scripts')
         <script type="text/javascript" src="{{ mix('js/settings/settings.js') }}"></script>
         <script type="text/javascript">
-            const STATE_ROUTE = "{{ route('state', ':id') }}";
+            const LOCATION_API_ROUTE = "{{ route('api.location') }}";
         </script>
     @endpush
 @endsection

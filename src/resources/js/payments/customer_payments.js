@@ -24,12 +24,12 @@ $(function () {
   let submitForm = $('#submitForm');
 
   const paymentStatuses = {
-    1: { label: "Paid", iconClass: "fal fa-check-circle" },
-    2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
-    3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
-    4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
-    5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
-    6: { label: "Ordered", iconClass: "fal fa-shopping-cart" }
+    1: { label: "Paid", iconClass: " <span class='icon'><i class='fal fa-check-circle'></i></span>" },
+    2: { label: "Pending", iconClass: "<span class='icon'><i class='fal fa-hourglass-half'></i></span>" },
+    3: { label: "Partially Paid", iconClass: "<span class='text-danger font-weight-bold'>Partially paid</span>" },
+    4: { label: "Overdue", iconClass: "<span class='icon'><i class='fal fa-exclamation-circle'></i></span>" },
+    5: { label: "Refunded", iconClass: "<span class='icon'><i class='fal fa-undo-alt'></i></span>" },
+    6: { label: "Ordered", iconClass: "<span class='icon'><i class='fal fa-shopping-cart'</i></span>" }
   };
 
   let dataTable;
@@ -98,6 +98,7 @@ $(function () {
                           <th>Quantity</th>
                           <th>Method</th>
                           <th>Status</th>
+                          <th>Partially paid</th>
                           <th>Reference</th>
                           <th>Date of payment</th>
                           <th>Delay</th>
@@ -216,24 +217,28 @@ $(function () {
         },
         {
           name: 'tracking_number',
+          class:'text-center',
           render: function (data, type, row) {
             return `<span>${row.order.tracking_number}</span>`
           }
         },
         {
           name: 'price',
+          class:'text-center',
           render: function (data, type, row) {
             return `<span>€${row.price}</span>`
           }
         },
         {
           name: 'quantity',
+          class:'text-center',
           render: function (data, type, row) {
             return `<span>${row.quantity}</span>`
           }
         },
         {
           name: 'payment_method',
+          class:'text-center',
           render: function (data, type, row) {
             const paymentMethods = {
               1: "Cash",
@@ -249,13 +254,24 @@ $(function () {
         },
         {
           name: 'payment_status',
+          class:'text-center',
           render: function (data, type, row) {
             const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
-
             return `
               <div title="${statusData.label}" class="status">
-                <span class="icon"><i class="${statusData.iconClass}"></i></span>
+                ${statusData.iconClass}
               </div>`;
+          }
+        },
+        {
+          name:'partially_paid_price',
+          class:'text-center',
+          render: function(data,type,row) {
+            let partially = '';
+            if(row.payment_status === 3) {
+              partially = `<span class="font-weight-bold">€${row.partially_paid_price}</span>`;
+            }
+            return partially
           }
         },
         {
@@ -276,7 +292,7 @@ $(function () {
             const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
 
             if (['Paid', 'Partially Paid', 'Overdue'].includes(statusData.label)) {
-              const purchaseExpectedDateOfPayment = moment(row.order.package_extenstion_date ? row.order.package_extenstion_date : row.order.date_of_sale);
+              const purchaseExpectedDateOfPayment = moment(row.order.package_extension_date ? row.order.package_extension_date : row.order.date_of_sale);
               const dateOfPayment = moment(row.date_of_payment);
 
               // Calculate the delay in days

@@ -38,6 +38,7 @@ mix.js('resources/js/packages/packages.js', 'public/js/packages'),
 
 mix.js('resources/js/payments/customer_payments.js', 'public/js/payments'),
 mix.js('resources/js/payments/supplier_payments.js', 'public/js/payments'),
+mix.js('resources/js/payments/form.js', 'public/js/payments'),
 
 mix.js('resources/js/packages/customer_package_payment.js', 'public/js/packages'),
 

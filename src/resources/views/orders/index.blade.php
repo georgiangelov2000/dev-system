@@ -97,20 +97,19 @@
                                     </div>
                                 </th>
                                 <th>ID</th>
-                                <th>Payment</th>
                                 <th>Customer</th>
                                 <th>Purchase</th>
                                 <th>Amount</th>
-                                <th title="Unut price">Unit Price</th>
-                                <th title="Discount unit price">Discount unit price</th>
-                                <th title="Official price">Official Price</th>
-                                <th title="Regular price">Regular price</th>                            
+                                <th>Unit Price</th>
+                                <th>Discount price</th>
+                                <th>Official Price</th>
+                                <th>Regular price</th>
+                                <th>Partially paid price</th>                        
                                 <th>Discount</th>
                                 <th>Date of sale</th>
                                 <th>Expired</th>
-                                <th>Payment date</th>
                                 <th>Package</th>
-                                <th class="text-center">Status</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>

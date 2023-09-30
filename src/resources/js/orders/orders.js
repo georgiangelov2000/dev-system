@@ -1,8 +1,17 @@
-import { APICaller, APIPOSTCALLER, APIDELETECALLER } from '../ajax/methods';
+import { APICaller,APIDELETECALLER } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 
 $(function () {
     $('.selectAction, .selectType, .selectCustomer, .selectPackage, .selectDriver').selectpicker();
+
+    const statusMap = {
+        1: { label: "Paid", iconClass: " <span class='icon'><i class='fal fa-check-circle'></i></span>" },
+        2: { label: "Pending", iconClass: "<span class='icon'><i class='fal fa-hourglass-half'></i></span>" },
+        3: { label: "Partially Paid", iconClass: "<span class='text-danger font-weight-bold'>Partially paid</span>" },
+        4: { label: "Overdue", iconClass: "<span class='icon'><i class='fal fa-exclamation-circle'></i></span>" },
+        5: { label: "Refunded", iconClass: "<span class='icon'><i class='fal fa-undo-alt'></i></span>" },
+        6: { label: "Ordered", iconClass: "<span class='icon'><i class='fal fa-shopping-cart'</i></span>" }
+    };
 
     const bootstrapCustomer = $('.bootstrap-select .selectCustomer');
     const bootstrapSelectDriver = $('.bootstrap-select .selectDriver');
@@ -60,32 +69,9 @@ $(function () {
                 }
             },
             {
-                width: '3%',
-                name: "id",
-                render: function (data, type, row) {
-                    let input = '';
-
-                    if (typeof CUSTOMER !== 'undefined') {
-                        input = `<input type="hidden" value="${row.id}" name="order_id[]" />`
-                    }
-                    return `<span class="font-weight-bold">${row.id}</span>${input}`;
-
-                }
-            },
-            {
-                width: '1%',
-                class:'text-center',
-                orderable: false,
-                render: function (data, type, row) {
-                    let payment;
-
-                    if (row.payment) {
-                        payment = `<a href=${PAYMENT_EDIT.replace(':payment', row.payment.id).replace(':type', 'order')}>${row.payment.alias}</a>`
-                    } else {
-                        payment = ''
-                    }
-
-                    return payment;
+                width:"1%",
+                render:function(data,type,row) {
+                    return `<span class="font-weight-bold">${row.id}</span>`;
                 }
             },
             {
@@ -114,16 +100,17 @@ $(function () {
                 data: "sold_quantity"
             },
             {
-                width: '7%',
+                width: '5%',
                 orderable: false,
                 class:'text-center',
                 name: "single_sold_price",
                 render: function (data, type, row) {
+                    
                     return `<span>€${row.single_sold_price}</span>`
                 }
             },
             {
-                width: '10%',
+                width: '5',
                 orderable: false,
                 class:'text-center',
                 name: "discount_single_sold_price",
@@ -132,7 +119,7 @@ $(function () {
                 }
             },
             {
-                width: '7%',
+                width: '10%',
                 orderable: false,
                 class:'text-center',
                 name: "total_sold_price",
@@ -141,7 +128,7 @@ $(function () {
                 }
             },
             {
-                width: '7%',
+                width: '10%',
                 orderable: false,
                 class:'text-center',
                 name: "original_sold_price",
@@ -150,7 +137,17 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '10%',
+                orderable: false,
+                class: 'text-center',
+                render: function (data, type, row) {
+                    const partiallyPaidStatus = statusMap[row.payment.payment_status];
+                    const partiallyPaidPrice = partiallyPaidStatus.label === 'Partially Paid' ? row.payment.partially_paid_price : '';
+                    return partiallyPaidPrice;
+                }
+            },            
+            {
+                width: '1%',
                 orderable: false,
                 class:'text-center',
                 name: "discount_percent",
@@ -161,13 +158,13 @@ $(function () {
             {
                 width: '6%',
                 orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
-                    if (row.package_extension_date) {
-                        return `<span>${moment(row.package_extension_date).format('YYYY-MM-DD')}</span>`
-                    } else {
-                        return `<span>${moment(row.date_of_sale).format('YYYY-MM-DD')}</span>`
-                    }
-
+                    const dateToDisplay = row.package_extension_date 
+                        ? row.package_extension_date 
+                        : row.date_of_sale;
+                    
+                    return `<span>${moment(dateToDisplay).format('YYYY-MM-DD')}</span>`;
                 }
             },
             {
@@ -186,86 +183,52 @@ $(function () {
                     switch (row.status) {
                         case 6:
                         case 2:
-                            badgeClass = 'badge-warning';
+                            badgeClass = 'text-warning';
                             badgeText = `${daysRemaining} days remaining`;
                             break;
                         case 1:
                         case 3:
                         case 4:
-                            badgeClass = 'badge-success';
-                            badgeText = 'Order received';
+                            badgeClass = 'text-success';
+                            badgeText = 'Received';
                             break;
                         default:
-                            badgeText = 'Invalid status please check the system!';
+                            badgeText = 'Invalid status!';
                     }
 
-                    return `<span class="badge p-2 ${badgeClass}">${badgeText}</span>`;
+                    return `<span class="font-weight-bold p-2 ${badgeClass}">${badgeText}</span>`;
                 }
             },
             {
                 width: '8%',
                 orderable: false,
-                class:'text-center',
-                name: 'payment.date_of_payment',
-                render: function (data, type, row) {
-                    let date = '';
-
-                    if (row.payment) {
-                        date = row.payment.date_of_payment;
-                    }
-
-                    return date;
-                }
-            },
-            {
-                width: '8%',
-                orderable: false,
-                class:'text-center',
+                class: 'text-center',
                 name: 'package',
                 render: function (data, type, row) {
-                    if (row.package) {
-                        return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id', row.package.id)}>${row.package.package_name}</a>`;
-                    } else {
-                        return '';
-                    }
+                    return row.package
+                        ? `<a href=${PACKAGE_EDIT_ROUTE.replace(':id', row.package.id)}>${row.package.package_name}</a>`
+                        : '';
                 }
-            },
+            },            
             {
                 width: '5%',
                 orderable: false,
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    const statusMap = {
-                        1: { text: "Paid", iconClass: "fal fa-check-circle" },
-                        2: { text: "Pending", iconClass: "fal fa-hourglass-half" },
-                        3: { text: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
-                        4: { text: "Overdue", iconClass: "fal fa-exclamation-circle" },
-                        5: { text: "Refunded", iconClass: "fal fa-undo-alt" },
-                        6: { text: "Ordered", iconClass: "fal fa-shopping-cart" }
-                    };
+                    const statusData = statusMap[row.status] || { text: "Unknown", iconClass: "fal fa-question" };
 
-                    const statusInfo = statusMap[row.status] || { text: "Unknown", iconClass: "fal fa-question" };
-
-                    return `<div title="${statusInfo.text}" class="status">
-                        <span class="icon"><i class="${statusInfo.iconClass}"></i></span>
+                    return `
+                    <div title="${statusData.label}" class="status">
+                      ${statusData.iconClass}
                     </div>`;
                 }
             },
             {
-                width: '15%',
+                width: '5%',
                 orderable: false,
                 class: 'text-center',
                 render: function (data, type, row) {
-                    const statusMap = {
-                        1: { text: "Paid", iconClass: "fal fa-check-circle" },
-                        2: { text: "Pending", iconClass: "fal fa-hourglass-half" },
-                        3: { text: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
-                        4: { text: "Overdue", iconClass: "fal fa-exclamation-circle" },
-                        5: { text: "Refunded", iconClass: "fal fa-undo-alt" },
-                        6: { text: "Ordered", iconClass: "fal fa-shopping-cart" },
-                    };
-
                     const statusInfo = statusMap[row.status] || { text: "Unknown", iconClass: "fal fa-question" };
 
                     let buttons = [];
