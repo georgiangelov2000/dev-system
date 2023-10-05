@@ -9,7 +9,9 @@ use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use App\Helpers\LoadStaticData;
+use App\Http\Requests\CSVRequest;
 use App\Services\SupplierService;
+use App\TemplatePatterns\Import\SupplierCsvImporter;
 use Illuminate\Support\Facades\Log;
 
 class SupplierController extends Controller
@@ -19,6 +21,7 @@ class SupplierController extends Controller
     private $dir = 'public/images/suppliers';
     private $helper;
     private $supplierService;
+    private $csvImporter;
     /**
      * Constructor to initialize class dependencies.
      *
@@ -29,11 +32,13 @@ class SupplierController extends Controller
     public function __construct(
         LoadStaticData $staticDataHelper,
         FunctionsHelper $helper,
-        SupplierService $supplierService
+        SupplierService $supplierService,
+        SupplierCsvImporter $csvImporter,
     ) {
         $this->staticDataHelper = $staticDataHelper;
         $this->helper = $helper;
         $this->supplierService = $supplierService;
+        $this->csvImporter = $csvImporter;
     }
 
     /**
@@ -129,7 +134,6 @@ class SupplierController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             return back()->withInput()->with('error', 'Supplier has not been updated');
         }
 
@@ -190,6 +194,54 @@ class SupplierController extends Controller
         $categories = $supplier->categories()->get();
         $brands = $this->staticDataHelper->callBrands();
         return view('suppliers.mass_edit_purchases', ['supplier' => $supplier, 'categories' => $categories, 'brands' => $brands]);
+    }
+
+    public function createImport()
+    {
+        return view('suppliers.import');
+    }
+
+    /**
+     * Handles the request to import data from a CSV file.
+     *
+     * @param CSVRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function insertImport(CSVRequest $request)
+    {
+        // We start a database transaction
+        DB::beginTransaction();
+        try {
+            // Validate and retrieve the data from the request
+            $data = $request->validated();
+            // Process the data from the CSV file
+            $csvData = $this->csvImporter->processData($data['file']);
+
+            // We check if the CSV file contains data
+            if (empty($csvData)) {
+                // If not, we return the user with an error message
+                return back()->withInput()->with(['error' => 'There is no data in the file.']);
+            };
+
+            // We initiate validation and create the new providers
+            $validationData = $this->csvImporter->initValidation($csvData);
+
+            // Check for validation errors
+            if (isset($validationData['error'])) {
+                // If there is, we return the user with the error
+                return back()->withInput()->with($validationData);
+            }
+
+            // If there are no errors, we commit the transaction to the database
+            DB::commit();
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+            // If an error occurs, we return the user with the error and rollback the transaction
+            DB::rollback();
+        }
+
+        // If everything is successful, we redirect the user to the provider list with a success message
+        return redirect()->route('supplier.index')->with('success', 'Suppliers has been created');
     }
 
     /**

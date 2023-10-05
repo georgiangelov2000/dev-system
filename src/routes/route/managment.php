@@ -65,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('suppliers')->name('supplier.')->group(function () {
         Route::get('/', [SupplierController::class, 'index'])->name('index');
         Route::get('/create', [SupplierController::class, 'create'])->name('create');
+        Route::get('/import', [SupplierController::class, 'createImport'])->name('create.import');
+        Route::post('/store/import', [SupplierController::class, 'insertImport'])->name('store.import');
         Route::post('/store', [SupplierController::class, 'store'])->name('store');
         Route::get('/edit/{supplier}', [SupplierController::class, 'edit'])->name('edit');
         Route::put('/update/{supplier}', [SupplierController::class, 'update'])->name('update');

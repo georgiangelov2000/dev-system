@@ -64,6 +64,12 @@
                     </ul>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('category.index') }}" class="nav-link">
+                        <i class="fal fa-flag"></i>
+                        <p>Countries</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa-light fa-box"></i>
                         <p>
@@ -107,6 +113,11 @@
                         <li class="nav-item">
                             <a href="{{ route('supplier.create') }}" class="nav-link">
                                 <p>Create supplier</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('supplier.create.import') }}" class="nav-link">
+                                Import
                             </a>
                         </li>
                     </ul>

@@ -2,7 +2,7 @@
 
 @section('content')
     <div id="dashboard" class="row">
-        <div class="card col-12">
+        {{-- <div class="card col-12">
             <div class="card-body">
                 <div>
                     <div class="row">
@@ -439,7 +439,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
         @push('scripts')
         @endpush
     @endsection

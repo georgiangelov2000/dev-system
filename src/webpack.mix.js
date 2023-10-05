@@ -40,6 +40,8 @@ mix.js('resources/js/payments/customer_payments.js', 'public/js/payments'),
 mix.js('resources/js/payments/supplier_payments.js', 'public/js/payments'),
 mix.js('resources/js/payments/form.js', 'public/js/payments'),
 
+mix.js('resources/js/csv/import.js', 'public/js/csv'),
+
 mix.js('resources/js/packages/customer_package_payment.js', 'public/js/packages'),
 
 // Javascript libraries
