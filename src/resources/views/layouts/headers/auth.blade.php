@@ -64,7 +64,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('category.index') }}" class="nav-link">
+                    <a href="{{ route('country.index') }}" class="nav-link">
                         <i class="fal fa-flag"></i>
                         <p>Countries</p>
                     </a>

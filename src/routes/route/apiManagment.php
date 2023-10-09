@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CategoryApiController as CategoryApiController;
 use App\Http\Controllers\Api\BrandApiController as BrandApiController;
+use App\Http\Controllers\Api\CountryApiController as CountryApiController;
 use App\Http\Controllers\Api\SupplierApiController as SupplierApiController;
 use App\Http\Controllers\Api\PurchaseApiController as PurchaseApiController;
 use App\Http\Controllers\Api\CustomerApiController as CustomerApiController;
@@ -30,5 +31,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/order/purchases', [InvoicePurchaseApiController::class, 'getData'])->name('api.purchase.invoices');
     Route::get('/api/users', [UserApiController::class, 'getData'])->name('api.users');
     Route::get('/api/location', [StateApiController::class, 'getData'])->name('api.location');
+    Route::get('/api/countries', [CountryApiController::class, 'getData'])->name('api.countries');
 });
 

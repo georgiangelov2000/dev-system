@@ -4,8 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Country;
+use App\Models\Customer;
+use App\Models\Supplier;
 
 class State extends Model {
+
+    protected $fillable = ['country_id','name'];
 
     use HasFactory;
 
@@ -28,4 +33,19 @@ class State extends Model {
      *
      * @var array
      */
+
+     public function country()
+     {
+         return $this->belongsTo(Country::class, 'country_id', 'id');
+     }
+
+     public function customer()
+     {
+         return $this->hasMany(Customer::class);
+     }
+
+     public function supplier()
+     {
+         return $this->hasMany(Supplier::class);
+     }
 }

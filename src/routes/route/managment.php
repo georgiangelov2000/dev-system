@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\SubCategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
@@ -15,7 +16,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\ReportsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -24,6 +24,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('dashboard')->name('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'index']);
+    });
+
+    Route::prefix('country')->name('country.')->group(function () {
+        Route::get('/', [CountryController::class, 'index'])->name('index');
     });
 
     Route::prefix('users')->name('user.')->group(function () {
