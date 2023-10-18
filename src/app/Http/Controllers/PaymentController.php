@@ -37,7 +37,7 @@ class PaymentController extends Controller
      */
     public function index($type): ?View
     {
-        return $this->paymentService->redirectToView($type);
+        return $this->paymentService->getData($type);
     }
 
     /**
@@ -49,7 +49,7 @@ class PaymentController extends Controller
      */
     public function edit($payment, $type)
     {
-        return $this->paymentService->redirectToView($type, $payment);
+        return $this->paymentService->getData($type, $payment);
     }
 
     /**
@@ -72,7 +72,6 @@ class PaymentController extends Controller
             DB::commit();
         } catch (Exception $e) {
             DB::rollback();
-            dd($e->getMessage()); 
             return back()->withInput()->with('error', 'Payment has not been updated');
         }
 

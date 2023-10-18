@@ -1,14 +1,14 @@
 <?php
 
-namespace App\TemplatePatterns\Import;
+namespace App\Factory\Imports;
 
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Supplier;
-use App\TemplatePatterns\Import\CsvImporter;
+use App\Factory\CsvImporter;
 use Illuminate\Support\Facades\Validator;
 
-class SupplierCsvImporter extends CsvImporter
+final class SupplierCsvImporter extends CsvImporter
 {
 
     /**
@@ -30,19 +30,6 @@ class SupplierCsvImporter extends CsvImporter
         'image_path' => "nullable|string"
     ];
 
-
-    /**
-     * Processes the data from the CSV file.
-     *
-     * @param string $file
-     * @return array
-     */
-    public function processData($file)
-    {
-        $csvData = $this->parseCSV($file);
-        return $csvData;
-    }
-
     /**
      * Performs validation and creates providers from the provided data.
      *
@@ -52,7 +39,7 @@ class SupplierCsvImporter extends CsvImporter
     public function initValidation(array $data): array
     {
         $createdSuppliers = [];
-  
+
         foreach ($data as $row) {
 
             // Checks and converts the categories before validation
@@ -63,27 +50,30 @@ class SupplierCsvImporter extends CsvImporter
                 }
             }
 
-            // Performs validation and creates a new provider
+            // Create a new validator instance for the current data using predefined validation rules
             $validator = Validator::make($row, $this->keys);
 
+            // Check if validation fails
             if ($validator->fails()) {
+                // Return an error message if validation fails for the current data
                 return ['error' => 'Data has not been inserted'];
             }
 
-            // Checks for location availability before validation
+            // Check for location availability before validation
             if (!$this->checkForLocation($row['country_id'], $row['state_id'])) {
                 return ['error' => "Provided location data has not been found!"];
             }
 
-            // Create supplier
+            // Validation successful; create a new supplier using the validated data
             $supplier = Supplier::create($validator->validated());
 
             // Assign categories to current supplier
             $supplier->categories()->sync($row['categories']);
 
+            // Add the created supplier to the array of created suppliers
             $createdSuppliers[] = $supplier;
         }
-
+        // Return the array of created suppliers
         return $createdSuppliers;
     }
 

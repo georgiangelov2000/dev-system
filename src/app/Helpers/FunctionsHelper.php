@@ -192,4 +192,18 @@ class FunctionsHelper
 
         return null;
     }
+
+    // CSV Importing Helpers
+    public static function processArrayField($value, $fieldName): array {
+        $fieldValue = isset($value[$fieldName]) ? trim($value[$fieldName]) : '';
+    
+        if (preg_match('/^\d+&\d+$/', $fieldValue)) {
+            return explode('&', $fieldValue);
+        } elseif (ctype_digit($fieldValue)) {
+            return [$fieldValue];
+        } else {
+            return [];
+        }
+    }
+    
 }

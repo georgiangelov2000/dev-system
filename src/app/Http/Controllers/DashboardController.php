@@ -17,11 +17,12 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $data = $this->getData();
+        // $data = $this->getData();
 
-        return view('dashboard.home', [
-            'dashboard' => $this->getStats($data)
-        ]);
+        return view('dashboard.home');
+        // return view('dashboard.home', [
+        //     'dashboard' => $this->getStats($data)
+        // ]);
     }
 
     public function getStats(array $data)

@@ -165,10 +165,11 @@ class CategoryController extends Controller
         DB::beginTransaction();
 
         try {
-            $isItFileDeleted = $this->helper->deleteImage($category);
-            if ($isItFileDeleted) {
-                $category->delete();
+            
+            if($category->image_path) {
+                $this->helper->deleteImage($category);
             }
+            $category->delete();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();

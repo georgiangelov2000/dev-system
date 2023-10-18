@@ -1,10 +1,17 @@
 <?php
 
-namespace App\TemplatePatterns\Import;
+namespace App\Factory;
+use Illuminate\Http\UploadedFile;
 
 abstract class CsvImporter
 {
-    protected function parseCSV($file){
+
+    /**
+     * @param UploadedFile $file
+     * 
+     * @return [type]
+     */
+    public function parseCSV(UploadedFile $file){
         $data = [];
         $headers = [];
 
@@ -24,5 +31,10 @@ abstract class CsvImporter
         return $data;
     } 
 
+    /**
+     * @param array $data
+     * 
+     * @return array
+     */
     abstract protected function initValidation(array $data):array;
 }

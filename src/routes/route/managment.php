@@ -13,6 +13,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
@@ -28,6 +29,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('country')->name('country.')->group(function () {
         Route::get('/', [CountryController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('imports')->name('import.')->group(function () {
+        Route::get('/get/{type}', [ImportController::class, 'index'])->name('index');
+        Route::post('/store', [ImportController::class, 'store'])->name('store');
     });
 
     Route::prefix('users')->name('user.')->group(function () {
@@ -69,8 +75,6 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('suppliers')->name('supplier.')->group(function () {
         Route::get('/', [SupplierController::class, 'index'])->name('index');
         Route::get('/create', [SupplierController::class, 'create'])->name('create');
-        Route::get('/import', [SupplierController::class, 'createImport'])->name('create.import');
-        Route::post('/store/import', [SupplierController::class, 'insertImport'])->name('store.import');
         Route::post('/store', [SupplierController::class, 'store'])->name('store');
         Route::get('/edit/{supplier}', [SupplierController::class, 'edit'])->name('edit');
         Route::put('/update/{supplier}', [SupplierController::class, 'update'])->name('update');

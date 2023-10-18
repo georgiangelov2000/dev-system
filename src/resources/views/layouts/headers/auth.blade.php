@@ -44,8 +44,8 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                            alt="Company logo" id="company-logo" />
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
+                        alt="Company logo" id="company-logo" />
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -113,11 +113,6 @@
                         <li class="nav-item">
                             <a href="{{ route('supplier.create') }}" class="nav-link">
                                 <p>Create supplier</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('supplier.create.import') }}" class="nav-link">
-                                Import
                             </a>
                         </li>
                     </ul>
@@ -243,12 +238,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('payment.index','order') }}" class="nav-link">
+                            <a href="{{ route('payment.index', 'order') }}" class="nav-link">
                                 <p>Order payments</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('payment.index','purchase') }}" class="nav-link">
+                            <a href="{{ route('payment.index', 'purchase') }}" class="nav-link">
                                 <p>Purchase payments</p>
                             </a>
                         </li>
@@ -267,6 +262,39 @@
                         <li class="nav-item">
                             <a href="{{ route('settings.get') }}" class="nav-link">
                                 <p>Company info</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-light fa-file-import"></i>
+                        <p>
+                            Imports
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{{ route('import.index','supplier') }}" class="nav-link">
+                                <p>Suppliers</p>
+                            </a>
+                            <a href="{{ route('import.index','customer') }}" class="nav-link">
+                                <p>Customers</p>
+                            </a>
+                            <a href="{{ route('import.index','purchase') }}" class="nav-link">
+                                <p>Purchases</p>
+                            </a>
+                            <a href="{{ route('import.index','package') }}" class="nav-link">
+                                <p>Packages</p>
+                            </a>
+                            <a href="{{ route('import.index','category') }}" class="nav-link">
+                                <p>Categories</p>
+                            </a>
+                            </a>
+                            <a href="{{ route('import.index','brand') }}" class="nav-link">
+                                <p>Brands</p>
                             </a>
                         </li>
                     </ul>

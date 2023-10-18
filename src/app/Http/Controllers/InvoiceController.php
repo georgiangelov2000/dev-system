@@ -41,7 +41,7 @@ class InvoiceController extends Controller
         try {
             
             $data = $request->validated();
-
+            
             $invoice->update($data);
             
             DB::commit();

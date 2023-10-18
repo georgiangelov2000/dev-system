@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Factory\Views\PaymentView;
 use App\Helpers\FunctionsHelper;
 use App\Models\Customer;
 use App\Models\Supplier;
@@ -10,15 +11,15 @@ use App\Models\PurchasePayment;
 
 class PaymentService
 {
-    private $types = ['order', 'purchase'];
-
     private $indexMapping = [];
 
     private $editMapping = [];
 
     private $helper;
 
-    public function __construct(FunctionsHelper $helper)
+    private $paymentView;
+
+    public function __construct(FunctionsHelper $helper, PaymentView $paymentView)
     {
         $this->helper = $helper;
 
@@ -37,19 +38,8 @@ class PaymentService
             'order' => OrderPayment::query(),
             'purchase' => PurchasePayment::query(),
         ];
-    }
 
-    /**
-     * Redirects to the appropriate view based on the payment type.
-     *
-     * @param string $type - Type of payment ('order' or 'purchase').
-     * @return mixed - Returns a view or null if the type is not in the list.
-     */
-    public function redirectToView($type, $payment = null)
-    {
-        if (in_array($type, $this->types)) {
-            return $this->getView($type, $payment);
-        }
+        $this->paymentView = $paymentView;
     }
 
     /**
@@ -59,11 +49,10 @@ class PaymentService
      * @param string|null $payment - Payment ID (optional).
      * @return mixed - Returns a view or null if the type is not in the list.
      */
-    public function getView(string $type, string $payment = null)
+    public function getData(string $type, string $payment = null)
     {
         if (array_key_exists($type, $this->indexMapping) && !$payment) {
             $data = $this->indexMapping[$type];
-            $view = view('payments.' . $type . '_payments', $data);
         } elseif (array_key_exists($type, $this->editMapping) && $payment) {
             $relations = [];
             $builder = $this->editMapping[$type]->where('id', $payment)->first();
@@ -78,10 +67,9 @@ class PaymentService
             $data['payment'] = $builder;
             $data['settings'] = $this->helper->settings();
 
-            $view = view($type . 's.' . 'edit' . '_payment', $data);
         }
         
-        return $view;
+        return view($this->paymentView->getView($type,$payment),$data) ;
     }
 
     /**
