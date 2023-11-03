@@ -5,7 +5,7 @@
 
         <div class="card-header">
             <div class="col-12">
-                <h3 class="card-title">Edit purchase: <span class="text-primary">{{ $status }}</span> </h3>
+                <h3 class="card-title">Edit purchase</h3>
             </div>
         </div>
 

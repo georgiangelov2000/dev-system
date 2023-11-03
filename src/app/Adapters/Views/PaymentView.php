@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Factory\Views;
+namespace App\Adapters\Views;
 
-use App\Factory\ViewType;
+use App\Adapters\ViewType;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PaymentView extends ViewType

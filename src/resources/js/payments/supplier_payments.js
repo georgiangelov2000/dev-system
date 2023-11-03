@@ -88,12 +88,14 @@ $(function () {
                                 <tr>
                                     <th>ID</th>
                                     <th>Image</th>
-                                    <th>Purchase</th>
+                                    <th>Name</th>
                                     <th>Code</th>
                                     <th>Price</th>
                                     <th>Amount</th>
+                                    <th>Discount</th>
                                     <th>Method</th>
                                     <th>Status</th>
+                                    <th>Category</th>
                                     <th>Reference</th>
                                     <th>Date of payment</th>
                                     <th>Delay</th>
@@ -225,6 +227,15 @@ $(function () {
                 {
                     width: '1%',
                     class:'text-center',
+                    name: 'discount_percent',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return `<span>${row.purchase.discount_percent}%</span>`;
+                    }
+                },
+                {
+                    width: '1%',
+                    class:'text-center',
                     name: 'payment_method',
                     orderable: false,
                     render: function (data, type, row) {
@@ -253,6 +264,22 @@ $(function () {
                             <div title="${statusData.label}" class="status">
                                 <span class="icon"><i class="${statusData.iconClass}"></i></span>
                             </div>`;
+                    }
+                },
+                {
+                    width: '10%',
+                    class: 'text-center',
+                    name: 'payment.purchase.category',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (row.purchase.categories.length > 0) {
+                            var categoryNames = row.purchase.categories.map(function (category) {
+                                return "<span> " + category.name + " </span>";
+                            });
+                            return categoryNames.join(', ');
+                        } else {
+                            return "";
+                        }
                     }
                 },
                 {

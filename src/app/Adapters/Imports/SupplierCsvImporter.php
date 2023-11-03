@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Factory\Imports;
+namespace App\Adapters\Imports;
 
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Supplier;
-use App\Factory\CsvImporter;
+use App\Adapters\CsvImporter;
 use Illuminate\Support\Facades\Validator;
 
 final class SupplierCsvImporter extends CsvImporter

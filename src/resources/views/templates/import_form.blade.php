@@ -33,7 +33,7 @@
                         <tr>
                             @if (count($tbodyRows))
                                 @foreach ($tbodyRows as $item)
-                                    <th>{{ $item }}</th>
+                                    <td style="width:150px;">{{ $item }}</td>
                                 @endforeach
                             @endif
                         </tr>

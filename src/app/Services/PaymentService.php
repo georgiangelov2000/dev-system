@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Factory\Views\PaymentView;
+use App\Adapters\Views\PaymentView;
 use App\Helpers\FunctionsHelper;
 use App\Models\Customer;
 use App\Models\Supplier;

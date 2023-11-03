@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FunctionsHelper;
 use Exception;
 use Illuminate\Http\Request;
 use App\Http\Requests\PaymentRequest;
@@ -13,20 +14,21 @@ use Illuminate\View\View; // Import the View class
 class PaymentController extends Controller
 {
     private $paymentMethods;
-
+    private $helper;
     private $paymentService;
-
-    const DEFAULT_STATUS = 6;
+    private $paymentStatuses;
 
     /**
      * Constructor for the PaymentController.
      *
      * @param PaymentService $paymentService - The payment service for handling payments.
      */
-    public function __construct(PaymentService $paymentService)
+    public function __construct(PaymentService $paymentService, FunctionsHelper $helper)
     {
         $this->paymentService = $paymentService;
         $this->paymentMethods  = config('statuses.payment_methods_statuses');
+        $this->paymentStatuses = config('statuses.payment_statuses');
+        $this->helper = $helper;
     }
 
     /**
@@ -79,43 +81,6 @@ class PaymentController extends Controller
     }
 
     /**
-     * Deletes the payment and, if the related model is available, sets its status to the default value.
-     *
-     * @param int $payment - Payment ID.
-     * @param string $type - Type of payment ('order' or 'purchase').
-     * @return \Illuminate\Http\JsonResponse - JSON response with status 200, 404, or 500 depending on the outcome.
-     */
-    public function delete($payment, $type)
-    {
-        DB::beginTransaction();
-
-        try {
-            $builder = $this->paymentService->getInstance($payment, $type);
-
-            $relatedModel = $builder->{$type};
-
-            if ($relatedModel) {
-                $relatedModel->status = self::DEFAULT_STATUS;
-                $relatedModel->save();
-            }
-
-            // Delete the payment
-            $builder->delete();
-            DB::commit();
-
-            if ($relatedModel) {
-                return response()->json(['message' => 'Payment has been deleted'], 200);
-            } else {
-                return response()->json(['message' => $type . ': Not found'], 404);
-            }
-        } catch (Exception $e) {
-            DB::rollback();
-            return response()->json(['message' => 'Payment could not be deleted'], 500);
-        }
-    }
-
-
-    /**
      * Processes payment data and saves it to the database.
      *
      * @param array $data - Array of payment data.
@@ -124,25 +89,30 @@ class PaymentController extends Controller
      */
     private function paymentProcessing(array $data, $builder, $relation)
     {
-        $relation = $builder->$relation;
-        
-        if ($builder->statusValidation($data['payment_status'])) {
-            $relation->status = $data['payment_status'];
+        // Validate payment status and method
+        $validPaymentStatus = $this->helper->statusValidation($data['payment_status'], $this->paymentStatuses);
+        $validPaymentMethod = $data['payment_method'] && $this->helper->statusValidation($data['payment_method'], $this->paymentMethods);
+
+        // Set payment status if valid
+        if ($validPaymentStatus) {
             $builder->payment_status = $data['payment_status'];
-            $relation->save();
         }
 
-        if ($builder->methodValidation($data['payment_method'])) {
+        // Set payment method if valid
+        if ($validPaymentMethod) {
             $builder->payment_method = $data['payment_method'];
         }
 
-        $builder->price = $data['price'];
-        $builder->quantity = $data['quantity'];
-        $builder->date_of_payment = now()->parse($data['date_of_payment']);
-        $builder->payment_reference = $data['payment_reference'];
-        $builder->partially_paid_price = $data['partially_paid_price'] ?? null;
-        $builder->save();
+        // Fill payment attributes from input data
+        $builder->fill([
+            'price' => $data['price'],
+            'quantity' => $data['quantity'],
+            'date_of_payment' => now()->parse($data['date_of_payment']),
+            'payment_reference' => $data['payment_reference'],
+            'partially_paid_price' => $data['partially_paid_price'] ?? '0.00', // Set to '0.00' if not provided
+        ])->save();
 
+        // Update invoice attributes
         $builder->invoice()->update([
             'price' => $builder->price,
             'quantity' => $builder->quantity

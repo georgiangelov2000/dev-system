@@ -20,6 +20,7 @@ class PaymentApiController extends Controller
         $this->helper = $helper;
     }
 
+
     public function getData(Request $request)
     {
         $type = isset($request->type) && $request->type ? $request->type : null;
@@ -87,9 +88,11 @@ class PaymentApiController extends Controller
     private function purchasePayments($id, $dateStart, $dateEnd): array
     {
         $paymentQuery = PurchasePayment::query()
-            ->with(
-                ['purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,status,image_path', 'invoice']
-            );
+        ->with([
+            'purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,image_path,discount_percent',
+            'purchase.categories', // Include the category relationship
+            'invoice'
+        ]);
 
         if ($id) {
             $paymentQuery->whereHas('purchase', function ($query) use ($id) {

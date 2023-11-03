@@ -24,58 +24,33 @@ class OrderService
     public function calculatePrices($price, $discount, $quantity): array
     {
         // Calculate the discounted price
-        $discountPrice = $this->helper->calculatedDiscountPrice($price, $discount);
+        $discount_price = $this->helper->calculatedDiscountPrice($price, $discount);
 
         // Calculate the total price
-        $totalPrice = $this->helper->calculatedFinalPrice($discountPrice, $quantity);
+        $total_price = $this->helper->calculatedFinalPrice($discount_price, $quantity);
 
         // Calculate the original price
-        $originalPrice = $this->helper->calculatedFinalPrice($price, $quantity);
+        $original_price = $this->helper->calculatedFinalPrice($price, $quantity);
 
-        return [
-            'discount_price' => $discountPrice,
-            'total_price' => $totalPrice,
-            'original_price' => $originalPrice
-        ];
+        return compact('discount_price', 'total_price', 'original_price');
     }
 
-    public function createOrUpdatePayment($order)
-    {
-        // Generate an alias based on the order's date
-        $alias = $this->getAlias($order);
-
-        $paymentData = [
-            'alias' => $alias,
-            'quantity' => $order->sold_quantity,
-            'price' => $order->total_sold_price,
-            'date_of_payment' => $this->dateOfPayment($order)
-        ];
-
-        // Update or create the payment record
-        $payment = $order->payment()->updateOrCreate([], $paymentData);
-
-        // Update or create the associated invoice record
-        $payment->invoice()->updateOrCreate([], [
-            'price' => $payment->price,
-            'quantity' => $payment->quantity
-        ]);
-    }
-
-    private function getAlias($order)
+    /**
+     * Generate an alias based on the provided order's package extension date or date of sale.
+     *
+     * If package_extension_date is available, it will be used; otherwise, date_of_sale will be used.
+     *
+     * @param \App\Models\Order $order The order instance for which to generate the alias.
+     * @return string The generated alias.
+     */
+    public function getAlias($order)
     {
         // Determine the alias based on package_extension_date or date_of_sale
         $aliasDate = $order->package_extension_date
             ? now()->parse($order->package_extension_date)->format('F j, Y')
             : now()->parse($order->date_of_sale)->format('F j, Y');
 
+        // Replace spaces and commas with underscores, and convert to lowercase
         return strtolower(str_replace([' ', ','], ['_', ''], $aliasDate));
-    }
-
-    private function dateOfPayment($order)
-    {
-        // Determine the date of payment based on package_extension_date or date_of_sale
-        return $order->package_extension_date
-            ? $order->package_extension_date
-            : $order->date_of_sale;
     }
 }

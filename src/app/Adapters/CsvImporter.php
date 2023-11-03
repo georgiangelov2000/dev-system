@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Factory;
+namespace App\Adapters;
 use Illuminate\Http\UploadedFile;
 
 abstract class CsvImporter

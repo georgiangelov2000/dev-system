@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Factory\Views\ImportView;
+use App\Factory\FactoryImportAdapter;
+use App\Adapters\Views\ImportView;
 use App\Http\Requests\CSVRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use App\Factory\CsvImporter;
-use App\Services\CategoryService;
 
 class ImportController extends Controller
 {
@@ -49,12 +48,11 @@ class ImportController extends Controller
             $data = $request->validated();
 
             // Build the class name dynamically
-            $classBuilder = 'App\\Factory\\Imports\\' . ucfirst($data['type']) . 'CsvImporter';
-
+            $classBuilder =  FactoryImportAdapter::select($data['type']);
             // Check if the class exists
-            if (class_exists($classBuilder)) {
+            if ($classBuilder && class_exists(get_class($classBuilder))) {
                 // Instantiate the class and initialize validation
-                $instance = new $classBuilder();
+                $instance = $classBuilder;
             } else {
                 // If the class does not exist, handle the error as needed
                 return back()->withInput()->with('error', 'Invalid CSV importer type.');
@@ -62,7 +60,7 @@ class ImportController extends Controller
 
             // Process the data from the CSV file
             $csvData = $instance->parseCSV($data['file']);
-
+            
             // We check if the CSV file contains data
             if (empty($csvData)) {
                 // If not, we return the user with an error message
@@ -70,12 +68,12 @@ class ImportController extends Controller
             };
 
             $validationData = $instance->initValidation(array_change_key_case($csvData));
-            
-            // Check for validation errors
-            if (isset($validationData['error'])) {
-                // If there are errors, return the user with the error
-                return back()->withInput()->with($validationData);
-            }
+
+            // // Check for validation errors
+            // if (isset($validationData['error'])) {
+            //     // If there are errors, return the user with the error
+            //     return back()->withInput()->with($validationData);
+            // }
 
             // If there are no errors, we commit the transaction to the database
             DB::commit();

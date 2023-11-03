@@ -12,9 +12,6 @@
                 <div class="col-12">
                     <h6 class="font-weight-bold">Legend:</h6>
                 </div>
-                <div class="col-12">
-                    <span>- You can update purchases with status delivered</span>
-                </div>
             </div>
             <form method="PUT" onsubmit="updatePurchases(event)">
                 @csrf

@@ -38,7 +38,6 @@ class PurchaseApiController extends Controller
             'price',
             'total_price',
             'code',
-            'status',
             'initial_quantity',
             'expected_date_of_payment',
             'original_price',
@@ -46,7 +45,7 @@ class PurchaseApiController extends Controller
             'discount_price',
             'image_path',
         );
-
+        
         if ($limit) {
             $purchaseQuery->skip($offset)->take($limit);
         }
@@ -60,7 +59,9 @@ class PurchaseApiController extends Controller
             $purchaseQuery->where('id', $id);
         }
         if ($status) {
-            $purchaseQuery->whereIn('status', $status);
+            $purchaseQuery->whereHas('payment',function($query)use($status){
+                $query->whereIn('purchase_payments.payment_status',$status);
+            });
         }
         if ($supplier) {
             $purchaseQuery->where('supplier_id', $supplier);
@@ -111,7 +112,7 @@ class PurchaseApiController extends Controller
             );
         }
 
-        $relations = [...$relations, ...['payment:id,purchase_id,alias']];
+        $relations = [...$relations, ...['payment:id,payment_status,purchase_id,alias']];
         $purchaseQuery->with($relations)->withCount([
             'orders',
             // Add other relationships you want to count here

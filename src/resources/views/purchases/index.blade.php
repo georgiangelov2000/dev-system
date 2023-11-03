@@ -85,7 +85,7 @@
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select name="status" id="" class="form-control selectType" multiple>
-                                @foreach (config('statuses.purchase_statuses') as $key => $status)
+                                @foreach (config('statuses.payment_statuses') as $key => $status)
                                     <option value="{{ $key }}">{{ $status }}</option>
                                 @endforeach
                             </select>
@@ -103,7 +103,7 @@
                         </th>
                         <th>Payment</th>
                         <th>ID</th>
-                        <th class='text-center'>Image</th>
+                        <th>Image</th>
                         <th>Name</th>
                         <th>Price</th>
                         <th>Disc.price</th>

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Factory\Imports;
+namespace App\Adapters\Imports;
 
-use App\Factory\CsvImporter;
+use App\Adapters\CsvImporter;
 use App\Models\Country;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Validator;

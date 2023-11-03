@@ -26,7 +26,6 @@ class CreateOrdersTable extends Migration
             $table->date('package_extension_date')->nullable();
             $table->date('date_of_sale');
             $table->string('tracking_number');
-            $table->tinyInteger('status')->comment('1: Paid, 2: Pending, 3: Partially Paid, 4: Overdue, 5: Refunded, 6: Ordered');
             $table->timestamps();
 
             // Add foreign key constraint with ON DELETE CASCADE

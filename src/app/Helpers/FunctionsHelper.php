@@ -24,7 +24,7 @@ class FunctionsHelper
             $finalPrice = $price;
         }
 
-        return number_format($finalPrice, 2);
+        return number_format($finalPrice, 2, '.', '');
     }
 
     /**
@@ -164,7 +164,8 @@ class FunctionsHelper
         return $result;
     }
 
-    public static function dateRange($date) {
+    public static function dateRange($date)
+    {
         if (!empty($date)) {
             $dates = explode(" - ", $date);
             $date1 = $dates[0];
@@ -184,7 +185,8 @@ class FunctionsHelper
         return null;
     }
 
-    public static function dateToString($dateStart,$dateEnd): ?string {
+    public static function dateToString($dateStart, $dateEnd): ?string
+    {
         // Format the date range for the response
         if ($dateStart && $dateEnd) {
             return date('F j, Y', strtotime($dateStart)) . ' - ' . date('F j, Y', strtotime($dateEnd));
@@ -194,9 +196,10 @@ class FunctionsHelper
     }
 
     // CSV Importing Helpers
-    public static function processArrayField($value, $fieldName): array {
+    public static function processArrayField($value, $fieldName): array
+    {
         $fieldValue = isset($value[$fieldName]) ? trim($value[$fieldName]) : '';
-    
+        
         if (preg_match('/^\d+&\d+$/', $fieldValue)) {
             return explode('&', $fieldValue);
         } elseif (ctype_digit($fieldValue)) {
@@ -205,5 +208,32 @@ class FunctionsHelper
             return [];
         }
     }
-    
+
+    /**
+     * Status validation.
+     *
+     * @param int $status
+     * @return int
+     */
+    public static function statusValidation(int|string $status, array $statuses): ?int
+    {
+        return array_key_exists($status, $statuses) ? $status : null;
+    }
+
+    /**
+     * Syncs a relationship for the given model if the key exists in the data array and is not empty.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  array  $data
+     * @param  string  $relationshipKey
+     * @return void
+     */
+    public static function syncRelationshipIfNotEmpty($model, $data, $relationshipKey, $relationship)
+    {
+        // Check if the relationship key exists in the data array and is not empty
+        if (array_key_exists($relationshipKey, $data) && !empty($data[$relationshipKey])) {
+            // Sync the relationship data using the provided key
+            $model->{$relationship}()->sync($data[$relationshipKey]);
+        }
+    }
 }

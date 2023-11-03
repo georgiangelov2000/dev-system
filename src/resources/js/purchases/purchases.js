@@ -10,7 +10,6 @@ $(function () {
         3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
         4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
         5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
-        6: { label: "Delivered", iconClass: "fal fa-shipping-fast" }
     };
 
     $('.selectAction, .selectSupplier, .selectCategory, .selectSubCategory, .selectBrands, .selectPrice, .selectStock, .selectType')
@@ -274,7 +273,7 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    const statusInfo = statusMap[row.status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
+                    const statusInfo = statusMap[row.payment.payment_status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
             
                     return `<div title="${statusInfo.label}" class="status">
                         <span class="icon"><i class="${statusInfo.iconClass}"></i></span>
@@ -287,8 +286,8 @@ $(function () {
                 class: 'text-center',
                 render: function (data, type, row) {
                     let deleteFormTemplate = '';
-
-                    if (row.status === 6) {
+                    
+                    if (statusMap[row.payment.payment_status].label === 'Pending') {
                         deleteFormTemplate = `
                         <form style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
                             <input type='hidden' name='_method' value='DELETE'>

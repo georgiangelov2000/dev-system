@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Factory\Imports;
+namespace App\Adapters\Imports;
 
-use App\Factory\CsvImporter;
+use App\Adapters\CsvImporter;
 use App\Models\Category;
 use App\Services\CategoryService;
 use Illuminate\Support\Facades\Validator;

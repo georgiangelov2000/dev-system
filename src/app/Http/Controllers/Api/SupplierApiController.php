@@ -79,23 +79,32 @@ class SupplierApiController extends Controller
             'state_id',
             'country_id',
             'image_path'
-        ])->withCount([
-            'purchases as paid_purchases_count' => function ($query) {
-                $query->where('status', 1);
-            },
-            'purchases as pending_purchases_count' => function ($query) {
-                $query->where('status', 2);
-            },
-            'purchases as overdue_purchases_count' => function ($query) {
-                $query->where('status', 4);
-            },
-            'purchases as refund_purchases_count' => function ($query) {
-                $query->where('status', 5);
-            },
-            'purchases as delivered_purchases_count' => function ($query) {
-                $query->where('status', 6);
-            }
-        ])->withCount('purchases');
+        ])
+        ->withCount(
+            [
+                'purchases as paid' => function ($query) {
+                    $query->whereHas('payment', function ($subquery) {
+                        $subquery->where('payment_status', 1);
+                    });
+                },
+                'purchases as pending' => function ($query) {
+                    $query->whereHas('payment', function ($subquery) {
+                        $subquery->where('payment_status', 2);
+                    });
+                },
+                'purchases as overdue' => function ($query) {
+                    $query->whereHas('payment', function ($subquery) {
+                        $subquery->where('payment_status', 4);
+                    });
+                },
+                'purchases as refunded' => function ($query) {
+                    $query->whereHas('payment', function ($subquery) {
+                        $subquery->where('payment_status', 5);
+                    });
+                },
+            ]
+        )
+        ->withCount('purchases');
 
         // Calculate total records and filtered records
         $totalRecords = Supplier::count();

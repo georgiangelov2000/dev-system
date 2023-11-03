@@ -52,14 +52,6 @@ class Order extends Model
         'package_extension_date'
     ];
 
-    public $specificFields = [
-        'date_of_sale', 'sold_quantity', 'single_sold_price', 'discount_percent', 'tracking_number'
-    ];
-
-    public $defaultFields = [
-        'customer_id', 'user_id', 'package_id', 'purchase_id'
-    ];
-
     protected $statuses; // Declare statuses as a class property
 
     public function __construct()
@@ -91,15 +83,5 @@ class Order extends Model
     public function payment()
     {
         return $this->hasOne(OrderPayment::class);
-    }
-
-    public function statusValidation()
-    {
-        return array_key_exists($this->status, $this->statuses) ? $this->status : null;
-    }
-
-    public function orderedStatus()
-    {
-        return array_key_exists($this->status, $this->statuses) && $this->status === 6 ? $this->status : null;
     }
 }

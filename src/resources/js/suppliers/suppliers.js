@@ -149,18 +149,17 @@ $(document).ready(function () {
                 orderable: false,
                 class: 'text-center',
                 render: function (data, type, row) {
-                    let paidPurchases = row.paid_purchases_count;
-                    let overduePurchases = row.overdue_purchases_count;
-                    let pendingPurchases = row.pending_purchases_count;
-                    let refundPurchases = row.refund_purchases_count;
-                    let deliveredPurchases = row.delivered_purchases_count;
+                    console.log(row);
+                    let paidPurchases = row.paid;
+                    let pendingPurchases = row.pending;
+                    let overduePurchases = row.overdue;
+                    let refundPurchases = row.refunded;
 
                     return `<div>
                         <span class="text-success">${paidPurchases} paid</span> /
                         <span class="text-danger">${overduePurchases} overdue</span> /
                         <span class="text-primary">${pendingPurchases} pending</span> /
-                        <span class="text-dark">${refundPurchases} refund</span> /
-                        <span>${deliveredPurchases} delivered</span>
+                        <span class="text-dark">${refundPurchases} refund</span>
                     </div>`
                 }
             },

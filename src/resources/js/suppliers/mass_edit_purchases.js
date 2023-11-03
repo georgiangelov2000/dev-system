@@ -8,7 +8,15 @@ $(function () {
     const bootstrapSubCategory = $('select[name="sub_category_ids"]');
     const bootstrapCategory = $('select[name="category_id"]');
 
-    const statuses = [6];
+    const statuses = [2];
+
+    const statusMap = {
+        1: { label: "Paid", iconClass: "fal fa-check-circle" },
+        2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
+        3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
+        4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
+        5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
+    };
 
     let dataTable = table.DataTable({
         serverSide: true,
@@ -163,16 +171,7 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    const statusMap = {
-                        1: { label: "Paid", iconClass: "fal fa-check-circle" },
-                        2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
-                        3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
-                        4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
-                        5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
-                        6: { label: "Delivered", iconClass: "fal fa-shipping-fast" }
-                    };
-            
-                    const statusInfo = statusMap[row.status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
+                    const statusInfo = statusMap[row.payment.payment_status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
             
                     return `<div title="${statusInfo.label}" class="status">
                         <span class="icon"><i class="${statusInfo.iconClass}"></i></span>

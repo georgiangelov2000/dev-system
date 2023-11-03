@@ -286,9 +286,6 @@
                             <a href="{{ route('import.index','purchase') }}" class="nav-link">
                                 <p>Purchases</p>
                             </a>
-                            <a href="{{ route('import.index','package') }}" class="nav-link">
-                                <p>Packages</p>
-                            </a>
                             <a href="{{ route('import.index','category') }}" class="nav-link">
                                 <p>Categories</p>
                             </a>

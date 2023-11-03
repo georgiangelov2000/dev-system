@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Factory;
+namespace App\Adapters;
 
 abstract class ViewType
 {

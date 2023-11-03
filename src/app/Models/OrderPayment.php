@@ -57,15 +57,4 @@ class OrderPayment extends Model
     {
         return $this->hasOne(InvoiceOrder::class, 'order_payment_id');
     }
-
-    public function statusValidation(string $status = null): ?string
-    {
-        return array_key_exists($status, $this->statuses) ? $status : (array_key_exists($this->payment_status, $this->statuses) ? $this->payment_status : null);
-    }
-    
-    public function methodValidation(string $method = null): ?string
-    {
-        return array_key_exists($method, $this->methods) ? $method : (array_key_exists($this->payment_method, $this->methods) ? $this->payment_method : null);
-    }
-    
 }
