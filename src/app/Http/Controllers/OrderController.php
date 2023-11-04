@@ -62,14 +62,12 @@ class OrderController extends Controller
         try {
             if (count($data['purchase_id'])) {
                 foreach ($data['purchase_id'] as $key => $id) {
-                    $this->orderUpdateProcessing($data, null, $key);
+                    $this->orderProcessing($data, null, $key);
                 }
             }
-            dd('yes');
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             return response()->json(['message' => 'Order has not been created'], 500);
         }
         return response()->json(['message' => 'Order has been created'], 200);
@@ -92,7 +90,7 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $data = $request->validated();
-            $this->orderUpdateProcessing($data, $order);
+            $this->orderProcessing($data, $order);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -111,7 +109,7 @@ class OrderController extends Controller
             if (count($data['order_ids'])) {
                 foreach ($data['order_ids'] as $key => $value) {
                     $order = Order::find($value);
-                    $this->orderUpdateProcessing($data, $order);
+                    $this->orderProcessing($data, $order);
                 }
             }
             DB::commit();
@@ -188,7 +186,7 @@ class OrderController extends Controller
      * @param Order $order
      * @return void
      */
-    private function orderUpdateProcessing(array $data, $order = null, $key = null)
+    private function orderProcessing(array $data, $order = null, $key = null)
     {
         $order = $order ? $order : new Order;
         $isNewOrder = !$order->exists; // Check if it's a new order
@@ -262,9 +260,9 @@ class OrderController extends Controller
 
             //Save the updated order and create or update the payment
             $this->createOrUpdatePayment($order);
-        }
 
-        unset($order, $purchase);
+            return $order; 
+        }
     }
 
     /**
@@ -275,38 +273,28 @@ class OrderController extends Controller
      * @return Payment The created or updated payment instance.
      */
 
-    private function createOrUpdatePayment(Order $order): OrderPayment
-    {
-        // Generate an alias for the payment based on the order's delivery date
-        $alias = $this->service->getAlias($order);
+     private function createOrUpdatePayment(Order $order): OrderPayment
+     {
+         $alias = $this->service->getAlias($order);
+         
+         $paymentData = [
+            'alias' => $alias ?: 'default_alias',
+             'quantity' => $order->sold_quantity,
+             'price' => $order->total_sold_price,
+             'date_of_payment' => $order->package_extension_date ?: $order->date_of_sale,
+             'payment_status' => self::INIT_STATUS,
+         ];
 
-        // Prepare payment data
-        $paymentData = [
-            'alias' => $alias,
-            'quantity' => $order->sold_quantity,
-            'price' => $order->total_sold_price,
-            'date_of_payment' => $order->package_extension_date ? $order->package_extension_date : $order->date_of_sale
-        ];
+         $payment = $order->payment 
+         ? $order->payment->update($paymentData) 
+         : $order->payment()->create($paymentData);
 
-        // Check if a payment record already exists for the order
-        $existingPayment = $order->payment;
-
-        // If no payment record exists, create one
-        if (!$existingPayment) {
-            $paymentData['payment_status'] = self::INIT_STATUS;
-            $payment = $order->payment()->create($paymentData);
-        } else {
-            // Update the existing payment record with new data
-            $existingPayment->update($paymentData);
-            $payment = $existingPayment;
-        }
-
-        // Update or create invoice record associated with the payment
-        $payment->invoice()->updateOrCreate([], [
-            'price' => $payment->price,
-            'quantity' => $payment->quantity
-        ]);
-
-        return $payment;
-    }
+         $payment->invoice()->updateOrCreate([], [
+             'price' => $payment->price,
+             'quantity' => $payment->quantity
+         ]);
+     
+         return $payment;
+     }
+     
 }
