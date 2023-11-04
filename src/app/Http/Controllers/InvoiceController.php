@@ -2,53 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\InvoiceOrderRequest;
-use App\Http\Requests\InvoicePurchaseRequest;
+use App\Http\Requests\InvoiceRequest;
 use App\Models\InvoicePurchase;
 use App\Models\InvoiceOrder;
+use App\Services\InvoiceService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
+    protected $invoiceService;
 
-    public function update(){
-
+    public function __construct(InvoiceService $invoiceService)
+    {
+        $this->invoiceService = $invoiceService;
     }
 
-    private function modelFounder(){
-        
-    }
-    
-    public function updatePurchaseInvoice(InvoicePurchase $invoice, InvoicePurchaseRequest $request) {
+    public function update(InvoiceRequest $request, $type, $invoice)
+    {
         DB::beginTransaction();
+
         try {
-
+            $builder = $this->invoiceService->getInstance($invoice, $type);
             $data = $request->validated();
-
-            $invoice->update($data);
-
+            $this->invoiceProcessing($data, $builder);
             DB::commit();
-            return response()->json(['message' => 'Successfully updated invoice',200]);
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Unsuccesfully updated invoice',500]);
+            return response()->json(['message' => 'Invoice has not been updated'], 500);
         }
+        return response()->json(['message' => 'Invoice has been updated'], 200);
     }
 
-    public function updateOrderInvoice(InvoiceOrder $invoice, InvoiceOrderRequest $request) {
-        DB::beginTransaction();
-        try {
-            
-            $data = $request->validated();
-            
-            $invoice->update($data);
-            
-            DB::commit();
-            return response()->json(['message' => 'Successfully updated invoice',200]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['message' => 'Unsuccesfully updated invoice',500]);
-        }
+    private function invoiceProcessing(array $data, $builder)
+    {
+        $builder->fill([
+            'invoice_number' => $data['invoice_number'],
+            'invoice_date' => now()->parse($data['invoice_date']),
+            'price' => $data['price'],
+            'quantity' => $data['quantity']
+        ])->save();
+
+        return $builder;
     }
 }

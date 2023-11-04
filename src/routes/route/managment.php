@@ -140,8 +140,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('invoices')->name('invoice.')->group(function () {
-        Route::put('/purchase/update/{invoice}', [InvoiceController::class, 'updatePurchaseInvoice'])->name('update.purchase');
-        Route::put('/order/update/{invoice}', [InvoiceController::class, 'updateOrderInvoice'])->name('update.order');
+        Route::put('/{type}/update/{invoice}', [InvoiceController::class, 'update'])->name('update');
     });
 
 }); 

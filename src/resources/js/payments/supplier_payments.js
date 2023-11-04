@@ -371,7 +371,7 @@ $(function () {
 
             modalInvoice.modal('show');
 
-            modalInvoice.find('form').attr('action', PARCHASE_INVOICE_UPDATE_ROUTE.replace(":id", id))
+            modalInvoice.find('form').attr('action', PURCHASE_INVOICE_UPDATE_ROUTE.replace(':type',TYPE).replace(":id", id))
 
             modalInvoice.find('form input').each(function () {
                 let inputName = $(this).attr('name');

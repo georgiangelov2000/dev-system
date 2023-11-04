@@ -2,7 +2,7 @@
     <div class="card-header">
         <h3 class="card-title bg-muted">Summary statistics</h3>
         <div class="card-tools">
-            <i class="fas fa-bars"></i>
+            <i class="fas fa-lg fa-chart-bar text-primary"></i>
         </div>
     </div>
     <div class="card-body">
