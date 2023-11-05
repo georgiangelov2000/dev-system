@@ -102,7 +102,6 @@ class SettingsController extends Controller
             return redirect()->back()->with('success', 'Settings has been updated');
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
             return back()->withInput()->with('error', 'Settings has not been updated');
         }
     }

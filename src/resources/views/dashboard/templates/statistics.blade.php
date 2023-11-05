@@ -22,7 +22,7 @@
                                 {{ $item['status'] }}
                             </span>
                             <span class="ml-1 mr-1">:</span>
-                            <span class="text text-primary m-0">
+                            <span class="text font-weight-normal m-0">
                                 {{ $item['total_price'] }} $
                             </span>
                         </li>
@@ -42,7 +42,7 @@
                         <li class="border-bottom p-0 d-flex align-items-center p-1">
                             <span class="text">{{ $item['status'] }}</span>
                             <span class="ml-1 mr-1">:</span>
-                            <span class="text text-primary m-0">
+                            <span class="text font-weight-normal m-0">
                                 {{ $item['total_price'] }} $
                             </span>
                         </li>
@@ -70,7 +70,7 @@
                             <span class="text mr-3">
                                 {{ $item['name'] }}
                             </span>
-                            <span class="text text-primary m-0">
+                            <span class="text font-weight-normal m-0">
                                 <span class="text font-weight-normal">Price:</span>
                                 {{ $item['total_price'] }} $
                             </span>
@@ -97,7 +97,7 @@
                             <span class="text mr-3">
                                 {{ $item['name'] }}
                             </span>
-                            <span class="text text-primary m-0">
+                            <span class="text font-weight-normal m-0">
                                 <span class="text font-weight-normal">Price:</span>
                                 {{ $item['total_price'] }} $
                             </span>

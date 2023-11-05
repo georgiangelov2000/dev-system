@@ -83,7 +83,7 @@ class UserController extends Controller
                     if (in_array($extension, ['png', 'jpg', 'jpeg'], true)) {
                         try {
                             $hashedImage = $file->store('public/users');
-                            $user->image = Storage::url($hashedImage);
+                            $user->photo = Storage::url($hashedImage);
                         } catch (\Exception $e) {
                             Log::error('Error storing image file: ' . $e->getMessage());
                         }
@@ -167,7 +167,7 @@ class UserController extends Controller
                     $extension = $file->getClientOriginalExtension();
                     if (in_array($extension, ['png', 'jpg', 'jpeg'], true)) {
                         try {
-                            $existingImage = $user->image;
+                            $existingImage = $user->photo;
                             if ($existingImage !== null) {
                                 $imagePath = public_path($existingImage);
 
@@ -179,7 +179,7 @@ class UserController extends Controller
 
                             // Store the new image file
                             $newImagePath = $file->store('public/users');
-                            $user->image = Storage::url($newImagePath);
+                            $user->photo = Storage::url($newImagePath);
                         } catch (\Exception $e) {
                             Log::error('Error storing image file: ' . $e->getMessage());
                         }

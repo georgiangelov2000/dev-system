@@ -45,7 +45,19 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
-                        alt="Company logo" id="company-logo" />
+                    alt="Company logo" id="company-logo" />
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('profile.index') }}" class="nav-link">
+                        <i class="fa-light fa-user"></i>
+                        <p>My profile</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('country.index') }}" class="nav-link">
+                        <i class="fal fa-flag"></i>
+                        <p>Countries</p>
+                    </a>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -62,12 +74,6 @@
                             </a>
                         </li>
                     </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('country.index') }}" class="nav-link">
-                        <i class="fal fa-flag"></i>
-                        <p>Countries</p>
-                    </a>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -277,20 +283,20 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('import.index','supplier') }}" class="nav-link">
+                            <a href="{{ route('import.index', 'supplier') }}" class="nav-link">
                                 <p>Suppliers</p>
                             </a>
-                            <a href="{{ route('import.index','customer') }}" class="nav-link">
+                            <a href="{{ route('import.index', 'customer') }}" class="nav-link">
                                 <p>Customers</p>
                             </a>
-                            <a href="{{ route('import.index','purchase') }}" class="nav-link">
+                            <a href="{{ route('import.index', 'purchase') }}" class="nav-link">
                                 <p>Purchases</p>
                             </a>
-                            <a href="{{ route('import.index','category') }}" class="nav-link">
+                            <a href="{{ route('import.index', 'category') }}" class="nav-link">
                                 <p>Categories</p>
                             </a>
                             </a>
-                            <a href="{{ route('import.index','brand') }}" class="nav-link">
+                            <a href="{{ route('import.index', 'brand') }}" class="nav-link">
                                 <p>Brands</p>
                             </a>
                         </li>
