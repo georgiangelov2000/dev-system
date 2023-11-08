@@ -1,4 +1,5 @@
 import { APICaller } from '../ajax/methods';
+import { numericFormat } from '../helpers/functions';
 
 $(function () {
   $('.purchaseFilter, .selectCustomer, .packageType, .deliveryMethod, .selectSupplier').selectpicker();
@@ -69,7 +70,7 @@ $(function () {
             value="${customer.id}"
             data-name="${customer.name}"
           > 
-            ${customer.name} 
+            ${customer.name}
           </option>`)
         })
       }
@@ -88,7 +89,7 @@ $(function () {
       'customer': bootstrapCustomer.val(),
       'select_json': 1,
       'without_package': 1,
-      'status': [6]
+      'status': [2]
     }, function (response) {
       let orders = response;
       let ordersLength = orders.length;
@@ -99,7 +100,7 @@ $(function () {
         toastr['success'](`${ordersLength} ${ordersLength > 1 ? "orders" : 'order'} was fetched.`);
         bootstrapOrder.append('<option value="" style="display:none;"></option>');
         $.each(orders, function ($key, order) {
-          bootstrapOrder.append(`<option value="${order.id}"> ${order.purchase.name} </option>`);
+          bootstrapOrder.append(`<option value="${order.id}"> ${order.purchase.name} - ${order.tracking_number} </option>`);
         });
       }
 
@@ -118,8 +119,7 @@ $(function () {
       'select_json': 1,
     }, function (response) {
 
-      let order = response[0];
-
+      let order = response.order;
       let row = table.find(`tr[data-id="${order.id}"]`);
 
       if (row.length) {
@@ -152,7 +152,7 @@ $(function () {
         6: { text: "Ordered", iconClass: "fal fa-shopping-cart" }
       };
 
-      const statusInfo = statusMap[data.status] || { text: "Unknown", iconClass: "fal fa-question" };
+      const statusInfo = statusMap[data.payment.payment_status] || { text: "Unknown", iconClass: "fal fa-question" };
       
       let template = `
         <tr data-id="${data.id}">
@@ -170,17 +170,17 @@ $(function () {
             <a href='${PURCHASE_EDIT_ROUTE.replace(':id', data.purchase.id)}'>${data.purchase.name}</a>
           </td>
           <td>${data.date_of_sale}</td>
-          <td>€${data.discount_single_sold_price}</td>
-          <td>€${data.single_sold_price}</td>
+          <td>${ numericFormat(data.discount_single_sold_price) }</td>
+          <td>${ numericFormat(data.single_sold_price) }</td>
           <td>
             <input 
               type="hidden" 
               name="total_sold_price" 
               value="${data.total_sold_price}" 
             />
-            €${data.total_sold_price}
+            ${numericFormat(data.total_sold_price)}
           </td>
-          <td>€${data.original_sold_price}</td>
+          <td>${numericFormat(data.original_sold_price)}</td>
           <td>${data.discount_percent}</td>
           <td>${data.sold_quantity}</td>
           <td><i title="${statusInfo.text}" class="${statusInfo.iconClass}"></i></td>

@@ -23,7 +23,7 @@
                             </span>
                             <span class="ml-1 mr-1">:</span>
                             <span class="text font-weight-normal m-0">
-                                {{ $item['total_price'] }} $
+                                {{ $item['total_price'] }}
                             </span>
                         </li>
                     @endforeach
@@ -43,7 +43,7 @@
                             <span class="text">{{ $item['status'] }}</span>
                             <span class="ml-1 mr-1">:</span>
                             <span class="text font-weight-normal m-0">
-                                {{ $item['total_price'] }} $
+                                {{ $item['total_price'] }}
                             </span>
                         </li>
                     @endforeach
@@ -72,7 +72,7 @@
                             </span>
                             <span class="text font-weight-normal m-0">
                                 <span class="text font-weight-normal">Price:</span>
-                                {{ $item['total_price'] }} $
+                                <span class="text">{{ $item['total_price'] }}</span>
                             </span>
                         </li>
                     @endforeach
@@ -99,7 +99,7 @@
                             </span>
                             <span class="text font-weight-normal m-0">
                                 <span class="text font-weight-normal">Price:</span>
-                                {{ $item['total_price'] }} $
+                                <span class="text">{{ $item['total_price'] }}</span>
                             </span>
                         </li>
                     @endforeach

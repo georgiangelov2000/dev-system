@@ -1,5 +1,6 @@
 import { APICaller,APIDELETECALLER } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
+import { numericFormat } from '../helpers/functions';
 
 $(function () {
     $('.selectAction, .selectType, .selectCustomer, .selectPackage, .selectDriver').selectpicker();
@@ -106,7 +107,7 @@ $(function () {
                 name: "single_sold_price",
                 render: function (data, type, row) {
                     
-                    return `<span>€${row.single_sold_price}</span>`
+                    return `<span>${numericFormat(row.single_sold_price)}</span>`
                 }
             },
             {
@@ -115,20 +116,20 @@ $(function () {
                 class:'text-center',
                 name: "discount_single_sold_price",
                 render: function (data, type, row) {
-                    return `<span>€${row.discount_single_sold_price}</span>`
+                    return `<span>${numericFormat(row.discount_single_sold_price)}</span>`
                 }
             },
             {
-                width: '10%',
+                width: '8%',
                 orderable: false,
                 class:'text-center',
                 name: "total_sold_price",
                 render: function (data, type, row) {
-                    return `<span>€${row.total_sold_price}</span>`
+                    return `<span>${numericFormat(row.total_sold_price)}</span>`
                 }
             },
             {
-                width: '10%',
+                width: '8%',
                 orderable: false,
                 class:'text-center',
                 name: "original_sold_price",
@@ -168,7 +169,7 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '10%',
                 orderable: false,
                 class:'text-center',
                 name: 'expired',
@@ -180,7 +181,7 @@ $(function () {
                     let badgeClass = '';
                     let badgeText = '';
 
-                    switch (row.status) {
+                    switch (row.payment.payment_status) {
                         case 6:
                         case 2:
                             badgeClass = 'text-warning';
@@ -216,7 +217,7 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    const statusData = statusMap[row.status] || { text: "Unknown", iconClass: "fal fa-question" };
+                    const statusData = statusMap[row.payment.payment_status] || { text: "Unknown", iconClass: "fal fa-question" };
 
                     return `
                     <div title="${statusData.label}" class="status">
@@ -229,7 +230,7 @@ $(function () {
                 orderable: false,
                 class: 'text-center',
                 render: function (data, type, row) {
-                    const statusInfo = statusMap[row.status] || { text: "Unknown", iconClass: "fal fa-question" };
+                    const statusInfo = statusMap[row.payment.payment_status] || { text: "Unknown", iconClass: "fal fa-question" };
 
                     let buttons = [];
                     let deleteFormTemplate = '';

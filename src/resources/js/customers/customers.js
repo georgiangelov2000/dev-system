@@ -54,6 +54,7 @@ $(function () {
                     'country': selectCountry.val(),
                     'state': selectState.val(),
                     "search": d.search.value,
+                    'limit': d.custom_length = d.length,
                 });
             }
         },
@@ -168,10 +169,8 @@ $(function () {
                     let overdueOrders = row.overdue_orders_count;
                     let pendingOrders = row.pending_orders_count;
                     let refundOrders = row.refund_orders_count;
-                    let orderedOrders = row.ordered_orders_count;
 
                     return `<div>
-                        <span class="text-muted">${orderedOrders} orders</span> /
                         <span class="text-success">${paidOrders} paid</span> /
                         <span class="text-danger">${overdueOrders} overdue</span> /
                         <span class="text-primary">${pendingOrders} pending</span> /

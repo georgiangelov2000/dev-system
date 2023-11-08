@@ -37,7 +37,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('imports')->name('import.')->group(function () {
-        Route::get('/get/{type}', [ImportController::class, 'index'])->name('index');
+        Route::get('/{type}', [ImportController::class, 'index'])->name('index');
         Route::post('/store', [ImportController::class, 'store'])->name('store');
     });
 

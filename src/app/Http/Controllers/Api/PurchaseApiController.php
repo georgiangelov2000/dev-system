@@ -11,23 +11,10 @@ class PurchaseApiController extends Controller
 
     public function getData(Request $request)
     {
-        $relations = ['categories', 'subcategories', 'brands', 'supplier:id,name'];
-
-        $supplier = isset($request->supplier) ? $request->supplier : null;
-        $id = isset($request->id) ? $request->id : null;
-        $category = isset($request->category) ? $request->category : null;
-        $status = isset($request->status) ? $request->status : null;
-        $sub_category = isset($request->sub_category) ? $request->sub_category : null;
-        $brand = isset($request->brand) ? $request->brand : null;
-        $single_total_price = isset($request->single_total_price) ? $request->single_total_price : null;
-        $total_price_range = isset($request->total_price_range) ? $request->total_price_range : null;
-        $search = isset($request->search) ? $request->search : null;
-        $select_json = isset($request->select_json) ? boolval($request->select_json) : null;
-        $order_dir = isset($request->order_dir) ? $request->order_dir : null;
-        $column_name = isset($request->order_column) ? $request->order_column : null;
-        $limit  = isset($request->limit) ? $request->limit : null;
-        $out_of_stock = isset($request->out_of_stock) ? $request->out_of_stock : null;
+        $relations = ['categories','subcategories', 'brands', 'supplier:id,name','payment:id,payment_status,purchase_id,alias'];
+        $select_json = $request->input('select_json');
         $offset = $request->input('start', 0);
+        $limit = $request->input('length', 10);
 
         $purchaseQuery = Purchase::query()->select(
             'id',
@@ -45,82 +32,18 @@ class PurchaseApiController extends Controller
             'discount_price',
             'image_path',
         );
-        
-        if ($limit) {
-            $purchaseQuery->skip($offset)->take($limit);
-        }
-        if ($column_name && $order_dir) {
-            $purchaseQuery->orderBy($column_name, $order_dir);
-        }
-        if ($search) {
-            $purchaseQuery->where('name', 'LIKE', '%' . $search . '%');
-        }
-        if ($id) {
-            $purchaseQuery->where('id', $id);
-        }
-        if ($status) {
-            $purchaseQuery->whereHas('payment',function($query)use($status){
-                $query->whereIn('purchase_payments.payment_status',$status);
-            });
-        }
-        if ($supplier) {
-            $purchaseQuery->where('supplier_id', $supplier);
-        }
-        if ($category) {
-            $purchaseQuery->whereHas('categories', function ($query) use ($category) {
-                $query->where('category_id', $category);
-            });
-        }
-        if ($sub_category) {
-            $purchaseQuery->whereHas('subcategories', function ($query) use ($sub_category) {
-                $query->whereIn('subcategories.id', $sub_category);
-            });
-        }
-        if ($brand) {
-            if (is_array($brand)) {
-                $purchaseQuery->whereHas('brands', function ($query) use ($brand) {
-                    $query->whereIn('brands.id', $brand);
-                });
-            } else {
-                $purchaseQuery->whereHas('brands', function ($query) use ($brand) {
-                    $query->where('brands.id', $brand);
-                });
-            }
-        }
-        if ($total_price_range) {
-            $pieces = explode('-', $total_price_range);
 
-            $purchaseQuery
-                ->where('total_price', '>=', (int)$pieces[0])
-                ->where('total_price', '<=', (int)$pieces[1]);
+        $this->applyFilters($request, $purchaseQuery);
+
+        if ($select_json) {
+            return $this->applySelectFieldJSON($purchaseQuery);
         }
 
-        if ($single_total_price) {
-            $purchaseQuery->where('total_price', 'LIKE', '%' . $single_total_price . '%');
-        }
-        if (!is_null($out_of_stock)) {
-            if(boolval($out_of_stock) === true) {
-                $purchaseQuery->where('quantity', '<=', 0);
-            } else if(boolval($out_of_stock) === false) {
-                $purchaseQuery->where('quantity', '>', 0);
-            } 
-        } 
-         if ($select_json) {
-            $purchaseQuery->with($relations);
-            return response()->json(
-                $purchaseQuery->get()
-            );
-        }
-
-        $relations = [...$relations, ...['payment:id,payment_status,purchase_id,alias']];
-        $purchaseQuery->with($relations)->withCount([
-            'orders',
-            // Add other relationships you want to count here
-        ]);
+        $purchaseQuery->with($relations)->withCount(['orders']);
         
         $filteredRecords = $purchaseQuery->count();
-        $result = $purchaseQuery->get();
         $totalRecords = Purchase::count();
+        $result = $purchaseQuery->skip($offset)->take($limit)->get();
 
         return response()->json(
             [
@@ -130,5 +53,61 @@ class PurchaseApiController extends Controller
                 'data' => $result
             ]
         );
+    }
+
+    private function applyFilters($request, $query)
+    {
+        $query->when($request->input('order_column') && $request->input('order_dir'), function ($query) use ($request) {
+            return $query->orderBy($request->input('order_column'), $request->input('order_dir'));
+        });
+
+        $query->when($request->input('search'), function ($query) use ($request) {
+            return $query->where('name', 'LIKE', '%' . $request->input('search') . '%');
+        });
+
+        $query->when($request->input('id'), function ($query) use ($request) {
+            return $query->where('id', $request->id);
+        });
+
+        $query->when($request->input('status'), function ($query) use ($request) {
+            $statuses = $request->input('status');
+            return $query->whereHas('payment', fn ($query) => $query->whereIn('purchase_payments.payment_status', $statuses));
+        });
+
+        $query->when($request->input('supplier'), function ($query) use ($request) {
+            return $query->where('supplier_id', $request->input('supplier'));
+        });
+
+        $query->when($request->input('category'), function ($query) use ($request) {
+            return $query->whereHas('categories', fn ($query) => $query->where('category_id', $request->input('category')));
+        });
+
+        $query->when($request->input('sub_category'), function ($query) use ($request) {
+            $sub_categories = $request->input('sub_category');
+            return $query->whereHas('subcategories', fn ($query) => $query->whereIn('subcategories.id', $sub_categories));
+        });
+
+        $query->when($request->input('brand'), function ($query) use ($request) {
+            $brands = $request->input('brand');
+            return $query->whereHas('brands', fn ($query) => $query->whereIn('brands.id', $brands));
+        });
+
+        $query->when($request->input('total_price_range'), function ($query) use ($request) {
+            [$minPrice, $maxPrice] = array_map('intval', explode('-', $request->input('total_price_range')));
+            return $query->whereBetween('total_price', [$minPrice, $maxPrice]);
+        });
+
+        $query->when($request->input('single_total_price'), function ($query) use ($request) {
+            return $query->where('total_price', 'LIKE', '%' . $request->input('single_total_price') . '%');
+        });
+
+        $query->when($request->input('out_of_stock') !== null, function ($query) use ($request) {
+            $quantityComparison = boolval($request->input('out_of_stock')) ? '<=' : '>';
+            return $query->where('quantity', $quantityComparison, 0);
+        });
+    }
+
+    private function applySelectFieldJSON($query){
+        return response()->json($query->get());
     }
 }

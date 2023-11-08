@@ -1,5 +1,6 @@
 import { APICaller, APIDELETECALLER } from '../ajax/methods';
 import { handleErrors, swalText, showConfirmationDialog } from '../helpers/action_helpers';
+import { numericFormat } from '../helpers/functions';
 
 $(function () {
     $('.selectSupplier').selectpicker('refresh').val('').trigger('change')
@@ -212,7 +213,7 @@ $(function () {
                     name: 'price',
                     orderable: false,
                     render: function (data, type, row) {
-                        return `<span>€${row.price}</span>`;
+                        return `<span>${numericFormat(row.price)}</span>`;
                     }
                 },
                 {

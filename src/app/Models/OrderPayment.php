@@ -30,24 +30,14 @@ class OrderPayment extends Model
         'id',
         'order_id',
         'alias',
-        'price',
         'quantity',
+        'price',
         'date_of_payment',
         'payment_method',
         'payment_reference',
         'payment_status',
         'partially_paid_price'
     ];
-
-    private $statuses; // Declare statuses as a class property
-    private $methods; // Declare methods as a class property
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->statuses = config('statuses.payment_statuses'); // Initialize statuses in the constructor
-        $this->methods = config('statuses.payment_methods_statuses'); // Initialize methods in the constructor
-    }
 
     public function order()
     {

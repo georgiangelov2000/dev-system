@@ -13,6 +13,8 @@ mix.js('resources/js/brands/brands.js', 'public/js/brands'),
 
 mix.js('resources/js/helpers/action_helpers.js', 'public/helpers/js'),
 mix.js('resources/js/helpers/render_helpers.js', 'public/js/helpers'),
+mix.js('resources/js/helpers/functions.js', 'public/js/helpers'),
+mix.js('resources/js/helpers/statuses.js', 'public/js/helpers'),
 
 mix.js('resources/js/settings/settings.js', 'public/js/settings'),
 mix.js('resources/js/settings/e-mail.js', 'public/js/settings'),

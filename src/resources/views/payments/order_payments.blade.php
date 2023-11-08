@@ -126,7 +126,7 @@
             const ORDER_PAYMENT_EDIT_ROUTE = "{{ route('payment.edit', [':payment', ':type']) }}";
             const ORDER_PAYMENT_DELETE_ROUTE = "{{ route('payment.delete', [':payment', ':type']) }}";
             const ORDER_INVOICE_API_ROUTE = "{{route('api.order.invoices')}}"
-            const ORDER_INVOICE_UPDATE_ROUTE = "{{route('invoice.update.order',':id')}}"
+            const ORDER_INVOICE_UPDATE_ROUTE = "{{route('invoice.update',[':type',':id'])}}"
             const PACKAGE_API_ROUTE = "{{ route('api.packages') }}";
         </script>
     @endpush

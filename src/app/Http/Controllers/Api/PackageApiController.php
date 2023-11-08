@@ -68,10 +68,14 @@ class PackageApiController extends Controller
 
         $packageQuery->withCount([
             'orders as paid_orders_count' => function ($query) {
-                $query->where('status', 1);
+                $query->whereHas('payment', function ($subquery) {
+                    $subquery->where('payment_status', 1);
+                });
             },
             'orders as overdue_orders_count' => function ($query) {
-                $query->where('status', 4);
+                $query->whereHas('payment', function ($subquery) {
+                    $subquery->where('payment_status', 4);
+                });
             },
         ])->withCount('orders');
 

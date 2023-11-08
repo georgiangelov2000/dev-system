@@ -9,31 +9,34 @@ class OrderRequest extends FormRequest
 {
     public function rules()
     {
-        $method = $this->method();
-        $order = $this->order ?? null;
-        $statusIsAllowed = [];
-
-        if($order) {
-            $statusIsAllowed = in_array($order->status, [1, 2, 3, 4, 5]);
-        }
-        
         $rules = [
             'customer_id' => 'required|string',
             'user_id' => 'required|string',
             'package_id' => 'nullable',
-            'purchase_id' => 'required',
-            'purchase_id.*' => 'numeric',
-            'tracking_number' => $statusIsAllowed && $method === 'PUT' ? 'nullable|string' : 'required|string',
-            'sold_quantity' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required',
-            'sold_quantity.*' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:1' : 'required|numeric|min:1',
-            'single_sold_price' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required',
-            'single_sold_price.*' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:1',
-            'discount_percent' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required',
-            'discount_percent.*' => $statusIsAllowed && $method === 'PUT' ? 'nullable|numeric|min:0' : 'required|numeric|min:0',
-            'date_of_sale' => $statusIsAllowed && $method === 'PUT' ? 'nullable' : 'required|date',
         ];
+        
+        if($this->isPaymentRequired() || !$this->order) {
+            $rules['purchase_id.*'] = 'required|string';
+            $rules['tracking_number.*'] = 'required|string';
+            $rules['sold_quantity.*'] = 'required|integer|min:1';
+            $rules['single_sold_price.*'] = 'required|numeric|min:1';
+            $rules['discount_percent.*'] = 'required|integer';
+            $rules['date_of_sale'] = 'required|date';
+        } else {
+            $rules['tracking_number'] = 'required|string';
+            $rules['sold_quantity']  ='required';
+            $rules['single_sold_price'] ='required';
+            $rules['discount_percent'] ='required';
+            $rules['date_of_sale'] ='nullable|date';
+        }
 
         return $rules;
+    }
+
+    private function isPaymentRequired()
+    {
+        $order = $this->order ?? null;
+        return $order && $order->payment && $order->payment->payment_status === 2;
     }
 
     public function messages()
@@ -43,6 +46,10 @@ class OrderRequest extends FormRequest
             'purchase_id.array' => 'The product ID must be an array.',
             'purchase_id.*.required' => 'Product ID field is required.',
             'purchase_id.*.numeric' => 'Product ID must be a numeric value.',
+            'tracking_number.required' => 'Tracking number field is required.',
+            'tracking_number.array' => 'Tracking number must be an array.',
+            'tracking_number.*.required' => 'Tracking number field is required.',
+            'tracking_number.*.string' => 'Tracking number must be a string value.',
             'sold_quantity.required' => 'The sold quantity field is required.',
             'sold_quantity.array' => 'The sold quantity must be an array.',
             'sold_quantity.*.required' => 'Sold quantity field is required.',

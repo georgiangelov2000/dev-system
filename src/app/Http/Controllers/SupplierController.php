@@ -98,18 +98,8 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
-        $country = $supplier->country_id;
-
-        $categories = $this->staticDataHelper->loadCallCategories();
-        $states = $this->staticDataHelper->callStatesAndCountries($country, 'states');
-        $countries = $this->staticDataHelper->callStatesAndCountries('countries');
-
-        return view('suppliers.edit', compact('supplier'), [
-            'countries' => $countries,
-            'states' => $states,
-            'categories' => $categories,
-            'related_categories' => $supplier->categories->pluck('id')->toArray()
-        ]);
+        $supplier->load('categories:id,name','country:id,name,short_name','state:id,name');
+        return view('suppliers.edit', compact('supplier'));
     }
 
     /**

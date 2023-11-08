@@ -12,8 +12,8 @@ class OrderApiController extends Controller
     {
         $relations = [
             'customer:id,name',
-            'payment',
-            'purchase:id,name,image_path',
+            'payment:id,payment_status,order_id,alias',
+            'purchase:id,name,image_path,price,quantity',
             'user:id,username',
             'package:id,package_name'
         ];
@@ -21,7 +21,7 @@ class OrderApiController extends Controller
         $id = isset($request->id) && $request->id ? $request->id : null;
         $customer = isset($request->customer) && $request->customer ? $request->customer : null;
         $package = isset($request->package) && $request->package ? $request->package : null;
-        $status = isset($request->status) && $request->status ? $request->status : null;
+        $statuses = isset($request->status) && $request->status ? $request->status : null;
         $search = isset($request->search) && $request->search ? $request->search : null;
         $date_of_sale = isset($request->date_range) && $request->date_range ? $request->date_range : null;
         $date_of_payment = isset($request->date_of_payment) && $request->date_of_payment ? $request->date_of_payment : null;
@@ -47,7 +47,6 @@ class OrderApiController extends Controller
             'original_sold_price',
             'discount_percent',
             'date_of_sale',
-            'status',
             'package_extension_date',
             'user_id',
             'package_id',
@@ -73,9 +72,11 @@ class OrderApiController extends Controller
         if ($search) {
             $orderQuery->where('tracking_number', 'LIKE', '%' . $search . '%');
         }
-        if ($status) {
-            $orderQuery->whereIn('status', $status);
-        }
+        if ($statuses) {
+            $orderQuery->whereHas('payment', function ($subquery) use ($statuses) {
+                $subquery->whereIn('payment_status', $statuses);
+            });
+        }        
         if ($date_of_sale) {
             $date_pieces = explode(' - ', $date_of_sale);
             $date1_formatted = date('Y-m-d 00:00:00', strtotime($date_pieces[0]));
@@ -100,8 +101,11 @@ class OrderApiController extends Controller
             $orderQuery->whereNull('package_id');
         }
         if ($select_json) {
-            return response()->json($orderQuery->get());
-        }
+            if($orderQuery->count() > 1) {
+                return response()->json($orderQuery->get());
+            } 
+            return response()->json(["order" => $orderQuery->first()]);
+        }        
 
         $result = $orderQuery->skip($offset)->take($limit)->get();
 

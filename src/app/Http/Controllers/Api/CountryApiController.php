@@ -10,11 +10,18 @@ class CountryApiController extends Controller
 {
     public function getData(Request $request)
     {
+        $select_json = $request->input('select_json');
         $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
+        $countryQ = Country::select('id', 'name', 'short_name', 'country_code');
 
-        $countryQ = Country::select('id', 'name', 'short_name', 'country_code')
-        ->withCount(['customers','suppliers']);
+        $this->applyFilters($request,$countryQ);
+        
+        if(boolval($select_json)) {
+           return $this->applySelectFieldJSON($countryQ);
+        }
+
+        $countryQ->withCount(['customers','suppliers']);
 
         $totalRecords = Country::count();
         $filteredRecords = $countryQ->count();
@@ -28,5 +35,15 @@ class CountryApiController extends Controller
                 'data' => $result
             ]
         );
+    }
+
+    private function applyFilters($request,$query) {
+        $query->when($request->input('search'), function ($query) use ($request) {
+            return $query->where('name', 'LIKE', '%' . $request->input('search') . '%');
+        });
+    }
+    
+    private function applySelectFieldJSON($query){
+        return response()->json($query->get());
     }
 }

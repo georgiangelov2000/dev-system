@@ -9,27 +9,22 @@ use App\Models\Category;
 class CategoryApiController extends Controller {
 
     public function getData(Request $request) {
-        $supplier = $request->supplier;
-        $category = $request->category;
-        $search = $request->search;
-        
-        $categoryQuery = $this->buildCategoriesQuery();
-
-        if ($supplier) {
-            $this->filterCategoriesBySupplier($categoryQuery, $supplier);
-        }
-        if($search) {
-            $categoryQuery->where('name', 'LIKE', '%'.$search.'%');
-        }
-        if ($category) {
-            $this->findCategory($categoryQuery,$category);
-        }
-
-        $offset = $request->input('start', 0);  
+        $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
+        $select_json = $request->input('select_json');
+        $categoryQ = Category::query()->select('id','name','description');
+        
+        $this->applyFilters($request,$categoryQ);
+
+        if(boolval($select_json)) {
+            return $this->applySelectFieldJSON($categoryQ);
+        }
+
+        $categoryQ->with('subCategories')->withCount('products');
+
         $totalRecords = Category::count(); 
-        $filteredRecords = $categoryQuery->count();
-        $result = $categoryQuery->skip($offset)->take($limit)->get();
+        $filteredRecords = $categoryQ->count();
+        $result = $categoryQ->skip($offset)->take($limit)->get();
 
         return response()->json(
             [
@@ -41,17 +36,19 @@ class CategoryApiController extends Controller {
         );
     }
 
-    private function buildCategoriesQuery() {
-        return Category::query()->with('subCategories')->withCount('products');
-    }
-
-    private function filterCategoriesBySupplier($query, $supplier) {        
-        $query->whereHas('suppliers', function ($query) use ($supplier) {
-            $query->where('supplier_id', $supplier);
+    private function applyFilters($request, $query){
+        $query->when($request->input('search'), function ($query) use ($request) {
+            return $query->where('name', 'LIKE', '%' . $request->input('search') . '%');
+        });
+        $query->when($request->input('id'), function ($query) use ($request) {
+            return $query->where('id', $request->id);
+        });
+        $query->when($request->input('supplier'), function ($query) use ($request) {
+            return $query->whereHas('suppliers', fn ($query) => $query->where('supplier_id', $request->input('supplier_id')));
         });
     }
 
-    private function findCategory($query,$category){
-        return $query->where('id',$category);
+    private function applySelectFieldJSON($query) {
+        return response()->json($query->get());
     }
 }

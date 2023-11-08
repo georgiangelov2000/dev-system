@@ -11,35 +11,23 @@ class BrandApiController extends Controller
 
     public function getData(Request $request)
     {
-
-        $select_json = isset($request->select_json) && $request->select_json ? $request->select_json : null;
-        $orderDir = isset($request->order_dir) ? $request->order_dir : null;
-        $columnName = isset($request->order_column) ? $request->order_column : null;
-        $search = isset($request->search) ? $request->search : null;
-
-        $brandQuery = Brand::query()->select('id', 'name', 'description','image_path')
-        ->when($search, function ($query) use ($search) {
-            $query->where('name', 'LIKE', '%' . $search . '%');
-        })
-        ->when($columnName && $orderDir, function ($query) use ($columnName, $orderDir) {
-            $query->orderBy($columnName, $orderDir);
-        });
-            
+        $select_json = $request->input('select_json');
         $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
 
-        if ($select_json) {
-            return response()->json($brandQuery->get());
+        $brandQ = Brand::select('id', 'name', 'description', 'image_path');
+        
+        $this->applyFilters($request, $brandQ);
+
+        if (boolval($select_json)) {
+            return $this->applySelectFieldJSON($brandQ);
         }
 
-        $filteredRecords = $brandQuery->count();
-        $result = $brandQuery->skip($offset)->take($limit)->get();
+        $brandQ->withCount('purchases');
 
-        $result->each(function ($brand) {
-            $brand->purchases_count = $brand->purchases()->count();
-        });
-        
+        $filteredRecords = $brandQ->count();
         $totalRecords = Brand::count();
+        $result = $brandQ->skip($offset)->take($limit)->get();
 
         return response()->json(
             [
@@ -49,5 +37,21 @@ class BrandApiController extends Controller
                 'data' => $result
             ]
         );
+    }
+
+    private function applyFilters($request, $query)
+    {
+        $query->when($request->input('search'), function ($query) use ($request) {
+            return $query->where('name', 'LIKE', '%' . $request->input('search') . '%');
+        });
+        $query->when($request->input('order_dir') && $request->input('order_column'), function ($query) use ($request) {
+            return $query->orderBy($request->input('order_column'), $request->input('order_dir'));
+        });
+        
+    }
+
+    private function applySelectFieldJSON($query)
+    {
+        return response()->json($query->get());
     }
 }

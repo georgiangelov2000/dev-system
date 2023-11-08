@@ -7,6 +7,7 @@ use App\Helpers\LoadStaticData;
 use App\Models\Purchase;
 use App\Http\Requests\PurchaseRequest;
 use App\Models\SubCategory;
+use App\Models\PurchasePayment;
 use App\Helpers\FunctionsHelper;
 use App\Http\Requests\PurchaseMassEditRequest;
 use App\Services\PurchaseService;
@@ -46,8 +47,7 @@ class PurchaseController extends Controller
 
     public function create()
     {
-        $data = $this->loadStaticData();
-        return view('purchases.create', $data);
+        return view('purchases.create');
     }
 
     public function store(PurchaseRequest $request)
@@ -68,22 +68,27 @@ class PurchaseController extends Controller
     }
     public function edit(Purchase $purchase)
     {
-        $relatedProductData = $this->fetchRelatedProductData($purchase);
-        $data = $this->loadStaticData();
-        $orderAmount = $purchase->orders->sum('sold_quantity');
 
-        $isEditable = $this->helper->statusValidation($purchase->payment->payment_status,$this->statuses) === 2 ? true : false;
+        $purchase->load('categories:id,name','subcategories:id,name', 'brands:id,name','supplier:id,name');
+        
+        $orderAmounts = 0;
 
-        return view(
-            'purchases.edit',
-            compact(
-                'purchase',
-                'orderAmount',
-                'relatedProductData',
-                'isEditable',
-            ),
-            $data
-        );
+        if($purchase->orders()->exists()){
+            $orderAmounts = $purchase->orders->sum('sold_quantity'); 
+        }
+
+        // Assuming $purchaseId is the ID you want to use in the query
+        $paymentRecord = PurchasePayment::where('purchase_id', $purchase->id)->first();
+
+        // Check if the payment record exists and is not null
+        if ($paymentRecord) {
+            $isEditable = $this->helper->statusValidation($paymentRecord->payment_status,$this->statuses) === 2; 
+        }
+
+        $purchase->order_amount = $orderAmounts;
+        $purchase->is_editable = $isEditable;
+
+        return view('purchases.edit',compact('purchase'));
     }
 
     public function update(Purchase $purchase, PurchaseRequest $request)
@@ -169,20 +174,4 @@ class PurchaseController extends Controller
     {
         return view('purchases.orders', compact('purchase'));
     }
-
-    // Private methods
-
-    private function loadStaticData()
-    {
-        $suppliers = $this->staticDataHelper->callSupliers();
-        $brands = $this->staticDataHelper->callBrands();
-        $categories = $this->staticDataHelper->loadCallCategories();
-
-        return [
-            'suppliers' => $suppliers,
-            'brands' => $brands,
-            'categories' => $categories
-        ];
-    }
-
 }

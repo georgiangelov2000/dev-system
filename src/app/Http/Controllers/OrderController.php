@@ -57,7 +57,6 @@ class OrderController extends Controller
     public function store(OrderRequest $request)
     {
         $data = $request->validated();
-
         DB::beginTransaction();
         try {
             if (count($data['purchase_id'])) {
@@ -75,13 +74,7 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
-        $order->load(
-            'customer:id,name',
-            'user:id,username',
-            'purchase.categories',
-            'purchase.brands',
-            'purchase'
-        );
+        $order->load('customer:id,name','user:id,username');
         return view('orders.edit', compact('order'));
     }
 
@@ -90,13 +83,13 @@ class OrderController extends Controller
         DB::beginTransaction();
         try {
             $data = $request->validated();
-            $this->orderProcessing($data, $order);
+            $this->orderProcessing($data, $order,0);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withInput()->with('error', 'Order has not been updated');
+            return response()->json(['message' => 'Order has not been updated'], 500);
         }
-        return redirect()->route('order.index')->with('success', 'Order has been updated');
+        return response()->json(['message' => 'Orders has been updated'], 200);
     }
 
     public function massUpdate(OrderMassEditRequest $request)
@@ -187,8 +180,8 @@ class OrderController extends Controller
      * @return void
      */
     private function orderProcessing(array $data, $order = null, $key = null)
-    {
-        $order = $order ? $order : new Order;
+    {        
+        $order = $order ? $order : new Order;        
         $isNewOrder = !$order->exists; // Check if it's a new order
         $status = $isNewOrder
             ? $this->helper->statusValidation(self::INIT_STATUS, $this->statuses)
@@ -198,14 +191,15 @@ class OrderController extends Controller
 
             // Create order based of found purchase
             $purchase = $key !== null ? Purchase::findOrFail($data['purchase_id'][$key]) : $data['purchase_id'];
-
+            
             // Update properties based on $key using null coalescing operator
             $amount = $data['sold_quantity'][$key] ?? $data['sold_quantity'];
 
             // Defined single price and discount
             $singlePrice = $data['single_sold_price'][$key] ?? $data['single_sold_price'];
             $discount = $data['discount_percent'][$key] ?? $data['discount_percent'];
-
+            $trackingNumber = $data['tracking_number'][$key] ?? $data['tracking_number'];
+            
             // Calculate total sold quantity and remaining quantity
             $totalSoldAmount = $purchase->orders->sum('sold_quantity');
             $remainingAmount = ($totalSoldAmount - $order->getOriginal('sold_quantity'));
@@ -247,7 +241,7 @@ class OrderController extends Controller
                 'original_sold_price' => $prices['original_price'],
                 'discount_percent' => $discount,
                 'date_of_sale' => now()->parse($data['date_of_sale']),
-                'tracking_number' => $data['tracking_number'],
+                'tracking_number' => $trackingNumber,
                 'package_id' => $package ?? null,
                 'package_extension_date' => $package ? $package->expected_delivery_date : null,
                 'created_at' => now(),
@@ -275,19 +269,29 @@ class OrderController extends Controller
 
      private function createOrUpdatePayment(Order $order): OrderPayment
      {
+        // Generate an alias for the payment based on the order's delivery date
          $alias = $this->service->getAlias($order);
          
+         // Prepare payment data
          $paymentData = [
-            'alias' => $alias ?: 'default_alias',
+             'alias' => $alias,
              'quantity' => $order->sold_quantity,
              'price' => $order->total_sold_price,
              'date_of_payment' => $order->package_extension_date ?: $order->date_of_sale,
-             'payment_status' => self::INIT_STATUS,
          ];
 
-         $payment = $order->payment 
-         ? $order->payment->update($paymentData) 
-         : $order->payment()->create($paymentData);
+         // Check if a payment record already exists for the order
+         $existingPayment = $order->payment;
+         
+         // If no payment record exists, create one
+         if(!$existingPayment) {
+            $paymentData['payment_status'] = self::INIT_STATUS;
+            $payment = $order->payment()->create($paymentData);
+         } else {
+            // Update the existing payment record with new data
+            $existingPayment->update($paymentData);
+            $payment = $existingPayment;
+         }
 
          $payment->invoice()->updateOrCreate([], [
              'price' => $payment->price,

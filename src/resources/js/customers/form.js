@@ -1,5 +1,4 @@
 import { APICaller } from '../ajax/methods';
-import { initializeMap, setMapView } from '../ajax/leaflet';
 
 $(function () {
     $('.selectCountry, .selectState, .selectCategory').selectpicker();
@@ -8,6 +7,33 @@ $(function () {
     const bootstrapState = $('.bootstrap-select .selectState');
     const searchAddress = $('#searchAddress');
     const addresses = $('.addresses');
+
+    $('.selectCountry input[type="text"]').on('keyup', _.debounce(function () {
+        const text = $(this).val();
+
+        if(text == '') {
+            bootstrapCountry.append('<option value="">All</option>').selectpicker('refresh');
+            return;
+        }
+
+        APICaller(COUNTRY_API_ROUTE, {"search": text, "select_json":true}, function (response) {
+            const countries = response;
+            bootstrapCountry.empty().append('<option value="" class="d-none"></option>');
+            if (countries.length) {
+                countries.forEach(country => {
+                    bootstrapCountry.append(`
+                        <option value="${country.id}"> 
+                            <i class="flag-icon flag-icon-${country.short_name.toLowerCase()}"> </i>
+                            ${country.name}
+                        </option>
+                    `);
+                });
+            }
+            bootstrapCountry.selectpicker('refresh');
+        }, error => {
+            console.log(error);
+        });
+    }, 300));
 
     $('#image').on('change', function () {
         previewImage(this);
@@ -18,8 +44,7 @@ $(function () {
             var reader = new FileReader();
 
             reader.onload = function (e) {
-                $('.imagePreview').removeClass('d-none');
-                $('#preview-image').attr('src', e.target.result);
+                $('img[name="cardWidgetImage"]').attr('src', e.target.result);
             }
 
             reader.readAsDataURL(input.files[0]);
@@ -47,6 +72,25 @@ $(function () {
 
     });
 
+    bootstrapCountry.on('changed.bs.select', function () {
+        let countryId = $(this).val();
+        bootstrapState.empty();
+
+        APICaller(LOCATION_API_ROUTE, { "country_id": countryId }, function (response) {
+            let data = response;
+
+            if (data.length) {
+                $.each(data, function (key, value) {
+                    bootstrapState.append('<option value=' + value.id + '>' + value.name + '</option>');
+                });
+            } else {
+                bootstrapState.append('<option value="0">Nothing selected</option>');
+            }
+            bootstrapState.selectpicker('refresh');
+        }, function (error) {
+            console.log(error);
+        })
+    });
 
     searchAddress.on('click', function () {
         var url = 'https://nominatim.openstreetmap.org/search';
@@ -81,11 +125,5 @@ $(function () {
 
     window.applyAddress = function (e) {
         $('input[name="address"]').val($(e).text());
-        var latitude = parseFloat($(e).data('latitude'));
-        var longitude = parseFloat($(e).data('longitude'));
-        setMapView([latitude, longitude], 15);
     }
-
-    initializeMap()
-
 });

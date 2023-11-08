@@ -16,9 +16,9 @@ class CreateInvoiceOrders extends Migration
         Schema::create('invoice_orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('order_payment_id');
-            $table->string('invoice_number')->nullable()->unique();
+            $table->string('invoice_number',20)->nullable()->unique();
             $table->date('invoice_date')->nullable();
-            $table->unsignedDecimal('price')->default(0);
+            $table->unsignedDecimal('price',8,2)->default(0);
             $table->unsignedInteger('quantity')->default(0);
 
             // Add foreign key constraint with ON DELETE CASCADE

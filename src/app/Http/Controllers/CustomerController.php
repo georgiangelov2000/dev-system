@@ -80,11 +80,8 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
-        $country = $customer->country_id;
-        $states = $this->staticDataHelper->callStatesAndCountries($country, 'states');
-        $countries = $this->staticDataHelper->callStatesAndCountries();
-
-        return view('customers.edit', compact('customer', 'countries', 'states'));
+        $customer->load('country:id,name,short_name','state:id,name');
+        return view('customers.edit',compact('customer'));
     }
 
     /**

@@ -9,8 +9,9 @@ $(function () {
             url: API_COUNTRY_ROUTE,
             data: function (d) {
                 return $.extend({}, d, {
-                    search: d.search.value,
-                    order_dir: d.order[0].dir,
+                    'search': d.search.value,
+                    'order_dir': d.order[0].dir,
+                    'limit': d.custom_length = d.length,
                 });
             },
         },

@@ -52,14 +52,6 @@ class Order extends Model
         'package_extension_date'
     ];
 
-    protected $statuses; // Declare statuses as a class property
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->statuses = config('statuses.order_statuses'); // Initialize statuses in the constructor
-    }
-
     public function customer()
     {
         return $this->belongsTo(Customer::class);

@@ -25,7 +25,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedInteger('discount_percent')->default(0);
             $table->date('package_extension_date')->nullable();
             $table->date('date_of_sale');
-            $table->string('tracking_number');
+            $table->string('tracking_number',20);
             $table->timestamps();
 
             // Add foreign key constraint with ON DELETE CASCADE

@@ -53,27 +53,7 @@
                             <span name="date_of_sale" class="text-danger"></span>
                         </div>
 
-                        <div class="form-group col-xl-3 col-lg-4 col-md-4 col-sm-4 mb-0">
-                            <label for="order_status">Tracking number</label>
-                            <div class="input-group mb-3">
-                                <input 
-                                    type="text" 
-                                    name="tracking_number" 
-                                    class="form-control"
-                                    placeholder="Enter or generate tracking number"
-                                >
-                                <span class="input-group-append">
-                                    <button 
-                                        type="button" 
-                                        id="generateCode" 
-                                        class="btn btn-primary btn-flat"
-                                    >Generate</button>
-                                </span>
-                            </div>
-                            <span name="tracking_number" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group col-12">
+                        <div class="form-group col-xl-3 col-lg-4 col-md-4 col-sm-4 ">
                             <label for="">Search purchase</label>
                             <select name="" id="" class="productFilter form-control" data-live-search="true">
                             </select>
@@ -89,13 +69,11 @@
                                 <th>Purchase</th>
                                 <th>Unit price</th>
                                 <th>Amount</th>
-                                <th>Category</th>
-                                <th>Sub categories</th>
-                                <th>Brands</th>
                                 <th>Order amount</th>
                                 <th>Order unit price</th>
                                 <th>Order discount %</th>
-                                <th>Order original price</th>
+                                <th>Tracking number</th>
+                                <th>Order final price</th>
                                 <th>Order regular price</th>
                             </thead>
                         </table>
