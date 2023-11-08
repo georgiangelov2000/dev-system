@@ -17,10 +17,10 @@ $(function () {
     //Global category variables
 
     let createModal = $('#createModal');
-    let editModal = $('#editModal');
 
     let createForm = createModal.find('form');
     let closeModalButton = $('.modalCloseBtn');
+    const selectAll = $('.selectAll');
 
     $('.selectSubCategory,.selectAction')
         .selectpicker('refresh')
@@ -44,19 +44,9 @@ $(function () {
                 orderable: false,
                 width: "1%",
                 render: function (data, type, row) {
-                    let checkbox =
-                        `<div class='form-check'> 
-                        <input 
-                            name = 'checkbox'
-                            class='form-check-input' 
-                            type='checkbox' 
-                            onchange='selectCategory(this)'
-                            data-id = '${row.id}'
-                            data-name = '${row.name}'
-                        />
-                    </div>`;
-
-                    return `${checkbox}`;
+                    return `<div class='form-check'>
+                                <input name='checkbox' class='form-check-input' type='checkbox' onchange='selectCategory(this)' data-id='${row.id}' data-name='${row.name}' />
+                            </div>`;
                 }
             },
             {
@@ -72,11 +62,8 @@ $(function () {
                 class: 'text-center',
                 name: "image",
                 render: function (data, type, row) {
-                    if (row.image_path) {
-                        return "<img class='rounded mx-auto w-100' src=" + row.image_path + " />"
-                    } else {
-                        return "<img class='rounded mx-auto w-100' src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png'/>";
-                    }
+                    const imageSrc = row.image_path ? row.image_path : 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png';
+                    return `<img class='rounded mx-auto w-100' src='${imageSrc}' />`;
                 }
             },
             {
@@ -99,13 +86,8 @@ $(function () {
                 orderable: false,
                 name: 'subcategories',
                 render: function (data, type, row) {
-                    if (!row.sub_categories) {
-                        return '';
-                    }
-                    const subcategoryNames = row.sub_categories.map((subcategory) => {
-                        return `<span class="font-weight-bold">${subcategory.name}</span>`;
-                    });
-                    return subcategoryNames.join(', ');
+                    const subcategoryNames = (row.sub_categories || []).map(subcategory => `<span class="font-weight-bold">${subcategory.name}</span>`).join(', ');
+                    return subcategoryNames;
                 }
             },
             {
@@ -121,40 +103,24 @@ $(function () {
                 width: '10%',
                 class: 'text-center',
                 render: function (data, type, row) {
-
-                    let removeImage = '';
-
-                    const deleteFormTemplate = `
-                    <form style="display:inline-block;" action="${REMOVE_CATEGORY_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
-                      <input type="hidden" name="_method" value="DELETE">
-                      <input type="hidden" name="id" value="${row.id}">
-                      <button type="submit" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteCategory(this);"><i class="fa-light fa-trash text-danger"></i></button>
-                    </form>
-                  `;
-
+                    const deleteFormTemplate = `<form style="display:inline-block;" action="${REMOVE_CATEGORY_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <input type="hidden" name="id" value="${row.id}">
+                                                    <button type="submit" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteCategory(this);"><i class="fa-light fa-trash text-danger"></i></button>
+                                                </form>`;
                     const editButton = `<a data-id="${row.id}" class="btn editCategory p-1" onclick="editCategory(this)" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
                     const subCategories = `<button data-toggle="collapse" data-target="#subcategories_${row.id}" title="Sub categories" class="btn btn-outline-muted showSubCategories p-1"><i class="fa-light fa-list" aria-hidden="true"></i></button>`;
-                    
-                    if(row.image_path) {
-                        removeImage = `
-                        <form style="display:inline-block;" action="${REMOVE_CATEGORY_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
-                            <input type="hidden" name="_method" value="DELETE">
-                            <input type="hidden" name="id" value="${row.id}">
-                            <button 
-                                type="submit" 
-                                class="btn p-1" 
-                                title="Delete" 
-                                onclick="event.preventDefault(); deleteImage(this);">
-                                <i class="fa-light fa-image text-danger fa-lg"></i>
-                                </button>
-                        </form>`;
-                    }
-
-                    return `${subCategories} ${deleteFormTemplate} ${editButton} ${removeImage}`;
+                    const imageSrc = row.image_path ? `<form style="display:inline-block;" action="${REMOVE_CATEGORY_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
+                                                        <input type="hidden" name="_method" value="DELETE">
+                                                        <input type="hidden" name="id" value="${row.id}">
+                                                        <button type="submit" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteImage(this);"><i class="fa-light fa-image text-danger fa-lg"></i></button>
+                                                    </form>` : '';
+        
+                    return `${subCategories} ${deleteFormTemplate} ${editButton} ${imageSrc}`;
                 }
             }
-
         ],
+        
         order: [[1, 'asc']]
     });
 
@@ -276,20 +242,11 @@ $(function () {
         closeModal($(this).closest('.modal'));
     });
 
-    $(document).on('change', ".selectAll", function () {
-        if (this.checked) {
-            $('.actions').removeClass('d-none');
-            $(':checkbox').each(function () {
-                this.checked = true;
-            });
-        } else {
-            $('.actions').addClass('d-none');
-
-            $(':checkbox').each(function () {
-                this.checked = false;
-            });
-        }
-    });
+    selectAll.on('change',function() {
+        const isChecked = this.checked;
+        $('.actions').toggleClass('d-none', !isChecked);
+        $(':checkbox').prop('checked', isChecked);
+    })
 
     // WINDOW EVENTS
 
