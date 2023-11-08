@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="card card-default cardTemplate">
-        <div class="card-header">
+        <div class="card-header bg-primary">
             <div class="col-12">
                 <h3 class="card-title">Edit order</h3>
             </div>

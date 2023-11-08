@@ -1,18 +1,10 @@
 import { APICaller,APIDELETECALLER } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 import { numericFormat } from '../helpers/functions';
+import { statusPaymentsWithIcons } from '../helpers/statuses';
 
 $(function () {
     $('.selectAction, .selectType, .selectCustomer, .selectPackage, .selectDriver').selectpicker();
-
-    const statusMap = {
-        1: { label: "Paid", iconClass: " <span class='icon'><i class='fal fa-check-circle'></i></span>" },
-        2: { label: "Pending", iconClass: "<span class='icon'><i class='fal fa-hourglass-half'></i></span>" },
-        3: { label: "Partially Paid", iconClass: "<span class='text-danger font-weight-bold'>Partially paid</span>" },
-        4: { label: "Overdue", iconClass: "<span class='icon'><i class='fal fa-exclamation-circle'></i></span>" },
-        5: { label: "Refunded", iconClass: "<span class='icon'><i class='fal fa-undo-alt'></i></span>" },
-        6: { label: "Ordered", iconClass: "<span class='icon'><i class='fal fa-shopping-cart'</i></span>" }
-    };
 
     const bootstrapCustomer = $('.bootstrap-select .selectCustomer');
     const bootstrapSelectDriver = $('.bootstrap-select .selectDriver');
@@ -57,16 +49,9 @@ $(function () {
                 orderable: false,
                 width: "1%",
                 render: function (data, type, row) {
-                    let checkbox = '';
-
-                    if (row.status === 6) {
-                        checkbox =
-                            '<div div class="form-check">\n\
-                            <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
-                        </div>';
-                    }
-
-                    return `${checkbox}`;
+                    return row.payment.payment_status === 2 ? '<div div class="form-check">\n\
+                    <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
+                    </div>' : ''
                 }
             },
             {
@@ -134,7 +119,7 @@ $(function () {
                 class:'text-center',
                 name: "original_sold_price",
                 render: function (data, type, row) {
-                    return `<span>€${row.original_sold_price}</span>`
+                    return `<span>${numericFormat(row.original_sold_price)}</span>`
                 }
             },
             {
@@ -142,7 +127,7 @@ $(function () {
                 orderable: false,
                 class: 'text-center',
                 render: function (data, type, row) {
-                    const partiallyPaidStatus = statusMap[row.payment.payment_status];
+                    const partiallyPaidStatus = statusPaymentsWithIcons[row.payment.payment_status];
                     const partiallyPaidPrice = partiallyPaidStatus.label === 'Partially Paid' ? row.payment.partially_paid_price : '';
                     return partiallyPaidPrice;
                 }
@@ -217,11 +202,11 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    const statusData = statusMap[row.payment.payment_status] || { text: "Unknown", iconClass: "fal fa-question" };
+                    const statusData = statusPaymentsWithIcons[row.payment.payment_status] || { text: "Unknown", iconClass: "fal fa-question" };
 
                     return `
                     <div title="${statusData.label}" class="status">
-                      ${statusData.iconClass}
+                    <span class="icon"><i class="${statusData.iconClass}"></i></span>
                     </div>`;
                 }
             },
@@ -230,13 +215,12 @@ $(function () {
                 orderable: false,
                 class: 'text-center',
                 render: function (data, type, row) {
-                    const statusInfo = statusMap[row.payment.payment_status] || { text: "Unknown", iconClass: "fal fa-question" };
-
                     let buttons = [];
                     let deleteFormTemplate = '';
                     let detachPackage = '';
+                    let previewButton = '<a title="Review" class="btn p-0"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
 
-                    if (row.package && (statusInfo.text === 'Ordered')) {
+                    if (row.package && row.payment.status === 2) {
                         detachPackage = `
                             <form onsubmit="detachOrder(event)" style='display:inline-block;' id='detach-form' action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method='PUT'>
                                 <input type='hidden' name='id' value='${row.id}'>
@@ -248,7 +232,7 @@ $(function () {
 
                     buttons.push(`<a href="${ORDER_EDIT_ROUTE.replace(':id', row.id)}" class="btn p-0" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>`);
 
-                    if (statusInfo.text === 'Ordered') {
+                    if (row.payment.status === 2) {
                         deleteFormTemplate = `
                             <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
                                 <input type='hidden' name='_method' value='DELETE'>
@@ -258,8 +242,6 @@ $(function () {
                                 </button>
                             </form>`;
                     }
-
-                    let previewButton = '<a title="Review" class="btn p-0"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
 
                     return `${deleteFormTemplate} ${detachPackage} ${buttons.join(' ')} ${previewButton}`;
                 }
@@ -396,19 +378,10 @@ $(function () {
 
 
     $(document).on('change', ".selectAll", function () {
-        if (this.checked) {
-            $('.actions').removeClass('d-none');
-            $(':checkbox').each(function () {
-                this.checked = true;
-            });
-        } else {
-            $('.actions').addClass('d-none');
-
-            $(':checkbox').each(function () {
-                this.checked = false;
-            });
-        }
-    });
+        const isChecked = this.checked;
+        $('.actions').toggleClass('d-none', !isChecked);
+        $(':checkbox').prop('checked', isChecked);
+    }); 
 
     // Window actions
 
@@ -476,14 +449,13 @@ $(function () {
     };
 
     window.deleteMultipleOrders = function (e) {
-
-        let searchedIds = [];
-        let searchedNames = [];
-
-        $('tbody input[type="checkbox"]:checked').map(function () {
-            searchedIds.push($(this).attr('data-id'));
-            searchedNames.push($(this).attr('data-name'));
-        });
+        const searchedIds = $('tbody input[type="checkbox"]:checked').map(function () {
+            return $(this).attr('data-id');
+        }).get();
+    
+        const searchedNames = $('tbody input[type="checkbox"]:checked').map(function () {
+            return $(this).attr('data-name');
+        }).get();
 
         let template = swalText(searchedNames);
 
@@ -501,11 +473,8 @@ $(function () {
     };
 
     window.selectOrder = function (e) {
-        if ($('tbody input[type="checkbox"]:checked').length === 0) {
-            $('.actions').addClass('d-none');
-        } else {
-            $('.actions').removeClass('d-none');
-        }
+        const isChecked = $('tbody input[type="checkbox"]:checked').length > 0;
+        $('.actions').toggleClass('d-none', !isChecked);
     };
 
 });
