@@ -347,7 +347,7 @@ $(function () {
             </td>
             <td>${image}</td>
             <td>
-                <a href="${PURCHASE_ROUTE.replace(":id", data.id)}">${name}</a>
+                <a href="${PURCHASE_ROUTE.replace(":id", currentId)}">${name}</a>
             </td>
             <td>${price}</td>
             <td>${quantity}</td>
