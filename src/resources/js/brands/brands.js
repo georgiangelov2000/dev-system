@@ -49,7 +49,7 @@ $(function () {
                 class: 'text-center',
                 name: "image",
                 render: function (data, type, row) {
-                    const imageSrc = row.image_path ? row.image_path : 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png';
+                    const imageSrc = row.image_path || 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png';
                     return `<img class='rounded mx-auto w-100' src=${imageSrc} />`;
                 }
             },
@@ -76,35 +76,21 @@ $(function () {
                 orderable: false,
                 width: '15%',
                 render: function (data, type, row) {
-                    let removeImage = '';
-
-                    const deleteFormTemplate = `
-                    <form style="display:inline-block;" data-name="${row.name}" action="${REMOVE_BRAND_ROUTE.replace(':id', row.id)}" method="POST" data-name="${row.name}">
-                      <input type="hidden" name="_method" value="DELETE">
-                      <input type="hidden" name="id" value="${row.id}">
-                      <button type="submit" data-name="${row.name}" data-id="${row.id}" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteBrand(this);"><i class="fa-light fa-trash text-danger"></i></button>
-                    </form>
-                  `;
-                    const editButton = `<a data-id=${row.id} class="btn p-1" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
-
-                    if(row.image_path) {
-                        removeImage = `
-                        <form style="display:inline-block;" action="${REMOVE_BRAND_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
-                           <input type="hidden" name="_method" value="DELETE">
-                           <input type="hidden" name="id" value="${row.id}">
-                           <button 
-                               type="submit" 
-                               data-name="${row.name}" 
-                               data-id="${row.id}" 
-                               class="btn p-1" 
-                               title="Delete" 
-                               onclick="event.preventDefault(); deleteImage(this);">
-                               <i class="fa-light fa-image text-danger fa-lg"></i>
-                               </button>
-                        </form>`;   
-                    }
-
-                    return `${deleteFormTemplate} ${editButton} ${removeImage}`;
+                const deleteForm = `<form style="display:inline-block;" data-name="${row.name}" action="${REMOVE_BRAND_ROUTE.replace(':id', row.id)}" method="POST">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="id" value="${row.id}">
+                    <button type="submit" data-name="${row.name}" data-id="${row.id}" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteBrand(this);"><i class="fa-light fa-trash text-danger"></i></button>
+                </form>`;
+        
+                const editButton = `<a data-id=${row.id} class="btn p-1" onclick="editBrand(this)" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
+        
+                const removeImageForm = row.image_path ? `<form style="display:inline-block;" action="${REMOVE_BRAND_IMAGE_ROUTE.replace(':id', row.id)}" method="POST">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="id" value="${row.id}">
+                    <button type="submit" data-name="${row.name}" data-id="${row.id}" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteImage(this);"><i class="fa-light fa-image text-danger fa-lg"></i></button>
+                </form>` : '';
+        
+                return `${deleteForm} ${editButton} ${removeImageForm}`;
                 }
             }
         ],
@@ -114,22 +100,17 @@ $(function () {
     // ACTIONS
     $('.createBrand').on("click", () => openModal($('#createModal'), STORE_BRAND_ROUTE));
 
-    $('input.custom-file-input').each(function () {
-        $(this).on('change', function () {
-            const fileName = $(this).val().split('\\').pop();
-            const label = $(this).siblings('label.custom-file-label');
-            label.text(fileName || 'Choose file');
-        });
+    $('input.custom-file-input').on('change', function () {
+        const fileName = $(this).val().split('\\').pop() || 'Choose file';
+        $(this).siblings('label.custom-file-label').text(fileName);
     });
 
-    $('#submitForm, #updateForm').on("click", function (e) {
-        e.preventDefault();
-
+    const handleFormSubmission = function () {
         const visibleModal = $('.modal:visible');
         const modalForm = visibleModal.find('form');
         const actionUrl = modalForm.attr('action');
         const formData = new FormData(modalForm[0]);
-
+    
         APIPOSTCALLER(actionUrl, formData,
             (response, xhr) => {
                 if (xhr === 'success') {
@@ -140,10 +121,15 @@ $(function () {
                 }
             },
             (error) => {
-                toastr['error'](response.responseJSON.message);
+                toastr['error'](error.responseJSON.message);
                 ajaxResponse(error.responseJSON.errors);
             }
         );
+    };
+    
+    $('#submitForm, #updateForm').on("click", function (e) {
+        e.preventDefault();
+        handleFormSubmission();
     });
 
     $('.selectAction').on('change', function () {
@@ -160,14 +146,14 @@ $(function () {
     window.deleteImage = (e) => {
         const form = $(e).closest('form');
         const url = form.attr('action');
-
-        APIDELETECALLER(url,(response) => {
+    
+        APIDELETECALLER(url, (response) => {
             toastr['success'](response.message);
             dataTable.ajax.reload(null, false);
-        },(error) => {
+        }, (error) => {
             toastr['error'](error.message);
-        })
-    }
+        });
+    };
 
     window.deleteBrand = (e) => {
         const form = $(e).closest('form');
@@ -187,7 +173,6 @@ $(function () {
 
     window.editBrand = (e) => {
         const id = $(e).attr('data-id');
-
         const modal = $('#editModal');
         const modalForm = modal.find('form');
 

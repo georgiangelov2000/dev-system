@@ -58,7 +58,7 @@
             'inputOne' => 'name',
             'formMethod' => 'POST',
             'inputType' => 'text',
-            'isDatePicker' => true
+            'isDatePicker' => false
         ])
 
         @push('scripts')

@@ -10,38 +10,19 @@ class SubCategoryApiController extends Controller
 {
     public function getData(Request $request)
     {
-        $category = isset($request->category) ? $request->category : null;
-        $select_json  = isset($request->select_json) ? $request->select_json : null;
-        $order_dir = isset($request->order_dir) ? $request->order_dir : null;
-        $column_name = isset($request->order_column) ? $request->order_column : null;
-        $limit  = isset($request->limit) ? $request->limit : null;
-        $search = isset($request->search) ? $request->search : null;
         $offset = $request->input('start', 0);
-        
+        $limit = $request->input('length', 10);
+        $select_json = $request->input('select_json');
         $subCategoryQ = SubCategory::query();
 
-        if ($category) {
-            $subCategoryQ->where('category_id', $category);
-        }
-        if($limit) {
-            $subCategoryQ->skip($offset)->take($limit);
-        }
-        if ($column_name && $order_dir) {
-            $subCategoryQ->orderBy($column_name, $order_dir);
-        }
-        if ($search) {
-            $subCategoryQ->where('name', 'LIKE', '%' . $search . '%');
-        }
-        if($select_json) {
-            return response()->json(
-                $subCategoryQ->get()
-            );
-        } else {
-            $subCategoryQ->with('category')->get();
+        $this->applyFilters($request,$subCategoryQ);
+
+        if(boolval($select_json)) {
+            return $this->applySelectFieldJSON($subCategoryQ);
         }
 
         $filteredRecords = $subCategoryQ->count();
-        $result = $subCategoryQ->get();
+        $result = $subCategoryQ->skip($offset)->take($limit)->get();
         $totalRecords = SubCategory::count();
         
         return response()->json(
@@ -54,5 +35,22 @@ class SubCategoryApiController extends Controller
         );
 
     }
-    
+ 
+    private function applyFilters($request,$query) {
+        $query->when($request->input('order_column') && $request->input('order_dir'), function ($query) use ($request) {
+            return $query->orderBy($request->input('order_column'), $request->input('order_dir'));
+        });
+        $query->when($request->input('search'), function ($query) use ($request) {
+            return $query->where('name', 'LIKE', '%' . $request->input('search') . '%');
+        });
+        $query->when($request->input('supplier'), function ($query) use ($request) {
+            return $query->whereHas('suppliers', fn ($query) => $query->where('supplier_id', $request->input('supplier_id')));
+        });
+        $query->when($request->input('category'), function ($query) use ($request) {
+            return $query->where('category_id', $request->input('category'));
+        });
+    }
+    private function applySelectFieldJSON($query){
+        return response()->json($query->get());
+    }
 }

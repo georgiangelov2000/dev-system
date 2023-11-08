@@ -52,19 +52,10 @@ $(function () {
                 orderable: false,
                 width: "1%",
                 render: function (data, type, row) {
-                    let checkbox =
-                        `<div class='form-check'> 
-                        <input 
-                            name = 'checkbox'
-                            class='form-check-input' 
-                            type='checkbox' 
-                            onchange='selectSubCategory(this)'
-                            data-id = '${row.id}'
-                            data-name = '${row.name}'
-                        />
+                    return `<div class='form-check'> 
+                    <input name='checkbox' class='form-check-input' type='checkbox' onchange='selectSubCategory(this)' 
+                           data-id='${row.id}' data-name='${row.name}' />
                     </div>`;
-
-                    return `${checkbox}`;
                 }
             },
             {
@@ -88,29 +79,24 @@ $(function () {
                 name: 'category',
                 width: '5%',
                 render: function (data, type, row) {
-                    if (row.category) {
-                        return `<span>${row.category.name}</span>`;
-                    } else {
-                        return '';
-                    }
+                    return row.category ? `<span>${row.category.name}</span>` : '';
                 }
             },
             {
                 orderable: false,
                 width: '35%',
                 render: function (data, type, row) {
-
                     const deleteFormTemplate = `
                     <form style="display:inline-block;" action="${DELETE_SUB_CATEGORY_ROUTE.replace(':id', row.id)}" id="delete-form" method="POST" data-name="${row.name}">
                       <input type="hidden" name="_method" value="DELETE">
                       <input type="hidden" name="id" value="${row.id}">
                       <button type="submit" class="btn p-1" title="Delete" onclick="event.preventDefault(); deleteSubCategory(this);"><i class="fa-light fa-trash text-danger"></i></button>
                     </form>
-                  `;
+                `;
 
-                    const editButton = `<a onclick="editSubCategory(this)" data-id="${row.id}" class="btn editSubCategory" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
+                const editButton = `<a onclick="editSubCategory(this)" data-id="${row.id}" class="btn editSubCategory" title="Edit"><i class="fa-light fa-pencil text-primary"></i></a>`;
 
-                    return `${editButton} ${deleteFormTemplate}`;
+                return `${editButton} ${deleteFormTemplate}`;
                 }
             }
 
@@ -151,28 +137,32 @@ $(function () {
         }
 
         window.selectSubCategory = function(e) {
-            if ($('tbody input[type="checkbox"]:checked').length === 0) {
-                $('.actions').addClass('d-none');
-            } else {
-                $('.actions').removeClass('d-none');
-            }
+            const isChecked = $('tbody input[type="checkbox"]:checked').length > 0;
+            $('.actions').toggleClass('d-none', !isChecked);
         }
+        
     // Window events end
 
     // Variable functions
         let deleteMultipleSubCategories = function() {
-            let searchedIds = [];
-            let searchedNames = [];
-
-            $('tbody tr input[type="checkbox"]:checked').each(function () {
-                searchedIds.push($(this).attr('data-id'));
-                searchedNames.push($(this).attr('data-name'));
-            });
+            const searchedIds = $('tbody input[type="checkbox"]:checked').map(function () {
+                return $(this).attr('data-id');
+            }).get();
+        
+            const searchedNames = $('tbody input[type="checkbox"]:checked').map(function () {
+                return $(this).attr('data-name');
+            }).get();
 
             let template = swalText(searchedNames);
 
             showConfirmationDialog('Selected items!',template,function(){
-                searchedIds.forEach(function(id,index){
+                searchedIds.forEach(function(id,index){            let searchedIds = [];
+                    let searchedNames = [];
+        
+                    $('tbody tr input[type="checkbox"]:checked').each(function () {
+                        searchedIds.push($(this).attr('data-id'));
+                        searchedNames.push($(this).attr('data-name'));
+                    });
                     APIDELETECALLER(DELETE_SUB_CATEGORY_ROUTE.replace(':id',id),function(response){
                         toastr['success'](response.message);
                         dataTable.ajax.reload();
@@ -203,27 +193,17 @@ $(function () {
     })
 
     selectAll.on('change',function() {
-        if (this.checked) {
-            $('.actions').removeClass('d-none');
-            $(':checkbox').each(function () {
-                this.checked = true;
-            });
-        } else {
-            $('.actions').addClass('d-none');
-            $(':checkbox').each(function () {
-                this.checked = false;
-            });
-        }
+        const isChecked = this.checked;
+        $('.actions').toggleClass('d-none', !isChecked);
+        $(':checkbox').prop('checked', isChecked);
     })
 
     selectAction.on('change',function(){
         switch ($(this).val()) {
             case 'delete':
                 deleteMultipleSubCategories();
-            break;
-        
-            default:
                 break;
+            default:
         }
     })
 

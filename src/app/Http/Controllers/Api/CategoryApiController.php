@@ -37,6 +37,9 @@ class CategoryApiController extends Controller {
     }
 
     private function applyFilters($request, $query){
+        $query->when($request->input('order_column') && $request->input('order_dir'), function ($query) use ($request) {
+            return $query->orderBy($request->input('order_column'), $request->input('order_dir'));
+        });
         $query->when($request->input('search'), function ($query) use ($request) {
             return $query->where('name', 'LIKE', '%' . $request->input('search') . '%');
         });
