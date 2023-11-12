@@ -1,16 +1,20 @@
+@php
+    $statuses = config('statuses.payment_statuses');
+@endphp
+
 @extends('app')
 
 @section('content')
     <div class="row flex-wrap">
         <div class="card card-default col-5 cardTemplate mr-1">
-            <div class="card-header">
+            <div class="card-header bg-primary">
                 <div class="col-12">
                     <h3 class="card-title">Payment</h3>
                 </div>
             </div>
             <div class="card-body p-0">
                 <div class="col-12 d-flex flex-wrap">
-                    <form action="{{ route('payment.update',[$payment->id,'purchase']) }}" class="col-12" method="POST">
+                    <form action="{{ route('payment.update', [$payment->id, 'purchase']) }}" class="col-12" method="POST">
                         @method('PUT')
                         @csrf
                         <div class="form-group col-12">
@@ -22,6 +26,19 @@
                                 value="{{ $payment->price }}">
                         </div>
                         <div class="form-group col-12">
+                            <label for="is_it_delivered">Delivered</label>
+                            <select class="form-control" name="is_it_delivered" id="is_it_delivered">
+                                @foreach (config('statuses.is_it_delivered') as $key => $val)
+                                    <option {{ $key == $payment->purchase->is_it_delivered ? 'selected' : '' }} value="{{ $key }}">
+                                        {{ $val }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('is_it_delivered')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="form-group col-12">
                             <label for="quantity">Amount</label>
                             <input name="quantity" type="text" class="form-control" max="{{ $payment->quantity }}"
                                 value="{{ $payment->quantity }}">
@@ -29,20 +46,60 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
+                        <div id="deliveryWrapper">
+                            @if ($payment->purchase->is_it_delivered)
+                                <div class="form-group col-12 dateOfPaymentContainer">
+                                        <label for="date_of_payment">Date of payment</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control datepicker" name="date_of_payment"
+                                                value="{{ $payment->date_of_payment }}">
+                                        </div>
+                                        @error('date_of_payment')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                </div>  
+                                <div class="form-group col-12 deliveryDateContainer">
+                                        <label for="delivery_date">Delivery date</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                </span>
+                                            </div>
+                                            <input type="text" class="form-control datepicker" name="delivery_date"
+                                                value="{{ $payment->purchase->delivery_date ?? '' }}">
+                                        </div>
+                                        @error('delivery_date')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                </div>
+                            @endif
+                        </div>
                         <div class="form-group col-12">
-                            <label for="date_of_payment">Date of payment</label>
+                            <label for="">Expected date of payment</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text">
-                                        <i class="far fa-calendar-alt"></i>
-                                    </span>
+                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
                                 </div>
-                                <input type="text" class="form-control datepicker" name="date_of_payment"
-                                    value="{{ $payment->date_of_payment }}">
+                                <input 
+                                    disabled 
+                                    type="text" 
+                                    class="form-control"
+                                    value="{{ $payment->expected_date_of_payment }}" 
+                                />
                             </div>
-                            @error('date_of_payment')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                        </div>
+                        <div class="form-group col-12">
+                            <label for="">Status</label>
+                            <div class="input-group">
+                                <input name="payment_status" disabled type="text" class="form-control"
+                                    value="{{ $statuses[$payment->payment_status] }}" />
+                            </div>
                         </div>
                         <div class="form-group col-12">
                             <label for="payment_method">Payment method</label>
@@ -56,21 +113,6 @@
                                 @endforeach
                             </select>
                             @error('payment_method')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="form-group col-12">
-                            <label for="payment_status">Payment status</label>
-                            <select class="form-control" name="payment_status" id="payment_status">
-                                <option value="">Select status</option>
-                                @foreach (config('statuses.payment_statuses') as $key => $val)
-                                    <option {{ $key === $payment->payment_status ? 'selected' : '' }}
-                                        value="{{ $key }}">
-                                        {{ $val }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('payment_status')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -97,7 +139,7 @@
             </div>
         </div>
         <div class="card card-default col-6 cardTemplate print-only">
-            <div class="card-header">
+            <div class="card-header bg-primary">
                 <div class="col-12">
                     <h3 class="card-title">Details</h3>
                 </div>
@@ -121,35 +163,38 @@
                     </div>
                     <div class="col-6 text-right">
                         @if ($payment->purchase->supplier->image_path)
-                            <img class="w-25 m-0"
-                                src="{{$payment->purchase->supplier->image_path}}" />
+                            <img class="w-25 m-0" src="{{ $payment->purchase->supplier->image_path }}" />
                         @endif
                     </div>
                 </div>
 
                 <div class="col-12">
                     <h5 class="text-center">PAYMENT RECEIPT</h5>
-                    <table class="table table-striped table-hover">
-                        <thead>
+                    <table class="table table-hover">
+                        <thead class="bg-primary rounded-left rounded-right">
                             <tr>
-                                <th>Payment date</th>
-                                <th>Final price</th>
-                                <th>Amount</th>
-                                <th>Payment method</th>
-                                <th>Payment status</th>
-                                <th>Payment reference</th>
+                                <th class="rounded-left border-0 text-center">Payment date</th>
+                                <th class="border-0 text-center">Final price</th>
+                                <th class="border-0 text-center">Amount</th>
+                                <th class="border-0 text-center">Payment method</th>
+                                <th class="border-0 text-center">Payment status</th>
+                                <th class="border-0 text-center rounded-right">Payment reference</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{{ $payment->date_of_payment }}</td>
-                                <td>${{ $payment->price }}</td>
-                                <td>{{ $payment->quantity }}</td>
-                                <td>{{ isset(config('statuses.payment_methods_statuses')[$payment->payment_method]) ? config('statuses.payment_methods_statuses')[$payment->payment_method] : '' }}
+                                <td class="border-left-0 border-top-0 border-right text-center">{{ $payment->date_of_payment }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">{{ number_format($payment->price, 2, '.', '.') }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">{{ $payment->quantity }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ isset(config('statuses.payment_methods_statuses')[$payment->payment_method]) ? config('statuses.payment_methods_statuses')[$payment->payment_method] : '' }}
                                 </td>
-                                <td>{{ isset(config('statuses.payment_statuses')[$payment->payment_status]) ? config('statuses.payment_statuses')[$payment->payment_status] : '' }}
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ isset(config('statuses.payment_statuses')[$payment->payment_status]) ? config('statuses.payment_statuses')[$payment->payment_status] : '' }}
                                 </td>
-                                <td>{{ $payment->payment_reference }}</td>
+                                <td class="border-left-0 border-top-0 text-center">
+                                    {{ $payment->payment_reference }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -157,38 +202,42 @@
 
                 <div class="col-12">
                     <h5 class="text-center">PURCHASE</h5>
-                    <table class="table table-striped table-hover">
-                        <thead>
+                    <table class="table table-hover">
+                        <thead class="bg-primary rounded-left rounded-right">
                             <tr>
-                                <th>Product</th>
-                                <th>Single price</th>
-                                <th>Final price</th>
-                                <th>Amount</th>
-                                <th>Discount %</th>
-                                <th>Category</th>
-                                <th>Code</th>
+                                <th class="rounded-left border-0 text-center">ID</th>
+                                <th class="border-0 text-center">Product</th>
+                                <th class="border-0 text-center">Single price</th>
+                                <th class="border-0 text-center">Final price</th>
+                                <th class="border-0 text-center">Amount</th>
+                                <th class="border-0 text-center">Discount %</th>
+                                <th class="border-0 text-center">Category</th>
+                                <th class="border-0 text-center rounded-right">Tracking number</th>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                   {{ $payment->purchase->id }}
+                                </td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
                                     {{ $payment->purchase->name }}
                                 </td>
-                                <td>
-                                    ${{ $payment->purchase->price }}
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ number_format($payment->purchase->price, 2, '.', '.') }}
                                 </td>
-                                <td>
-                                    ${{ $payment->purchase->total_price }}
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ number_format($payment->purchase->total_price, 2, '.', '.') }}
                                 </td>
-                                <td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
                                     {{ $payment->purchase->initial_quantity }}
                                 </td>
-                                <td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
                                     {{ $payment->purchase->discount_percent }}
                                 </td>
-                                <td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
                                     {{ $payment->purchase->categories->first()->name }}
                                 </td>
-                                <td>
+                                <td class="border-left-0 border-top-0 text-center">
                                     {{ $payment->purchase->code }}
                                 </td>
                             </tr>
@@ -198,21 +247,21 @@
 
                 <div class="col-12">
                     <h5 class="text-center">INVOICE</h5>
-                    <table class="table table-striped table-hover">
-                        <thead>
+                    <table class="table table-hover">
+                        <thead class="bg-primary rounded-left rounded-right">
                             <tr>
-                                <th>Invoice number</th>
-                                <th>Invoice date</th>
-                                <th>Invoice price</th>
-                                <th>Invoice amount</th>
+                                <th class="rounded-left border-0 text-center">Invoice number</th>
+                                <th class="border-0 text-center">Invoice date</th>
+                                <th class="border-0 text-center">Invoice price</th>
+                                <th class="border-0 text-center rounded-right">Invoice amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{{ $payment->invoice->invoice_number }}</td>
-                                <td>{{ $payment->invoice->invoice_date }}</td>
-                                <td>${{ $payment->invoice->price }}</td>
-                                <td>{{ $payment->invoice->quantity }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">{{ $payment->invoice->invoice_number }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">{{ $payment->invoice->invoice_date }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">{{ number_format($payment->invoice->price, 2, '.', '.') }}</td>
+                                <td class="border-left-0 border-top-0 text-center">{{ $payment->invoice->quantity }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -232,7 +281,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 text-left mt-5">
+                <div class="col-6 text-left mt-5">
                     <button id="print" type="button" class="btn btn-primary" style="margin-right: 5px;">
                         <i class="fas fa-download"></i> Generate PDF
                     </button>
@@ -243,17 +292,9 @@
     </div>
     @push('scripts')
         <script type="text/javascript">
-            $(function() {
-                $('select[name="payment_method"],select[name="payment_status"]').selectpicker();
-                
-                $('.datepicker').datepicker({
-                    format: 'yyyy-mm-dd'
-                });
-
-                $('#print').on('click', function() {
-                    window.print();
-                })
-            })
+            const expected = new Date("{{ date('Y-m-d', strtotime($payment->expected_date_of_payment)) }}");
+            const delivery = "{{ $payment->purchase->is_it_delivered }}";
         </script>
+        <script type="text/javascript" src="{{ mix('js/payments/form.js') }}"></script>
     @endpush
 @endsection

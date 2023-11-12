@@ -10,6 +10,7 @@ use App\Models\OrderPayment;
 use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View; // Import the View class
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PaymentController extends Controller
 {
@@ -65,22 +66,33 @@ class PaymentController extends Controller
     public function update(PaymentRequest $request, $payment, $type)
     {
         DB::beginTransaction();
-
+    
         try {
             $builder = $this->paymentService->getInstance($payment, $type);
+    
+            if (!$builder) {
+                throw new ModelNotFoundException("Payment not found");
+            }
+    
             $relation = $builder instanceof OrderPayment ? 'order' : 'purchase';
+            $builder->load($relation);
+    
             $data = $request->validated();
             $this->paymentProcessing($data, $builder, $relation);
+    
             DB::commit();
+        } catch (ModelNotFoundException $e) {
+            DB::rollback();
+            return abort(404);
         } catch (Exception $e) {
             DB::rollback();
             return back()->withInput()->with('error', 'Payment has not been updated');
         }
-
+    
         return redirect()->back()->with('success', 'Payment has been updated');
     }
 
-    /**
+    /**ce->getInstance($payment,
      * Processes payment data and saves it to the database.
      *
      * @param array $data - Array of payment data.
@@ -88,30 +100,43 @@ class PaymentController extends Controller
      * @param string $relation - Related model ('order' or 'purchase').
      */
     private function paymentProcessing(array $data, $builder, $relation)
-    {
-        // Validate payment status and method
-        $validPaymentStatus = $this->helper->statusValidation($data['payment_status'], $this->paymentStatuses);
+    {   
         $validPaymentMethod = $data['payment_method'] && $this->helper->statusValidation($data['payment_method'], $this->paymentMethods);
-
-        // Set payment status if valid
-        if ($validPaymentStatus) {
-            $builder->payment_status = $data['payment_status'];
+        
+        // Check if the payment method is not valid and throw an exception
+        if (!$validPaymentMethod) {
+            throw new \Exception('Invalid payment method.');
         }
+        $delivery_date = null;
+        
+        // Validate payment status and method
+        if ($data['is_it_delivered']) {
+            $expected = $builder->expected_date_of_payment;
+            $dateOfPayment = $data['date_of_payment'];
+            $delivery_date = now()->parse($data['delivery_date']);
 
-        // Set payment method if valid
-        if ($validPaymentMethod) {
-            $builder->payment_method = $data['payment_method'];
+            if ($dateOfPayment >= $expected) {
+                $status = $builder::PAID;
+            } elseif ($dateOfPayment <= $expected) {
+                $status = $builder::OVERDUE;
+            }
+    
+            $builder->payment_status = $status;
+            $builder->date_of_payment = now()->parse($dateOfPayment);
+            $builder->$relation->is_it_delivered = $builder->$relation::IS_IT_DELIVERED_TRUE;
+            $builder->$relation->delivery_date = $delivery_date;
+
+            $builder->$relation->save();
         }
+        
+        $builder->price = $data['price'];
+        $builder->quantity = $data['quantity'];
+        $builder->payment_reference = $data['payment_reference'];
+        $builder->partially_paid_price = $data['partially_paid_price'] ?? '0.00';
+        $builder->payment_method = $data['payment_method'];
 
-        // Fill payment attributes from input data
-        $builder->fill([
-            'price' => $data['price'],
-            'quantity' => $data['quantity'],
-            'date_of_payment' => now()->parse($data['date_of_payment']),
-            'payment_reference' => $data['payment_reference'],
-            'partially_paid_price' => $data['partially_paid_price'] ?? '0.00', // Set to '0.00' if not provided
-        ])->save();
-
+        $builder->save();
+    
         // Update invoice attributes
         $builder->invoice()->update([
             'price' => $builder->price,

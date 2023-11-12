@@ -110,19 +110,18 @@
                                         </span>
                                     </div>
                                     <input type="text"
-                                        value="{{ date('m/d/Y', strtotime($purchase->expected_date_of_payment)) }}"
+                                        value="{{ date('m/d/Y', strtotime($purchase->payment->expected_date_of_payment))}}"
                                         class="form-control datepicker" name="expected_date_of_payment" />
                                 </div>
                                 @error('expected_date_of_payment')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             @else
-                                <p class="input-group-text col-12">
-                                    {{ $purchase->expected_date_of_payment }}</p>
+                                <p class="input-group-text col-12">{{ $purchase->payment->expected_date_of_payment }}</p>
                             @endif
                         </div>
                         <div class="form-group col-3">
-                            <label class="form-label required">Delivery date:</label>
+                            <label class="form-label required">Expected delivery date:</label>
                             <div class="input-group">
                                 @if ($purchase->is_editable)
                                     <div class="input-group-prepend">
@@ -130,10 +129,10 @@
                                             <i class="far fa-calendar-alt"></i>
                                         </span>
                                     </div>
-                                    <input type="text" class="form-control datepicker" name="delivery_date"
-                                        value="{{ $purchase->delivery_date ? date('m/d/Y', strtotime($purchase->delivery_date)) : '' }}" />
+                                    <input type="text" class="form-control datepicker" name="expected_delivery_date"
+                                        value="{{ date('m/d/Y', strtotime($purchase->expected_delivery_date)) }}" />
                                 @else
-                                    <p class="input-group-text col-12">{{ $purchase->delivery_date }}</p>
+                                    <p class="input-group-text col-12">{{ $purchase->expected_delivery_date }}</p>
                                 @endif
                             </div>
                             @error('delivery_date')
@@ -246,6 +245,7 @@
 
         <script type="text/javascript">
             const CATEGORY_ROUTE = "{{ route('api.categories') }}";
+            const SUB_CATEGORY_ROUTE = "{{ route('api.subcategories') }}";
             const SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
             const BRAND_API_ROUTE = "{{ route('api.brands') }}";
 

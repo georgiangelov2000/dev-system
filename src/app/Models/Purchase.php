@@ -32,6 +32,10 @@ class Purchase extends Model {
      *
      * @var array
      */
+
+     const IS_IT_DELIVERED_TRUE = 1;
+     const IS_IT_DELIVERED_FALSE = 1;
+
     protected $fillable = [
         'image',
         'name',
@@ -52,7 +56,8 @@ class Purchase extends Model {
         'discount_percent',
         'discount_price',
         'delivery_date',
-        'image_path'
+        'image_path',
+        'is_it_delivered',
     ];
 
     public function categories() {

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="card card-default cardTemplate">
-        <div class="card-header">
+        <div class="card-header bg-primary">
             <div class="col-12">
                 <h3 class="card-title">Company information</h3>
             </div>
@@ -30,7 +30,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="name">Email</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -44,7 +44,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="country_id">Country</label>
                             <select class="form-control selectCountry" name="country_id" id="country_id">
                                 <option value="">Select option</option>
@@ -58,7 +58,7 @@
                             @enderror
                         </div>
 
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="state_id">State</label>
                             <select class="form-control selectState" name="state_id" id="state_id">
                                 @foreach ($data['states'] as $state)
@@ -71,7 +71,7 @@
                             @enderror
                         </div>
 
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="comapny-name">Company name</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -85,7 +85,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="phone_number">Phone number</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -99,7 +99,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="tax_number">Tax number</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -113,7 +113,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="owner_name">Owner</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -127,7 +127,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="website">Website</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -140,7 +140,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="bussines_type">Bussines type</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -153,7 +153,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
                             <label for="registration_date">Registration date</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -168,7 +168,20 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="form-group col-6">
+                        <div class="form-group col-3">
+                            <label for="country_id">Language</label>
+                            <select class="form-control selectCountry" name="country_id" id="country_id">
+                                <option value="">Select option</option>
+                                @foreach ($data['countries'] as $item)
+                                    <option {{ $settings['country'] === $item->name ? 'selected' : '' }}
+                                        value="{{ $item->id }}">{{ $item->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('country_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="form-group col-4">
                             <label for="address">Address</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -178,7 +191,7 @@
                                     name="address" class="form-control" placeholder="Enter address" />
                                 <span class="input-group-append">
                                     <button type="button" id="searchAddress"
-                                        class="btn btn-primary btn-flat">Search</button>
+                                        class="btn btn-primary btn-flat rounded-right">Search</button>
                                 </span>
                             </div>
                             @error('address')
@@ -208,11 +221,6 @@
                     <div class="col-10 d-flex flex-wrap justify-content-between">
                         <div class="form-group col-6 text-left">
                             <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                        <div class="form-group col-6 text-right">
-                            <button id="print" class="btn btn-outline-primary" type="button">
-                                <i class="fa-light fa-file-pdf fa-lg"></i>
-                            </button>
                         </div>
                     </div>
                 </div>

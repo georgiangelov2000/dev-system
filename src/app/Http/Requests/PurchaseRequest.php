@@ -24,7 +24,7 @@ class PurchaseRequest extends FormRequest
             "notes" => "nullable|string",
             "brands" => "nullable|array",
             "image_path" => "nullable",
-            "delivery_date" => !$this->isPaymentRequired() ? 'required|date' : 'nullable|date',
+            "expected_delivery_date" => !$this->isPaymentRequired() ? 'required|date' : 'nullable|date',
             'expected_date_of_payment' => !$this->isPaymentRequired() ? 'required|date' : 'nullable|date',
             'discount_percent' => !$this->isPaymentRequired() ? 'required|integer|min:0' : 'nullable|integer|min:0',
             'price' => !$this->isPaymentRequired() ? 'required|numeric|min:1' : 'nullable|numeric|min:0',

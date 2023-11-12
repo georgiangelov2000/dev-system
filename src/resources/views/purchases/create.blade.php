@@ -18,7 +18,7 @@
                             </div>
                             <div class="custom-file col-12">
                                 <input type="file" class="custom-file-input" name="image" id="image">
-                                <label class="custom-file-label" for="customFile">Choose file</label>
+                                <label class="custom-file-label" id="fileLabel" for="customFile">Choose file</label>
                                 @error('image')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -75,16 +75,16 @@
                             @enderror
                         </div>
                         <div class="form-group col-3">
-                            <label class="form-label required">Delivery date:</label>
+                            <label class="form-label required">Expected delivery date:</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
                                         <i class="far fa-calendar-alt"></i>
                                     </span>
                                 </div>
-                                <input type="text" class="form-control datepicker" name="delivery_date">
+                                <input type="text" class="form-control datepicker" name="expected_delivery_date">
                             </div>
-                            @error('delivery_date')
+                            @error('expected_delivery_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>

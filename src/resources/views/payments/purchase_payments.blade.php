@@ -126,8 +126,8 @@
             const PURCHASE_EDIT_ROUTE = "{{ route('purchase.edit',':id') }}"
             const PURCHASE_PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
             const PURCHASE_PAYMENT_DELETE_ROUTE = "{{ route('payment.delete', [':payment', ':type']) }}";
-            const PURCHASE_INVOICE_API_ROUTE = "{{ route('api.purchase.invoices') }}";
             const PURCHASE_INVOICE_UPDATE_ROUTE = "{{ route('invoice.update',[':type',':id']) }}";
+            const INVOICE_API_ROUTE = "{{ route('api.invoices') }}";
         </script>
     @endpush
 @endsection

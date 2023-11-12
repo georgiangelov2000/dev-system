@@ -80,14 +80,6 @@ $(function () {
                 }
             },
             {
-                orderable: false,
-                width: '2%',
-                class:'text-center',
-                render: function (data, type, row) {
-                    return row.payment ? `<a href="${PAYMENT.replace(':payment', row.payment.id).replace(':type','purchase')}">${row.payment.alias}</a>` : '';
-                }
-            },
-            {
                 width: '1%',
                 orderable: true,
                 name: 'id',
@@ -98,7 +90,7 @@ $(function () {
             {
                 width: '1%',
                 orderable: false,
-                name: "image",
+                name: "image_path",
                 render: function (data, type, row) {
                     return row.image_path ? `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${row.image_path}" />` : `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;
                 }
@@ -172,11 +164,9 @@ $(function () {
             {
                 width: '4%',
                 orderable: false,
+                class:'text-center',
                 render: function (data, type, row) {
-                    let stockStatus = row.quantity ? 'In stock' : 'Out of stock';
-                    let stockColor = row.quantity ? 'text-success' : 'text-danger';
-
-                    return `<span class="${stockColor}">${stockStatus}</span>`
+                  return row.is_it_delivered ? `<span class="text-success">Yes</span>` : `<span class="text-danger">No</span>`;
                 }
             },
             {
@@ -194,10 +184,26 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '10%',
                 orderable: false,
                 render: function (data, type, row) {
-                    return row.subcategories.length > 0 ? row.subcategories.map(subcategory => `<span> ${subcategory.name} </span>`).join(', ') : '';
+                    let expected = moment(row.expected_delivery_date);
+                    let deliveryDate = moment(row.delivery_date);
+                    let isDelivered = row.is_it_delivered;
+                    
+                    if (!isDelivered) {
+                        let currDate = moment();
+                        let diffDays = currDate.diff(expected, 'days');
+                        return (currDate.isAfter(expected))
+                            ? `<span class="text-danger">${diffDays} days delay</span>`
+                            : `<span class="text-info">${diffDays} days left</span>`;
+                    } else {
+                        let diffDays = deliveryDate.diff(expected, 'days');
+                        return (deliveryDate.isAfter(expected))
+                            ? `<span class="text-danger">${diffDays} days delay in delivery</span>`
+                            : `<span class="text-success">Delivered on time (${diffDays} days)</span>`;
+                    }
+
                 }
             },
             {

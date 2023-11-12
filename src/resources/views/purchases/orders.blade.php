@@ -20,7 +20,7 @@
                     <div class="form-group col-3">
                         <label for="">Order status</label>
                         <select name="status" id="" class="form-control selectType" multiple>
-                            @foreach (config('statuses.order_statuses') as $key => $status)
+                            @foreach (config('statuses.payment_statuses') as $key => $status)
                                 <option value="{{ $key }}">{{ $status }}</option>
                             @endforeach
                         </select>

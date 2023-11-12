@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Factory\PaymentRepositoryFactory;
+use Illuminate\Http\Request;
+use App\Factory\InvoiceRepositoryFactory;
 
-class PaymentApiController extends Controller
+class InvoiceApiController extends Controller
 {
     public function getData(Request $request)
     {
@@ -17,11 +17,9 @@ class PaymentApiController extends Controller
 
         $type = $request->input('type');
 
-        // You can add more conditions here if needed
-
         // Create repository based on type
         try {
-            $repository = PaymentRepositoryFactory::create($type);
+            $repository = InvoiceRepositoryFactory::create($type);
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

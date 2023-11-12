@@ -1,13 +1,5 @@
 <?php 
 return [
-    "order_statuses" => [
-        1 => 'Paid',
-        2 => 'Pending',
-        3 => 'Partially Paid',
-        4 => 'Overdue',
-        5 => 'Refunded',
-        6 => 'Ordered',
-    ],
     'payment_statuses' => [
         1 => 'Paid',
         2 => 'Pending',
@@ -52,6 +44,17 @@ return [
     'settings_type' => [
         1 => 'Company Information',
     ],
+    'languages' => [
+        'english',
+        'portuguese',
+        'german',
+        'french',
+        'spanish'
+    ],
+    'is_it_delivered' => [
+        0 => 'Not delivered',
+        1 => 'Delivered',
+    ]
 ]
 
 ?>

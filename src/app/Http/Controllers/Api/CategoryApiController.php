@@ -47,8 +47,10 @@ class CategoryApiController extends Controller {
             return $query->where('id', $request->id);
         });
         $query->when($request->input('supplier'), function ($query) use ($request) {
-            return $query->whereHas('suppliers', fn ($query) => $query->where('supplier_id', $request->input('supplier_id')));
+            return $query->whereHas('suppliers', fn ($query) => $query->where('supplier_id', $request->input('supplier')));
         });
+
+        return $query;
     }
 
     private function applySelectFieldJSON($query) {

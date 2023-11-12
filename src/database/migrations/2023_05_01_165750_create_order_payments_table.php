@@ -15,7 +15,7 @@ class CreateOrderPaymentsTable extends Migration
     {
         Schema::create('order_payments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('order_id')->index();
             $table->unsignedInteger('quantity')->default(0);
             $table->unsignedDecimal('price', 8, 2)->default(0);
             $table->tinyInteger('payment_method')->nullable()->comment('1: Cash, 2: Bank Transfer, 3: Credit Card, 4: Cheque, 5: Online Payment');

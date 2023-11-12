@@ -26,6 +26,10 @@ class PurchasePayment extends Model
     protected $primaryKey = "id";
 
     public $timestamps = false;
+    
+    const PAID = 1;
+    const PENDING = 2;
+    const OVERDUE = 4;
 
     protected $fillable = [
         'id',
@@ -36,8 +40,10 @@ class PurchasePayment extends Model
         'date_of_payment',
         'payment_method',
         'payment_reference',
+        'expected_date_of_payment',
         'payment_status',
-        'partially_paid_price'
+        'partially_paid_price',
+        'delivery_date'
     ];
 
     public function purchase()

@@ -67,10 +67,7 @@ class PurchaseController extends Controller
         return redirect()->route('purchase.index')->with('success', 'Purchase has been created');
     }
     public function edit(Purchase $purchase)
-    {
-
-        $purchase->load('categories:id,name','subcategories:id,name', 'brands:id,name','supplier:id,name');
-        
+    {        
         $orderAmounts = 0;
 
         if($purchase->orders()->exists()){

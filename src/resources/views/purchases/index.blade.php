@@ -101,7 +101,6 @@
                                 <label class="form-check-label" for="flexCheckDefault"></label>
                             </div>
                         </th>
-                        <th>Payment</th>
                         <th>ID</th>
                         <th>Image</th>
                         <th>Name</th>
@@ -112,10 +111,10 @@
                         <th>Amount</th>
                         <th>Init.amount</th>
                         <th>Discount</th>
-                        <th>Stock</th>
+                        <th>Delivered</th>
                         <th>Supplier</th>
                         <th>Category</th>
-                        <th>Subcategories</th>
+                        <th>Delivery delay</th>
                         <th>Brands</th>
                         <th>Status</th>
                         <th>Actions</th>

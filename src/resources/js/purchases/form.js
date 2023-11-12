@@ -16,8 +16,8 @@ $(function () {
     const categoryId = selectCategory.val();
 
     if(categoryId && categoryId !== '0') {
-        APICaller(CATEGORY_ROUTE, { "category": categoryId }, response => {
-            const subCategories = response.data[0]?.sub_categories || [];
+        APICaller(SUB_CATEGORY_ROUTE, { "category": categoryId, 'select_json':true }, response => {
+            const subCategories = response;
             subCategories.forEach(subCategory => {
                 selectSubCategory.append(`<option value=${subCategory.id}>${subCategory.name}</option>`);
             });
@@ -34,9 +34,10 @@ $(function () {
         selectCategory.empty();
         selectSubCategory.empty();
 
-        APICaller(CATEGORY_ROUTE, { "supplier": supplier }, response => {
-            const categories = response.data;
-            if (categories.length > 0) {
+        APICaller(CATEGORY_ROUTE, { "supplier": supplier, 'select_json': true }, response => {
+            const categories = response;
+
+            if (categories.length) {
                 selectCategory.append('<option>Select category</option>');
                 categories.forEach(category => {
                     selectCategory.append(`<option value=${category.id}>${category.name}</option>`);
@@ -55,8 +56,8 @@ $(function () {
         const category = $(this).val();
         selectSubCategory.empty();
 
-        APICaller(CATEGORY_ROUTE, { "category": category }, response => {
-            const subCategories = response.data[0]?.sub_categories || [];
+        APICaller(SUB_CATEGORY_ROUTE, { "category": category, 'select_json':true }, response => {
+            const subCategories = response;
             subCategories.forEach(subCategory => {
                 selectSubCategory.append(`<option value=${subCategory.id}>${subCategory.name}</option>`);
             });
@@ -124,6 +125,11 @@ $(function () {
             reader.readAsDataURL(input.files[0]);
         }
     }
+
+    $('input[name="image"]').on('change', function () {
+        let fileName = $(this).val().split('\\').pop();
+        $('#fileLabel').text(fileName || 'Choose file');
+    });
     
     function updateResults(updatedQuantity) {
         

@@ -81,7 +81,7 @@ class PaymentService
      */
     public function getInstance($payment, $type)
     {
-        $builder = $this->editMapping[$type]->findOrFail($payment);
+        $builder = $this->editMapping[$type]->find($payment);
         return $builder;
     }
 }

@@ -1,61 +1,84 @@
-import { APICaller, APIDELETECALLER } from '../ajax/methods';
-import { handleErrors, swalText, showConfirmationDialog } from '../helpers/action_helpers';
-import { numericFormat } from '../helpers/functions';
+import { APICaller, APIDELETECALLER } from "../ajax/methods";
+import {
+    handleErrors,
+    swalText,
+    showConfirmationDialog,
+} from "../helpers/action_helpers";
+import { numericFormat } from "../helpers/functions";
+import { statusPaymentsWithIcons, paymentMethods } from "../helpers/statuses";
 
 $(function () {
-    $('.selectSupplier').selectpicker('refresh').val('').trigger('change')
+    $(".selectSupplier").selectpicker("refresh").val("").trigger("change");
 
     $('input[name="datetimes"]').daterangepicker({
         autoUpdateInput: false,
         locale: {
-            cancelLabel: 'Clear'
-        }
+            cancelLabel: "Clear",
+        },
     });
 
-    $('.datepicker').datepicker({
-        format: 'yyyy-mm-dd'
+    $(".datepicker").datepicker({
+        format: "yyyy-mm-dd",
     });
 
-    let disabledOption = $('.disabledDateRange');
+    let disabledOption = $(".disabledDateRange");
     let dateRangePicker = $('input[name="datetimes"]');
-    let dateRangeCol = $('.dateRange');
-    let bootstrapSelectSupplier = $('.bootstrap-select .selectSupplier');
-    let btnFilter = $('.filter');
-    let modalInvoice = $('#modalInvoice');
-    let submitForm = $('#submitForm');
-
-    const paymentStatuses = {
-        1: { label: "Paid", iconClass: "fal fa-check-circle" },
-        2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
-        3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
-        4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
-        5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
-        6: { label: "Ordered", iconClass: "fal fa-shopping-cart" }
-    };
+    let dateRangeCol = $(".dateRange");
+    let bootstrapSelectSupplier = $(".bootstrap-select .selectSupplier");
+    let btnFilter = $(".filter");
+    let modalInvoice = $("#modalInvoice");
+    let submitForm = $("#submitForm");
 
     let dataTable;
-    let supplierData;
 
-    dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
-        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    dateRangePicker.on("apply.daterangepicker", function (ev, picker) {
+        $(this).val(
+            picker.startDate.format("YYYY-MM-DD") +
+                " - " +
+                picker.endDate.format("YYYY-MM-DD")
+        );
     });
 
-    disabledOption.on('click', function () {
-        if ($(this).is(':checked')) {
-            dateRangeCol.addClass('d-none');
-            dateRangePicker.addClass('d-none').prop('disabled', true).val(null);
-        } else {
-            dateRangeCol.removeClass('d-none');
-            dateRangePicker.removeClass('d-none').prop('disabled', false);
-            dateRangePicker.data('daterangepicker').setStartDate(moment().subtract(1, 'year'));
-            dateRangePicker.data('daterangepicker').setEndDate(moment().startOf('hour'));
+    disabledOption.on("click", function () {
+        const isChecked = $(this).is(":checked");
+        dateRangeCol.toggleClass("d-none", isChecked);
+        dateRangePicker
+            .toggleClass("d-none")
+            .prop("disabled", isChecked)
+            .val(null);
+
+        if (!isChecked) {
+            const picker = dateRangePicker.data("daterangepicker");
+            picker.setStartDate(moment().subtract(1, "year"));
+            picker.setEndDate(moment().startOf("hour"));
         }
     });
 
-
-    btnFilter.bind('click', function (e) {
-        loadDataTable()
+    btnFilter.bind("click", function (e) {
+        loadDataTable();
     });
+
+    function updateUI(response) {
+        const supplier = response.supplier;
+        const sum = response.sum;
+        const date = response.date || "";
+        const amountDue = date ? `Amount Due: ${date}` : "";
+
+        $('h4[data-target="name"]').text(supplier.name);
+        $('h4[data-target="date"]').text(date);
+        $('p[data-target="lead-date"]').text(amountDue);
+        $('span[data-target="address"]').text(supplier.address);
+        $('span[data-target="phone"]').text(supplier.phone);
+        $('span[data-target="email"]').text(supplier.email);
+        $('span[data-target="country"]').text(supplier.country.name);
+        $('span[data-target="city"]').text(supplier.state.name);
+        $('span[data-target="zip"]').text(supplier.zip);
+        $('#amountDueTable td[data-td-target="sum"]').text(numericFormat(sum));
+        $('#amountDueTable td[data-td-target="records"]').text(
+            response.data.length
+        );
+        $('img[id="supplierImage"]').attr("src", supplier.image_path);
+    }
 
     function loadDataTable() {
         let table = `
@@ -90,7 +113,7 @@ $(function () {
                                     <th>ID</th>
                                     <th>Image</th>
                                     <th>Name</th>
-                                    <th>Code</th>
+                                    <th>Tracking number</th>
                                     <th>Price</th>
                                     <th>Amount</th>
                                     <th>Discount</th>
@@ -99,7 +122,8 @@ $(function () {
                                     <th>Category</th>
                                     <th>Reference</th>
                                     <th>Date of payment</th>
-                                    <th>Delay</th>
+                                    <th>Expected date of payment</th>
+                                    <th>Payment delay</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -141,201 +165,174 @@ $(function () {
             </div>
     </div>`;
 
-        $('#paymentTemplate').removeClass('d-none').html(table);
+        $("#paymentTemplate").removeClass("d-none").html(table);
 
-        dataTable = $('#paymentsTable').DataTable({
+        dataTable = $("#paymentsTable").DataTable({
             serverSide: true,
             ajax: {
                 url: SUPPLIER_PAYMENTS_API,
                 data: function (data) {
                     data.user = bootstrapSelectSupplier.val();
                     data.date = dateRangePicker.val();
-                    data.type = TYPE
+                    data.type = TYPE;
                 },
                 dataSrc: function (response) {
-
-                    const supplier = response.user;
-                    const sum = response.sum;
-                    const date = response.date ? response.date : '';
-                    const amountDue = date ? `Amount Due: ${date}` : ''
-
-                    $('h4[data-target="name"]').text(supplier.name);
-                    $('h4[data-target="date"]').text(date);
-                    $('p[data-target="lead-date"]').text(amountDue);
-                    $('span[data-target="address"]').text(supplier.address);
-                    $('span[data-target="phone"]').text(supplier.phone);
-                    $('span[data-target="email"]').text(supplier.email);
-                    $('span[data-target="country"]').text(supplier.country.name);
-                    $('span[data-target="city"]').text(supplier.state.name);
-                    $('span[data-target="zip"]').text(supplier.zip);
-                    $('#amountDueTable td[data-td-target="sum"]').text('€' + sum);
-                    $('#amountDueTable td[data-td-target="records"]').text(response.data.length);
-                    $('img[id="supplierImage"]').attr('src', supplier.image_path);
+                    updateUI(response);
                     return response.data;
-                }
+                },
             },
             columns: [
-                { width: '1%', orderable: true, data: 'id' },
+                { width: "1%", orderable: true, data: "id" },
                 {
-                    width: '1%',
+                    width: "1%",
                     orderable: false,
                     name: "image",
                     render: function (data, type, row) {
-                        if (row.purchase.image_path) {
-                            return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${row.purchase.image_path}" />`;
-    
-                        } else {
-                            return `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;
-                        }
-                    }
+                        return row.purchase.image_path
+                            ? `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${row.purchase.image_path}">`
+                            : `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png">`;
+                    },                    
                 },
                 {
-                    width: '15%',
-                    name: 'name',
+                    width: "15%",
+                    name: "name",
                     orderable: false,
-                    class: 'text-center',
+                    class: "text-center",
                     render: function (data, type, row) {
-                        return `<a href="${PURCHASE_EDIT_ROUTE.replace(":id", row.purchase.id)}">${row.purchase.name}</a>`;
-                    }
+                        return `<a href="${PURCHASE_EDIT_ROUTE.replace(":id",row.purchase.id)}">${row.purchase.name}</a>`;
+                    },
                 },
                 {
-                    width: '5%',
-                    name: 'code',
+                    width: "5%",
+                    name: "code",
                     orderable: false,
-                    class: 'text-center',
+                    class: "text-center",
                     render: function (data, type, row) {
                         return `<span>${row.purchase.code}</span>`;
-                    }
+                    },
                 },
                 {
-                    width: '1%',
-                    class: 'text-center',
-                    name: 'price',
+                    width: "1%",
+                    class: "text-center",
+                    name: "price",
                     orderable: false,
                     render: function (data, type, row) {
                         return `<span>${numericFormat(row.price)}</span>`;
-                    }
+                    },
                 },
                 {
-                    width: '1%',
-                    class:'text-center',
-                    name: 'quantity',
+                    width: "1%",
+                    class: "text-center",
+                    name: "quantity",
                     orderable: false,
                     render: function (data, type, row) {
                         return `<span>${row.quantity}</span>`;
-                    }
+                    },
                 },
                 {
-                    width: '1%',
-                    class:'text-center',
-                    name: 'discount_percent',
+                    width: "1%",
+                    class: "text-center",
+                    name: "discount_percent",
                     orderable: false,
                     render: function (data, type, row) {
                         return `<span>${row.purchase.discount_percent}%</span>`;
-                    }
+                    },
                 },
                 {
-                    width: '1%',
-                    class:'text-center',
-                    name: 'payment_method',
+                    width: "1%",
+                    class: "text-center",
+                    name: "payment_method",
                     orderable: false,
                     render: function (data, type, row) {
-                        const paymentMethods = {
-                            1: "Cash",
-                            2: "Bank Transfer",
-                            3: "Credit Card",
-                            4: "Cheque",
-                            5: "Online Payment"
-                        };
-
                         const status = paymentMethods[row.payment_method] || "";
                         return `<span>${status}</span>`;
-                    }
+                    },
                 },
                 {
-                    width: '1%',
-                    class: 'text-center',
-                    name: 'payment_status',
+                    width: "1%",
+                    class: "text-center",
+                    name: "payment_status",
                     orderable: false,
                     render: function (data, type, row) {
-
-                        const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
-
+                        const statusData = statusPaymentsWithIcons[row.payment_status] || { label: "", iconClass: "" };
                         return `
                             <div title="${statusData.label}" class="status">
                                 <span class="icon"><i class="${statusData.iconClass}"></i></span>
                             </div>`;
-                    }
+                    },
                 },
                 {
-                    width: '10%',
-                    class: 'text-center',
-                    name: 'payment.purchase.category',
+                    width: "10%",
+                    class: "text-center",
+                    name: "payment.purchase.category",
                     orderable: false,
                     render: function (data, type, row) {
-                        if (row.purchase.categories.length > 0) {
-                            var categoryNames = row.purchase.categories.map(function (category) {
-                                return "<span> " + category.name + " </span>";
-                            });
-                            return categoryNames.join(', ');
+                        return row.purchase.categories.length > 0
+                        ? row.purchase.categories.map(category => `<span> ${category.name} </span>`).join(', ')
+                        : '';
+                    },
+                },
+                {
+                    width: "5%",
+                    data: "payment_reference",
+                    class: "text-center",
+                    orderable: false,
+                },
+                {
+                    width: "7%",
+                    name: "date_of_payment",
+                    class: "text-center",
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return `<span>${row.date_of_payment ?? ""}</span>`;
+                    },
+                },
+                {
+                    width: "11%",
+                    name: "expected_date_of_payment",
+                    class: "text-center",
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return `<span>${row.expected_date_of_payment ?? ""}</span>`;
+                    },
+                },
+                {
+                    width: "8%",
+                    class: "text-center",
+                    orderable: false,
+                    render: function (data, type, row) {
+                        let status = row.payment_status;
+                        if (status === 1 || status === 4) {
+                            let dateOfPayment = moment(row.date_of_payment); // Assuming you're using Moment.js
+                            let expectedDateOfPayment = moment(
+                                row.expected_date_of_payment
+                            );
+
+                            let daysDifference = dateOfPayment.diff(
+                                expectedDateOfPayment,
+                                "days"
+                            );
+
+                            if (daysDifference > 0) {
+                                return `<span class="text-danger">${daysDifference} days delay in payment</span>`;
+                            } else {
+                                return `<span class="text-success">Payment made on time</span>`;
+                            }
                         } else {
                             return "";
                         }
-                    }
+                    },
                 },
                 {
-                    width: '5%',
-                    data: 'payment_reference',
-                    class: 'text-center',
-                    orderable: false
-                },
-                {
-                    width: '5%',
-                    name: 'date_of_payment',
-                    class: 'text-center',
+                    width: "5%",
+                    class: "text-center",
                     orderable: false,
                     render: function (data, type, row) {
-                        return `<span>${row.date_of_payment}</span>`;
-                    }
-                },
-                {
-                    width: '5%',
-                    class:'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
-
-                        if (['Paid', 'Partially Paid', 'Overdue'].includes(statusData.label)) {
-                            const purchaseExpectedDateOfPayment = moment(row.purchase.expected_date_of_payment); // Assuming you're using moment.js for date handling
-                            const dateOfPayment = moment(row.date_of_payment);
-
-                            // Calculate the delay in days
-                            const delayInDays = dateOfPayment.diff(purchaseExpectedDateOfPayment, 'days');
-
-                            if (delayInDays > 0) {
-                                // Payment is delayed
-                                return `<span class="text-danger">${delayInDays} days overdue</span>`;
-                            } else if (delayInDays < 0) {
-                                // Payment was made before the expected date
-                                return `<span class="text-success">${-delayInDays} days early</span>`;
-                            } else {
-                                // Payment was made on the expected date
-                                return `<span class="text-info">On time</span>`;
-                            }
-                        } else {
-                            // For other payment statuses, return an empty string or other content as needed
-                            return '';
-                        }
-                    }
-                },
-                {
-                    width: '5%',
-                    class:'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-
                         let edit = `
-                        <a title="Edit" class="btn p-0" href="${PURCHASE_PAYMENT_EDIT.replace(':payment', row.id).replace(':type', 'purchase')}">
+                        <a title="Edit" class="btn p-0" href="${PURCHASE_PAYMENT_EDIT.replace(
+                            ":payment",
+                            row.id
+                        ).replace(":type", "purchase")}">
                             <i class="fa-light fa-pen text-primary"></i>
                         </a>
                         `;
@@ -345,11 +342,17 @@ $(function () {
                               <i class="fa-light fa-file-invoice text-primary"></i> 
                             </a>`;
 
-
                         let deleteForm = `
-                        <form data-name=${row.date_of_payment}  style='display:inline-block;' id='delete-form' action="${PURCHASE_PAYMENT_DELETE_ROUTE.replace(":payment", row.id).replace(':type', 'purchase')}" method='POST'>
+                        <form data-name=${
+                            row.date_of_payment
+                        }  style='display:inline-block;' id='delete-form' action="${PURCHASE_PAYMENT_DELETE_ROUTE.replace(
+                            ":payment",
+                            row.id
+                        ).replace(":type", "purchase")}" method='POST'>
                                             <input type='hidden' name='_method' value='DELETE'>
-                                            <input type='hidden' name='id' value='${row.id}'>
+                                            <input type='hidden' name='id' value='${
+                                                row.id
+                                            }'>
                                             <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deletePayment(this);'>
                                                 <i class='fa-light fa-trash text-primary'></i>
                                             </button>
@@ -357,61 +360,67 @@ $(function () {
                         `;
 
                         return `${edit} ${invoice} ${deleteForm}`;
-                    }
-                }
-            ]
+                    },
+                },
+            ],
         });
     }
 
     // Window actions
     window.editInvoice = function (e) {
-        console.log(e);
-        let id = $(e).attr('data-id');
-        APICaller(PURCHASE_INVOICE_API_ROUTE, { 'id': id }, function (response) {
-            let invoice = response.data[0];
+        let id = $(e).attr("data-id");
+        APICaller(INVOICE_API_ROUTE,{ invoice: id, select_json:1, type:TYPE },
+            function (response) {
+                let invoice = response;
+                modalInvoice.modal("show");
 
-            modalInvoice.modal('show');
+                modalInvoice
+                    .find("form")
+                    .attr("action",INVOICE_API_ROUTE.replace(":type",TYPE).replace(":id", id));
 
-            modalInvoice.find('form').attr('action', PURCHASE_INVOICE_UPDATE_ROUTE.replace(':type',TYPE).replace(":id", id))
+                modalInvoice.find("form input").each(function () {
+                    let inputName = $(this).attr("name");
 
-            modalInvoice.find('form input').each(function () {
-                let inputName = $(this).attr('name');
-
-                if (inputName && invoice.hasOwnProperty(inputName)) {
-                    $(this).val(invoice[inputName]);
-                }
-            });
-
-        }, function (error) {
-            toastr['error'](error.message);
-        });
-    }
+                    if (inputName && invoice.hasOwnProperty(inputName)) {
+                        $(this).val(invoice[inputName]);
+                    }
+                });
+            },
+            function (error) {
+                toastr["error"](error.message);
+            }
+        );
+    };
 
     // Window actions
     window.deletePayment = function (e) {
-        let form = $(e).closest('form');
+        let form = $(e).closest("form");
 
-        let name = form.attr('data-name');
-        let url = form.attr('action');
+        let name = form.attr("data-name");
+        let url = form.attr("action");
 
         const template = swalText(name);
 
-        showConfirmationDialog('Selected items!', template, function () {
-            APIDELETECALLER(url, function (response) {
-                toastr['success'](response.message);
-                dataTable.ajax.reload(null, false);
-            }, function (error) {
-                toastr['error']('Order payment has not been deleted');
-            });
+        showConfirmationDialog("Selected items!", template, function () {
+            APIDELETECALLER(
+                url,
+                function (response) {
+                    toastr["success"](response.message);
+                    dataTable.ajax.reload(null, false);
+                },
+                function (error) {
+                    toastr["error"]("Order payment has not been deleted");
+                }
+            );
         });
     };
 
-    submitForm.on('click', function (e) {
+    submitForm.on("click", function (e) {
         e.preventDefault();
 
-        let actionUrl = modalInvoice.find('form').attr('action');
-        let method = modalInvoice.find('form').attr('method');
-        let data = modalInvoice.find('form').serialize();
+        let actionUrl = modalInvoice.find("form").attr("action");
+        let method = modalInvoice.find("form").attr("method");
+        let data = modalInvoice.find("form").serialize();
 
         $.ajax({
             url: actionUrl,
@@ -419,21 +428,18 @@ $(function () {
             data: data,
             success: function (response) {
                 console.log(response.message);
-                toastr['success'](response.message);
-                modalInvoice.find('form').trigger('reset');
-                modalInvoice.modal('toggle');
+                toastr["success"](response.message);
+                modalInvoice.find("form").trigger("reset");
+                modalInvoice.modal("toggle");
                 dataTable.ajax.reload(null, false);
             },
             error: function (xhr, status, error) {
                 if (xhr.status === 422) {
-                    toastr['error'](xhr.responseJSON.message);
+                    toastr["error"](xhr.responseJSON.message);
                     var errors = xhr.responseJSON.errors;
                     handleErrors(errors);
                 }
-            }
-        })
-
-    })
-
-
-})
+            },
+        });
+    });
+});

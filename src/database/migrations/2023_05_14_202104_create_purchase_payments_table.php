@@ -15,13 +15,14 @@ class CreatePurchasePaymentsTable extends Migration
     {
         Schema::create('purchase_payments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('purchase_id');
+            $table->unsignedBigInteger('purchase_id')->index();
             $table->unsignedInteger('quantity')->default(0);
             $table->unsignedDecimal('price', 8, 2)->default(0);
             $table->tinyInteger('payment_method')->nullable()->comment('1: Cash, 2: Bank Transfer, 3: Credit Card, 4: Cheque, 5: Online Payment');
             $table->string('payment_reference')->default('N/A');
             $table->tinyInteger('payment_status')->nullable()->comment('1: Pending, 2: Paid, 3: Partially Paid, 4: Overdue, 5: Refunded');
-            $table->date('date_of_payment');
+            $table->date('date_of_payment')->nullable();
+            $table->date('expected_date_of_payment');
 
             // Add foreign key constraint with ON DELETE CASCADE
             $table->foreign('purchase_id')

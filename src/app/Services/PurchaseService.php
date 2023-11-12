@@ -11,6 +11,7 @@ class PurchaseService
     private $statuses;
     private $dir = 'public/images/products';
     const INIT_STATUS = 2;
+    const INITIAL_DELIVERED = 0;
 
     public function __construct()
     {
@@ -20,7 +21,6 @@ class PurchaseService
     public function purchaseProcessing(array $data, $purchase = null)
     {
         $prices = null;
-
         // Check if $data['image'] exists and set it to $file
         $file = $data['image'] ?? null;
 
@@ -29,18 +29,18 @@ class PurchaseService
         $status = $isNewPurchase
             ? FunctionsHelper::statusValidation(self::INIT_STATUS, $this->statuses)
             : FunctionsHelper::statusValidation($purchase->payment->payment_status, $this->statuses);
-
+        $expected_date_of_payment = !$isNewPurchase ? $purchase->payment->expected_date_of_payment : null;
+        
         // Update purchase or create Purchase;
         $purchase->name = $data['name'];
         $purchase->supplier_id = $data['supplier_id'];
         $purchase->notes = $data['notes'] ?? '';
-
         if (($purchase && $status === self::INIT_STATUS) || $isNewPurchase) {
 
             // assign updated values to purchase
             $purchase->price = $data['price'];
             $purchase->discount_percent = intval($data['discount_percent']) ?? 0;
-            
+        
             // Update amount
             if ($data['quantity'] > 0) {
                 $purchase->quantity = $data['quantity'];
@@ -72,8 +72,9 @@ class PurchaseService
             $purchase->code = $data['code'];
 
             // Update dates
-            $purchase->expected_date_of_payment = now()->parse($data['expected_date_of_payment']);
-            $purchase->delivery_date = now()->parse($data['delivery_date']);
+            $purchase->expected_delivery_date = now()->parse($data['expected_delivery_date']);
+            $expected_date_of_payment = now()->parse($data['expected_date_of_payment']);
+            $purchase->is_it_delivered = self::INITIAL_DELIVERED;
         }
 
         // Check for uploaded image
@@ -89,7 +90,9 @@ class PurchaseService
         FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'sub_category_ids', 'subcategories');
         FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'brands', 'brands');
 
-        $this->createOrUpdatePayment($purchase, $status);
+        $this->createOrUpdatePayment($purchase ,$expected_date_of_payment);
+
+        return $purchase;
     }
 
     public function purchaseMassEditProcessing(array $data, $id)
@@ -150,19 +153,19 @@ class PurchaseService
         return compact('discount_price', 'total_price', 'original_price');
     }
 
-    private function createOrUpdatePayment($purchase)
+    private function createOrUpdatePayment($purchase, $expected_date_of_payment)
     {
         // Generate an alias for the payment based on the purchase's delivery date
         $alias = $this->getAlias($purchase);
-
+        
         // Prepare payment data
         $paymentData = [
             'alias' => $alias,
             'quantity' => $purchase->initial_quantity,
             'price' => $purchase->total_price,
-            'date_of_payment' => $purchase->expected_date_of_payment,
+            'expected_date_of_payment' => $expected_date_of_payment
         ];
-
+                
         // Check if a payment record already exists for the purchase
         $existingPayment = $purchase->payment;
 
@@ -188,7 +191,7 @@ class PurchaseService
     private function getAlias($purchase)
     {
         // Generate an alias based on the delivery date of the purchase
-        $alias = now()->parse($purchase->delivery_date)->format('F j, Y');
+        $alias = $purchase->expected_delivery_date->format('F j, Y');
         // Replace spaces and commas with underscores
         $alias = str_replace([' ', ','], ['_', ''], $alias);
         // Convert alias to lowercase

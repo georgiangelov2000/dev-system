@@ -139,8 +139,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('payments')->name('payment.')->group(function () {
         Route::get('/{type}', [PaymentController::class, 'index'])->name('index');
-        Route::get('/edit/{payment}/{type}', [PaymentController::class, 'edit'])->name('edit');
-        Route::put('/update/{payment}/{type}', [PaymentController::class, 'update'])->name('update');
+        Route::get('/edit/{type}/{payment}', [PaymentController::class, 'edit'])->name('edit');
+        Route::put('/update/{type}/{payment}', [PaymentController::class, 'update'])->name('update');
         Route::delete('/delete/{payment}/{type}', [PaymentController::class, 'delete'])->name('delete');        
     });
 

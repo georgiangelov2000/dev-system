@@ -55,7 +55,7 @@
                     <div class="form-group col-xl-3 col-lg-3 col-md-3 col-sm-3">
                         <label for="">Status</label>
                         <select name="status" id="" class="form-control selectType" multiple>
-                            @foreach (config('statuses.order_statuses') as $key => $status)
+                            @foreach (config('statuses.payment_statuses') as $key => $status)
                                 <option value="{{ $key }}">{{ $status }}</option>
                             @endforeach
                         </select>

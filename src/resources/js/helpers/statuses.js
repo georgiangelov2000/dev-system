@@ -6,4 +6,20 @@ const statusPaymentsWithIcons = {
     5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
 }
 
-export { statusPaymentsWithIcons };
+const paymentStatuses = {
+    1: { label: "Paid"},
+    2: { label: "Pending"},
+    3: { label: "Partially Paid"},
+    4: { label: "Overdue"},
+    5: { label: "Refunded"},
+}
+
+const paymentMethods = {
+    1: "Cash",
+    2: "Bank Transfer",
+    3: "Credit Card",
+    4: "Cheque",
+    5: "Online Payment"
+}
+
+export { statusPaymentsWithIcons, paymentMethods, paymentStatuses };

@@ -23,7 +23,8 @@ $(document).ready(function () {
                     'country': selectCountry.val(),
                     'category': selectCategory.val(),
                     "search": d.search.value,
-                    'state': selectState.val()
+                    'state': selectState.val(),
+                    'limit': d.custom_length = d.length,
                 });
             }
         },

@@ -21,12 +21,14 @@ class CreatePurchasesTable extends Migration {
             $table->unsignedDecimal('discount_price', 8, 2)->default(0);
             $table->unsignedDecimal('total_price', 8, 2)->default(0);
             $table->unsignedDecimal('original_price',8,2)->default(0);
-            $table->date('expected_date_of_payment');
+            $table->date('delivery_date')->nullable();
+            $table->date('expected_delivery_date');
             $table->unsignedInteger('discount_percent')->default(0);
             $table->unsignedInteger('initial_quantity')->default(0);
             $table->string('notes')->default('');
             $table->string('code',20);
             $table->string('image_path')->nullable();
+            $table->tinyInteger('is_it_delivered')->comment('1: Delivered, 0: Not delivered')->default(0);
             $table->timestamps();
         });
     }
