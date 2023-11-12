@@ -16,27 +16,29 @@ class PurchaseRequest extends FormRequest
     {
         $rules = [
             "image" => "nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048",
-            "name" => "required|string",
-            "code" => !$this->isPaymentRequired() ? 'required|string' : 'nullable|string',
+            "name" => "required|string",  
             "supplier_id" => "required|integer|not_in:0",
             "category_id" => "required|integer|not_in:0",
             "subcategories" => "nullable|array",
             "notes" => "nullable|string",
             "brands" => "nullable|array",
-            "image_path" => "nullable",
-            "expected_delivery_date" => !$this->isPaymentRequired() ? 'required|date' : 'nullable|date',
-            'expected_date_of_payment' => !$this->isPaymentRequired() ? 'required|date' : 'nullable|date',
-            'discount_percent' => !$this->isPaymentRequired() ? 'required|integer|min:0' : 'nullable|integer|min:0',
-            'price' => !$this->isPaymentRequired() ? 'required|numeric|min:1' : 'nullable|numeric|min:0',
-            'quantity' => !$this->isPaymentRequired() ? 'required|integer|min:1' : 'nullable|integer|min:0',
+            "image_path" => "nullable",          
         ];
+
+        if($this->isPaymentRequired()) {
+            $rules["code"] = 'required|string|max:20';
+            $rules["expected_delivery_date"] = 'required|date';
+            $rules["expected_date_of_payment"] = 'required|date';
+            $rules["discount_percent"] = 'required|integer|min:0';
+            $rules["price"] = 'required|numeric|min:1';
+            $rules["quantity"] = 'required|integer|min:1';            
+        }
 
         return $rules;
     }
     private function isPaymentRequired()
     {
         $purchase = $this->purchase ?? null;
-
         return $purchase && $purchase->payment && $purchase->payment->payment_status === 2;
     }
 }

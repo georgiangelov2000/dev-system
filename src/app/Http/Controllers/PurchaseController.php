@@ -82,6 +82,12 @@ class PurchaseController extends Controller
             $isEditable = $this->helper->statusValidation($paymentRecord->payment_status,$this->statuses) === 2; 
         }
 
+        if(!$isEditable) {
+            $deliveryDate = now()->parse($purchase->delivery_date)->format('d F Y');
+            $purchase->delivery_date = $deliveryDate;
+        }
+
+        $purchase->status = $this->statuses[$paymentRecord->payment_status];
         $purchase->order_amount = $orderAmounts;
         $purchase->is_editable = $isEditable;
 

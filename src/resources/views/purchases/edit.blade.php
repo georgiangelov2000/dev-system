@@ -14,7 +14,12 @@
                 enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-
+                
+                @if(!$purchase->is_editable)
+                    <div class="alert alert-danger" role="alert">
+                        The purchase is currently marked as {{ $purchase->status }}. Please note that certain fields cannot be edited as the purchase is already closed. <a href="#" class="alert-link">Delivery date: {{ $purchase->delivery_date }}</a>.
+                    </div>
+                @endif
                 <div class="row flex-wrap">
                     <div class="col-10 d-flex flex-wrap p-2">
                         <div id="warning"
@@ -48,9 +53,7 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             @else
-                                <p class="input-group-text col-12">
-                                    {{ $purchase->quantity }}
-                                </p>
+                                <input disabled name="quantity" class="form-control" value="{{ $purchase->quantity }}" />
                             @endif
                         </div>
                         <div class="form-group col-3">
@@ -63,7 +66,7 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             @else
-                                <p name="price" class="input-group-text col-12">€ {{ $purchase->price }}</p>
+                                <input disabled name="price" class="form-control" value="{{ $purchase->price }}" />
                             @endif
                         </div>
                         <div class="form-group col-3">
@@ -77,8 +80,7 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             @else
-                                <p name="discount_percent" class="input-group-text col-12">
-                                    {{ $purchase->discount_percent }}</p>
+                                <input disabled name="discount_percent" class="form-control" value="{{ $purchase->discount_percent }}" />
                             @endif
                         </div>
                         <div class="form-group col-3">
@@ -94,7 +96,7 @@
                                     </span>
                                 </div>
                                 @error('code')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span name="code" class="text-danger">{{ $message }}</span>
                                 @enderror
                             @else
                                 <p class="input-group-text col-12">{{ $purchase->code }}</p>
@@ -117,7 +119,7 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             @else
-                                <p class="input-group-text col-12">{{ $purchase->payment->expected_date_of_payment }}</p>
+                                <input disabled name="expected_date_of_payment" class="form-control" value="{{ $purchase->payment->expected_date_of_payment }}" />
                             @endif
                         </div>
                         <div class="form-group col-3">
@@ -132,7 +134,7 @@
                                     <input type="text" class="form-control datepicker" name="expected_delivery_date"
                                         value="{{ date('m/d/Y', strtotime($purchase->expected_delivery_date)) }}" />
                                 @else
-                                    <p class="input-group-text col-12">{{ $purchase->expected_delivery_date }}</p>
+                                    <input disabled name="expected_delivery_date" class="form-control" value="{{ $purchase->expected_delivery_date }}" />
                                 @endif
                             </div>
                             @error('delivery_date')
@@ -189,6 +191,9 @@
                         <div class="form-group col-3">
                             <label for="notes">Notes</label>
                             <textarea cols="3" rows="1" class="form-control" name="notes">{{ e($purchase->notes) }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            
                         </div>
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary">

@@ -19,8 +19,8 @@ class PurchaseService
     }
 
     public function purchaseProcessing(array $data, $purchase = null)
-    {
-        $prices = null;
+    {        
+
         // Check if $data['image'] exists and set it to $file
         $file = $data['image'] ?? null;
 
@@ -35,8 +35,10 @@ class PurchaseService
         $purchase->name = $data['name'];
         $purchase->supplier_id = $data['supplier_id'];
         $purchase->notes = $data['notes'] ?? '';
+        
         if (($purchase && $status === self::INIT_STATUS) || $isNewPurchase) {
-
+            $prices = null;
+            
             // assign updated values to purchase
             $purchase->price = $data['price'];
             $purchase->discount_percent = intval($data['discount_percent']) ?? 0;
@@ -75,6 +77,8 @@ class PurchaseService
             $purchase->expected_delivery_date = now()->parse($data['expected_delivery_date']);
             $expected_date_of_payment = now()->parse($data['expected_date_of_payment']);
             $purchase->is_it_delivered = self::INITIAL_DELIVERED;
+
+            $this->createOrUpdatePayment($purchase ,$expected_date_of_payment);
         }
 
         // Check for uploaded image
@@ -87,10 +91,8 @@ class PurchaseService
 
         // Sync relationships for purchase
         FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'category_id', 'categories');
-        FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'sub_category_ids', 'subcategories');
+        FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'subcategories', 'subcategories');
         FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'brands', 'brands');
-
-        $this->createOrUpdatePayment($purchase ,$expected_date_of_payment);
 
         return $purchase;
     }
