@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Adapters\Views;
+namespace App\Factory\Views;
 
 use App\Adapters\ViewType;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;

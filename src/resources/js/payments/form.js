@@ -1,9 +1,7 @@
 import { paymentStatuses } from "../helpers/statuses";
 
 $(function () {
-    $(
-        'select[name="payment_method"], select[name="payment_status"], select[name="is_it_delivered"]'
-    ).selectpicker();
+    $('select[name="payment_method"], select[name="payment_status"], select[name="is_it_delivered"]').selectpicker();
 
     // Handle print button click event
     $("#print").on("click", function () {
@@ -11,9 +9,7 @@ $(function () {
     });
 
     // Get the delivery status select element
-    const deliveryStatusSelect = $(
-        '.bootstrap-select select[name="is_it_delivered"]'
-    );
+    const deliveryStatusSelect = $('.bootstrap-select select[name="is_it_delivered"]');
 
     // Handle delivery status change event
     deliveryStatusSelect.on(
@@ -27,10 +23,10 @@ $(function () {
                 getPaymentDateHtml();
 
                 // Initialize datepicker
-                $(".datepicker, .").datepicker({ format: "yyyy-mm-dd" });
+                $(".datepicker").datepicker({ format: "yyyy-mm-dd" });
 
                 // Handle datepicker change event
-                $(".datepicker").on("change", function () {
+                $("input[name='date_of_payment']").on("change", function () {
                     let selectedDate = new Date($(this).val());
                     // Update payment status based on the selected date
                     updatePaymentStatus(selectedDate, expected);

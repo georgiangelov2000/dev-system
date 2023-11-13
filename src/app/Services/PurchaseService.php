@@ -46,16 +46,19 @@ class PurchaseService
             // Update amount
             if ($data['quantity'] > 0) {
                 $purchase->quantity = $data['quantity'];
-                $purchase->initial_quantity = $data['quantity'];
             }
-
+            
             // Check order amount
             $ordersQuantity = $purchase->orders->sum('sold_quantity');
-
-            if ($purchase->initial_quantity < $ordersQuantity) {
+            
+            $calculateNewInitialQuantity = ($purchase->quantity  + $ordersQuantity);
+            
+            if ($calculateNewInitialQuantity < $ordersQuantity) {
                 throw new \Exception("Insufficient purchase quantity. The total order quantity exceeds the available purchase quantity.");
             };
-            $finalQuantity = ($purchase->initial_quantity - $ordersQuantity);
+
+            $finalQuantity = ($calculateNewInitialQuantity - $ordersQuantity);
+            $purchase->initial_quantity = $calculateNewInitialQuantity;
             $purchase->quantity = $finalQuantity;
 
             // Calculate prices
@@ -80,6 +83,8 @@ class PurchaseService
 
             $this->createOrUpdatePayment($purchase ,$expected_date_of_payment);
         }
+
+        // dd($purchase);
 
         // Check for uploaded image
         if ($file) {

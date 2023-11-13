@@ -14,16 +14,18 @@ class PaymentRequest extends FormRequest
     {
         $isDelivered = $this->input('is_it_delivered');
         $rules = [
-            'id' => 'required',
-            'price' => 'required|numeric',
+            'price' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
             'quantity' => 'required',
-            'date_of_payment' => $isDelivered ? 'required|date' : 'nullable',
-            'payment_method' => 'required|integer',
+            'payment_method' => 'required|integer', 
             'partially_paid_price' => 'nullable|numeric',
             'payment_reference' => 'nullable',
             'is_it_delivered' => 'required',
-            'delivery_date' =>  $isDelivered ? 'required|date' : 'nullable',
         ];
+
+        if($isDelivered && $isDelivered == 1) {
+            $rules['date_of_payment'] = 'required|date';
+            $rules['delivery_date'] = 'required|date';
+        }
         return $rules;
     }
 
@@ -35,7 +37,6 @@ class PaymentRequest extends FormRequest
     public function messages()
     {
         return [
-            'id.required' => 'The ID field is required.',
             'price.required' => 'The price field is required.',
             'price.numeric' => 'The price must be a number.',
             'quantity.required' => 'The quantity field is required.',

@@ -74,9 +74,7 @@ $(function () {
         $('span[data-target="city"]').text(supplier.state.name);
         $('span[data-target="zip"]').text(supplier.zip);
         $('#amountDueTable td[data-td-target="sum"]').text(numericFormat(sum));
-        $('#amountDueTable td[data-td-target="records"]').text(
-            response.data.length
-        );
+        $('#amountDueTable td[data-td-target="records"]').text(response.recordsFiltered);
         $('img[id="supplierImage"]').attr("src", supplier.image_path);
     }
 
@@ -113,7 +111,7 @@ $(function () {
                                     <th>ID</th>
                                     <th>Image</th>
                                     <th>Name</th>
-                                    <th>Tracking number</th>
+                                    <th>Tracking</th>
                                     <th>Price</th>
                                     <th>Amount</th>
                                     <th>Discount</th>
@@ -121,9 +119,11 @@ $(function () {
                                     <th>Status</th>
                                     <th>Category</th>
                                     <th>Reference</th>
+                                    <th>Exp delivery date</th>
+                                    <th>Delivery date</th>
                                     <th>Date of payment</th>
-                                    <th>Expected date of payment</th>
-                                    <th>Payment delay</th>
+                                    <th>Exp date of payment</th>
+                                    <th>Delay</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -175,6 +175,8 @@ $(function () {
                     data.user = bootstrapSelectSupplier.val();
                     data.date = dateRangePicker.val();
                     data.type = TYPE;
+                    data.custom_length = data.length; // Corrected the property assignment
+                    data.search.value = data.search.value; // Corrected the property assignment
                 },
                 dataSrc: function (response) {
                     updateUI(response);
@@ -208,7 +210,7 @@ $(function () {
                     orderable: false,
                     class: "text-center",
                     render: function (data, type, row) {
-                        return `<span>${row.purchase.code}</span>`;
+                        return `<p class="text-break">${row.purchase.code}</p>`
                     },
                 },
                 {
@@ -273,18 +275,21 @@ $(function () {
                     },
                 },
                 {
-                    width: "5%",
-                    data: "payment_reference",
-                    class: "text-center",
-                    orderable: false,
-                },
-                {
-                    width: "7%",
-                    name: "date_of_payment",
+                    width: "3%",
                     class: "text-center",
                     orderable: false,
                     render: function (data, type, row) {
-                        return `<span>${row.date_of_payment ?? ""}</span>`;
+                        return `<p class="text-break">${row.payment_reference}</p>`
+                    }
+                },
+                {
+                    width: "13%",
+                    name: "expected_delivery_date",
+                    class: "text-center",
+                    orderable: false,
+                    render: function (data, type, row) {
+                        const formattedDate = row.purchase.expected_delivery_date ? moment(row.purchase.expected_delivery_date).format('MMM DD, YYYY') : '';
+                        return `<span>${formattedDate}</span>`;
                     },
                 },
                 {
@@ -293,9 +298,30 @@ $(function () {
                     class: "text-center",
                     orderable: false,
                     render: function (data, type, row) {
-                        return `<span>${row.expected_date_of_payment ?? ""}</span>`;
+                        const formattedExpectedDate = row.purchase.delivery_date ? moment(row.purchase.delivery_date).format('MMM DD, YYYY') : '';
+                        return `<span>${formattedExpectedDate}</span>`;
+                    },
+                },    
+                {
+                    width: "11%",
+                    name: "date_of_payment",
+                    class: "text-center",
+                    orderable: false,
+                    render: function (data, type, row) {
+                        const formattedDate = row.date_of_payment ? moment(row.date_of_payment).format('MMM DD, YYYY') : '';
+                        return `<span>${formattedDate}</span>`;
                     },
                 },
+                {
+                    width: "13%",
+                    name: "expected_date_of_payment",
+                    class: "text-center",
+                    orderable: false,
+                    render: function (data, type, row) {
+                        const formattedExpectedDate = row.expected_date_of_payment ? moment(row.expected_date_of_payment).format('MMM DD, YYYY') : '';
+                        return `<span>${formattedExpectedDate}</span>`;
+                    },
+                },                
                 {
                     width: "8%",
                     class: "text-center",
@@ -328,40 +354,34 @@ $(function () {
                     class: "text-center",
                     orderable: false,
                     render: function (data, type, row) {
-                        let edit = `
-                        <a title="Edit" class="btn p-0" href="${PURCHASE_PAYMENT_EDIT.replace(
-                            ":payment",
-                            row.id
-                        ).replace(":type", "purchase")}">
-                            <i class="fa-light fa-pen text-primary"></i>
-                        </a>
-                        `;
-
-                        let invoice = `
-                            <a data-id="${row.invoice.id}" onclick="editInvoice(this)" title="Invoice" class="btn p-0"> 
-                              <i class="fa-light fa-file-invoice text-primary"></i> 
-                            </a>`;
-
-                        let deleteForm = `
-                        <form data-name=${
-                            row.date_of_payment
-                        }  style='display:inline-block;' id='delete-form' action="${PURCHASE_PAYMENT_DELETE_ROUTE.replace(
-                            ":payment",
-                            row.id
-                        ).replace(":type", "purchase")}" method='POST'>
-                                            <input type='hidden' name='_method' value='DELETE'>
-                                            <input type='hidden' name='id' value='${
-                                                row.id
-                                            }'>
-                                            <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deletePayment(this);'>
-                                                <i class='fa-light fa-trash text-primary'></i>
-                                            </button>
-                                        </form>
-                        `;
-
-                        return `${edit} ${invoice} ${deleteForm}`;
+                        let edit = `<a title="Edit" class="dropdown-item" href="${PURCHASE_PAYMENT_EDIT.replace(":payment", row.id).replace(":type", "purchase")}">
+                                        <i class="fa-light fa-pen text-primary"></i> Edit
+                                    </a>`;
+                
+                        let invoice = `<a title="Invoice" class="dropdown-item" data-id="${row.invoice.id}" onclick="editInvoice(this)">
+                                          <i class="fa-light fa-file-invoice text-primary"></i> Invoice
+                                       </a>`;
+                
+                        let deleteForm = `<form data-name=${row.purchase.name} style='display:inline-block;' id='delete-form' action="${PURCHASE_PAYMENT_DELETE_ROUTE.replace(":payment", row.id).replace(":type", "purchase")}" method='POST'>
+                                                <input type='hidden' name='_method' value='DELETE'>
+                                                <input type='hidden' name='id' value='${row.id}'>
+                                                <button type='submit' class='dropdown-item' title='Delete' onclick='event.preventDefault(); deletePayment(this);'>
+                                                    <i class='fa-light fa-trash text-primary'></i> Delete
+                                                </button>
+                                            </form>`;
+                
+                        return `<div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded" data-toggle="dropdown" aria-expanded="false">
+                                        <i class="fa-light fa-list" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="dropdown-menu" role="menu">
+                                        ${edit}
+                                        ${invoice}
+                                        ${deleteForm}
+                                    </div>
+                                </div>`;
                     },
-                },
+                },                                
             ],
         });
     }

@@ -34,7 +34,7 @@ class Purchase extends Model {
      */
 
      const IS_IT_DELIVERED_TRUE = 1;
-     const IS_IT_DELIVERED_FALSE = 1;
+     const IS_IT_DELIVERED_FALSE = 0;
 
     protected $fillable = [
         'image',

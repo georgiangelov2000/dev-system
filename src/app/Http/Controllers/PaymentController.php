@@ -11,6 +11,7 @@ use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View; // Import the View class
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Factory\PaymentViewFactory;
 
 class PaymentController extends Controller
 {
@@ -24,35 +25,32 @@ class PaymentController extends Controller
      *
      * @param PaymentService $paymentService - The payment service for handling payments.
      */
-    public function __construct(PaymentService $paymentService, FunctionsHelper $helper)
+    public function __construct(FunctionsHelper $helper)
     {
-        $this->paymentService = $paymentService;
         $this->paymentMethods  = config('statuses.payment_methods_statuses');
         $this->paymentStatuses = config('statuses.payment_statuses');
         $this->helper = $helper;
     }
 
     /**
-     * Calls paymentService to redirect to the respective view page.
+     * Calls PaymentViewFactory to redirect to the respective view page.
      *
      * @param string $type - Type of payment ('order' or 'purchase').
-     * @return View|null - Returns a view or null if the type is not in the list.
      */
     public function index($type): ?View
     {
-        return $this->paymentService->getData($type);
+        return PaymentViewFactory::select($type);
     }
 
     /**
-     * Calls paymentService to redirect to the payment edit view.
+     * Calls PaymentViewFactory to redirect to the payment edit view.
      *
      * @param int $payment - Payment ID.
      * @param string $type - Type of payment ('order' or 'purchase').
-     * @return View|null - Returns a view or null if the type is not in the list.
      */
-    public function edit($payment, $type)
+    public function edit($payment, $type): ?View
     {
-        return $this->paymentService->getData($type, $payment);
+        return PaymentViewFactory::select($type,$payment);
     }
 
     /**
@@ -68,8 +66,8 @@ class PaymentController extends Controller
         DB::beginTransaction();
     
         try {
-            $builder = $this->paymentService->getInstance($payment, $type);
-    
+            $builder = PaymentViewFactory::getInstanceModel($payment, $type);
+
             if (!$builder) {
                 throw new ModelNotFoundException("Payment not found");
             }
@@ -101,40 +99,42 @@ class PaymentController extends Controller
      */
     private function paymentProcessing(array $data, $builder, $relation)
     {   
-        $validPaymentMethod = $data['payment_method'] && $this->helper->statusValidation($data['payment_method'], $this->paymentMethods);
-        
-        // Check if the payment method is not valid and throw an exception
-        if (!$validPaymentMethod) {
+        // Validate payment method
+        if (!$data['payment_method'] || !$this->helper->statusValidation($data['payment_method'], $this->paymentMethods)) {
             throw new \Exception('Invalid payment method.');
         }
-        $delivery_date = null;
-        
+
         // Validate payment status and method
         if ($data['is_it_delivered']) {
             $expected = $builder->expected_date_of_payment;
-            $dateOfPayment = $data['date_of_payment'];
-            $delivery_date = now()->parse($data['delivery_date']);
 
-            if ($dateOfPayment >= $expected) {
-                $status = $builder::PAID;
-            } elseif ($dateOfPayment <= $expected) {
-                $status = $builder::OVERDUE;
-            }
-    
-            $builder->payment_status = $status;
-            $builder->date_of_payment = now()->parse($dateOfPayment);
+            $date_of_payment = $data['date_of_payment'];
+            $delivery_date = $data['delivery_date'];
+            $status = ($date_of_payment >= $expected) ? $builder::PAID : $builder::OVERDUE;
+
+            // Update relation attributes
             $builder->$relation->is_it_delivered = $builder->$relation::IS_IT_DELIVERED_TRUE;
-            $builder->$relation->delivery_date = $delivery_date;
+            $builder->$relation->delivery_date = now()->parse($delivery_date);
 
-            $builder->$relation->save();
+        } else {
+            // Update relation attributes for not delivered
+            $builder->$relation->is_it_delivered = $builder->$relation::IS_IT_DELIVERED_FALSE;
+            $builder->$relation->delivery_date = null;
         }
-        
+        $builder->$relation->save();
+
+        // Set common attributes
+        $builder->payment_status = $data['is_it_delivered'] ? $status : $builder::PENDING;
+        $builder->date_of_payment = $data['is_it_delivered'] ? now()->parse($date_of_payment) : null;
+
+        // Set other attributes
         $builder->price = $data['price'];
         $builder->quantity = $data['quantity'];
         $builder->payment_reference = $data['payment_reference'];
         $builder->partially_paid_price = $data['partially_paid_price'] ?? '0.00';
         $builder->payment_method = $data['payment_method'];
 
+        // Save the main model
         $builder->save();
     
         // Update invoice attributes

@@ -23,7 +23,7 @@
                         <div class="form-group col-12">
                             <label for="customer_id">Price</label>
                             <input name="price" type="text" class="form-control" max="{{ $payment->price }}"
-                                value="{{ $payment->price }}">
+                                value="{{ $payment->price}}">
                         </div>
                         <div class="form-group col-12">
                             <label for="is_it_delivered">Delivered</label>

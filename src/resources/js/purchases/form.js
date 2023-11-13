@@ -132,35 +132,29 @@ $(function () {
     });
     
     function updateResults(updatedQuantity) {
-        
-        const quantity = parseFloat(quantityInput.val()) || 0;
+        const quantity = parseInt(quantityInput.val()) || 0;
         const price = parseFloat(priceInput.val()) || 0;
-        const discountPercent = parseFloat(discountInput.val()) || 0;
-        let initAmount = quantity;
-        let orderAmount = 0;
+        const discountPercent = parseInt(discountInput.val()) || 0;
+    
+        let initAmount = initialQuantity !== undefined ? initialQuantity : parseInt(quantity);    
+        let orderAmount = purchaseOrderAmount !== undefined ? purchaseOrderAmount : 0;
 
-        if(typeof initialQuantity != 'undefined') {
-            initAmount = initialQuantity;
-        }
-
-        if(typeof updatedQuantity != 'undefined') {
-            initAmount = updatedQuantity
+        if (updatedQuantity !== undefined) {
+            initAmount = (parseInt(updatedQuantity) + parseInt(orderAmount)) || 0;
         }
         
-        if(typeof purchaseOrderAmount != 'undefined') {
-            orderAmount = purchaseOrderAmount;
-        }
-
         const originalPrice = price * initAmount;
         const finalPrice = originalPrice - (originalPrice * discountPercent) / 100;
         const unitDiscountPrice = price - (price * discountPercent) / 100;
     
+        const numericFormatResult = (value) => numericFormat(value);
+    
         resultTable.find('td[name="initial_amount"]').text(initAmount);
         resultTable.find('td[name="current_amount"]').text(quantity);
-        resultTable.find('td[name="final_price"]').text(numericFormat(finalPrice));
-        resultTable.find('td[name="regular_price"]').text(numericFormat(originalPrice));
-        resultTable.find('td[name="unit_discount_price"]').text(numericFormat(unitDiscountPrice));
-        resultTable.find('td[name="unit_price"]').text(numericFormat(price));
+        resultTable.find('td[name="final_price"]').text(numericFormatResult(finalPrice));
+        resultTable.find('td[name="regular_price"]').text(numericFormatResult(originalPrice));
+        resultTable.find('td[name="unit_discount_price"]').text(numericFormatResult(unitDiscountPrice));
+        resultTable.find('td[name="unit_price"]').text(numericFormatResult(price));
         resultTable.find('td[name="order_amount"]').text(orderAmount);
     }
 

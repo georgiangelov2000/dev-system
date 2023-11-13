@@ -8,11 +8,6 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-12">
-                    <h6 class="font-weight-bold">Legend:</h6>
-                </div>
-            </div>
             <form method="PUT" onsubmit="updatePurchases(event)">
                 @csrf
                 <table id="massEditPurchases" class="table table-hover table-sm dataTable no-footer">
@@ -26,15 +21,15 @@
                         <th>ID</th>
                         <th>Image</th>
                         <th>Name</th>
-                        <th>Unit price</th>
-                        <th>Discount unit price</th>
-                        <th>Official price</th>
+                        <th>Price</th>
+                        <th>Disc.price</th>
+                        <th>Final price</th>
                         <th>Regular price</th>
                         <th>Amount</th>
                         <th>Initial amount</th>
                         <th>Discount</th>
                         <th>Categories</th>
-                        <th>Sub categories</th>
+                        <th>Delivery delay</th>
                         <th>Brands</th>
                         <th class="text-center">Status</th>
                     </thead>

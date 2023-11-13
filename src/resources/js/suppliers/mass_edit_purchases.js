@@ -1,4 +1,6 @@
 import { APICaller } from '../ajax/methods';
+import { numericFormat } from '../helpers/functions';
+import { paymentStatuses, statusPaymentsWithIcons} from '../helpers/statuses';
 
 $(function () {
     let table = $("#massEditPurchases");
@@ -10,14 +12,6 @@ $(function () {
 
     const statuses = [2];
 
-    const statusMap = {
-        1: { label: "Paid", iconClass: "fal fa-check-circle" },
-        2: { label: "Pending", iconClass: "fal fa-hourglass-half" },
-        3: { label: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
-        4: { label: "Overdue", iconClass: "fal fa-exclamation-circle" },
-        5: { label: "Refunded", iconClass: "fal fa-undo-alt" },
-    };
-
     let dataTable = table.DataTable({
         serverSide: true,
         ordering: false,
@@ -27,7 +21,8 @@ $(function () {
                 return $.extend({}, d, {
                     'supplier': SUPPLIER_ID,
                     'search': d.search.value,
-                    'status': statuses
+                    'limit': d.custom_length = d.length,
+                    'status': statuses,
                 });
             }
         },
@@ -36,7 +31,7 @@ $(function () {
                 width: "1%",
                 render: function (data, type, row) {
                     let checkbox = '<div div class="form-check">\n\
-                       <input name="checkbox" class="form-check-input" onchange="selectPurchase(this)" data-id=' + row.id + ' data-name= ' + row.name + ' type="checkbox"> \n\
+                       <input name="checkbox" class="form-check-input" data-id=' + row.id + ' data-name= ' + row.name + ' type="checkbox"> \n\
                     </div>';
 
                     return `${checkbox}`;
@@ -53,12 +48,7 @@ $(function () {
                 orderable: false,
                 name: "image",
                 render: function (data, type, row) {
-                    if (row.image_path) {
-                        return `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${row.image_path}" />`;
-
-                    } else {
-                        return `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;
-                    }
+                    return row.image_path ? `<img id="preview-image" alt="Preview" class="img-fluid card-widget widget-user w-100 m-0" src="${row.image_path}" />` : `<img class="rounded mx-auto w-100" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png"/>`;
                 }
             },
             {
@@ -73,7 +63,7 @@ $(function () {
                 name: "price",
                 class:'text-center',
                 render:function(data,type,row) {
-                    return `<span>€${row.price}</span>`
+                    return `<span>${numericFormat(row.price)}</span>`
                 }
             },
             {
@@ -81,7 +71,7 @@ $(function () {
                 name: "discount_price",
                 class:'text-center',
                 render:function(data,type,row) {
-                    return `<span>€${row.discount_price}</span>`
+                    return `<span>${numericFormat(row.discount_price)}</span>`
                 }
             },
             {
@@ -89,7 +79,7 @@ $(function () {
                 width: '5%',
                 name:'total_price',
                 render: function (data, type, row) {
-                    return `<span>€${row.total_price}</span>`
+                    return `<span>${numericFormat(row.total_price)}</span>`
                 }
             },
             {
@@ -97,7 +87,7 @@ $(function () {
                 width:'5%',
                 name:'original_price',
                 render:function(data,type,row) {
-                    return `<span>€${row.original_price}</span>`
+                    return `<span>${numericFormat(row.original_price)}</span>`
                 }
             },
             {
@@ -127,42 +117,37 @@ $(function () {
                 width: '7%',
                 orderable: false,
                 render: function (data, type, row) {
-                    if (row.categories.length > 0) {
-                        var categoryNames = row.categories.map(function (category) {
-                            return "<span> " + category.name + " </span>";
-                        });
-                        return categoryNames.join(', ');
+                    return row.categories.length > 0 ? row.categories.map(category => `<span> ${category.name} </span>`).join(', ') : '';
+                }
+            },
+            {
+                width: '10%',
+                orderable: false,
+                render: function (data, type, row) {
+                    let expected = moment(row.expected_delivery_date);
+                    let deliveryDate = moment(row.delivery_date);
+                    let isDelivered = row.is_it_delivered;
+                    
+                    if (!isDelivered) {
+                        let currDate = moment();
+                        let diffDays = currDate.diff(expected, 'days');
+                        return (currDate.isAfter(expected))
+                            ? `<span class="text-danger">${diffDays} days delay</span>`
+                            : `<span class="text-info">${diffDays} days left</span>`;
                     } else {
-                        return "";
+                        let diffDays = deliveryDate.diff(expected, 'days');
+                        return (deliveryDate.isAfter(expected))
+                            ? `<span class="text-danger">${diffDays} days delay in delivery</span>`
+                            : `<span class="text-success">Delivered on time (${diffDays} days)</span>`;
                     }
+
                 }
             },
             {
                 width: '5%',
                 orderable: false,
                 render: function (data, type, row) {
-                    if (row.categories.length > 0) {
-                        var subCategoryNames = row.subcategories.map(function (subcategory) {
-                            return "<span> " + subcategory.name + " </span>";
-                        });
-                        return subCategoryNames.join(', ');
-                    } else {
-                        return "";
-                    }
-                }
-            },
-            {
-                width: '5%',
-                orderable: false,
-                render: function (data, type, row) {
-                    if (row.brands.length > 0) {
-                        var brandNames = row.brands.map(function (brand) {
-                            return "<span> " + brand.name + " </span>";
-                        });
-                        return brandNames.join(', ');
-                    } else {
-                        return "";
-                    }
+                    return row.brands.length > 0 ? row.brands.map(brand => `<span> ${brand.name} </span>`).join(', ') : '';
                 }
             },
             {
@@ -171,7 +156,7 @@ $(function () {
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    const statusInfo = statusMap[row.payment.payment_status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
+                    const statusInfo = statusPaymentsWithIcons[row.payment.payment_status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
             
                     return `<div title="${statusInfo.label}" class="status">
                         <span class="icon"><i class="${statusInfo.iconClass}"></i></span>
@@ -202,15 +187,6 @@ $(function () {
             console.log(error);
         }))
     })
-
-    // Window actions
-    window.selectPurchase = function (e) {
-        if ($('tbody input[type="checkbox"]:checked').length === 0) {
-            $('.actions').addClass('d-none');
-        } else {
-            $('.actions').removeClass('d-none');
-        }
-    };
 
     window.updatePurchases = function (e) {
         e.preventDefault();

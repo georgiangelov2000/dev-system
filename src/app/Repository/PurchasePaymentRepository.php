@@ -13,7 +13,7 @@ class PurchasePaymentRepository implements ApiRepository
     public function getData($request)
     {
         $relations = [
-            'purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,image_path,discount_percent',
+            'purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,image_path,discount_percent,expected_delivery_date,delivery_date',
             'purchase.categories',
             'invoice'
         ];
@@ -28,11 +28,11 @@ class PurchasePaymentRepository implements ApiRepository
         
         $filteredRecords = $paymentQ->count();
         $totalRecords = PurchasePayment::count();
-        $result = $paymentQ->skip($offset)->take($limit)->get();
         $sum = number_format($paymentQ->sum('price'), 2, '.', '');
+        $result = $paymentQ->skip($offset)->take($limit)->get();
 
         return response()->json([
-            'draw' => intval($request->input('draw')),
+            'draw' => $request->input('draw'),
             'recordsTotal' => $totalRecords,
             'recordsFiltered' => $filteredRecords,
             'supplier' => $this->supplier,
