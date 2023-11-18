@@ -1,9 +1,14 @@
+@php
+    $paymentStatuses = config('statuses.payment_statuses');
+    $deliveryStatuses = config('statuses.delivery_statuses');
+@endphp
+
 @extends('app')
 
 @section('content')
     <div class="row flex-wrap">
         <div class="card card-default col-5 cardTemplate mr-2">
-            <div class="card-header">
+            <div class="card-header bg-primary">
                 <div class="col-12">
                     <h3 class="card-title">Payment</h3>
                 </div>
@@ -18,33 +23,99 @@
                             <input type="hidden" name="id" value="{{ $payment->order->id }}">
                         </div>
                         <div class="form-group col-12">
-                            <label for="customer_id">Price</label>
-                            <input name="price" type="text" class="form-control" max="{{ $payment->price }}"
-                                value="{{ $payment->price }}">
+                            <label for="price">Price</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-light fa-coins"></i></span>
+                                </div>
+                                <input 
+                                    disabled 
+                                    type="text"
+                                    class="form-control"
+                                    value="{{ $payment->price }}" 
+                                />
+                            </div>
                         </div>
                         <div class="form-group col-12">
-                            <label for="quantity">Quantity</label>
-                            <input name="quantity" type="text" class="form-control" max="{{ $payment->quantity }}"
-                                value="{{ $payment->quantity }}">
-                            @error('quantity')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <label for="quantity">Amount</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-sort-amount-up"></i></span>
+                                </div>
+                                <input 
+                                    disabled 
+                                    type="text" 
+                                    class="form-control" 
+                                    value="{{ $payment->quantity }}"
+                                >
+                            </div>
                         </div>
                         <div class="form-group col-12">
-                            <label for="date_of_payment">Date of payment</label>
+                            <label for="">Expected date of payment</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                </div>
+                                <input 
+                                    disabled 
+                                    type="text"
+                                    class="form-control"
+                                    value="{{ $payment->expected_date_of_payment }}" 
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group col-12">
+                            <label for="">Expected delivery date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                </div>
+                                <input 
+                                    disabled 
+                                    type="text" 
+                                    class="form-control"
+                                    value="{{ $payment->expected_delivery_date }}" 
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group col-12">
+                            <label for="">Payment status</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
-                                        <i class="far fa-calendar-alt"></i>
+                                        <i class="fa-regular fa-credit-card"></i>
                                     </span>
                                 </div>
-                                <input type="text" class="form-control datepicker" name="date_of_payment"
-                                    value="{{ $payment->date_of_payment }}">
+                                <input name="payment_status" disabled type="text" class="form-control"
+                                value="{{ $paymentStatuses[$payment->payment_status] }}" />
                             </div>
-                            @error('date_of_payment')
+                        </div>
+                        <div class="form-group col-12">
+                            <label for="">Delivery status</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fa-light fa-truck"></i>
+                                    </span>
+                                </div>
+                                <input name="delivery_status" disabled type="text" class="form-control"
+                                    value="{{ $deliveryStatuses[$payment->delivery_status] }}" />
+                            </div>
+                        </div>
+                        <div class="form-group col-12">
+                            <label for="is_it_delivered">Delivered</label>
+                            <select class="form-control" name="is_it_delivered" id="is_it_delivered">
+                                @foreach (config('statuses.is_it_delivered') as $key => $val)
+                                    <option {{ $key == $payment->order->is_it_delivered ? 'selected' : '' }} value="{{ $key }}">
+                                        {{ $val }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('is_it_delivered')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
+                        <div id="deliveryWrapper"></div>
                         <div class="form-group col-12">
                             <label for="payment_method">Payment method</label>
                             <select class="form-control" name="payment_method" id="payment_method">
@@ -60,19 +131,7 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="form-group col-12">
-                            <label for="payment_status">Payment status</label>
-                            <select class="form-control" name="payment_status" id="payment_status">
-                                <option value="">Select status</option>
-                                @foreach (config('statuses.payment_statuses') as $key => $val)
-                                    <option {{ $key === $payment->payment_status ? 'selected' : '' }}
-                                        value="{{ $key }}">
-                                        {{ $val }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        @if ($payment->payment_status === 3)
+                        {{-- @if ($payment->payment_status === 3)
                             <div class="form-group col-12" id="partiallyPaidPriceInput">
                                 <label for="partially_paid_price">Partially paid price</label>
                                 <input name="partially_paid_price" id="partially_paid_price" type="text" required="true"
@@ -84,7 +143,7 @@
                                 <input name="partially_paid_price" id="partially_paid_price" type="text" required="true"
                                     class="form-control" />
                             </div>
-                        @endif
+                        @endif --}}
                         <div class="form-group col-12">
                             <label for="payment_reference">Payment reference</label>
                             <input class="form-control" name="payment_reference" type="text"
@@ -108,7 +167,7 @@
             </div>
         </div>
         <div class="card card-default col-6 cardTemplate print-only">
-            <div class="card-header">
+            <div class="card-header bg-primary">
                 <div class="col-12 d-flex align-items-center justify-content-between ">
                     <h3 class="card-title">Details</h3>
                 </div>
@@ -139,27 +198,31 @@
 
                 <div class="col-12">
                     <h5 class="text-center">PAYMENT RECEIPT </h5>
-                    <table class="table table-striped table-hover">
-                        <thead>
+                    <table class="table table-hover">
+                        <thead class="bg-primary rounded-left rounded-right">
                             <tr>
-                                <th>Payment date</th>
-                                <th>Total price</th>
-                                <th>Quantity</th>
-                                <th>Payment method</th>
-                                <th>Payment status</th>
-                                <th>Payment reference</th>
+                                <th class="rounded-left border-0 text-center">Payment date</th>
+                                <th class="border-0 text-center">Final price</th>
+                                <th class="border-0 text-center">Amount</th>
+                                <th class="border-0 text-center">Payment method</th>
+                                <th class="border-0 text-center">Payment status</th>
+                                <th class="border-0 text-center rounded-right">Payment reference</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{{ $payment->date_of_payment }}</td>
-                                <td>${{ $payment->price }}</td>
-                                <td>{{ $payment->quantity }}</td>
-                                <td>{{ isset(config('statuses.payment_methods_statuses')[$payment->payment_method]) ? config('statuses.payment_methods_statuses')[$payment->payment_method] : '' }}
+                                <td class="border-left-0 border-top-0 border-right text-center">{{ $payment->date_of_payment_formatting }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">{{ $payment->price }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">{{ $payment->quantity }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ isset(config('statuses.payment_methods_statuses')[$payment->payment_method]) ? config('statuses.payment_methods_statuses')[$payment->payment_method] : '' }}
                                 </td>
-                                <td>{{ isset(config('statuses.payment_statuses')[$payment->payment_status]) ? config('statuses.payment_statuses')[$payment->payment_status] : '' }}
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ isset(config('statuses.payment_statuses')[$payment->payment_status]) ? config('statuses.payment_statuses')[$payment->payment_status] : '' }}
                                 </td>
-                                <td>{{ $payment->payment_reference }}</td>
+                                <td class="border-left-0 border-top-0 text-center">
+                                    {{ $payment->payment_reference }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -167,57 +230,44 @@
 
                 <div class="col-12">
                     <h5 class="text-center">ORDER</h5>
-                    <table class="table table-striped table-hover">
-                        <thead>
+                    <table class="table table-hover">
+                        <thead class="bg-primary rounded-left rounded-right">
                             <tr>
-                                <th>Product</th>
-                                <th>Delay</th>
-                                <th>Unit Price</th>
-                                <th>Total price</th>
-                                <th>Regular price</th>
-                                <th>Quantity</th>
-                                <th>Discount</th>
+                                <th class="rounded-left border-0 text-center">ID</th>
+                                <th class="border-0 text-center">Product</th>
+                                <th class="border-0 text-center">Single Price</th>
+                                <th class="border-0 text-center">Final price</th>
+                                <th class="border-0 text-center">Amount</th>
+                                <th class="border-0 text-center">Discount %</th>
+                                <th class="border-0 text-center">Category</th>
+                                <th class="border-0 text-center rounded-right">Tracking number</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ $payment->order->id }}
+                                </td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
                                     {{ $payment->order->purchase->name }}
                                 </td>
-                                <td>
-                                    @php
-                                        // Convert the date strings to DateTime objects
-                                        $dateOfSale = new DateTime($payment->order->package_extension_date ?: $payment->order->date_of_sale);
-                                        $dateOfPayment = new DateTime($payment->date_of_payment);
-                                        
-                                        // Calculate the delay in days (if any)
-                                        $delayInterval = $dateOfSale->diff($dateOfPayment);
-                                        $delayInDays = $delayInterval->format('%r%a');
-                                        
-                                        // Check if there is a delay in payment
-                                        if ($delayInDays > 0) {
-                                            $delayMessage = 'Payment is delayed by ' . $delayInDays . ' day(s).';
-                                        } else {
-                                            $delayMessage = 'Order was paid on time.';
-                                        }
-                                    @endphp
-
-                                    {{ $delayMessage }}
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ number_format($payment->order->single_sold_price, 2, '.', '.') }}
                                 </td>
-                                <td>
-                                    ${{ $payment->order->single_sold_price }}
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ number_format($payment->order->total_sold_price, 2, '.', '.') }}
                                 </td>
-                                <td>
-                                    ${{ $payment->order->total_sold_price }}
-                                </td>
-                                <td>
-                                    ${{ $payment->order->original_sold_price }}
-                                </td>
-                                <td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
                                     {{ $payment->order->sold_quantity }}
                                 </td>
-                                <td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
                                     {{ $payment->order->discount_percent }}%
+                                </td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ $payment->order->purchase->categories->first()->name }}
+                                </td>
+                                <td class="border-left-0 border-top-0 text-center">
+                                    {{ $payment->order->tracking_number }}
                                 </td>
                             </tr>
                         </tbody>
@@ -226,25 +276,34 @@
 
                 <div class="col-12">
                     <h5 class="text-center">INVOICE</h5>
-                    <table class="table table-striped table-hover">
-                        <thead>
+                    <table class="table table-hover">
+                        <thead class="bg-primary rounded-left rounded-right">
                             <tr>
-                                <th>Invoice number</th>
-                                <th>Invoice date</th>
-                                <th>Invoice price</th>
-                                <th>Invoice quantity</th>
+                                <th class="rounded-left border-0 text-center">Invoice number</th>
+                                <th class="border-0 text-center">Invoice date</th>
+                                <th class="border-0 text-center">Invoice price</th>
+                                <th class="border-0 text-center rounded-right">Invoice amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>{{ $payment->invoice->invoice_number }}</td>
-                                <td>{{ $payment->invoice->invoice_date }}</td>
-                                <td>${{ $payment->invoice->price }}</td>
-                                <td>{{ $payment->invoice->quantity }}</td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ $payment->invoice->invoice_number }}
+                                </td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ $payment->invoice->invoice_date }}
+                                </td>
+                                <td class="border-left-0 border-top-0 border-right text-center">
+                                    {{ number_format($payment->invoice->price, 2, '.', '.') }}
+                                </td>
+                                <td class="border-left-0 border-top-0 text-center">
+                                    {{ $payment->invoice->quantity }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                
                 <div class="row align-items-center">
                     <div class="col-7">
                         <div class="col-12"><b>Company:</b> <span>{{ $settings['name'] }}</span></div>
@@ -258,15 +317,23 @@
                         @endif
                     </div>
                 </div>
+
                 <div class="col-12 text-left mt-5">
                     <button id="print" type="button" class="btn btn-primary" style="margin-right: 5px;">
                         <i class="fas fa-download"></i> Generate PDF
                     </button>
                 </div>
+                
             </div>
         </div>
     </div>
     @push('scripts')
+        <script type="text/javascript">
+            const expectedDateOfPayment = new Date("{{ date('Y-m-d', strtotime($payment->expected_date_of_payment)) }}");
+            const expectedDeliveryDate = new Date("{{ date('Y-m-d', strtotime($payment->expected_delivery_date)) }}");
+            const dateOfPayment = "{{ date('Y-m-d', strtotime($payment->date_of_payment)) }}";
+            const deliveryDate = "{{ date('Y-m-d', strtotime($payment->order->delivery_date)) }}";
+        </script>
         <script type="text/javascript" src="{{ mix('js/payments/form.js') }}"></script>
     @endpush
 @endsection

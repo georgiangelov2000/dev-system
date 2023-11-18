@@ -18,7 +18,7 @@ class OrderMassEditRequest extends FormRequest
             'single_sold_price' => 'nullable|numeric|min:0',
             'sold_quantity' => 'nullable|numeric|min:0',
             'discount_percent' => 'nullable|numeric|min:0',
-            'date_of_sale' => 'nullable|date',
+            'expected_delivery_date' => 'nullable|date',
             'package_id' => 'nullable|string',
             'user_id' => 'nullable|string'
         ];

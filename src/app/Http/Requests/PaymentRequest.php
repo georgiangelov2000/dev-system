@@ -13,11 +13,10 @@ class PaymentRequest extends FormRequest
     public function rules()
     {
         $isDelivered = $this->input('is_it_delivered');
+
         $rules = [
-            'price' => 'required|numeric|regex:/^\d+(\.\d{1,2})?$/',
-            'quantity' => 'required',
             'payment_method' => 'required|integer', 
-            'partially_paid_price' => 'nullable|numeric',
+            // 'partially_paid_price' => 'nullable|numeric',
             'payment_reference' => 'nullable',
             'is_it_delivered' => 'required',
         ];
@@ -40,7 +39,7 @@ class PaymentRequest extends FormRequest
             'price.required' => 'The price field is required.',
             'price.numeric' => 'The price must be a number.',
             'quantity.required' => 'The quantity field is required.',
-            'partially_paid_price.numeric' => 'The partially paid price must be a number.',
+            // 'partially_paid_price.numeric' => 'The partially paid price must be a number.',
             'is_it_delivered.required' => 'The Delivered field is required.',
         ];
     }

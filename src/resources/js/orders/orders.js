@@ -1,7 +1,7 @@
 import { APICaller,APIDELETECALLER } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 import { numericFormat } from '../helpers/functions';
-import { statusPaymentsWithIcons } from '../helpers/statuses';
+import { deliveryStatusesWithIcons, statusPaymentsWithIcons } from '../helpers/statuses';
 
 $(function () {
     $('.selectAction, .selectType, .selectCustomer, .selectPackage, .selectDriver').selectpicker();
@@ -122,16 +122,16 @@ $(function () {
                     return `<span>${numericFormat(row.original_sold_price)}</span>`
                 }
             },
-            {
-                width: '10%',
-                orderable: false,
-                class: 'text-center',
-                render: function (data, type, row) {
-                    const partiallyPaidStatus = statusPaymentsWithIcons[row.payment.payment_status];
-                    const partiallyPaidPrice = partiallyPaidStatus.label === 'Partially Paid' ? row.payment.partially_paid_price : '';
-                    return partiallyPaidPrice;
-                }
-            },            
+            // {
+            //     width: '10%',
+            //     orderable: false,
+            //     class: 'text-center',
+            //     render: function (data, type, row) {
+            //         const partiallyPaidStatus = statusPaymentsWithIcons[row.payment.payment_status];
+            //         const partiallyPaidPrice = partiallyPaidStatus.label === 'Partially Paid' ? row.payment.partially_paid_price : '';
+            //         return partiallyPaidPrice;
+            //     }
+            // },            
             {
                 width: '1%',
                 orderable: false,
@@ -142,51 +142,70 @@ $(function () {
                 }
             },
             {
-                width: '6%',
+                width: '1%',
+                orderable: false,
+                class:'text-center',
+                name:'is_it_delivered',
+                render: function (data, type, row) {
+                  return row.is_it_delivered ? 
+                  `<i class="fa-light fa-check text-success"></i>` : 
+                  `<i class="fa-light fa-x text-danger"></i>`;
+                }
+            },
+            {
+                width: '8%',
                 orderable: false,
                 class:'text-center',
                 render: function (data, type, row) {
                     const dateToDisplay = row.package_extension_date 
                         ? row.package_extension_date 
-                        : row.date_of_sale;
+                        : row.expected_delivery_date;
                     
-                    return `<span>${moment(dateToDisplay).format('YYYY-MM-DD')}</span>`;
+                    const formattedDate = dateToDisplay ? moment(dateToDisplay).format('MMM DD, YYYY') : '';
+
+                    return `<span>${formattedDate}</span>`;
+                }
+            },
+            {
+                width: '8%',
+                orderable: false,
+                class:'text-center',
+                render: function (data, type, row) {
+                    const isDelivered = row.is_it_delivered;
+                    let deliveryDate = '';
+
+                    if(isDelivered) {
+                        deliveryDate = row.delivery_date;
+                    }
+
+                    const formattedDate = deliveryDate ? moment(deliveryDate).format('MMM DD, YYYY') : '';
+
+                    return `<span>${formattedDate}</span>`;
                 }
             },
             {
                 width: '10%',
                 orderable: false,
                 class:'text-center',
-                name: 'expired',
+                name: 'delivery_delay',
                 render: function (data, type, row) {
-                    const date = row.package_extension_date ? moment(row.package_extension_date) : moment(row.date_of_sale);
-                    const currentDate = moment();
-                    const daysRemaining = date.diff(currentDate, 'days');
-
-                    let badgeClass = '';
-                    let badgeText = '';
-
-                    switch (row.payment.payment_status) {
-                        case 6:
-                        case 2:
-                            badgeClass = 'text-warning';
-                            badgeText = `${daysRemaining} days remaining`;
-                            break;
-                        case 1:
-                        case 3:
-                        case 4:
-                            badgeClass = 'text-success';
-                            badgeText = 'Received';
-                            break;
-                        default:
-                            badgeText = 'Invalid status!';
-                    }
-
-                    return `<span class="font-weight-bold p-2 ${badgeClass}">${badgeText}</span>`;
+                    const isDelivered = row.is_it_delivered;
+                    const expectedDate = row.package_extension_date ? moment(row.package_extension_date) : moment(row.expected_delivery_date);
+                    const deliveryDate = moment(row.delivery_date);
+                    const currDate = moment();
+                    const diffDays = currDate.diff(expectedDate, 'days');
+                    
+                    if (!isDelivered) {
+                        return `<span class="text-${currDate.isAfter(expectedDate) ? 'danger' : 'info'}">${diffDays} days ${currDate.isAfter(expectedDate) ? 'delay' : 'left'}</span>`;
+                    } else {
+                        const deliveryDiffDays = deliveryDate.diff(expectedDate, 'days');
+                        return `<span class="text-${deliveryDate.isAfter(expectedDate) ? 'danger' : 'success'}">${deliveryDiffDays} ${deliveryDate.isAfter(expectedDate) ? 'days delay in delivery' : 'days delay, Delivered on time'}</span>`;
+                        
+                    }                    
                 }
             },
             {
-                width: '8%',
+                width: '5%',
                 orderable: false,
                 class: 'text-center',
                 name: 'package',
@@ -197,12 +216,12 @@ $(function () {
                 }
             },            
             {
-                width: '5%',
+                width: '7%',
                 orderable: false,
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    const statusData = statusPaymentsWithIcons[row.payment.payment_status] || { text: "Unknown", iconClass: "fal fa-question" };
+                    const statusData = deliveryStatusesWithIcons[row.payment.delivery_status] || { text: "Unknown", iconClass: "fal fa-question" };
 
                     return `
                     <div title="${statusData.label}" class="status">
@@ -215,35 +234,46 @@ $(function () {
                 orderable: false,
                 class: 'text-center',
                 render: function (data, type, row) {
-                    let buttons = [];
-                    let deleteFormTemplate = '';
-                    let detachPackage = '';
-                    let previewButton = '<a title="Review" class="btn p-0"><i class="text-primary fa-sharp fa-thin fa-magnifying-glass"></i></a>'
+                    let edit = `
+                    <a class="dropdown-item text-primary" href="${ORDER_EDIT_ROUTE.replace(':id', row.id)}">
+                        <i class="fa-light fa-pen text-primary"></i> Edit
+                    </a>`;
 
-                    if (row.package && row.payment.status === 2) {
+                    let detachPackage =``;
+                    let deleteForm = ``;
+
+                    if(row.package && !row.is_it_delivered) {
                         detachPackage = `
-                            <form onsubmit="detachOrder(event)" style='display:inline-block;' id='detach-form' action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method='PUT'>
+                        <form onsubmit="detachOrder(event)" class="dropdown-item" style='display:inline-block;' id='detach-form' action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method='PUT'>
                                 <input type='hidden' name='id' value='${row.id}'>
-                                <button type='submit' class='btn p-0' title="Detach package">
-                                    <i class="fa-light fa-boxes-packing text-danger"></i>
+                                <button type='submit' class='btn p-0 text-danger'>
+                                    <i class="fa-light fa-boxes-packing text-danger"></i> Detach package
                                 </button>
-                            </form>`;
+                        </form>`;
                     }
 
-                    buttons.push(`<a href="${ORDER_EDIT_ROUTE.replace(':id', row.id)}" class="btn p-0" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>`);
-
-                    if (row.payment.status === 2) {
-                        deleteFormTemplate = `
-                            <form style='display:inline-block;' id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
+                    if(!row.is_it_delivered) {
+                        deleteForm = `
+                            <form style='display:inline-block;' data-name="${row.id}-${row.purchase.name}" class="dropdown-item" id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
                                 <input type='hidden' name='_method' value='DELETE'>
                                 <input type='hidden' name='id' value='${row.id}'>
-                                <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
-                                    <i class='fa-light fa-trash text-danger'></i>
+                                <button type='submit' class='btn p-0 text-danger' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
+                                    <i class='fa-light fa-trash text-danger'></i> Delete
                                 </button>
                             </form>`;
                     }
 
-                    return `${deleteFormTemplate} ${detachPackage} ${buttons.join(' ')} ${previewButton}`;
+                    return `
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded" data-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-light fa-list" aria-hidden="true"></i>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            ${edit}
+                            ${detachPackage}
+                            ${deleteForm}
+                        </div>
+                    </div>`;
                 }
             }
         ],

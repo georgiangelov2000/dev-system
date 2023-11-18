@@ -106,11 +106,15 @@ class PaymentController extends Controller
 
         // Validate payment status and method
         if ($data['is_it_delivered']) {
-            $expected = $builder->expected_date_of_payment;
+            $expectedDateOfPayment = $builder->expected_date_of_payment;
+            $expectedDeliveryDate  =$builder->$relation->expected_delivery_date;
 
             $date_of_payment = $data['date_of_payment'];
             $delivery_date = $data['delivery_date'];
-            $status = ($date_of_payment >= $expected) ? $builder::PAID : $builder::OVERDUE;
+
+            // Set payment status based on date of payment and expected date of payment
+            $statusDateOfPayment = ($date_of_payment > $expectedDateOfPayment) ? $builder::OVERDUE : $builder::SUCCESSFULLY_PAID_DELIVERED;
+            $statusDeliveryDate = ($delivery_date > $expectedDeliveryDate) ? $builder::OVERDUE : $builder::SUCCESSFULLY_PAID_DELIVERED;
 
             // Update relation attributes
             $builder->$relation->is_it_delivered = $builder->$relation::IS_IT_DELIVERED_TRUE;
@@ -124,14 +128,12 @@ class PaymentController extends Controller
         $builder->$relation->save();
 
         // Set common attributes
-        $builder->payment_status = $data['is_it_delivered'] ? $status : $builder::PENDING;
+        $builder->payment_status = $data['is_it_delivered'] ? $statusDateOfPayment : $builder::PENDING;
+        $builder->delivery_status = $data['is_it_delivered'] ? $statusDeliveryDate : $builder::PENDING;
         $builder->date_of_payment = $data['is_it_delivered'] ? now()->parse($date_of_payment) : null;
 
         // Set other attributes
-        $builder->price = $data['price'];
-        $builder->quantity = $data['quantity'];
         $builder->payment_reference = $data['payment_reference'];
-        $builder->partially_paid_price = $data['partially_paid_price'] ?? '0.00';
         $builder->payment_method = $data['payment_method'];
 
         // Save the main model

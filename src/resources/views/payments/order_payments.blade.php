@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="card col-12 cardTemplate">
-            <div class="card-header">
+            <div class="card-header bg-primary">
                 <div class="col-12">
                     <h3 class="card-title">Order payments</h3>
                 </div>
@@ -125,7 +125,7 @@
             const ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";
             const ORDER_PAYMENT_EDIT_ROUTE = "{{ route('payment.edit', [':payment', ':type']) }}";
             const ORDER_PAYMENT_DELETE_ROUTE = "{{ route('payment.delete', [':payment', ':type']) }}";
-            const ORDER_INVOICE_API_ROUTE = "{{route('api.order.invoices')}}"
+            const ORDER_INVOICE_API_ROUTE = "{{route('api.invoices')}}"
             const ORDER_INVOICE_UPDATE_ROUTE = "{{route('invoice.update',[':type',':id'])}}"
             const PACKAGE_API_ROUTE = "{{ route('api.packages') }}";
         </script>

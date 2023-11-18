@@ -3,7 +3,15 @@ import { handleErrors } from "../helpers/action_helpers";
 import { numericFormat } from "../helpers/functions";
 
 $(function () {
-    $(".selectCustomer,.selectUser,.selectType,.productFilter,.selectPackage").selectpicker();
+    if (typeof ORDER !== "undefined") {
+        APICaller(ORDER_API_ROUTE, { id: ORDER, select_json: 1 }, (response) =>
+            renderData(response, true)
+        );
+    }
+
+    $(
+        ".selectCustomer,.selectUser,.selectType,.productFilter,.selectPackage"
+    ).selectpicker();
 
     $(".datepicker").datepicker({
         format: "mm/dd/yyyy",
@@ -18,24 +26,44 @@ $(function () {
 
     let totalPriceProducts = 0;
     let availableQuantity = 0;
-    let counter = 0;
+    let counter = -1;
 
-    table.DataTable({
-        ordering: false,
-        columns: [
+    const tableConfig = {};
+    tableConfig["ordering"] = false;
+
+    if (typeof IS_EDITABLE !== "undefined" && IS_EDITABLE == false) {
+        tableConfig["columns"] = [
             { class: "text-center", width: "1%" },
             { class: "text-center", width: "1%" },
             { class: "text-center", width: "5%" },
-            { class: "text-center", width: "2%" },
+            { class: "text-center", width: "5%" },
+            { class: "text-center", width: "5%" },
+            { class: "text-center", width: "5%" },
+            { class: "text-center", width: "5%" },
+            { class: "text-center", width: "5%" },
+            { class: "text-center", width: "5%" },
+            { class: "text-center", width: "5%" },
+            { class: "text-center", width: "5%" },
+            { class: "text-center", width: "5%" },
+        ];
+    } else {
+        tableConfig["columns"] = [
             { class: "text-center", width: "1%" },
-            { class: "text-center", width: "7%" },
-            { class: "text-center", width: "7%" },
-            { class: "text-center", width: "7%" },
-            { class: "text-center", width: "7%" },
+            { class: "text-center", width: "1%" },
             { class: "text-center", width: "5%" },
+            { class: "text-center", width: "4%" },
+            { class: "text-center", width: "1%" },
             { class: "text-center", width: "5%" },
-        ],
-    });
+            { class: "text-center", width: "8%" },
+            { class: "text-center", width: "8%" },
+            { class: "text-center", width: "8%" },
+            { class: "text-center", width: "8%" },
+            { class: "text-center", width: "5%" },
+            { class: "text-center", width: "8%" },
+        ];
+    }
+
+    table.DataTable(tableConfig);
 
     $('.selectCustomer input[type="text"]').on("keyup", function () {
         let text = $(this).val();
@@ -127,7 +155,7 @@ $(function () {
                     );
                     $.each(purchases, function ($key, purchase) {
                         bootstrapProduct.append(
-                            `<option value="${purchase.id}"> ${purchase.name} </option>`
+                            `<option value="${purchase.id}"> ${purchase.name} - Remaining amount <b>${purchase.quantity}</b> </option>`
                         );
                     });
                 }
@@ -209,18 +237,14 @@ $(function () {
         }
     );
 
-    if (typeof ORDER === 'undefined') {
-        
-    } else {
-        APICaller(ORDER_API_ROUTE,{'id':ORDER,'select_json':1},function(response){
-            let data = response;
-            console.log(data);
-            renderData(data);
-        })
-    }
-    
     function calculateOrderPrice(row) {
-        const quantity =
+        let remainingAmount = 0;
+        let updatedAmount = 0;
+        let finalAmount = 0;
+        let discountPrice = 0;
+        let totalPrice = 0;
+
+        const amount =
             parseInt(
                 row.find('input[data-manipulation-name="sold_quantity"]').val()
             ) || 0;
@@ -236,29 +260,47 @@ $(function () {
                     .find('input[data-manipulation-name="discount_percent"]')
                     .val()
             ) || 0;
+        const purchaseInitAmount =
+            parseInt(
+                row.find('td[name="purchase_init_amount"]').attr("value")
+            ) || 0;
+        const purchaseCurrentAmount =
+            parseInt(row.find('td[name="purchase_amount"]').attr("value")) || 0;
 
-        let discountPrice = 0;
-
-        let totalPrice = quantity * price;
-
-        if (!isNaN(discount)) {
-            discountPrice = totalPrice - (totalPrice * discount) / 100;
+        if (typeof ORDER !== "undefined") {
+            remainingAmount =
+                parseInt(ORDER_AMOUNT) - parseInt(ORIGINAL_AMOUNT);
+            updatedAmount = remainingAmount + amount;
+            finalAmount = purchaseInitAmount - updatedAmount;
+        } else {
+            if (amount > purchaseCurrentAmount) {
+                finalAmount = -1 * (amount - purchaseCurrentAmount);
+            } else {
+                finalAmount = Math.abs(amount - purchaseCurrentAmount);
+            }
         }
 
-        discountPrice = parseFloat(discountPrice.toFixed(2));
-        totalPrice = parseFloat(totalPrice.toFixed(2));
+        totalPrice = parseFloat(amount * price).toFixed(2);
 
-        let formattedDiscountPrice = discountPrice.toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
-        let formattedTotalPrice = totalPrice.toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
+        if (!isNaN(discount)) {
+            discountPrice = parseFloat(
+                totalPrice - (totalPrice * discount) / 100
+            );
+        }
 
-        row.find('span[name="original_price"]').html(formattedDiscountPrice);
-        row.find('span[name="regular_price"]').html(formattedTotalPrice);
+        if (finalAmount < 0) {
+            finalAmount = `<span class="text-danger">${finalAmount}</span>`;
+        } else {
+            finalAmount = `<span class="text-dark">${Math.abs(
+                finalAmount
+            )}</span>`;
+        }
+
+        row.find('span[name="original_price"]').html(
+            numericFormat(discountPrice)
+        );
+        row.find('span[name="regular_price"]').html(numericFormat(totalPrice));
+        row.find('td[name="purchase_amount"]').html(finalAmount);
     }
 
     window.removeRow = function (button) {
@@ -287,176 +329,177 @@ $(function () {
         calculateOrderPrice(row);
     };
 
-    function renderData(data) {
-        let image = "";
+    function renderData(data, isEdit = false) {
+        let template = ``;
 
-        if(data.order) {
-            image = `<img src="${data.order.purchase.image_path}" />`;
-        } else {
-            image = `<img src="${data.image_path}" />`;
+        if (isEdit) {
+            if (typeof IS_EDITABLE !== "undefined" && IS_EDITABLE == false) {
+                template += `<tr data-id=${data.order.id}>
+                    <td>
+                        <b>${data.order.id}</b>
+                    </td>
+                    <td>
+                        <img src = "${data.order.purchase.image_path}" />
+                    </td>
+                    <td>
+                        <a href="${PURCHASE_ROUTE.replace(
+                            ":id",
+                            data.order.purchase.id
+                        )}">
+                            ${data.order.purchase.name}
+                        </a>
+                    </td>
+                    <td>
+                        ${data.order.sold_quantity}
+                    </td>
+                    <td>
+                        ${numericFormat(data.order.single_sold_price)}
+                    </td>
+                    <td>
+                        ${numericFormat(data.order.discount_single_sold_price)}
+                    </td>
+                    <td>
+                        ${numericFormat(data.order.total_sold_price)}
+                    </td>
+                    <td>
+                        ${numericFormat(data.order.original_sold_price)}
+                    </td>
+                    <td>
+                        ${data.order.discount_percent}
+                    </td>
+                    <td>
+                        ${data.order.tracking_number}
+                    </td>
+                    <td>
+                        ${moment(data.order.created_at).format("MMMM Do YYYY")}
+                    </td>
+                    <td>
+                        ${moment(data.order.updated_at).format("MMMM Do YYYY")}
+                    </td>
+                </tr>`;
+            } else {
+                template += `<tr data-id=${data.order.id}>
+                    <td>
+                        <b>${data.order.id}</b>
+                    </td>
+                    <td>
+                        <img src = "${data.order.purchase.image_path}" />
+                    </td>
+                    <td>
+                        <a href="${PURCHASE_ROUTE.replace(":id",data.order.purchase.id)}">
+                            ${data.order.purchase.name}
+                        </a>
+                    </td>
+                    <td>
+                        ${numericFormat(data.order.purchase.price)}
+                    </td>
+                    <td value="${data.order.purchase.quantity}" name="purchase_amount">
+                        ${data.order.purchase.quantity}
+                    </td>
+                    <td value="${data.order.purchase.initial_quantity}" name="purchase_init_amount">
+                        ${data.order.purchase.initial_quantity}
+                    </td>
+                    <td>
+                        <div class="form-group col-12">
+                            <input
+                                name="sold_quantity" 
+                                type='number'
+                                value ="${data.order.sold_quantity}"
+                                data-manipulation-name="sold_quantity"
+                                class='form-control form-control-sm'
+                                placeholder="Integer value (e.g., 1, 2)"
+                                onkeyup="handleOrderQuantity(this)"
+                            />
+                            <span name="sold_quantity" class="text-danger"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group col-12">
+                            <input
+                                name="single_sold_price" 
+                                type='text'
+                                value ="${data.order.single_sold_price}"
+                                data-manipulation-name="single_sold_price"
+                                class='form-control form-control-sm'
+                                placeholder="Integer value (e.g., 1, 2)"
+                                onkeyup="handleOrderQuantity(this)"
+                            />
+                            <span name="single_sold_price" class="text-danger"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group col-12">
+                            <input
+                                name="discount_percent" 
+                                type='number'
+                                value ="${data.order.discount_percent}"
+                                data-manipulation-name="discount_percent"
+                                class='form-control form-control-sm'
+                                placeholder="Integer value (e.g., 1, 2)"
+                                onkeyup="handleOrderQuantity(this)"
+                            />
+                            <span name="discount_percent" class="text-danger"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group col-12">
+                            <input
+                                name="tracking_number" 
+                                type='text'
+                                value ="${data.order.tracking_number}"
+                                data-manipulation-name="tracking_number"
+                                class='form-control form-control-sm'
+                                onkeyup="handleOrderQuantity(this)"
+                            />
+                            <span name="tracking_number" class="text-danger"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <span name="original_price">${numericFormat(data.order.total_sold_price)}</span>
+                    </td>
+                    <td>
+                        <span name="regular_price">${numericFormat(data.order.original_sold_price)}</span>
+                    </td>
+                </tr>`;
+            }
         }
-        
-        let price = data.order !== undefined
-        ? numericFormat(data.order.purchase.price) 
-        : numericFormat(data.price);
-
-        let quantity = data.order !== undefined
-        ? data.order.purchase.quantity 
-        : data.quantity;
-
-        let name = data.order !== undefined
-        ? data.order.purchase.name 
-        : data.name;
-
-        let orderQuantity = data.order !== undefined
-        ? data.order.sold_quantity 
-        : 0;
-
-        let orderUnitPrice = data.order!== undefined
-        ?  data.order.single_sold_price 
-        : 0;
-
-        let orderDiscountPrice = data.order !== undefined
-        ?  data.order.discount_percent 
-        : 0;
-
-        let orderTrackingNumber = data.order !== undefined
-        ?  data.order.tracking_number
-        : '';
-
-        let orderFinalPrice = data.order !== undefined
-        ?  numericFormat(data.order.total_sold_price)
-        : numericFormat(0);
-
-
-        let orderRegularPrice = data.order !== undefined 
-        ?  numericFormat(data.order.original_sold_price)
-        : numericFormat(0);
-
-        let currentId = data.order !==undefined
-        ? data.order.purchase.id
-        : data.id;
-
-        let template = `
-        <tr data-id="${currentId}">
-            <input type="hidden" value='${currentId}' name="purchase_id[]" />
-            <td>
-                <button class="text-danger btn p-0" onclick="removeRow(this)" type="button">
-                    <i class="fa-light fa-trash text-danger"></i>
-                </button>
-            </td>
-            <td>${image}</td>
-            <td>
-                <a href="${PURCHASE_ROUTE.replace(":id", currentId)}">${name}</a>
-            </td>
-            <td>${price}</td>
-            <td>${quantity}</td>
-            <td>
-                <div class="form-group col-12">
-                    <input 
-                        name="sold_quantity[]" 
-                        type='number'
-                        data-manipulation-name="sold_quantity"
-                        max='${quantity}'
-                        value ="${orderQuantity}"
-                        class='form-control form-control-sm' 
-                        onkeyup="handleOrderQuantity(this)" 
-                        placeholder="Integer value (e.g., 1, 2)"
-                    />
-                    <span name="sold_quantity.${
-                        counter - 1
-                    }" class="text-danger"></span>
-                </div>
-            </td>
-            <td>
-                <div class="form-group col-12">
-                    <input 
-                        type='text'
-                        name="single_sold_price[]"
-                        data-manipulation-name="single_sold_price"
-                        class='form-control form-control-sm' 
-                        min="0"
-                        value="${orderUnitPrice}"
-                        onkeyup="handleSinglePrice(this)" 
-                        placeholder="Numeric value (e.g., 1.00)"
-                    />
-                    <span name="single_sold_price.${
-                        counter - 1
-                    }" class="text-danger"></span>
-                </div>
-            </td>
-            <td> 
-                <div class="form-group col-12">
-                    <input 
-                        type='number' 
-                        min="0"
-                        class='form-control form-control-sm' 
-                        data-manipulation-name="discount_percent"
-                        name="discount_percent[]"
-                        value="${orderDiscountPrice}"
-                        onkeyup="handleDiscountChange(this)"
-                        placeholder="Integer value (e.g., 1, 2)"
-                    />
-                    <span name="discount_percent.${
-                        counter - 1
-                    }" class="text-danger"></span>
-                </div>
-            </td>
-            <td>
-                <div class="form-group col-12">
-                    <input 
-                        type="text" 
-                        class="form-control form-control-sm" 
-                        name="tracking_number[]"
-                        value="${orderTrackingNumber}"
-                        placeholder="Max length 20"
-                    />
-                    <span name="tracking_number.${
-                        counter - 1
-                    }" class="text-danger"></span>
-                </div>
-            </td>
-            <td>
-                <span name="original_price">${orderFinalPrice}</span>
-            </td>
-            <td>
-                <span name="regular_price">${orderRegularPrice}</span>
-            </td>
-        </tr>`;
-
         table.DataTable().row.add($(template)).draw();
     }
 
     //Send HTTP POST
-    $('#orderForm').submit(function (event) {
+    $("#orderForm").submit((event) => {
         event.preventDefault();
 
-        let form = $(this);
-        let url = form.attr("action");
-        let method = form.attr("method");
+        const form = $(event.currentTarget);
+        const url = form.attr("action");
+        const method = form.attr("method");
 
-        let formData = $(form)
+        const formData = $(form)
             .serializeArray()
+            .filter((item) => item.name !== "DataTables_Table_0_length")
             .reduce((acc, obj) => {
                 acc[obj.name] = obj.value;
                 return acc;
             }, {});
 
+        // console.log(formData);
+
         $.ajax({
             type: method,
-            url: url,
+            url,
             data: formData,
-            success: function (response) {
-                toastr["success"](response.message);
+            success: (response) => {
+                toastr.success(response.message);
+
+                if (ORDER !== undefined) {
+                    window.location.href = ORDER_INDEX_ROUTE;
+                }
+
                 table.DataTable().clear().draw();
             },
-            error: function (xhr, status, error) {
-                console.log(error);
-                if (xhr.status === 422) {
-                    toastr["error"](xhr.responseJSON.message);
-                    var errors = xhr.responseJSON.errors;
-                    handleErrors(errors);
-                }
+            error: (xhr, status, error) => {
+                toastr.error(xhr.responseJSON.message);
+                handleErrors(xhr.responseJSON.errors);
             },
         });
     });

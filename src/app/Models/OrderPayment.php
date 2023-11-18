@@ -26,17 +26,25 @@ class OrderPayment extends Model
 
     public $timestamps = false;
 
+    // Payment status
+    const SUCCESSFULLY_PAID_DELIVERED = 1;
+
+    // FOR BOTH
+    const PENDING = 2;
+    const OVERDUE = 4;
+
     protected $fillable = [
-        'id',
         'order_id',
         'alias',
         'quantity',
         'price',
-        'date_of_payment',
         'payment_method',
         'payment_reference',
+        'date_of_payment',
+        'expected_date_of_payment',
         'payment_status',
-        'partially_paid_price'
+        'delivery_status'
+        // 'partially_paid_price',
     ];
 
     public function order()

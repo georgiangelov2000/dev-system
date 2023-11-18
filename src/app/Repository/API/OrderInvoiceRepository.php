@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\API;
 use App\Helpers\FunctionsHelper;
-use App\Models\InvoicePurchase;
+use App\Models\InvoiceOrder;
 
-class PurchaseInvoiceRepository implements ApiRepository
+class OrderInvoiceRepository implements ApiRepository
 {
     public function getData($request){
 
-        $invoiceQ = InvoicePurchase::query();
+        $invoiceQ = InvoiceOrder::query();
         $select_json = $request->input('select_json');
 
         $this->applyFilters($request, $invoiceQ);

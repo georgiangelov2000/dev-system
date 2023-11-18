@@ -35,9 +35,18 @@ class Order extends Model
      * @var array
      */
 
+    const IS_IT_DELIVERED_TRUE = 1;
+    const IS_IT_DELIVERED_FALSE = 0;
+
+    const PAID = 1;
+    const PENDING = 2;
+    const OVERDUE = 4;
+
     protected $fillable = [
+        "id",
         "customer_id",
-        "date_of_sale",
+        "expected_delivery_date",
+        'delivery_date',
         'user_id',
         "status",
         "purchase_id",
@@ -49,7 +58,8 @@ class Order extends Model
         "discount_percent",
         "package_id",
         "tracking_number",
-        'package_extension_date'
+        'package_extension_date',
+        'is_it_delivered'
     ];
 
     public function customer()

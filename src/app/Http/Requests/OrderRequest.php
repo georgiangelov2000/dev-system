@@ -9,26 +9,33 @@ class OrderRequest extends FormRequest
 {
     public function rules()
     {
+        $method = $this->method();
+        $isDelivered = $this->order->is_it_delivered;
+
         $rules = [
             'customer_id' => 'required|string',
             'user_id' => 'required|string',
-            'package_id' => 'nullable',
         ];
         
         if($this->isPaymentRequired() || !$this->order) {
-            $rules['purchase_id.*'] = 'required|string';
-            $rules['tracking_number.*'] = 'required|string';
-            $rules['sold_quantity.*'] = 'required|integer|min:1';
-            $rules['single_sold_price.*'] = 'required|numeric|min:1';
-            $rules['discount_percent.*'] = 'required|integer';
-            $rules['date_of_sale'] = 'required|date';
-        } else {
-            $rules['tracking_number'] = 'required|string';
-            $rules['sold_quantity']  ='required';
-            $rules['single_sold_price'] ='required';
-            $rules['discount_percent'] ='required';
-            $rules['date_of_sale'] ='nullable|date';
-        }
+            if(!$isDelivered) {
+                $rules['expected_delivery_date'] = 'required|date';
+                $rules['expected_date_of_payment'] = 'required|date';
+                $rules['package_id'] = 'nullable';
+            }
+            if($method === 'PUT') {
+                $rules['tracking_number'] = 'required|string|max:20';
+                $rules['sold_quantity'] = 'required|integer|min:1';
+                $rules['single_sold_price'] = 'required|numeric|min:1';
+                $rules['discount_percent'] = 'required|integer|min:0';
+            } else {
+                $rules['purchase_id.*'] = 'required|string';
+                $rules['tracking_number.*'] = 'required|string';
+                $rules['sold_quantity.*'] = 'required|integer|min:1';
+                $rules['single_sold_price.*'] = 'required|numeric|min:1';
+                $rules['discount_percent.*'] = 'required|integer|min:0';
+            }
+        };
 
         return $rules;
     }

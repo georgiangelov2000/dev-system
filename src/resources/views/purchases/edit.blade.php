@@ -17,7 +17,7 @@
                 
                 @if(!$purchase->is_editable)
                     <div class="alert alert-danger" role="alert">
-                        The purchase is currently marked as {{ $purchase->status }}. Please note that certain fields cannot be edited as the purchase is already closed. <a href="#" class="alert-link">Delivery date: {{ $purchase->delivery_date }}</a>.
+                        The purchase is currently marked as <a href="#" class="alert-link"> {{ $purchase->status }}</a>. Please note that certain fields cannot be edited as the purchase is already closed. <a href="#" class="alert-link">Delivery date: {{ $purchase->delivery_date }}</a>.
                     </div>
                 @endif
                 <div class="row flex-wrap">
@@ -113,13 +113,14 @@
                                     </div>
                                     <input type="text"
                                         value="{{ date('m/d/Y', strtotime($purchase->payment->expected_date_of_payment))}}"
-                                        class="form-control datepicker" name="expected_date_of_payment" />
+                                        class="form-control datepicker" 
+                                        name="expected_date_of_payment" />
                                 </div>
                                 @error('expected_date_of_payment')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             @else
-                                <input disabled name="expected_date_of_payment" class="form-control" value="{{ $purchase->payment->expected_date_of_payment }}" />
+                                <input disabled name="expected_date_of_payment" class="form-control" value="{{ $purchase->expected_date_of_payment }}" />
                             @endif
                         </div>
                         <div class="form-group col-3">
@@ -134,7 +135,12 @@
                                     <input type="text" class="form-control datepicker" name="expected_delivery_date"
                                         value="{{ date('m/d/Y', strtotime($purchase->expected_delivery_date)) }}" />
                                 @else
-                                    <input disabled name="expected_delivery_date" class="form-control" value="{{ $purchase->expected_delivery_date }}" />
+                                    <input 
+                                        disabled 
+                                        name="expected_delivery_date" 
+                                        class="form-control" 
+                                        value="{{ $purchase->expected_delivery_date }}" 
+                                    />
                                 @endif
                             </div>
                             @error('delivery_date')

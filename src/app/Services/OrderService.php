@@ -21,7 +21,7 @@ class OrderService
      * @param int $quantity The quantity of items.
      * @return array An array containing discount price, total price, and original price.
      */
-    public function calculatePrices($price, $discount, $quantity): array
+    public function calculatePrices($price, $discount, $quantity, $model)
     {
         // Calculate the discounted price
         $discount_price = $this->helper->calculatedDiscountPrice($price, $discount);
@@ -32,23 +32,28 @@ class OrderService
         // Calculate the original price
         $original_price = $this->helper->calculatedFinalPrice($price, $quantity);
 
-        return compact('discount_price', 'total_price', 'original_price');
+        $model->discount_single_sold_price= $discount_price;
+        $model->total_sold_price= $total_price;
+        $model->original_sold_price= $original_price;
+        
+        return $model;
+        // return compact('discount_price', 'total_price', 'original_price');
     }
 
     /**
-     * Generate an alias based on the provided order's package extension date or date of sale.
+     * Generate an alias based on the provided order's package extension date or expected_delivery_date.
      *
-     * If package_extension_date is available, it will be used; otherwise, date_of_sale will be used.
+     * If package_extension_date is available, it will be used; otherwise, expected_delivery_date will be used.
      *
      * @param \App\Models\Order $order The order instance for which to generate the alias.
      * @return string The generated alias.
      */
     public function getAlias($order)
     {
-        // Determine the alias based on package_extension_date or date_of_sale
+        // Determine the alias based on package_extension_date or expected_delivery_date
         $aliasDate = $order->package_extension_date
             ? now()->parse($order->package_extension_date)->format('F j, Y')
-            : now()->parse($order->date_of_sale)->format('F j, Y');
+            : now()->parse($order->expected_delivery_date)->format('F j, Y');
 
         // Replace spaces and commas with underscores, and convert to lowercase
         return strtolower(str_replace([' ', ','], ['_', ''], $aliasDate));

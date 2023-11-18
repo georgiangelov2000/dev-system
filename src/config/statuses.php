@@ -7,6 +7,11 @@ return [
         4 => 'Overdue',
         5 => 'Refunded',
     ],
+    'delivery_statuses' => [
+        1 => 'Delivered',
+        2 => 'Pending',
+        4 => 'Overdue',
+    ],
     "package_types" => [
         1 => "Standart",
         2 => "Express",

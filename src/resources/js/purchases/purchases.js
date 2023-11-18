@@ -187,9 +187,9 @@ $(function () {
                 width: '10%',
                 orderable: false,
                 render: function (data, type, row) {
-                    let expected = moment(row.expected_delivery_date);
-                    let deliveryDate = moment(row.delivery_date);
-                    let isDelivered = row.is_it_delivered;
+                    const expected = moment(row.expected_delivery_date);
+                    const deliveryDate = moment(row.delivery_date);
+                    const isDelivered = row.is_it_delivered;
                     
                     if (!isDelivered) {
                         let currDate = moment();
@@ -203,7 +203,6 @@ $(function () {
                             ? `<span class="text-danger">${diffDays} days delay in delivery</span>`
                             : `<span class="text-success">Delivered on time (${diffDays} days)</span>`;
                     }
-
                 }
             },
             {

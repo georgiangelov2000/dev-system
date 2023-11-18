@@ -67,32 +67,28 @@ class PurchaseController extends Controller
         return redirect()->route('purchase.index')->with('success', 'Purchase has been created');
     }
     public function edit(Purchase $purchase)
-    {        
-        $orderAmounts = 0;
-
-        if($purchase->orders()->exists()){
-            $orderAmounts = $purchase->orders->sum('sold_quantity'); 
-        }
-
+    {
+        $orderAmounts = $purchase->orders->sum('sold_quantity');
+    
         // Assuming $purchaseId is the ID you want to use in the query
         $paymentRecord = PurchasePayment::where('purchase_id', $purchase->id)->first();
-
+    
         // Check if the payment record exists and is not null
-        if ($paymentRecord) {
-            $isEditable = $this->helper->statusValidation($paymentRecord->payment_status,$this->statuses) === 2; 
+        $isEditable = $paymentRecord && $this->helper->statusValidation($paymentRecord->payment_status, $this->statuses) === Purchase::PENDING;
+    
+        if (!$isEditable) {
+            $purchase->expected_delivery_date = now()->parse($purchase->expected_delivery_date)->format('d F Y');
+            $purchase->expected_date_of_payment = now()->parse(optional($purchase->payment)->expected_date_of_payment)->format('d F Y');
+            $purchase->delivery_date = now()->parse($purchase->delivery_date)->format('d F Y');
         }
-
-        if(!$isEditable) {
-            $deliveryDate = now()->parse($purchase->delivery_date)->format('d F Y');
-            $purchase->delivery_date = $deliveryDate;
-        }
-
-        $purchase->status = $this->statuses[$paymentRecord->payment_status];
+        
+        $purchase->status = !$isEditable ? $this->statuses[$paymentRecord->payment_status] : null;
         $purchase->order_amount = $orderAmounts;
         $purchase->is_editable = $isEditable;
-
-        return view('purchases.edit',compact('purchase'));
+    
+        return view('purchases.edit', compact('purchase'));
     }
+    
 
     public function update(Purchase $purchase, PurchaseRequest $request)
     {

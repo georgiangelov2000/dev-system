@@ -3,6 +3,7 @@
 namespace App\Factory;
 
 use App\Factory\Views\PaymentView;
+use App\Factory\Payments\PaymentRelationFactory;
 use App\Helpers\FunctionsHelper;
 use App\Models\Customer;
 use App\Models\OrderPayment;
@@ -26,18 +27,8 @@ class PaymentViewFactory
      * @var array
      */
     private static $editMapping = [
-        'order' => [
-            'instance' => OrderPayment::class,
-            'relation' => [
-                'order.customer', 'invoice',
-            ],
-        ],
-        'purchase' => [
-            'instance' => PurchasePayment::class,
-            'relation' => [
-                'purchase.supplier', 'invoice',
-            ],
-        ],
+        'order' => OrderPayment::class,
+        'purchase' => PurchasePayment::class,
     ];
 
     /**
@@ -72,16 +63,27 @@ class PaymentViewFactory
  *
  * @return View
  */
-    public static function select(string $type, ?string $payment = null): View
+    public static function select(string $type, ?int $id = 0): View
     {
         $data = [];
 
         if (in_array($type, self::$types)) {
-            if ($payment) {
-                $relations = self::$editMapping[$type]['relation'];
-                $data['payment'] = self::$editMapping[$type]['instance']::with($relations)->find($payment);
+            if ($id) {
+
+                $className = self::$editMapping[$type];
+
+                if (class_exists($className)) {
+                    $instance = new $className;
+                }
+
+                $instance = $instance->find($id);
+                
+                $payment = PaymentRelationFactory::selectBuilder($instance);
+
+                $data['payment'] = $payment;
                 $data['settings'] = FunctionsHelper::settings();
-            } else {
+            } 
+            else {
                 // Get the model class from the array
                 $modelClassArray = self::$indexMapping[$type];
 
@@ -110,8 +112,7 @@ class PaymentViewFactory
         } else {
             throw new NotFoundHttpException();
         }
-
-        return view(PaymentView::getView($type, $payment), $data);
+        return view(PaymentView::getView($type, $id), $data);
     }
     
     /**
@@ -123,6 +124,7 @@ class PaymentViewFactory
     */
    public static function getInstanceModel($payment, $type)
    {
-        return self::$editMapping[$type]['instance']::find($payment);
+        $className =  self::$editMapping[$type]::find($payment);
+        return $className;
    }
 }

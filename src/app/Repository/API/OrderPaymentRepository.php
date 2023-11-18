@@ -1,33 +1,30 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\API;
+use App\Models\OrderPayment;
+use App\Models\Customer;
 use App\Helpers\FunctionsHelper;
-use App\Models\PurchasePayment;
-use App\Models\Supplier;
+use Illuminate\Http\JsonResponse;
 
-class PurchasePaymentRepository implements ApiRepository
+class OrderPaymentRepository implements ApiRepository
 {
-    public $supplier;
-    public $date; 
+    public $customer;
+    public $date;
 
     public function getData($request)
     {
-        $relations = [
-            'purchase:id,name,supplier_id,quantity,price,total_price,initial_quantity,notes,code,image_path,discount_percent,expected_delivery_date,delivery_date',
-            'purchase.categories',
-            'invoice'
-        ];
+        $relations = ['order','order.purchase','invoice'];
 
         $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
 
-        $paymentQ = PurchasePayment::query();
+        $paymentQ = OrderPayment::query();
         $this->applyFilters($request,$paymentQ);
 
         $paymentQ->with($relations);
-        
+
         $filteredRecords = $paymentQ->count();
-        $totalRecords = PurchasePayment::count();
+        $totalRecords = OrderPayment::count();
         $sum = number_format($paymentQ->sum('price'), 2, '.', '');
         $result = $paymentQ->skip($offset)->take($limit)->get();
 
@@ -35,21 +32,24 @@ class PurchasePaymentRepository implements ApiRepository
             'draw' => $request->input('draw'),
             'recordsTotal' => $totalRecords,
             'recordsFiltered' => $filteredRecords,
-            'supplier' => $this->supplier,
+            'customer' => $this->customer,
             'sum' => $sum,
             'date' => $this->date,
             'data' => $result
         ]);
+
     }
 
-    private function applyFilters($request, $query){
+    private function applyFilters($request, $query)
+    {
+
         $date = $request->input('date',null);
         list($dateStart, $dateEnd) = $this->helper()->dateRange($date);
-        $this->date  =$this->helper()->dateToString($dateStart, $dateEnd);
+        $this->date = $this->helper()->dateToString($dateStart, $dateEnd);
 
         $query->when($request->input('user'), function ($query) use ($request) {
-            $this->supplierData($request->input('user'));
-            return $query->whereHas('purchase', fn ($query) => $query->where('supplier_id', $request->input('user')));
+            $this->customerData($request->input('user'));
+            return $query->whereHas('order', fn ($query) => $query->where('customer_id', $request->input('user')));
         });
 
         $query->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
@@ -61,8 +61,8 @@ class PurchasePaymentRepository implements ApiRepository
         return $query;
     }
 
-    private function supplierData($id){
-        $this->supplier = Supplier::with(['state:id,name', 'country:id,name,short_name'])->find($id);
+    private function customerData($id){
+        $this->customer = Customer::with(['state:id,name', 'country:id,name,short_name'])->find($id);
     }
 
     public function helper() {

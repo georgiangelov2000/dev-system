@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Factory;
-use App\Repository\PurchasePaymentRepository;
-use App\Repository\OrderPaymentRepository;
+use App\Repository\API\PurchasePaymentRepository;
+use App\Repository\API\OrderPaymentRepository;
 
 class PaymentRepositoryFactory
 {

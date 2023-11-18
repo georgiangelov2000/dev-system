@@ -79,6 +79,8 @@ $(function () {
     }
 
     function loadDataTable() {
+        $('#loader').show();
+
         let table = `
             <div class="p-3 mb-3">
 
@@ -163,7 +165,7 @@ $(function () {
                     </button>
                 </div>
             </div>
-    </div>`;
+        </div>`;
 
         $("#paymentTemplate").removeClass("d-none").html(table);
 
@@ -179,8 +181,14 @@ $(function () {
                     data.search.value = data.search.value; // Corrected the property assignment
                 },
                 dataSrc: function (response) {
+                    $('#loader').hide();
                     updateUI(response);
                     return response.data;
+                },
+                // Add an error handler to hide loader in case of an error
+                error: function (xhr, error, thrown) {
+                    console.error(error, thrown);
+                    $('#loader').hide();
                 },
             },
             columns: [
@@ -278,8 +286,9 @@ $(function () {
                     width: "3%",
                     class: "text-center",
                     orderable: false,
+                    name: 'payment_reference',
                     render: function (data, type, row) {
-                        return `<p class="text-break">${row.payment_reference}</p>`
+                        return `<p class="text-break">${row.payment_reference ? row.payment_reference : ""}</p>`
                     }
                 },
                 {
@@ -294,7 +303,7 @@ $(function () {
                 },
                 {
                     width: "11%",
-                    name: "expected_date_of_payment",
+                    name: "delivery_date",
                     class: "text-center",
                     orderable: false,
                     render: function (data, type, row) {

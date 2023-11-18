@@ -1,5 +1,7 @@
 import { APICaller, APIDELETECALLER } from '../ajax/methods';
 import { handleErrors, swalText, showConfirmationDialog } from '../helpers/action_helpers';
+import { numericFormat } from "../helpers/functions";
+import { statusPaymentsWithIcons, paymentMethods, deliveryStatusesWithIcons } from "../helpers/statuses";
 
 $(function () {
   $('.selectCustomer').selectpicker('refresh').val('').trigger('change')
@@ -12,7 +14,7 @@ $(function () {
   });
 
   $('.datepicker').datepicker({
-    format: 'mm/dd/yyyy'
+    format: "yyyy-mm-dd",
   });
 
   let disabledOption = $('.disabledDateRange');
@@ -23,38 +25,51 @@ $(function () {
   let modalInvoice = $('#modalInvoice');
   let submitForm = $('#submitForm');
 
-  const paymentStatuses = {
-    1: { label: "Paid", iconClass: " <span class='icon'><i class='fal fa-check-circle'></i></span>" },
-    2: { label: "Pending", iconClass: "<span class='icon'><i class='fal fa-hourglass-half'></i></span>" },
-    3: { label: "Partially Paid", iconClass: "<span class='text-danger font-weight-bold'>Partially paid</span>" },
-    4: { label: "Overdue", iconClass: "<span class='icon'><i class='fal fa-exclamation-circle'></i></span>" },
-    5: { label: "Refunded", iconClass: "<span class='icon'><i class='fal fa-undo-alt'></i></span>" },
-    6: { label: "Ordered", iconClass: "<span class='icon'><i class='fal fa-shopping-cart'</i></span>" }
-  };
-
   let dataTable;
-  let supplierData;
 
   dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
     $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
   });
 
   disabledOption.on('click', function () {
-    if ($(this).is(':checked')) {
-      dateRangeCol.addClass('d-none');
-      dateRangePicker.addClass('d-none').prop('disabled', true).val(null);
-    } else {
-      dateRangeCol.removeClass('d-none');
-      dateRangePicker.removeClass('d-none').prop('disabled', false);
-      dateRangePicker.data('daterangepicker').setStartDate(moment().subtract(1, 'year'));
-      dateRangePicker.data('daterangepicker').setEndDate(moment().startOf('hour'));
+    const checked = $(this).is(':checked');
+    dateRangeCol.toggleClass('d-none', checked);
+    dateRangePicker.toggleClass('d-none').prop('disabled', checked).val(null);
+  
+    if (!checked) {
+      const picker = dateRangePicker.data('daterangepicker');
+      picker.setStartDate(moment().subtract(1, 'year')).setEndDate(moment().startOf('hour'));
     }
   });
 
   btnFilter.bind('click', function (e) {
-    loadDataTable()
-  });
+    $('#loader').show();
+     loadDataTable();
+});
+
+
+  function updateUI(response) {
+    const customer = response.customer;
+    const sum = response.sum;
+    const date = response.date ? response.date : '';
+    const amountDue = date ? `Amount Due: ${date}` : ''
+
+    $('h4[data-target="name"]').text(customer.name);
+    $('h4[data-target="date"]').text(date);
+    $('p[data-target="lead-date"]').text(amountDue);
+    $('span[data-target="address"]').text(customer.address);
+    $('span[data-target="phone"]').text(customer.phone);
+    $('span[data-target="email"]').text(customer.email);
+    $('span[data-target="country"]').text(customer.country.name);
+    $('span[data-target="city"]').text(customer.state.name);
+    $('span[data-target="zip"]').text(customer.zip);
+    $('#amountDueTable td[data-td-target="sum"]').text(numericFormat(sum));
+    $('#amountDueTable td[data-td-target="records"]').text(response.data.length);
+    $('img[id="customerImage"]').attr('src', customer.image_path);
+  }
+
   function loadDataTable() {
+
     let template = $(`
       <div class="p-3 mb-3">
 
@@ -95,13 +110,17 @@ $(function () {
                           <th>Order</th>
                           <th>Tracking number</th>
                           <th>Price</th>
-                          <th>Quantity</th>
+                          <th>Amount</th>
+                          <th>Discount</th>
                           <th>Method</th>
-                          <th>Status</th>
-                          <th>Partially paid</th>
+                          <th>Payment Status</th>
+                          <th>Delivery Status</th>
                           <th>Reference</th>
+                          <th>Exp Delivery date</th>
+                          <th>Delivery date</th>
+                          <th>Exp date of payment</th>
                           <th>Date of payment</th>
-                          <th>Delay</th>
+                          <th>Payment Delay</th>
                           <th>Actions</th>
                       </tr>
                   </thead>
@@ -180,164 +199,214 @@ $(function () {
         data: function (data) {
           data.user = bootstrapSelectCustomer.val();
           data.date = dateRangePicker.val();
-          data.type = TYPE
-          data.package = bootstrapSelectPackage.val()
+          data.type = TYPE;
+          data.package = bootstrapSelectPackage.val();
+          data.custom_length = data.length; // Corrected the property assignment
+          data.search.value = data.search.value; // Corrected the property assignment
         },
         dataSrc: function (response) {
-          const customer = response.user;
-          const sum = response.sum;
-          const date = response.date ? response.date : '';
-          const amountDue = date ? `Amount Due: ${date}` : ''
-
-          $('h4[data-target="name"]').text(customer.name);
-          $('h4[data-target="date"]').text(date);
-          $('p[data-target="lead-date"]').text(amountDue);
-          $('span[data-target="address"]').text(customer.address);
-          $('span[data-target="phone"]').text(customer.phone);
-          $('span[data-target="email"]').text(customer.email);
-          $('span[data-target="country"]').text(customer.country.name);
-          $('span[data-target="city"]').text(customer.state.name);
-          $('span[data-target="zip"]').text(customer.zip);
-          $('#amountDueTable td[data-td-target="sum"]').text('€' + sum);
-          $('#amountDueTable td[data-td-target="records"]').text(response.data.length);
-          $('img[id="customerImage"]').attr('src', customer.image_path);
+          $('#loader').hide();
+          updateUI(response);
           return response.data;
+        },
+        // Add an error handler to hide loader in case of an error
+        error: function (xhr, error, thrown) {
+          $('#loader').hide();
         },
       },
       columns: [
-        {
-          name: 'id',
-          data: 'id',
+        { 
+          width: "1%", 
+          orderable: true, 
+          data: "id" 
         },
         {
           name: 'name',
+          width: "10%",
+          orderable: false,
+          class: "text-center",
           render: function (data, type, row) {
             return `<a href="${ORDER_EDIT_ROUTE.replace(':id', row.order.id)}">${row.order.purchase.name}</a>`
           }
         },
         {
+          width: "10%",
           name: 'tracking_number',
           class:'text-center',
           render: function (data, type, row) {
-            return `<span>${row.order.tracking_number}</span>`
+            return `<span class="text-break">${row.order.tracking_number}</span>`
           }
         },
         {
+          width: "1%",
           name: 'price',
           class:'text-center',
           render: function (data, type, row) {
-            return `<span>€${row.price}</span>`
+            return `<span>${numericFormat(row.price)}</span>`;
           }
         },
         {
-          name: 'quantity',
-          class:'text-center',
+          width: "1%",
+          class: "text-center",
+          name: "quantity",
+          orderable: false,
           render: function (data, type, row) {
-            return `<span>${row.quantity}</span>`
-          }
+              return `<span>${row.quantity}</span>`;
+          },
         },
         {
+          width: "1%",
+          class: "text-center",
+          name: "discount_percent",
+          orderable: false,
+          render: function (data, type, row) {
+              return `<span>${row.order.discount_percent}%</span>`;
+          },
+        },
+        {
+          width: "1%",
           name: 'payment_method',
           class:'text-center',
           render: function (data, type, row) {
-            const paymentMethods = {
-              1: "Cash",
-              2: "Bank Transfer",
-              3: "Credit Card",
-              4: "Cheque",
-              5: "Online Payment"
-            };
-
             const status = paymentMethods[row.payment_method] || "";
             return `<span>${status}</span>`;
           }
         },
         {
+          width: "8%",
           name: 'payment_status',
           class:'text-center',
-          render: function (data, type, row) {
-            const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
-            return `
-              <div title="${statusData.label}" class="status">
-                ${statusData.iconClass}
-              </div>`;
-          }
-        },
-        {
-          name:'partially_paid_price',
-          class:'text-center',
-          render: function(data,type,row) {
-            let partially = '';
-            if(row.payment_status === 3) {
-              partially = `<span class="font-weight-bold">€${row.partially_paid_price}</span>`;
-            }
-            return partially
-          }
-        },
-        {
-          name: 'payment_reference',
-          render: function (data, type, row) {
-            return `<span>${row.payment_reference ? row.payment_reference : ''}</span>`
-          }
-        },
-        {
-          name: 'date_of_payment',
-          render: function (data, type, row) {
-            return `<span>${row.date_of_payment ? row.date_of_payment : ''}</span>`
-          }
-        },
-        {
           orderable: false,
           render: function (data, type, row) {
-            const statusData = paymentStatuses[row.payment_status] || { label: "", iconClass: "" };
-
-            if (['Paid', 'Partially Paid', 'Overdue'].includes(statusData.label)) {
-              const purchaseExpectedDateOfPayment = moment(row.order.package_extension_date ? row.order.package_extension_date : row.order.date_of_sale);
-              const dateOfPayment = moment(row.date_of_payment);
-
-              // Calculate the delay in days
-              const delayInDays = dateOfPayment.diff(purchaseExpectedDateOfPayment, 'days');
-
-              if (delayInDays > 0) {
-                // Payment is delayed
-                return `<span class="text-danger">${delayInDays} days overdue</span>`;
-              } else if (delayInDays < 0) {
-                // Payment was made before the expected date
-                return `<span class="text-success">${-delayInDays} days early</span>`;
-              } else {
-                // Payment was made on the expected date
-                return `<span class="text-info">On time</span>`;
-              }
-            } else {
-              // For other payment statuses, return an empty string or other content as needed
-              return '';
-            }
+            const statusData = statusPaymentsWithIcons[row.payment_status] || { label: "", iconClass: "" };
+            return `
+                <div title="${statusData.label}" class="status">
+                    <span class="icon"><i class="${statusData.iconClass}"></i></span>
+                </div>`;
           }
         },
         {
+          width: "8%",
+          name: 'delivery_status',
+          class:'text-center',
+          orderable: false,
           render: function (data, type, row) {
-            let editBtn = `
-              <a href="${ORDER_PAYMENT_EDIT_ROUTE.replace(":payment", row.id).replace(':type', 'order')}" title="Edit" class="btn p-0" href="">
-                  <i class="fa-light fa-pen text-primary"></i>
+            const statusData = deliveryStatusesWithIcons[row.payment_status] || { label: "", iconClass: "" };
+            return `
+                <div title="${statusData.label}" class="status">
+                    <span class="icon"><i class="${statusData.iconClass}"></i></span>
+                </div>`;
+          }
+        },
+        {
+          width: "3%",
+          name: 'payment_reference',
+          orderable: false,
+          class:'text-center',
+          render: function (data, type, row) {
+            return `<p class="text-break">${row.payment_reference ? row.payment_reference : ""}</p>`
+          }
+        },
+        {
+          width: "13%",
+          name: "expected_delivery_date",
+          class: "text-center",
+          orderable: false,
+          render: function (data, type, row) {
+              const formattedDate = row.order.expected_delivery_date ? moment(row.order.expected_delivery_date).format('MMM DD, YYYY') : '';
+              return `<span>${formattedDate}</span>`;
+          },
+        },
+        {
+          width: "11%",
+          name: 'delivery_date',
+          class: "text-center",
+          orderable: false,
+          render: function (data, type, row) {
+            const formattedExpectedDate = row.order.delivery_date ? moment(row.order.delivery_date).format('MMM DD, YYYY') : '';
+            return `<span>${formattedExpectedDate}</span>`;
+          }
+        },
+        {
+          width: "13%",
+          name: "expected_date_of_payment",
+          class: "text-center",
+          orderable: false,
+          render: function (data, type, row) {
+              const formattedExpectedDate = row.expected_date_of_payment ? moment(row.expected_date_of_payment).format('MMM DD, YYYY') : '';
+              return `<span>${formattedExpectedDate}</span>`;
+          },
+        },
+        {
+          width: "11%",
+          name: 'date_of_payment',
+          class: "text-center",
+          orderable: false,
+          render: function (data, type, row) {
+            const formattedDate = row.date_of_payment ? moment(row.date_of_payment).format('MMM DD, YYYY') : '';
+            return `<span>${formattedDate}</span>`
+          }
+        },
+        {
+          width: "8%",
+          class: "text-center",
+          orderable: false,
+          render: function (data, type, row) {
+              let status = row.payment_status;
+              if (status === 1 || status === 4) {
+                  let dateOfPayment = moment(row.date_of_payment); // Assuming you're using Moment.js
+                  let expectedDateOfPayment = moment(
+                      row.expected_date_of_payment
+                  );
+
+                  let daysDifference = dateOfPayment.diff(
+                      expectedDateOfPayment,
+                      "days"
+                  );
+
+                  if (daysDifference > 0) {
+                      return `<span class="text-danger">${daysDifference} days delay in payment</span>`;
+                  } else {
+                      return `<span class="text-success">Payment made on time</span>`;
+                  }
+              } else {
+                  return "";
+              }
+          },
+        },
+        {
+          render: function (data, type, row) {
+            let edit = `
+              <a class="dropdown-item" href="${ORDER_PAYMENT_EDIT_ROUTE.replace(":payment", row.id).replace(':type', 'order')}">
+                  <i class="fa-light fa-pen text-primary"></i> Edit
               </a>
               `;
 
-            let invoiceBtn = `
-              <a type="button" data-id="${row.invoice.id}" onclick="editInvoice(this)" title="Invoice" class="btn p-0"> 
-                <i class="fa-light fa-file-invoice text-primary"></i>
+            let invoice = `
+              <a class="dropdown-item" data-id="${row.invoice.id}" onclick="editInvoice(this)"> 
+                <i class="fa-light fa-file-invoice text-primary"></i> Invoice
               </a>`;
 
             let deleteForm = `
-            <form data-name=${row.date_of_payment}  style='display:inline-block;' id='delete-form' action="${ORDER_PAYMENT_DELETE_ROUTE.replace(":payment", row.id).replace(':type', 'order')}" method='POST'>
+            <form data-name=${row.date_of_payment} class="dropdown-item"  style='display:inline-block;' id='delete-form' action="${ORDER_PAYMENT_DELETE_ROUTE.replace(":payment", row.id).replace(':type', 'order')}" method='POST'>
                                 <input type='hidden' name='_method' value='DELETE'>
                                 <input type='hidden' name='id' value='${row.id}'>
-                                <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deletePayment(this);'>
-                                    <i class='fa-light fa-trash text-primary'></i>
+                                <button type='submit' class='btn p-0' onclick='event.preventDefault(); deletePayment(this);'>
+                                    <i class='fa-light fa-trash text-primary'></i> Delete
                                 </button>
                             </form>
             `;
 
-            return `${editBtn} ${invoiceBtn} ${deleteForm}`;
+            return `<div class="btn-group">
+              <button type="button" class="btn btn-sm btn-outline-primary rounded" data-toggle="dropdown" aria-expanded="false">
+                  <i class="fa-light fa-list" aria-hidden="true"></i>
+              </button>
+              <div class="dropdown-menu" role="menu">
+                  ${edit}
+                  ${invoice}
+                  ${deleteForm}
+              </div>
+            </div>`;
           }
         }
       ]

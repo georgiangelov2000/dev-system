@@ -206,7 +206,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('order.create') }}" class="nav-link">
-                                <p>Create order</p>
+                                <p>Create orders</p>
                             </a>
                         </li>
                     </ul>

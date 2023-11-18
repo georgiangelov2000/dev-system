@@ -27,12 +27,14 @@ class PurchasePayment extends Model
 
     public $timestamps = false;
     
-    const PAID = 1;
+    // Payment status
+    const SUCCESSFULLY_PAID_DELIVERED = 1;
+
+    // FOR BOTH
     const PENDING = 2;
     const OVERDUE = 4;
 
     protected $fillable = [
-        'id',
         'purchase_id',
         'alias',
         'quantity',
@@ -42,7 +44,7 @@ class PurchasePayment extends Model
         'payment_reference',
         'expected_date_of_payment',
         'payment_status',
-        'partially_paid_price',
+        // 'partially_paid_price',
         'delivery_date'
     ];
 

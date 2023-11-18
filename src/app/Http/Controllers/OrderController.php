@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FunctionsHelper;
-use Illuminate\Http\Request;
-use App\Http\Requests\OrderRequest;
 use App\Http\Requests\OrderMassEditRequest;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\OrderRequest;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\Package;
 use App\Models\Purchase;
 use App\Services\OrderService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -56,15 +56,73 @@ class OrderController extends Controller
      */
     public function store(OrderRequest $request)
     {
-        $data = $request->validated();
         DB::beginTransaction();
         try {
+
+            $data = $request->validated();
+
+            if (empty($data['purchase_id'])) {
+                return response()->json(['message' => 'Please add rows'], 400);
+            }    
+
             if (count($data['purchase_id'])) {
                 foreach ($data['purchase_id'] as $key => $id) {
-                    $this->orderProcessing($data, null, $key);
+                    $purchaseId = $data['purchase_id'][$key];
+                    $purchase = Purchase::find($purchaseId);
+
+                    if (!$purchase) {
+                        return response()->json(['message' => "Purchase with ID $purchaseId not found"], 404);
+                    }
+
+                    $order = new Order;
+                    $order->customer_id = $data['customer_id'];
+                    $order->user_id = $data['user_id'];
+                    $order->purchase_id = $purchase->id;
+                    $expected_date_of_payment = now()->parse($data['expected_date_of_payment']);
+
+                    if (array_key_exists('package_id', $data) && $data['package_id']) {
+                        try {
+                            $package = Package::findOrFail($data['package_id']);
+                            $order->package_id = $package->id;
+                            $order->package_extension_date = $package->expected_delivery_date;
+                        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                            DB::rollback();
+                            return response()->json(['message' => "Package not found for ID {$data['package_id']}"], 404);
+                        }
+                    }
+ 
+                    $order->expected_delivery_date = now()->parse($data['expected_delivery_date']);
+
+                    $amount = $data['sold_quantity'][$key];
+                    $singlePrice = $data['single_sold_price'][$key];
+                    $discount = $data['discount_percent'][$key];
+                    $trackingNumber = $data['tracking_number'][$key];
+
+                    $totalSoldAmount = $purchase->orders->sum('sold_quantity');
+                    if ($amount > $purchase->quantity) {                        
+                        return response()->json([
+                            'message' => "Order not saved for purchase ID $purchaseId: Sold quantity exceeds available quantity.",
+                            'purchase_id' => $purchaseId,
+                            'available_quantity' => $purchase->quantity,
+                        ], 400);
+                    }
+
+                    $updatedAmount = abs($purchase->quantity - $amount);
+                    $purchase->quantity = $updatedAmount;
+
+                    $order->tracking_number = $trackingNumber;
+                    $order->sold_quantity = $amount;
+                    $order->single_sold_price = $singlePrice;
+                    $order = $this->service->calculatePrices($singlePrice,$discount,$amount,$order);
+
+                    $order->save();
+                    $purchase->save();
+                    $this->createOrUpdatePayment($order,$expected_date_of_payment);
                 }
-            }
+            } 
+
             DB::commit();
+
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['message' => 'Order has not been created'], 500);
@@ -74,19 +132,107 @@ class OrderController extends Controller
 
     public function edit(Order $order)
     {
-        $order->load('customer:id,name','user:id,username');
+        $paymentRecord = OrderPayment::where('order_id', $order->id)->first();
+        $isEditable = $paymentRecord && $this->helper->statusValidation($paymentRecord->payment_status, $this->statuses) === Purchase::PENDING;
+    
+        if (!$isEditable) {
+            $order->expected_delivery_date = now()->parse($order->expected_delivery_date)->format('d F Y');
+            $order->payment->expected_date_of_payment = now()->parse($order->payment->expected_date_of_payment)->format('d F Y');
+            $order->payment->delivery_date = now()->parse($order->payment->delivery_date)->format('d F Y');
+        }
+    
+        $purchase = $order->purchase;
+        $order->is_editable = $isEditable;
+        
+        if (!$isEditable) {
+            $order->status = $this->statuses[$paymentRecord->payment_status];
+        } else {
+            $order->status = null;
+        }
+    
+        $order->sum_of_orders_amount = $purchase->orders->sum('sold_quantity');
+        $order->original_amount = $order->getOriginal('sold_quantity');
+        
         return view('orders.edit', compact('order'));
     }
+    
 
     public function update(Order $order, OrderRequest $request)
     {
         DB::beginTransaction();
         try {
             $data = $request->validated();
-            $this->orderProcessing($data, $order,0);
+            dd($data);
+            
+            $order->customer_id = $data['customer_id'];
+            $order->user_id = $data['user_id'];
+
+            if($order->payment->payment_status === $order::PENDING) {
+                $order->expected_delivery_date = now()->parse($data['expected_delivery_date']);
+                    
+                $newAmount = $data['sold_quantity'];
+                $singlePrice = $data['single_sold_price'];
+                $discount = $data['discount_percent'];
+                $trackingNumber = $data['tracking_number'];
+                $expectedDateOfPayment = now()->parse($data['expected_date_of_payment']);
+
+                if (array_key_exists('package_id', $data) && $data['package_id']) {
+                    try {
+                        $package = Package::findOrFail($data['package_id']);
+                        $order->package_id = $package->id;
+                        $order->package_extension_date = $package->expected_delivery_date;
+                    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                        return response()->json(['message' => "Package not found for ID {$data['package_id']}"], 404);
+                    }
+                }
+
+                $order->tracking_number = $trackingNumber;
+                $order->sold_quantity = $newAmount;
+
+                // order new amount
+                $amount = $order->sold_quantity;
+                // Take related purchase model
+                $purchase = $order->purchase;
+                // Purchase initial amount
+                $purchaseInitAmount = $purchase->initial_quantity;
+                // Sum of orders amount
+                $sumOfOrdersAmount = $purchase->orders->sum('sold_quantity');
+                // Order amount before update
+                $remainingOrderAmount = $order->getOriginal('sold_quantity');
+                // Current purchase amount before sold quantity update
+                $remainingAmount = ($sumOfOrdersAmount - $remainingOrderAmount);
+                // dd($remainingAmount);
+                //take updated amount based on remaining amount + updated amount
+                $updatedAmount = ($remainingAmount + $amount);
+                // dd($updatedAmount);
+                // Check if the updated amount exceeds the initial purchase amount
+                if ($updatedAmount > $purchaseInitAmount) {
+                    return response()->json([
+                        'message' => "Order not saved for purchase ID $purchase->id: Sold quantity exceeds available initial amount.",
+                        'purchase_id' => $purchase->id,
+                    ], 400);
+                }
+
+                // Update purchase amount and prices
+                $finalAmount = ($purchaseInitAmount - $updatedAmount);
+                // dd($purchaseInitAmount,$updatedAmount);
+                $purchase->quantity = $finalAmount;
+                
+                // calculate final prices
+                $order = $this->service->calculatePrices($singlePrice,$discount,$amount,$order);
+
+                // Save purchase related record
+                $purchase->save();
+
+                //Save the updated order and create or update the payment
+                $this->createOrUpdatePayment($order,$expectedDateOfPayment);
+            }
+            
+            $order->save();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
+            dd($e->getMessage());
             return response()->json(['message' => 'Order has not been updated'], 500);
         }
         return response()->json(['message' => 'Orders has been updated'], 200);
@@ -98,13 +244,6 @@ class OrderController extends Controller
 
         try {
             $data = $request->validated();
-
-            if (count($data['order_ids'])) {
-                foreach ($data['order_ids'] as $key => $value) {
-                    $order = Order::find($value);
-                    $this->orderProcessing($data, $order);
-                }
-            }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -127,7 +266,7 @@ class OrderController extends Controller
             $specificColumns = $request->only(['status', 'detach_package']);
 
             $detachPackage = isset($specificColumns['detach_package'])
-                && $specificColumns['detach_package'] == true ? true : false;
+            && $specificColumns['detach_package'] == true ? true : false;
 
             if ($detachPackage) {
                 $package = $order->packages()->first();
@@ -172,92 +311,6 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order has been deleted'], 200);
     }
 
-    /**
-     * Process order updates, including basic order information and completed order details.
-     *
-     * @param array $data
-     * @param Order $order
-     * @return void
-     */
-    private function orderProcessing(array $data, $order = null, $key = null)
-    {        
-        $order = $order ? $order : new Order;        
-        $isNewOrder = !$order->exists; // Check if it's a new order
-        $status = $isNewOrder
-            ? $this->helper->statusValidation(self::INIT_STATUS, $this->statuses)
-            : $this->helper->statusValidation($order->payment->payment_status, $this->statuses);
-
-        if (($order && $status === self::INIT_STATUS) || $isNewOrder) {
-
-            // Create order based of found purchase
-            $purchase = $key !== null ? Purchase::findOrFail($data['purchase_id'][$key]) : $data['purchase_id'];
-            
-            // Update properties based on $key using null coalescing operator
-            $amount = $data['sold_quantity'][$key] ?? $data['sold_quantity'];
-
-            // Defined single price and discount
-            $singlePrice = $data['single_sold_price'][$key] ?? $data['single_sold_price'];
-            $discount = $data['discount_percent'][$key] ?? $data['discount_percent'];
-            $trackingNumber = $data['tracking_number'][$key] ?? $data['tracking_number'];
-            
-            // Calculate total sold quantity and remaining quantity
-            $totalSoldAmount = $purchase->orders->sum('sold_quantity');
-            $remainingAmount = ($totalSoldAmount - $order->getOriginal('sold_quantity'));
-            $updatedAmount = ($remainingAmount + $amount);
-
-            // Check if the updated amount exceeds the initial purchase amount
-            if ($updatedAmount > $purchase->initial_quantity) {
-                return response()->json(['message', 'Purchase quantity is not enough']);
-            }
-
-            // Update purchase amount and prices
-            $finalQuantity = (intval($purchase->initial_quantity) - intval($updatedAmount));
-            $purchase->quantity = $finalQuantity;
-
-            // Calculate prices for current order
-            $prices = $this->service->calculatePrices(
-                $singlePrice,
-                $discount,
-                $amount
-            );
-
-            // Define initial values for ext_date and package_id;
-            $package = null;
-
-            // Check package_id if exists in array
-            if (array_key_exists('package_id', $data) && $data['package_id']) {
-                $package = Package::findOrFail($data['package_id']);
-            }
-
-            // Defined order attributes before creating
-            $orderAttributes = [
-                'customer_id' => $data['customer_id'],
-                'user_id' => $data['user_id'],
-                'purchase_id' => $purchase->id,
-                'sold_quantity' => $amount,
-                'single_sold_price' => $singlePrice,
-                'discount_single_sold_price' => $prices['discount_price'],
-                'total_sold_price' => $prices['total_price'],
-                'original_sold_price' => $prices['original_price'],
-                'discount_percent' => $discount,
-                'date_of_sale' => now()->parse($data['date_of_sale']),
-                'tracking_number' => $trackingNumber,
-                'package_id' => $package ?? null,
-                'package_extension_date' => $package ? $package->expected_delivery_date : null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-
-            $order->fill($orderAttributes);
-            $order->save();
-            $purchase->save();
-
-            //Save the updated order and create or update the payment
-            $this->createOrUpdatePayment($order);
-
-            return $order; 
-        }
-    }
 
     /**
      * Create or update payment and associated invoice for the given order.
@@ -267,38 +320,38 @@ class OrderController extends Controller
      * @return Payment The created or updated payment instance.
      */
 
-     private function createOrUpdatePayment(Order $order): OrderPayment
-     {
+    private function createOrUpdatePayment(Order $order, $expected_date_of_payment): OrderPayment
+    {
         // Generate an alias for the payment based on the order's delivery date
-         $alias = $this->service->getAlias($order);
-         
-         // Prepare payment data
-         $paymentData = [
-             'alias' => $alias,
-             'quantity' => $order->sold_quantity,
-             'price' => $order->total_sold_price,
-             'date_of_payment' => $order->package_extension_date ?: $order->date_of_sale,
-         ];
+        $alias = $this->service->getAlias($order);
 
-         // Check if a payment record already exists for the order
-         $existingPayment = $order->payment;
-         
-         // If no payment record exists, create one
-         if(!$existingPayment) {
+        // Prepare payment data
+        $paymentData = [
+            'alias' => $alias,
+            'quantity' => $order->sold_quantity,
+            'price' => $order->total_sold_price,
+            'expected_date_of_payment' => $order->package_extension_date ?: $expected_date_of_payment,
+        ];
+
+        // Check if a payment record already exists for the order
+        $existingPayment = $order->payment;
+
+        // If no payment record exists, create one
+        if (!$existingPayment) {
             $paymentData['payment_status'] = self::INIT_STATUS;
             $payment = $order->payment()->create($paymentData);
-         } else {
+        } else {
             // Update the existing payment record with new data
             $existingPayment->update($paymentData);
             $payment = $existingPayment;
-         }
+        }
 
-         $payment->invoice()->updateOrCreate([], [
-             'price' => $payment->price,
-             'quantity' => $payment->quantity
-         ]);
-     
-         return $payment;
-     }
-     
+        $payment->invoice()->updateOrCreate([], [
+            'price' => $payment->price,
+            'quantity' => $payment->quantity,
+        ]);
+
+        return $payment;
+    }
+
 }

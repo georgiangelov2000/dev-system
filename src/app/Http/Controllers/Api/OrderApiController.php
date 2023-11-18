@@ -12,8 +12,8 @@ class OrderApiController extends Controller
     {
         $relations = [
             'customer:id,name',
-            'payment:id,payment_status,order_id,alias',
-            'purchase:id,name,image_path,price,quantity',
+            'payment:id,payment_status,order_id,alias,delivery_status',
+            'purchase:id,name,image_path,price,quantity,initial_quantity',
             'user:id,username',
             'package:id,package_name'
         ];
@@ -23,7 +23,7 @@ class OrderApiController extends Controller
         $package = isset($request->package) && $request->package ? $request->package : null;
         $statuses = isset($request->status) && $request->status ? $request->status : null;
         $search = isset($request->search) && $request->search ? $request->search : null;
-        $date_of_sale = isset($request->date_range) && $request->date_range ? $request->date_range : null;
+        $delivery_date = isset($request->date_range) && $request->date_range ? $request->date_range : null;
         $date_of_payment = isset($request->date_of_payment) && $request->date_of_payment ? $request->date_of_payment : null;
         $select_json = isset($request->select_json) ? boolval($request->select_json) : null;
         $order = isset($request->order_id) && $request->order_id ? $request->order_id : null;
@@ -46,12 +46,14 @@ class OrderApiController extends Controller
             'total_sold_price',
             'original_sold_price',
             'discount_percent',
-            'date_of_sale',
+            'expected_delivery_date',
             'package_extension_date',
             'user_id',
             'package_id',
+            'delivery_date',
             'created_at',
             'updated_at',
+            'is_it_delivered',
         );
 
         if ($customer) {
@@ -77,14 +79,14 @@ class OrderApiController extends Controller
                 $subquery->whereIn('payment_status', $statuses);
             });
         }        
-        if ($date_of_sale) {
-            $date_pieces = explode(' - ', $date_of_sale);
+        if ($delivery_date) {
+            $date_pieces = explode(' - ', $delivery_date);
             $date1_formatted = date('Y-m-d 00:00:00', strtotime($date_pieces[0]));
             $date2_formatted = date('Y-m-d 23:59:59', strtotime($date_pieces[1]));
 
             $orderQuery
-                ->where('date_of_sale', '>=', $date1_formatted)
-                ->where('date_of_sale', '<=', $date2_formatted);
+                ->where('expected_delivery_date', '>=', $date1_formatted)
+                ->where('expected_delivery_date', '<=', $date2_formatted);
         }
         if ($date_of_payment) {
             $date_pieces = explode(' - ', $date_of_payment);

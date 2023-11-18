@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Factory;
-use App\Repository\PurchaseInvoiceRepository;
-use App\Repository\OrderInvoiceRepository;
+use App\Repository\API\PurchaseInvoiceRepository;
+use App\Repository\API\OrderInvoiceRepository;
 
 class InvoiceRepositoryFactory
 {

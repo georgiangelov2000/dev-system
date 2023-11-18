@@ -15,7 +15,7 @@
                             <i class="fa-solid fa-filter"></i> Filters
                         </p>
                     </div>
-                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3 actions d-none">
+                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3 mb-0 actions d-none">
                         <div class="form-group">
                             <label>Actions</label>
                             <select class="form-control selectAction">
@@ -24,7 +24,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3 mb-0">
                         <div class="form-group">
                             <label>Customers</label>
                             <select class="form-control selectCustomer" data-live-search="true">
@@ -32,7 +32,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3 mb-0">
                         <div class="form-group">
                             <label>Drivers</label>
                             <select class="form-control selectDriver" name="driver" data-live-search="true">
@@ -40,7 +40,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3">
+                    <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-3 mb-0">
                         <div class="form-group">
                             <label>Packages</label>
                             <select class="form-control selectPackage" name="package_id" data-live-search="true">
@@ -48,11 +48,11 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group col-xl-3 col-lg-3 col-md-3 col-sm-3">
-                        <label for="customRange1">Date of sale</label>
+                    <div class="form-group col-xl-2 col-lg-3 col-md-3 col-sm-3 mb-0">
+                        <label for="customRange1">Delivery date</label>
                         <input type="text" class="form-control pull-right" name="datetimes" />
                     </div>
-                    <div class="form-group col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                    <div class="form-group col-xl-2 col-lg-3 col-md-3 col-sm-3 mb-0">
                         <label for="">Status</label>
                         <select name="status" id="" class="form-control selectType" multiple>
                             @foreach (config('statuses.payment_statuses') as $key => $status)
@@ -101,15 +101,16 @@
                                 <th>Purchase</th>
                                 <th>Amount</th>
                                 <th>Unit Price</th>
-                                <th>Discount price</th>
+                                <th>Disc price</th>
                                 <th>Official Price</th>
                                 <th>Regular price</th>
-                                <th>Partially paid price</th>                        
                                 <th>Discount</th>
-                                <th>Date of sale</th>
-                                <th>Expired</th>
+                                <th>Delivered</th>
+                                <th>Exp delivery date</th>
+                                <th>Delivery date</th>
+                                <th>Delivery delay</th>
                                 <th>Package</th>
-                                <th>Status</th>
+                                <th>Delivery Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>

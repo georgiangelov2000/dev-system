@@ -36,7 +36,12 @@ class Purchase extends Model {
      const IS_IT_DELIVERED_TRUE = 1;
      const IS_IT_DELIVERED_FALSE = 0;
 
+    const PAID = 1;
+    const PENDING = 2;
+    const OVERDUE = 4;
+    
     protected $fillable = [
+        'id',
         'image',
         'name',
         'quantity',
