@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="card col-12 cardTemplate">
-            <div class="card-header">
+            <div class="card-header bg-primary">
                 <div class="col-12">
                     <h3 class="card-title">
                         Mass edit orders for {{ $customer->name }}
@@ -11,15 +11,6 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-12">
-                        <h6 class="font-weight-bold">Legend:</h6>
-                    </div>
-                    <div class="col-12">
-                        <span>- You can update orders with status ordered</span>
-                    </div>
-                </div>
-
                 <form method="POST" onsubmit="updateOrders(event)">
                     @csrf
                     
@@ -34,20 +25,20 @@
                                         </div>
                                     </th>
                                     <th>ID</th>
-                                    <th>Payment</th>
                                     <th>Customer</th>
                                     <th>Driver</th>
-                                    <th>Product</th>
+                                    <th>Purchase</th>
+                                    <th>Track.number</th>
                                     <th>Amount</th>
                                     <th>Unit Price</th>
-                                    <th>Discount unit price</th>
+                                    <th>Disc unit price</th>
                                     <th>Official Price</th>
                                     <th>Refular price</th>
                                     <th>Discount</th>
-                                    <th>Date of sale</th>
-                                    <th>Expired</th>
                                     <th>Package</th>
-                                    <th class="text-center">Status</th>
+                                    <th>Exp delivery date</th>
+                                    <th>Delivery delay</th>
+                                    <th>Delivery status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -64,15 +55,44 @@
                         <div class="col-12 d-flex  flex-wrap p-0">
                             <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                                 <label for="price">Single price</label>
-                                <input type="text" class="form-control" name="single_sold_price" id="single_sold_price" placeholder="Enter a numeric value (e.g., 1.00)" />
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    name="single_sold_price" 
+                                    id="single_sold_price" 
+                                    placeholder="Enter a numeric value (e.g., 1.00)" 
+                                />
+                                @error('single_sold_price')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
-                                <label for="sold_quantity">Quantity</label>
-                                <input type="number" class="form-control" name="sold_quantity" id="sold_quantity" min="0" placeholder="Enter a integer value (e.g.,1,2)">
+                                <label for="sold_quantity">Amount</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    name="sold_quantity" 
+                                    id="sold_quantity" 
+                                    min="0" 
+                                    placeholder="Enter a integer value (e.g.,1,2)"
+                                />
+                                @error('sold_quantity')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                                 <label for="discount_percent">Discount %</label>
-                                <input type="number" class="form-control" name="discount_percent" id="discount_percent" min="0"  placeholder="Enter a integer value (e.g.,1,2)">
+                                <input 
+                                    type="number" 
+                                    class="form-control" 
+                                    name="discount_percent" 
+                                    id="discount_percent" 
+                                    min="0"  
+                                    placeholder="Enter a integer value (e.g.,1,2)"
+                                />
+                                @error('discount_percent')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                             <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                                 <label for="package_id">Packages</label>
@@ -86,7 +106,7 @@
                                 </select>
                             </div>
                             <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
-                                <label for="date_of_sale">Date of sale</label>
+                                <label for="expected_delivery_date">Expected delivery date</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">
@@ -96,8 +116,31 @@
                                     <input 
                                         type="text" 
                                         class="form-control float-right datepicker"
-                                        name="date_of_sale"
-                                        data-date-format="mm/dd/yyyy">
+                                        name="expected_delivery_date"
+                                        data-date-format="mm/dd/yyyy"
+                                    />
+                                    @error('expected_delivery_date')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror                                    
+                                </div>
+                            </div>
+                            <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
+                                <label for="expected_date_of_payment">Expected payment date</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        class="form-control float-right datepicker"
+                                        name="expected_date_of_payment"
+                                        data-date-format="mm/dd/yyyy"
+                                    />
+                                    @error('expected_date_of_payment')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror  
                                 </div>
                             </div>
                             <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
@@ -134,7 +177,7 @@
             const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit', ':id') }}";
             const PACKAGE_EDIT_ROUTE = "{{ route('package.edit', ':id') }}"
             const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
-            const STATUS = [6];
+            const STATUS = [2];
         </script>
     @endpush
 @endsection

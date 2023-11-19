@@ -99,9 +99,9 @@
                                 <th>ID</th>
                                 <th>Customer</th>
                                 <th>Purchase</th>
+                                <th>Track.numer</th>
                                 <th>Amount</th>
                                 <th>Unit Price</th>
-                                <th>Disc price</th>
                                 <th>Official Price</th>
                                 <th>Regular price</th>
                                 <th>Discount</th>

@@ -1,9 +1,21 @@
+import {numericFormat} from '../helpers/functions';
+import { deliveryStatusesWithIcons } from '../helpers/statuses';
+
+
 $(function () {
     $('select[name="package_id"],select[name="user_id"]').selectpicker();
 
-    $('input[name="date_of_sale"]').datepicker({
-        format: 'mm/dd/yyyy'
-    });
+    let formData = {
+        'discount_percent': null,
+        'expected_date_of_payment': null,
+        'expected_delivery_date': null,
+        'package_id' : null,
+        'single_sold_price':null,
+        'sold_quantity': null,
+        'user_id': null
+    };
+
+    $('.datepicker').datepicker({format: 'mm/dd/yyyy'});
 
     let table = $('#ordersTable');
 
@@ -16,72 +28,18 @@ $(function () {
             }
         },
         columns: [
-            {
-                orderable: false,
-                width: "1%",
-                render: function (data, type, row) {
-                    let checkbox = '';
-
-                    if (row.status === 6) {
-                        checkbox =
-                            '<div div class="form-check">\n\
-                            <input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=' + row.id + ' data-name= ' + row.tracking_number + ' type="checkbox"> \n\
-                        </div>';
-                    }
-
-                    return `${checkbox}`;
-                }
-            },
-            {
-                width: '1%',
-                name: "id",
-                render: function (data, type, row) {
-                    let input = '';
-
-                    if (typeof CUSTOMER !== 'undefined') {
-                        input = `<input type="hidden" value="${row.id}" name="order_id[]" />`
-                    }
-                    return `<span class="font-weight-bold">${row.id}</span>${input}`;
-
-                }
-            },
-            {
-                width: '1%',
-                class:'text-center',
-                orderable: false,
-                render: function (data, type, row) {
-                    let payment;
-
-                    if (row.payment) {
-                        payment = `<a href=${PAYMENT_EDIT.replace(':payment', row.payment.id).replace(':type', 'order')}>${row.payment.alias}</a>`
-                    } else {
-                        payment = ''
-                    }
-
-                    return payment;
-                }
-            },
+            { orderable: false, width: "1%", render: (data, type, row) => !row.is_it_delivered ? `<div class="form-check">\n<input name="checkbox" class="form-check-input" onclick="selectOrder(this)" data-id=${row.id} data-name=${row.tracking_number} type="checkbox">\n</div>` : '' },
+            { width: '1%', name: "id", render: (data, type, row) => `<span class="font-weight-bold">${row.id}</span>${typeof CUSTOMER !== 'undefined' ? `<input type="hidden" value="${row.id}" />` : ''}` },
             {
                 width: '5%',
                 orderable: false,
                 name: "customer",
+                class: "text-center",
                 render: function (data, type, row) {
                     return '<a target="_blank" href="' + CUSTOMER_EDIT_ROUTE.replace(':id', row.customer.id) + '" >' + row.customer.name + '</a>';
                 }
             },
-            {
-                width:'1%',
-                orderable:false,
-                name:'user',
-                class: "text-center",
-                render: function(data,type,row) {
-                    let user = '';
-                    if(row.user) {
-                        user = `<a href="${USER_EDIT.replace(":id",row.user.id)}">${row.user.username}</a>`;
-                    }
-                    return user
-                }
-            },
+            { width: '1%', orderable: false, name: 'user', class: "text-center", render: (data, type, row) => row.user ? `<a href="${USER_EDIT.replace(":id",row.user.id)}">${row.user.username}</a>` : '' },
             {
                 width: '7%',
                 orderable: false,
@@ -89,6 +47,15 @@ $(function () {
                 class: "text-center",
                 render: function (data, type, row) {
                     return '<a target="_blank" href="' + EDIT_PRODUCT_ROUTE.replace(':id', row.purchase.id) + '">' + row.purchase.name + '</a>';
+                }
+            },
+            {
+                width: '1%',
+                orderable: false,
+                name: "tracking_number",
+                class: "text-center",
+                render: function(data,type,row) {
+                    return `<b class="text-primary ">${row.tracking_number}</b>`;
                 }
             },
             {
@@ -104,7 +71,7 @@ $(function () {
                 name: "single_sold_price",
                 class: "text-center",
                 render: function (data, type, row) {
-                    return `<span>€${row.single_sold_price}</span>`
+                    return `<span>${numericFormat(row.single_sold_price)}</span>`
                 }
             },
             {
@@ -113,7 +80,7 @@ $(function () {
                 name: "discount_single_sold_price",
                 class: "text-center",
                 render: function (data, type, row) {
-                    return `<span>€${row.discount_single_sold_price}</span>`
+                    return `<span>${numericFormat(row.discount_single_sold_price)}</span>`
                 }
             },
             {
@@ -122,7 +89,7 @@ $(function () {
                 name: "total_sold_price",
                 class: "text-center",
                 render: function (data, type, row) {
-                    return `<span>€${row.total_sold_price}</span>`
+                    return `<span>${numericFormat(row.total_sold_price)}</span>`
                 }
             },
             {
@@ -131,7 +98,7 @@ $(function () {
                 name: "original_sold_price",
                 class: "text-center",
                 render: function (data, type, row) {
-                    return `<span>€${row.original_sold_price}</span>`
+                    return `<span>${numericFormat(row.original_sold_price)}</span>`
                 }
             },
             {
@@ -143,83 +110,53 @@ $(function () {
                     return `<span>${row.discount_percent}%</span>`;
                 }
             },
+            { width: '5%', orderable: false, name: 'package', class: "text-center", render: (data, type, row) => row.package ? `<a href=${PACKAGE_EDIT_ROUTE.replace(':id', row.package.id)}>${row.package.package_name}</a>` : '' },
             {
-                width: '6%',
+                width: '8%',
                 orderable: false,
-                class: "text-center",
+                class:'text-center',
                 render: function (data, type, row) {
-                    if (row.package_extension_date) {
-                        return `<span>${moment(row.package_extension_date).format('YYYY-MM-DD')}</span>`
+                    const dateToDisplay = row.package_extension_date 
+                        ? row.package_extension_date 
+                        : row.expected_delivery_date;
+                    
+                    const formattedDate = dateToDisplay ? moment(dateToDisplay).format('MMM DD, YYYY') : '';
+
+                    return `<span>${formattedDate}</span>`;
+                }
+            },
+            {
+                width: '8%',
+                orderable: false,
+                class:'text-center',
+                name: 'delivery_delay',
+                render: function (data, type, row) {
+                    const isDelivered = row.is_it_delivered;
+                    const expectedDate = row.package_extension_date ? moment(row.package_extension_date) : moment(row.expected_delivery_date);
+                    const deliveryDate = moment(row.delivery_date);
+                    const currDate = moment();
+                    const diffDays = currDate.diff(expectedDate, 'days');
+                    
+                    if (!isDelivered) {
+                        return `<span class="text-${currDate.isAfter(expectedDate) ? 'danger' : 'info'}">${diffDays} days ${currDate.isAfter(expectedDate) ? 'delay' : 'left'}</span>`;
                     } else {
-                        return `<span>${moment(row.date_of_sale).format('YYYY-MM-DD')}</span>`
-                    }
-
+                        const deliveryDiffDays = deliveryDate.diff(expectedDate, 'days');
+                        return `<span class="text-${deliveryDate.isAfter(expectedDate) ? 'danger' : 'success'}">${deliveryDiffDays} ${deliveryDate.isAfter(expectedDate) ? 'days delay in delivery' : 'days delay, Delivered on time'}</span>`;
+                        
+                    }                    
                 }
             },
             {
-                width: '5%',
-                orderable: false,
-                name: 'expired',
-                class: "text-center",
-                render: function (data, type, row) {
-                    const date = row.package_extension_date ? moment(row.package_extension_date) : moment(row.date_of_sale);
-                    const currentDate = moment();
-                    const daysRemaining = date.diff(currentDate, 'days');
-
-                    let badgeClass = '';
-                    let badgeText = '';
-
-                    switch (row.status) {
-                        case 6:
-                        case 2:
-                            badgeClass = 'badge-warning';
-                            badgeText = `${daysRemaining} days remaining`;
-                            break;
-                        case 1:
-                        case 3:
-                        case 4:
-                            badgeClass = 'badge-success';
-                            badgeText = 'Order received';
-                            break;
-                        default:
-                            badgeText = 'Invalid status please check the system!';
-                    }
-
-                    return `<span class="badge p-2 ${badgeClass}">${badgeText}</span>`;
-                }
-            },
-            {
-                width: '5%',
-                orderable: false,
-                name: 'package',
-                class: "text-center",
-                render: function (data, type, row) {
-                    if (row.package) {
-                        return `<a href= ${PACKAGE_EDIT_ROUTE.replace(':id', row.package.id)}>${row.package.package_name}</a>`;
-                    } else {
-                        return '';
-                    }
-                }
-            },
-            {
-                width: '5%',
+                width: '8%',
                 orderable: false,
                 name: "status",
                 class: "text-center",
                 render: function (data, type, row) {
-                    const statusMap = {
-                        1: { text: "Paid", iconClass: "fal fa-check-circle" },
-                        2: { text: "Pending", iconClass: "fal fa-hourglass-half" },
-                        3: { text: "Partially Paid", iconClass: "fal fa-money-bill-alt" },
-                        4: { text: "Overdue", iconClass: "fal fa-exclamation-circle" },
-                        5: { text: "Refunded", iconClass: "fal fa-undo-alt" },
-                        6: { text: "Ordered", iconClass: "fal fa-shopping-cart" }
-                    };
+                    const statusData = deliveryStatusesWithIcons[row.payment.delivery_status] || { text: "Unknown", iconClass: "fal fa-question" };
 
-                    const statusInfo = statusMap[row.status] || { text: "Unknown", iconClass: "fal fa-question" };
-
-                    return `<div title="${statusInfo.text}" class="status">
-                        <span class="icon"><i class="${statusInfo.iconClass}"></i></span>
+                    return `
+                    <div title="${statusData.label}" class="status">
+                    <span class="icon"><i class="${statusData.iconClass}"></i></span>
                     </div>`;
                 }
             },
@@ -227,51 +164,46 @@ $(function () {
         order: [[1, 'asc']],
     });
 
-
     function packageData(d) {
-        var orderColumnIndex = d.order[0].column; // Get the index of the column being sorted
-        var orderColumnName = d.columns[orderColumnIndex].name; // Retrieve the name of the column using the index
-
-        var data = {
-            "search": d.search.value,
-            'order_column': orderColumnName, // send the column name being sorted
-            'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
-            'limit': d.custom_length = d.length,
+        const orderColumnIndex = d.order[0].column;
+        const orderColumnName = d.columns[orderColumnIndex].name;
+        return {
+            search: d.search.value,
+            order_column: orderColumnName,
+            order_dir: d.order[0].dir,
+            limit: d.custom_length = d.length,
+            customer: typeof CUSTOMER !== 'undefined' ? CUSTOMER : bootstrapCustomer.val(),
+            status: typeof STATUS !== 'undefined' ? STATUS : bootstrapOrderStatus.val()
         };
-
-        if (typeof CUSTOMER !== 'undefined') {
-            data.customer = CUSTOMER;
-        } else {
-            data.customer = bootstrapCustomer.val()
-        }
-
-        if (typeof STATUS !== 'undefined') {
-            data.status = STATUS;
-        } else {
-            data.status = bootstrapOrderStatus.val();
-        }
-
-        return data;
     }
 
     window.updateOrders = function (e) {
         e.preventDefault();
         let form = e.target;
         let method = e.target.getAttribute('method');
-        let formData = $(form).serializeArray().reduce((acc, obj) => {
+
+        let serializedData = $(form).serializeArray().reduce((acc, obj) => {
             acc[obj.name] = obj.value;
             return acc;
         }, {});
+                
+        Object.keys(serializedData).forEach(key => {
+            if (formData.hasOwnProperty(key)) {
+                formData[key] = serializedData[key];
+            }
+        });
+        
         let searchedIds = $('tbody input[type="checkbox"]:checked').map(function () {
             return $(this).data('id');
         }).get();
+            
+        formData['ids'] = searchedIds;
         
-        if (searchedIds.length > 0) {
+        if (searchedIds.length) {
             $.ajax({
                 url: MASS_UPDATE_ORDERS,
-                method: 'POST',
+                method: method,
                 data: {
-                    'order_ids': searchedIds,
                     ...formData
                 },
                 success: function (response) {
@@ -289,10 +221,7 @@ $(function () {
     }
 
     window.selectOrder = function (e) {
-        if ($('tbody input[type="checkbox"]:checked').length === 0) {
-            $('.actions').addClass('d-none');
-        } else {
-            $('.actions').removeClass('d-none');
-        }
+        $('.actions').toggleClass('d-none', $('tbody input[type="checkbox"]:checked').length === 0);
     };
+    
 });

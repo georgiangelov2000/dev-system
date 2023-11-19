@@ -14,11 +14,12 @@ class OrderMassEditRequest extends FormRequest
     public function rules()
     {
         return [
-            'order_ids' => 'required|array',
+            'ids' => 'required|array',
             'single_sold_price' => 'nullable|numeric|min:0',
-            'sold_quantity' => 'nullable|numeric|min:0',
-            'discount_percent' => 'nullable|numeric|min:0',
+            'sold_quantity' => 'nullable|integer|min:0',
+            'discount_percent' => 'nullable|integer|min:0',
             'expected_delivery_date' => 'nullable|date',
+            'expected_date_of_payment' => 'nullable|date',
             'package_id' => 'nullable|string',
             'user_id' => 'nullable|string'
         ];

@@ -21,23 +21,31 @@ class OrderService
      * @param int $quantity The quantity of items.
      * @return array An array containing discount price, total price, and original price.
      */
-    public function calculatePrices($price, $discount, $quantity, $model)
+    public function calculatePrices($model)
     {
         // Calculate the discounted price
-        $discount_price = $this->helper->calculatedDiscountPrice($price, $discount);
+        $discount_price = $this->helper->calculatedDiscountPrice(
+            $model->single_sold_price, 
+            $model->discount_percent
+        );
 
         // Calculate the total price
-        $total_price = $this->helper->calculatedFinalPrice($discount_price, $quantity);
+        $total_price = $this->helper->calculatedFinalPrice(
+            $discount_price, 
+            $model->sold_quantity
+        );
 
         // Calculate the original price
-        $original_price = $this->helper->calculatedFinalPrice($price, $quantity);
+        $original_price = $this->helper->calculatedFinalPrice(
+            $model->single_sold_price, 
+            $model->sold_quantity
+        );
 
-        $model->discount_single_sold_price= $discount_price;
-        $model->total_sold_price= $total_price;
-        $model->original_sold_price= $original_price;
+        $model->discount_single_sold_price = $discount_price;
+        $model->total_sold_price = $total_price;
+        $model->original_sold_price = $original_price;
         
         return $model;
-        // return compact('discount_price', 'total_price', 'original_price');
     }
 
     /**

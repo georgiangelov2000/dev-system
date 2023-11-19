@@ -70,12 +70,21 @@ $(function () {
                 }
             },
             {
-                width: '10%',
+                width: '8%',
                 orderable: false,
                 name: "purchase",
                 class: "text-center",
                 render: function (data, type, row) {
                     return '<a target="_blank" href="' + EDIT_PRODUCT_ROUTE.replace(':id', row.purchase.id) + '">' + row.purchase.name + '</a>';
+                }
+            },
+            {
+                width: '5%',
+                orderable: false,
+                class: "text-center",
+                name: "tracking_number",
+                render: function(data,type,row) {
+                    return `<b class="text-primary ">${row.tracking_number}</b>`;
                 }
             },
             {
@@ -96,16 +105,7 @@ $(function () {
                 }
             },
             {
-                width: '5',
-                orderable: false,
-                class:'text-center',
-                name: "discount_single_sold_price",
-                render: function (data, type, row) {
-                    return `<span>${numericFormat(row.discount_single_sold_price)}</span>`
-                }
-            },
-            {
-                width: '8%',
+                width: '7%',
                 orderable: false,
                 class:'text-center',
                 name: "total_sold_price",
@@ -114,24 +114,14 @@ $(function () {
                 }
             },
             {
-                width: '8%',
+                width: '7%',
                 orderable: false,
                 class:'text-center',
                 name: "original_sold_price",
                 render: function (data, type, row) {
                     return `<span>${numericFormat(row.original_sold_price)}</span>`
                 }
-            },
-            // {
-            //     width: '10%',
-            //     orderable: false,
-            //     class: 'text-center',
-            //     render: function (data, type, row) {
-            //         const partiallyPaidStatus = statusPaymentsWithIcons[row.payment.payment_status];
-            //         const partiallyPaidPrice = partiallyPaidStatus.label === 'Partially Paid' ? row.payment.partially_paid_price : '';
-            //         return partiallyPaidPrice;
-            //     }
-            // },            
+            },        
             {
                 width: '1%',
                 orderable: false,
