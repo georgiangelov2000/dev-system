@@ -13,6 +13,7 @@ class OrderPaymentRepository implements ApiRepository
 
     public function getData($request)
     {
+
         $relations = ['order','order.purchase','invoice'];
 
         $offset = $request->input('start', 0);
@@ -52,11 +53,20 @@ class OrderPaymentRepository implements ApiRepository
             return $query->whereHas('order', fn ($query) => $query->where('customer_id', $request->input('user')));
         });
 
+        $query->when($request->input('delivery_status'), function ($query) use ($request) {
+            return $query->where('delivery_status', '=', $request->input('delivery_status'));
+        });
+
+        $query->when($request->input('payment_status'), function ($query) use ($request) {
+            return $query->where('payment_status', '=', $request->input('payment_status'));
+        });
+
         $query->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
             return $query
                 ->where('date_of_payment', '>=', $dateStart)
                 ->where('date_of_payment', '<=', $dateEnd);
         });
+        
 
         return $query;
     }

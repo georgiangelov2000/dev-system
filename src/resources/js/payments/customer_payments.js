@@ -1,7 +1,7 @@
 import { APICaller, APIDELETECALLER } from '../ajax/methods';
 import { handleErrors, swalText, showConfirmationDialog } from '../helpers/action_helpers';
 import { numericFormat } from "../helpers/functions";
-import { statusPaymentsWithIcons, paymentMethods, deliveryStatusesWithIcons } from "../helpers/statuses";
+import { statusPaymentsWithIcons, paymentMethods, deliveryStatusesWithIcons, paymentStatuses, deliveryStatuses } from "../helpers/statuses";
 
 $(function () {
   $('.selectCustomer').selectpicker('refresh').val('').trigger('change')
@@ -68,6 +68,24 @@ $(function () {
     $('img[id="customerImage"]').attr('src', customer.image_path);
   }
 
+  // Function to populate the select element with options
+  function populateSelectOptions(selectElement, template, statuses) {
+    const select = template.find(selectElement);
+    
+      const emptyOption = $("<option selected></option>").attr("value", "").text("Select All"); // Customize the text as needed
+      select.append(emptyOption);
+
+    // Iterate over statuses and create options
+    for (const key in statuses) {
+        if (statuses.hasOwnProperty(key)) {
+            const option = $("<option></option>").attr("value", key).text(statuses[key].label);
+            select.append(option);
+        }
+    }
+
+    select.selectpicker("refresh");
+  }
+
   function loadDataTable() {
 
     let template = $(`
@@ -95,10 +113,19 @@ $(function () {
         </div>
 
         <div class="row">
-          <div class="form-group">
-            <label>Group by packages</label>
-            <select class="form-control selectPackage" data-live-search="true"></select>
-          </div>
+            <div class="col-12">
+              <p class="bg-dark p-2 font-weight-bold filters">
+                <i class="fa-solid fa-filter"></i> Filters
+              </p>
+            </div>
+            <div class="form-group col-3">
+              <label>Group by payment status</label>
+              <select class="form-control paymentStatus"></select>
+            </div>
+            <div class="form-group col-3">
+            <label>Group by delivery status</label>
+            <select class="form-control deliveryStatus"></select>
+            </div>
         </div>
 
         <div class="row">
@@ -164,32 +191,16 @@ $(function () {
 
     </div>`);
 
-    template.find('.selectPackage').selectpicker();
-    let bootstrapSelectPackage = template.find('.selectPackage').parent().find('.bootstrap-select .selectPackage');
-    let bootstrapInputFinder = template.find('.selectPackage input[type="text"]');
-
-    bootstrapInputFinder.on('keyup', function () {
-      let text = $(this).val();
-      bootstrapSelectPackage.empty();
-
-      APICaller(PACKAGE_API_ROUTE, {
-        'search': text,
-        'select_json':1
-      }, function (response) {
-        let packages = response;
-        if (packages.length > 0) {
-          bootstrapSelectPackage.append('<option value="" style="display:none;"></option>');
-          $.each(packages, function ($key, pack) {
-            bootstrapSelectPackage.append(`<option value="${pack.id}"> ${pack.package_name} </option>`)
-          })
-        }
-        bootstrapSelectPackage.selectpicker('refresh');
-      }, function (error) {
-        console.log(error);
-      })
-    })
+    // Call the function to populate the select elements
+    populateSelectOptions('.paymentStatus', template, paymentStatuses);
+    populateSelectOptions('.deliveryStatus', template, deliveryStatuses);
 
     $('#paymentTemplate').removeClass('d-none').html(template);
+
+    // let bootstrapSelectPackage = template.find('.selectPackage').parent().find('.bootstrap-select .selectPackage');
+
+    let bootstrapSelectPaymentStatus = template.find('.paymentStatus').parent().find('.bootstrap-select .paymentStatus');
+    let bootstrapSelectDeliveryStatus = template.find('.deliveryStatus').parent().find('.bootstrap-select .deliveryStatus');
 
     dataTable = $('#paymentsTable').DataTable({
       serverSide: true,
@@ -200,7 +211,8 @@ $(function () {
           data.user = bootstrapSelectCustomer.val();
           data.date = dateRangePicker.val();
           data.type = TYPE;
-          data.package = bootstrapSelectPackage.val();
+          data.delivery_status = bootstrapSelectPaymentStatus.val();
+          data.payment_status = bootstrapSelectDeliveryStatus.val();
           data.custom_length = data.length; // Corrected the property assignment
           data.search.value = data.search.value; // Corrected the property assignment
         },
@@ -412,9 +424,14 @@ $(function () {
       ]
     });
 
-    bootstrapSelectPackage.bind('changed.bs.select', function () {
+    bootstrapSelectPaymentStatus.bind('changed.bs.select', function () {
       dataTable.ajax.reload(null, false);
     })
+
+    bootstrapSelectDeliveryStatus.bind('changed.bs.select', function () {
+      dataTable.ajax.reload(null, false);
+    })
+
   }
 
   // Window actions
