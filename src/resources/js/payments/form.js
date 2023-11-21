@@ -28,7 +28,7 @@ $(function () {
                                     <i class="far fa-calendar-alt"></i>
                                 </span>
                             </div>
-                            <input type="text" class="form-control datepicker" name="date_of_payment" 
+                            <input type="text" onChange="datepickerUpdate(this)" class="form-control datepicker" name="date_of_payment" 
                             value="${
                                 typeof dateOfPayment !== "undefined"
                                     ? dateOfPayment
@@ -44,7 +44,7 @@ $(function () {
                                     <i class="far fa-calendar-alt"></i>
                                 </span>
                             </div>
-                            <input type="text" class="form-control datepicker" name="delivery_date"
+                            <input type="text" class="form-control datepicker" onChange="datepickerUpdate(this)" name="delivery_date"
                             value="${
                                 typeof deliveryDate !== "undefined"
                                     ? deliveryDate
@@ -69,12 +69,10 @@ $(function () {
     }
 
     // Handle datepicker change event
-    $(".datepicker").on("change", function () {
-        let selectedDate = new Date($(this).val());
-        console.log(selectedDate);
-
-        updatePaymentStatus(this, selectedDate);
-    });
+    window.datepickerUpdate = (e) => {
+            const selectedDate = new Date($(e).val());
+            updatePaymentStatus(e, selectedDate);
+    };
 
     function updatePaymentStatus(e, selectedDate) {
         let changedStatus;
@@ -84,6 +82,8 @@ $(function () {
 
         // Assuming expectedDateOfPayment and expectedDeliveryDate are defined elsewhere
         // or you need to define them here.
+
+
 
         if ($(e).attr("name") === "date_of_payment") {
             changedStatus = $('input[name="payment_status"]');

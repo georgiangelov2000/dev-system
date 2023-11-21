@@ -5,7 +5,7 @@ import {
     showConfirmationDialog,
 } from "../helpers/action_helpers";
 import { numericFormat } from "../helpers/functions";
-import { statusPaymentsWithIcons, paymentMethods } from "../helpers/statuses";
+import { statusPaymentsWithIcons, paymentMethods, deliveryStatusesWithIcons, paymentStatuses, deliveryStatuses } from "../helpers/statuses";
 
 $(function () {
     $(".selectSupplier").selectpicker("refresh").val("").trigger("change");
@@ -78,10 +78,28 @@ $(function () {
         $('img[id="supplierImage"]').attr("src", supplier.image_path);
     }
 
+      // Function to populate the select element with options
+    function populateSelectOptions(selectElement, template, statuses) {
+        const select = template.find(selectElement);
+        
+        const emptyOption = $("<option selected></option>").attr("value", "").text("Select All"); // Customize the text as needed
+        select.append(emptyOption);
+
+        // Iterate over statuses and create options
+        for (const key in statuses) {
+            if (statuses.hasOwnProperty(key)) {
+                const option = $("<option></option>").attr("value", key).text(statuses[key].label);
+                select.append(option);
+            }
+        }
+
+        select.selectpicker("refresh");
+    }
+
     function loadDataTable() {
         $('#loader').show();
 
-        let table = `
+        let template = $(`
             <div class="p-3 mb-3">
 
                 <div class="row">
@@ -104,6 +122,22 @@ $(function () {
                         <span class="font-weight-bold">Zip code:</span> <span data-target="zip"></span> <br>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <p class="bg-dark p-2 font-weight-bold filters">
+                            <i class="fa-solid fa-filter"></i> Filters
+                        </p>
+                    </div>
+                    <div class="form-group col-3">
+                        <label>Group by payment status</label>
+                        <select class="form-control paymentStatus"></select>
+                    </div>
+                    <div class="form-group col-3">
+                        <label>Group by delivery status</label>
+                        <select class="form-control deliveryStatus"></select>
+                    </div>
+                </div>
     
                 <div class="row">
                     <div class="col-12 table-responsive">
@@ -123,9 +157,9 @@ $(function () {
                                     <th>Reference</th>
                                     <th>Exp delivery date</th>
                                     <th>Delivery date</th>
-                                    <th>Date of payment</th>
                                     <th>Exp date of payment</th>
-                                    <th>Delay</th>
+                                    <th>Date of payment</th>
+                                    <th>Payment Delay</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -165,9 +199,17 @@ $(function () {
                     </button>
                 </div>
             </div>
-        </div>`;
+        </div>`);
 
-        $("#paymentTemplate").removeClass("d-none").html(table);
+    // Call the function to populate the select elements
+    populateSelectOptions('.paymentStatus', template, paymentStatuses);
+    populateSelectOptions('.deliveryStatus', template, deliveryStatuses);
+
+    $("#paymentTemplate").removeClass("d-none").html(template);
+
+
+    let bootstrapSelectPaymentStatus = template.find('.paymentStatus').parent().find('.bootstrap-select .paymentStatus');
+    let bootstrapSelectDeliveryStatus = template.find('.deliveryStatus').parent().find('.bootstrap-select .deliveryStatus');
 
         dataTable = $("#paymentsTable").DataTable({
             serverSide: true,
@@ -177,6 +219,8 @@ $(function () {
                     data.user = bootstrapSelectSupplier.val();
                     data.date = dateRangePicker.val();
                     data.type = TYPE;
+                    data.delivery_status = bootstrapSelectPaymentStatus.val();
+                    data.payment_status = bootstrapSelectDeliveryStatus.val();
                     data.custom_length = data.length; // Corrected the property assignment
                     data.search.value = data.search.value; // Corrected the property assignment
                 },
@@ -310,6 +354,16 @@ $(function () {
                         const formattedExpectedDate = row.purchase.delivery_date ? moment(row.purchase.delivery_date).format('MMM DD, YYYY') : '';
                         return `<span>${formattedExpectedDate}</span>`;
                     },
+                },
+                {
+                    width: "13%",
+                    name: "expected_date_of_payment",
+                    class: "text-center",
+                    orderable: false,
+                    render: function (data, type, row) {
+                        const formattedExpectedDate = row.expected_date_of_payment ? moment(row.expected_date_of_payment).format('MMM DD, YYYY') : '';
+                        return `<span>${formattedExpectedDate}</span>`;
+                    },
                 },    
                 {
                     width: "11%",
@@ -321,16 +375,6 @@ $(function () {
                         return `<span>${formattedDate}</span>`;
                     },
                 },
-                {
-                    width: "13%",
-                    name: "expected_date_of_payment",
-                    class: "text-center",
-                    orderable: false,
-                    render: function (data, type, row) {
-                        const formattedExpectedDate = row.expected_date_of_payment ? moment(row.expected_date_of_payment).format('MMM DD, YYYY') : '';
-                        return `<span>${formattedExpectedDate}</span>`;
-                    },
-                },                
                 {
                     width: "8%",
                     class: "text-center",
@@ -393,6 +437,14 @@ $(function () {
                 },                                
             ],
         });
+
+        bootstrapSelectPaymentStatus.bind('changed.bs.select', function () {
+            dataTable.ajax.reload(null, false);
+          })
+      
+          bootstrapSelectDeliveryStatus.bind('changed.bs.select', function () {
+            dataTable.ajax.reload(null, false);
+          })
     }
 
     // Window actions

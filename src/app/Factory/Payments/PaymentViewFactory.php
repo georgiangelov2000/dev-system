@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Factory;
+namespace App\Factory\Payments;
 
 use App\Factory\Views\PaymentView;
 use App\Factory\Payments\PaymentRelationFactory;

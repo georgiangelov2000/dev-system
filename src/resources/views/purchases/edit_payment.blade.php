@@ -1,5 +1,6 @@
 @php
-    $statuses = config('statuses.payment_statuses');
+    $paymentStatuses = config('statuses.payment_statuses');
+    $deliveryStatuses = config('statuses.delivery_statuses');
 @endphp
 
 @extends('app')
@@ -21,64 +22,32 @@
                             <input type="hidden" name="id" value="{{ $payment->purchase->id }}">
                         </div>
                         <div class="form-group col-12">
-                            <label for="customer_id">Price</label>
-                            <input name="price" type="text" class="form-control" max="{{ $payment->price }}"
-                                value="{{ $payment->price}}">
-                        </div>
-                        <div class="form-group col-12">
-                            <label for="is_it_delivered">Delivered</label>
-                            <select class="form-control" name="is_it_delivered" id="is_it_delivered">
-                                @foreach (config('statuses.is_it_delivered') as $key => $val)
-                                    <option {{ $key == $payment->purchase->is_it_delivered ? 'selected' : '' }} value="{{ $key }}">
-                                        {{ $val }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('is_it_delivered')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <label for="price">Price</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-light fa-coins"></i></span>
+                                </div>
+                                <input 
+                                    disabled 
+                                    type="text"
+                                    class="form-control"
+                                    value="{{ $payment->price }}" 
+                                />
+                            </div>
                         </div>
                         <div class="form-group col-12">
                             <label for="quantity">Amount</label>
-                            <input name="quantity" type="text" class="form-control" max="{{ $payment->quantity }}"
-                                value="{{ $payment->quantity }}">
-                            @error('quantity')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div id="deliveryWrapper">
-                            @if ($payment->purchase->is_it_delivered)
-                                <div class="form-group col-12 dateOfPaymentContainer">
-                                        <label for="date_of_payment">Date of payment</label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="far fa-calendar-alt"></i>
-                                                </span>
-                                            </div>
-                                            <input type="text" class="form-control datepicker" name="date_of_payment"
-                                                value="{{ $payment->date_of_payment }}">
-                                        </div>
-                                        @error('date_of_payment')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
-                                </div>  
-                                <div class="form-group col-12 deliveryDateContainer">
-                                        <label for="delivery_date">Delivery date</label>
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text">
-                                                    <i class="far fa-calendar-alt"></i>
-                                                </span>
-                                            </div>
-                                            <input type="text" class="form-control datepicker" name="delivery_date"
-                                                value="{{ $payment->purchase->delivery_date ?? '' }}">
-                                        </div>
-                                        @error('delivery_date')
-                                            <span class="text-danger">{{ $message }}</span>
-                                        @enderror
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-sort-amount-up"></i></span>
                                 </div>
-                            @endif
+                                <input 
+                                    disabled 
+                                    type="text" 
+                                    class="form-control" 
+                                    value="{{ $payment->quantity }}"
+                                />
+                            </div>
                         </div>
                         <div class="form-group col-12">
                             <label for="">Expected date of payment</label>
@@ -95,12 +64,62 @@
                             </div>
                         </div>
                         <div class="form-group col-12">
-                            <label for="">Status</label>
+                            <label for="">Expected delivery date</label>
                             <div class="input-group">
-                                <input name="payment_status" disabled type="text" class="form-control"
-                                    value="{{ $statuses[$payment->payment_status] }}" />
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
+                                </div>
+                                <input 
+                                    disabled 
+                                    type="text" 
+                                    class="form-control"
+                                    value="{{ $payment->expected_delivery_date }}" 
+                                />
                             </div>
                         </div>
+                        <div class="form-group col-12">
+                            <label for="">Payment status</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fa-regular fa-credit-card"></i>
+                                    </span>
+                                </div>
+                                <input name="payment_status" disabled type="text" class="form-control"
+                                value="{{ $paymentStatuses[$payment->payment_status] }}" />
+                            </div>
+                        </div>
+                        <div class="form-group col-12">
+                            <label for="">Delivery status</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fa-light fa-truck"></i>
+                                    </span>
+                                </div>
+                                <input 
+                                    name="delivery_status" 
+                                    disabled 
+                                    type="text" 
+                                    class="form-control"
+                                    value="{{ $deliveryStatuses[$payment->delivery_status] }}" 
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group col-12">
+                            <label for="is_it_delivered">Delivered</label>
+                            <select class="form-control" name="is_it_delivered" id="is_it_delivered">
+                                @foreach (config('statuses.is_it_delivered') as $key => $val)
+                                    <option {{ $key == $payment->purchase->is_it_delivered ? 'selected' : '' }} value="{{ $key }}">
+                                        {{ $val }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('is_it_delivered')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div id="deliveryWrapper"></div>
                         <div class="form-group col-12">
                             <label for="payment_method">Payment method</label>
                             <select class="form-control" name="payment_method" id="payment_method">
@@ -118,8 +137,12 @@
                         </div>
                         <div class="form-group col-12">
                             <label for="payment_reference">Payment reference</label>
-                            <input class="form-control" name="payment_reference" type="text"
-                                value="{{ $payment->payment_reference }}">
+                            <input 
+                                class="form-control" 
+                                name="payment_reference" 
+                                type="text"
+                                value="{{ $payment->payment_reference }}"
+                            />
                             @error('payment_reference')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -292,8 +315,10 @@
     </div>
     @push('scripts')
         <script type="text/javascript">
-            const expected = new Date("{{ date('Y-m-d', strtotime($payment->expected_date_of_payment)) }}");
-            const delivery = "{{ $payment->purchase->is_it_delivered }}";
+            const expectedDateOfPayment = new Date("{{ date('Y-m-d', strtotime($payment->expected_date_of_payment)) }}");
+            const expectedDeliveryDate = new Date("{{ date('Y-m-d', strtotime($payment->expected_delivery_date)) }}");
+            const dateOfPayment = "{{ date('Y-m-d', strtotime($payment->date_of_payment)) }}";
+            const deliveryDate = "{{ date('Y-m-d', strtotime($payment->purchase->delivery_date)) }}";
         </script>
         <script type="text/javascript" src="{{ mix('js/payments/form.js') }}"></script>
     @endpush

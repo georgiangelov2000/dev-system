@@ -25,7 +25,7 @@ class PaymentRelationFactory
             return OrderPaymentRepository::data($builder);
         }
         if ($builder instanceof PurchasePayment) {
-            return PurchasePaymentRepository::data();
+            return PurchasePaymentRepository::data($builder);
         }
     }
 

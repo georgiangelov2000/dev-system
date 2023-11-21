@@ -52,6 +52,14 @@ class PurchasePaymentRepository implements ApiRepository
             return $query->whereHas('purchase', fn ($query) => $query->where('supplier_id', $request->input('user')));
         });
 
+        $query->when($request->input('delivery_status'), function ($query) use ($request) {
+            return $query->where('delivery_status', '=', $request->input('delivery_status'));
+        });
+
+        $query->when($request->input('payment_status'), function ($query) use ($request) {
+            return $query->where('payment_status', '=', $request->input('payment_status'));
+        });
+
         $query->when($dateStart && $dateEnd, function ($query) use ($dateStart, $dateEnd) {
             return $query
                 ->where('date_of_payment', '>=', $dateStart)

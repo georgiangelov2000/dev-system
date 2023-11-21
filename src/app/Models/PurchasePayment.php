@@ -44,8 +44,7 @@ class PurchasePayment extends Model
         'payment_reference',
         'expected_date_of_payment',
         'payment_status',
-        // 'partially_paid_price',
-        'delivery_date'
+        'delivery_status'
     ];
 
     public function purchase()

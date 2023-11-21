@@ -9,7 +9,7 @@ class OrderPayment implements ModelRepository
      */
     private function __construct()
     {
-        // Private constructor to prevent instantiation
+
     }
 
     public static function data($model)

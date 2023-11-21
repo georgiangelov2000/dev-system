@@ -47,7 +47,7 @@
                                     type="text" 
                                     class="form-control" 
                                     value="{{ $payment->quantity }}"
-                                >
+                                />
                             </div>
                         </div>
                         <div class="form-group col-12">

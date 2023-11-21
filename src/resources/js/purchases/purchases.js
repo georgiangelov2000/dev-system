@@ -166,7 +166,9 @@ $(function () {
                 orderable: false,
                 class:'text-center',
                 render: function (data, type, row) {
-                  return row.is_it_delivered ? `<span class="text-success">Yes</span>` : `<span class="text-danger">No</span>`;
+                    return row.is_it_delivered ? 
+                    `<i class="fa-light fa-check text-success"></i>` : 
+                    `<i class="fa-light fa-x text-danger"></i>`;
                 }
             },
             {

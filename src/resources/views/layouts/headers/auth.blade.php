@@ -60,6 +60,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('country.index') }}" class="nav-link">
+                        <i class="fa-light fa-lock"></i>
+                        <p>Role managment</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa-light fa-house"></i>
                         <p>
@@ -272,7 +278,22 @@
                         </li>
                     </ul>
                 </li>
-
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fa-light fa-flag"></i>
+                        <p>
+                            Reports
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{{ route('settings.get') }}" class="nav-link">
+                                <p></p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
                         <i class="fa-light fa-file-import"></i>
@@ -301,6 +322,12 @@
                             </a>
                         </li>
                     </ul>
+                    <li class="nav-item">
+                        <a href="{{ route('country.index') }}" class="nav-link">
+                        <i class="fa-light fa-clock-rotate-left"></i>
+                            <p>Logs</p>
+                        </a>
+                    </li>
                 </li>
 
             </ul>

@@ -167,12 +167,8 @@ class OrderController extends Controller
             $order->user_id = $data['user_id'];
 
             if($order->payment->payment_status === $order::PENDING) {
+
                 $order->expected_delivery_date = now()->parse($data['expected_delivery_date']);
-                    
-                $newAmount = $data['sold_quantity'];
-                $singlePrice = $data['single_sold_price'];
-                $discount = $data['discount_percent'];
-                $trackingNumber = $data['tracking_number'];
                 $expectedDateOfPayment = now()->parse($data['expected_date_of_payment']);
 
                 if (array_key_exists('package_id', $data) && $data['package_id']) {
@@ -185,8 +181,11 @@ class OrderController extends Controller
                     }
                 }
 
+                $order->single_sold_price  = $data['single_sold_price'];
                 $order->tracking_number = $trackingNumber;
-                $order->sold_quantity = $newAmount;
+                $order->sold_quantity =  $data['sold_quantity'];
+                $order->discount_percent = $data['discount_percent'];
+                $order->tracking_number = $data['tracking_number'];
 
                 // order new amount
                 $amount = $order->sold_quantity;
@@ -200,10 +199,10 @@ class OrderController extends Controller
                 $remainingOrderAmount = $order->getOriginal('sold_quantity');
                 // Current purchase amount before sold quantity update
                 $remainingAmount = ($sumOfOrdersAmount - $remainingOrderAmount);
-                // dd($remainingAmount);
                 //take updated amount based on remaining amount + updated amount
                 $updatedAmount = ($remainingAmount + $amount);
-                // dd($updatedAmount);
+
+
                 // Check if the updated amount exceeds the initial purchase amount
                 if ($updatedAmount > $purchaseInitAmount) {
                     return response()->json([
@@ -214,9 +213,7 @@ class OrderController extends Controller
 
                 // Update purchase amount and prices
                 $finalAmount = ($purchaseInitAmount - $updatedAmount);
-                // dd($purchaseInitAmount,$updatedAmount);
                 $purchase->quantity = $finalAmount;
-                $order->discount_percent = $discount; 
                 
                 // calculate final prices
                 $order = $this->service->calculatePrices($order);

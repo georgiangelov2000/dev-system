@@ -1,3 +1,8 @@
+@php
+    $paymentStatuses = config('statuses.payment_statuses');
+    $deliveryStatuses = config('statuses.delivery_statuses');
+@endphp
+
 @extends('app')
 
 @section('content')

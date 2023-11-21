@@ -11,7 +11,7 @@ use App\Services\PaymentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View; // Import the View class
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Factory\PaymentViewFactory;
+use App\Factory\Payments\PaymentViewFactory;
 
 class PaymentController extends Controller
 {
@@ -144,5 +144,12 @@ class PaymentController extends Controller
             'price' => $builder->price,
             'quantity' => $builder->quantity
         ]);
+    }
+
+    private function validatePaymentMethod(array $data)
+    {
+        if (empty($data['payment_method']) || !$this->helper->statusValidation($data['payment_method'], $this->paymentMethods)) {
+            throw new \Exception('Invalid payment method.');
+        }
     }
 }
