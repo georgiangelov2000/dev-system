@@ -11,6 +11,9 @@
                 </div>
             </div>
             <div class="card-body">
+                <div class="alert alert-light" role="alert">
+                    You have the flexibility to make updates to orders that have not yet been delivered.
+                </div>
                 <form method="POST" onsubmit="updateOrders(event)">
                     @csrf
                     

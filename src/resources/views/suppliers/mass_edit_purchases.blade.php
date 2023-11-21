@@ -8,6 +8,9 @@
             </div>
         </div>
         <div class="card-body">
+            <div class="alert alert-light" role="alert">
+                You have the flexibility to make updates to purchases that have not yet been delivered.
+            </div>
             <form method="PUT" onsubmit="updatePurchases(event)">
                 @csrf
                 <table id="massEditPurchases" class="table table-hover table-sm dataTable no-footer">
