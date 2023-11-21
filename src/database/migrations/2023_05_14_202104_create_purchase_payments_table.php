@@ -20,8 +20,8 @@ class CreatePurchasePaymentsTable extends Migration
             $table->unsignedDecimal('price', 8, 2)->default(0);
             $table->tinyInteger('payment_method')->nullable()->comment('1: Cash, 2: Bank Transfer, 3: Credit Card, 4: Cheque, 5: Online Payment');
             $table->string('payment_reference')->default('N/A');
-            $table->tinyInteger('payment_status')->default(2)->comment('1: Paid, 2: Pending, 3: Partially Paid, 4: Overdue,');
-            $table->tinyInteger('delivery_status')->default(2)->comment('2: Pending, 3: Delivered, 4: Overdue,');
+            $table->tinyInteger('payment_status')->default(2)->comment('1:Successfully_Paid_Delivered, 2: Pending, 4: Overdue');
+            $table->tinyInteger('delivery_status')->default(2)->comment('1:Successfully_Paid_Delivered, 2: Pending, 4: Overdue');
             $table->date('date_of_payment')->nullable();
             $table->date('expected_date_of_payment');
 

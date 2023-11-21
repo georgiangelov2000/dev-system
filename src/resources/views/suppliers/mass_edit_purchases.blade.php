@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="card card-default cardTemplate">
-        <div class="card-header">
+        <div class="card-header bg-primary">
             <div class="col-12">
                 <h3 class="card-title">Mass Edit purchases for {{ $supplier->name }}</h3>
             </div>
@@ -21,17 +21,18 @@
                         <th>ID</th>
                         <th>Image</th>
                         <th>Name</th>
-                        <th>Price</th>
-                        <th>Disc.price</th>
+                        <th>Unit Price</th>
+                        <th>Discount unit price</th>
                         <th>Final price</th>
                         <th>Regular price</th>
                         <th>Amount</th>
                         <th>Initial amount</th>
                         <th>Discount</th>
                         <th>Categories</th>
-                        <th>Delivery delay</th>
                         <th>Brands</th>
-                        <th class="text-center">Status</th>
+                        <th>Exp date of payment</th>
+                        <th>Exp delivery date</th>
+                        <th>Delivery delay</th>
                     </thead>
                 </table>
 
@@ -56,7 +57,7 @@
                             <input type="number" class="form-control" name="discount_percent" id="discount_percent"
                                 placeholder="Enter a integer value (e.g.,1,2)" />
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                             <label for="category_id">Categories</label>
                             <select class="form-control" name="category_id" id="category_id">
                                 <option value="9999">Please select</option>
@@ -67,12 +68,12 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                             <label for="sub_category_ids">Sub categories</label>
                             <select name="sub_category_ids" id="sub_category_ids" class="form-control" multiple
                                 data-selected-text-format="count > 1"></select>
                         </div>
-                        <div class="form-group col-2">
+                        <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                             <label for="category_id">Brands</label>
                             <select class="form-control" name="brand_id" id="brand_id" multiple
                                 data-selected-text-format="count > 1">
@@ -84,9 +85,47 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group col-2">
-                            <button id="massEditSubmit" class="btn btn-primary w-100">Save changes</button>
+                        <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
+                            <label for="expected_delivery_date">Expected delivery date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="far fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                                <input 
+                                    type="text" 
+                                    class="form-control float-right datepicker"
+                                    name="expected_delivery_date"
+                                    data-date-format="mm/dd/yyyy"
+                                />
+                                @error('expected_delivery_date')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror                                    
+                            </div>
                         </div>
+                        <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
+                            <label for="expected_date_of_payment">Expected payment date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="far fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                                <input 
+                                    type="text" 
+                                    class="form-control float-right datepicker"
+                                    name="expected_date_of_payment"
+                                    data-date-format="mm/dd/yyyy"
+                                />
+                                @error('expected_date_of_payment')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror  
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-xl-2 col-lg-2 col-md-12 col-sm-12">
+                        <button class="btn btn-primary w-100">Save changes</button>
                     </div>
                 </div>
             </form>

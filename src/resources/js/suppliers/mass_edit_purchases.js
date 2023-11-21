@@ -1,11 +1,24 @@
 import { APICaller } from '../ajax/methods';
 import { numericFormat } from '../helpers/functions';
-import { paymentStatuses, statusPaymentsWithIcons} from '../helpers/statuses';
+import {statusPaymentsWithIcons,deliveryStatusesWithIcons} from '../helpers/statuses';
 
 $(function () {
     let table = $("#massEditPurchases");
 
     $('select[name="category_id"],select[name="brand_id"], select[name="sub_category_ids"]').selectpicker().val('').trigger('change');
+
+    $('.datepicker').datepicker({format: 'mm/dd/yyyy'});
+
+    let formData = {
+        'discount_percent': null,
+        'expected_date_of_payment': null,
+        'expected_delivery_date': null,
+        'single_sold_price':null,
+        'sold_quantity': null,
+        'brands': null,
+        'categories': null,
+        'subcategories': null
+    };
 
     const bootstrapSubCategory = $('select[name="sub_category_ids"]');
     const bootstrapCategory = $('select[name="category_id"]');
@@ -52,14 +65,14 @@ $(function () {
                 }
             },
             {
-                width: '10%',
+                width: '5%',
                 class:'text-center',
                 render: function (data, type, row) {
                     return `<a href=${PURCHASE_EDIT.replace(':id', row.id)}>${row.name}</a>`
                 }
             },
             {
-                width: '6%',
+                width: '8%',
                 name: "price",
                 class:'text-center',
                 render:function(data,type,row) {
@@ -67,7 +80,7 @@ $(function () {
                 }
             },
             {
-                width: '6%',
+                width: '8%',
                 name: "discount_price",
                 class:'text-center',
                 render:function(data,type,row) {
@@ -91,7 +104,7 @@ $(function () {
                 }
             },
             {
-                width: '5%',
+                width: '1%',
                 orderable: true,
                 class:'text-center',
                 name: "quantity",
@@ -121,49 +134,51 @@ $(function () {
                 }
             },
             {
-                width: '10%',
-                orderable: false,
-                render: function (data, type, row) {
-                    let expected = moment(row.expected_delivery_date);
-                    let deliveryDate = moment(row.delivery_date);
-                    let isDelivered = row.is_it_delivered;
-                    
-                    if (!isDelivered) {
-                        let currDate = moment();
-                        let diffDays = currDate.diff(expected, 'days');
-                        return (currDate.isAfter(expected))
-                            ? `<span class="text-danger">${diffDays} days delay</span>`
-                            : `<span class="text-info">${diffDays} days left</span>`;
-                    } else {
-                        let diffDays = deliveryDate.diff(expected, 'days');
-                        return (deliveryDate.isAfter(expected))
-                            ? `<span class="text-danger">${diffDays} days delay in delivery</span>`
-                            : `<span class="text-success">Delivered on time (${diffDays} days)</span>`;
-                    }
-
-                }
-            },
-            {
                 width: '5%',
                 orderable: false,
                 render: function (data, type, row) {
                     return row.brands.length > 0 ? row.brands.map(brand => `<span> ${brand.name} </span>`).join(', ') : '';
                 }
             },
-            {
-                width: '5%',
+            { 
+                width: '8%',
                 orderable: false,
-                name: "status",
-                class: "text-center",
+                class:'text-center',
+                name: 'expected_date_of_payment',
                 render: function (data, type, row) {
-                    const statusInfo = statusPaymentsWithIcons[row.payment.payment_status] || { label: "Unknown", iconClass: "fal fa-question-circle" };
-            
-                    return `<div title="${statusInfo.label}" class="status">
-                        <span class="icon"><i class="${statusInfo.iconClass}"></i></span>
-                    </div>`;
+                    return `${moment(row.expected_date_of_payment).format('MMM DD, YYYY')}`
                 }
-            }
-            
+            },
+            {    
+                width: '8%',
+                orderable: false,
+                class:'text-center',
+                name: 'expected_delivery_date',
+                render: function (data, type, row) {
+                    return `${moment(row.expected_delivery_date).format('MMM DD, YYYY')}`
+                }
+            },
+            {
+                width: '6%',
+                orderable: false,
+                class:'text-center',
+                name: 'delivery_delay',
+                render: function (data, type, row) {
+                    const isDelivered = row.is_it_delivered;
+                    const expectedDate = row.package_extension_date ? moment(row.package_extension_date) : moment(row.expected_delivery_date);
+                    const deliveryDate = moment(row.delivery_date);
+                    const currDate = moment();
+                    const diffDays = currDate.diff(expectedDate, 'days');
+                    
+                    if (!isDelivered) {
+                        return `<span class="text-${currDate.isAfter(expectedDate) ? 'danger' : 'info'}">${diffDays} days ${currDate.isAfter(expectedDate) ? 'delay' : 'left'}</span>`;
+                    } else {
+                        const deliveryDiffDays = deliveryDate.diff(expectedDate, 'days');
+                        return `<span class="text-${deliveryDate.isAfter(expectedDate) ? 'danger' : 'success'}">${deliveryDiffDays} ${deliveryDate.isAfter(expectedDate) ? 'days delay in delivery' : 'days delay, Delivered on time'}</span>`;
+                        
+                    }                    
+                }
+            },      
         ]
     });
 

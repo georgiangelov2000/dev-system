@@ -149,7 +149,7 @@ $(function () {
             {
                 width: '8%',
                 orderable: false,
-                name: "status",
+                name: "payment_status",
                 class: "text-center",
                 render: function (data, type, row) {
                     const statusData = deliveryStatusesWithIcons[row.payment.delivery_status] || { text: "Unknown", iconClass: "fal fa-question" };

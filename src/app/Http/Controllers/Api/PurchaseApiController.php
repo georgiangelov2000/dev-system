@@ -11,7 +11,7 @@ class PurchaseApiController extends Controller
 
     public function getData(Request $request)
     {
-        $relations = ['categories','subcategories', 'brands', 'supplier:id,name','payment:id,payment_status,purchase_id,alias'];
+        $relations = ['categories','subcategories', 'brands', 'supplier:id,name','payment'];
         $select_json = $request->input('select_json');
         $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
