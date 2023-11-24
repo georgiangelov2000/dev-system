@@ -50,7 +50,7 @@ $(function () {
                 }
             },
             {
-                width: '1%',
+                width: '6%',
                 orderable: false,
                 name: "tracking_number",
                 class: "text-center",
@@ -144,20 +144,6 @@ $(function () {
                         return `<span class="text-${deliveryDate.isAfter(expectedDate) ? 'danger' : 'success'}">${deliveryDiffDays} ${deliveryDate.isAfter(expectedDate) ? 'days delay in delivery' : 'days delay, Delivered on time'}</span>`;
                         
                     }                    
-                }
-            },
-            {
-                width: '8%',
-                orderable: false,
-                name: "payment_status",
-                class: "text-center",
-                render: function (data, type, row) {
-                    const statusData = deliveryStatusesWithIcons[row.payment.delivery_status] || { text: "Unknown", iconClass: "fal fa-question" };
-
-                    return `
-                    <div title="${statusData.label}" class="status">
-                    <span class="icon"><i class="${statusData.iconClass}"></i></span>
-                    </div>`;
                 }
             },
         ],

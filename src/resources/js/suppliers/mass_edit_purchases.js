@@ -5,23 +5,23 @@ import {statusPaymentsWithIcons,deliveryStatusesWithIcons} from '../helpers/stat
 $(function () {
     let table = $("#massEditPurchases");
 
-    $('select[name="category_id"],select[name="brand_id"], select[name="sub_category_ids"]').selectpicker().val('').trigger('change');
+    $('select[name="categories"],select[name="brands"], select[name="sub_category_ids"]').selectpicker().val('').trigger('change');
 
     $('.datepicker').datepicker({format: 'mm/dd/yyyy'});
 
     let formData = {
-        'discount_percent': null,
-        'expected_date_of_payment': null,
-        'expected_delivery_date': null,
-        'single_sold_price':null,
-        'sold_quantity': null,
-        'brands': null,
-        'categories': null,
-        'subcategories': null
+        'discount_percent': '',
+        'expected_date_of_payment': '',
+        'expected_delivery_date': '',
+        'price':'',
+        'quantity': '',
+        'brands': [],
+        'categories': [],
+        'sub_category_ids': []
     };
 
     const bootstrapSubCategory = $('select[name="sub_category_ids"]');
-    const bootstrapCategory = $('select[name="category_id"]');
+    const bootstrapCategory = $('select[name="categories"]');
 
     const statuses = [2];
 
@@ -72,7 +72,7 @@ $(function () {
                 }
             },
             {
-                width: '8%',
+                width: '5%',
                 name: "price",
                 class:'text-center',
                 render:function(data,type,row) {
@@ -190,7 +190,6 @@ $(function () {
 
         APICaller(SUB_CATEGORY_API_ROUTE, { 'category': selectedCategory,'select_json':true }, function (response) {
             let sub_categories = response;
-            console.log(sub_categories);
             
             if (sub_categories.length > 0) {
                 $.each(sub_categories, function ($key, sub_category) {
@@ -207,53 +206,42 @@ $(function () {
         e.preventDefault();
         let form = e.target;
         let method = e.target.getAttribute('method');
+        let action = e.target.getAttribute('action');
         let data = $(form).serialize();
-        let formData = {};
+        let keys = {};
 
         data.split('&').forEach(function (keyValue) {
             let pair = keyValue.split('=');
             let key = decodeURIComponent(pair[0]);
             let value = decodeURIComponent(pair[1] || '');
 
-            if (formData[key]) {
-                if (Array.isArray(formData[key])) {
-                    formData[key].push(value);
-                } else {
-                    formData[key] = [formData[key], value];
+            if (keys[key]) {
+                if (formData.hasOwnProperty(key)) {
+                    if (Array.isArray(formData[key])) {
+                        formData[key].push(value);
+                    } else {
+                        formData[key] = [keys[key], value];
+                    }
                 }
             } else {
-                formData[key] = value;
-            }
+                if (formData.hasOwnProperty(key)) {
+                    formData[key] = value;
+                    keys[key] = value;
+                }
+            }                
         });
 
-        let price = formData.price;
-        let quantity = formData.quantity;
-        let brands = Array.isArray(formData.brand_id) ? formData.brand_id : (formData.brand_id ? [formData.brand_id] : []);
-        let category = formData.category_id;
-        let subCategoryIds = Array.isArray(formData.sub_category_ids) ? formData.sub_category_ids : (formData.sub_category_ids ? [formData.sub_category_ids] : []);
-        let discount_percent = formData.discount_percent;
+        let searchedIds = $('tbody input[type="checkbox"]:checked').map(function () {
+            return $(this).attr('data-id');
+        }).get();
 
-        let searchedIds = [];
+        formData['purchase_ids'] = searchedIds;
 
-        $('tbody input[type="checkbox"]:checked').map(function () {
-            searchedIds.push($(this).attr('data-id'));
-        });
-
-        if (searchedIds.length > 0) {
-            let action = PURCHASE_UPDATE;
-
+        if(searchedIds.length) {
             $.ajax({
                 url: action,
                 method: method,
-                data: {
-                    'purchases': searchedIds,
-                    'price':price,
-                    'quantity':quantity,
-                    'category_id':category,
-                    'brands':brands,
-                    'sub_category_ids':subCategoryIds,
-                    'discount_percent':discount_percent
-                },
+                data:formData,
                 success: function (response) {
                     toastr['success'](response.message);
                     dataTable.ajax.reload(null, false);
@@ -261,11 +249,11 @@ $(function () {
                 error: function (xhr, status, error) {
                     toastr['error'](xhr.responseJSON.message);
                 }
-            })
-
+            });
         } else {
             toastr['error']("Please select purchases");
         }
+
     }
 
     $(document).on('change', ".selectAll", function () {

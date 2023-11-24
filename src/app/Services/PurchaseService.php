@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Helpers\FunctionsHelper;
 use App\Models\Purchase;
+use App\Models\PurchasePayment;
 
 
 class PurchaseService
@@ -102,38 +103,39 @@ class PurchaseService
         return $purchase;
     }
 
-    public function purchaseMassEditProcessing(array $data, $id)
-    {
-        $purchase = Purchase::find($id);
-
+    public function purchaseMassEditProcessing(Purchase $purchase, array $data)
+    {   
+        $expectedDateOfPayment = null;
+        
         if ($data['quantity'] && is_int(intval($data['quantity']))) {
             $purchase->quantity = $data['quantity'];
             $purchase->initial_quantity = $data['quantity'];
         }
+
         if ($data['price'] && is_numeric($data['price'])) {
             $purchase->price = $data['price'];
         }
-
         if ($data['discount_percent'] && is_int(intval($data['discount_percent']))) {
             $purchase->discount_percent = $data['discount_percent'];
         }
 
+        if($data['expected_date_of_payment']) {
+            $expectedDateOfPayment = now()->parse($data['expected_date_of_payment']);
+        }
+
+        if($data['expected_delivery_date']) {
+            $purchase->expected_delivery_date = now()->parse($data['expected_delivery_date']);
+        }
+        
         $ordersQuantity = $purchase->orders->sum('sold_quantity');
         if ($purchase->initial_quantity < $ordersQuantity) {
             throw new \Exception("Insufficient purchase quantity. The total order quantity exceeds the available purchase quantity.");
         };
+
         $finalQuantity = ($purchase->initial_quantity - $ordersQuantity);
         $purchase->quantity = $finalQuantity;
 
-        $prices = $this->calculatePrices(
-            $purchase->price,
-            $purchase->discount_percent,
-            $purchase->quantity
-        );
-
-        $purchase->total_price = $prices['total_price'];
-        $purchase->original_price = $prices['original_price'];
-        $purchase->discount_price = $prices['discount_price'];
+        $purchase = $this->calculatePrices($purchase);
 
         $purchase->save();
 
@@ -142,54 +144,70 @@ class PurchaseService
         FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'sub_category_ids', 'subcategories');
         FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'brands', 'brands');
 
-        $this->createOrUpdatePayment($purchase);
+        $this->createOrUpdatePayment($purchase,$expectedDateOfPayment);
 
         return $purchase;
     }
 
-    public function calculatePrices($price, $discount, $quantity): array
+    /**
+     * Calculate prices based on price, discount, and quantity.
+     *
+     * @param float $price The original price.
+     * @param float $discount The discount percentage.
+     * @param int $quantity The quantity of items.
+     * @return array An array containing discount price, total price, and original price.
+     */
+    public function calculatePrices($model)
     {
-        // Calculate discounted price using helper method
-        $discount_price = FunctionsHelper::calculatedDiscountPrice(floatval($price), $discount);
-        // Calculate total price after applying discount for given quantity
-        $total_price = FunctionsHelper::calculatedFinalPrice(floatval($discount_price), $quantity);
-        // Calculate total price without discount for given quantity
-        $original_price = FunctionsHelper::calculatedFinalPrice(floatval($price), $quantity);
+        // Calculate the discounted price
+        $discount_price = FunctionsHelper::calculatedDiscountPrice(
+            $model->price, 
+            $model->discount_percent
+        );
 
-        // Return an array containing calculated prices
-        return compact('discount_price', 'total_price', 'original_price');
+        // Calculate the total price
+        $total_price = FunctionsHelper::calculatedFinalPrice(
+            $discount_price, 
+            $model->initial_quantity
+        );
+
+        // Calculate the original price
+        $original_price = FunctionsHelper::calculatedFinalPrice(
+            $model->price, 
+            $model->initial_quantity
+        );
+
+        $model->discount_price = $discount_price;
+        $model->total_price = $total_price;
+        $model->original_price = $original_price;
+        
+        return $model;
     }
 
-    private function createOrUpdatePayment($purchase, $expected_date_of_payment)
+    private function createOrUpdatePayment($purchase, $expected_date_of_payment = null): PurchasePayment
     {
+        $payment = $purchase->payment ? $purchase->payment : new PurchasePayment();
+        
         // Generate an alias for the payment based on the purchase's delivery date
         $alias = $this->getAlias($purchase);
-        
-        // Prepare payment data
-        $paymentData = [
-            'alias' => $alias,
-            'quantity' => $purchase->initial_quantity,
-            'price' => $purchase->total_price,
-            'expected_date_of_payment' => $expected_date_of_payment
-        ];
-                
-        // Check if a payment record already exists for the purchase
-        $existingPayment = $purchase->payment;
 
-        // If no payment record exists, create one
-        if (!$existingPayment) {
-            $paymentData['payment_status'] = self::INIT_STATUS;
-            $payment = $purchase->payment()->create($paymentData);
-        } else {
-            // Update the existing payment record with new data
-            $existingPayment->update($paymentData);
-            $payment = $existingPayment;
+        $payment->alias = $alias;
+        $payment->quantity = $purchase->quantity;
+        $payment->price = $purchase->total_price;
+
+        if(isset($expected_date_of_payment)) {
+            $payment->expected_date_of_payment = $expected_date_of_payment;
         }
 
-        // Update or create invoice record associated with the payment
+        if(!$payment->exists) {
+            $payment->payment_status = self::INIT_STATUS;
+        }
+
+        $payment->save();
+        
         $payment->invoice()->updateOrCreate([], [
             'price' => $payment->price,
-            'quantity' => $payment->quantity
+            'quantity' => $payment->quantity,
         ]);
 
         return $payment;
@@ -198,7 +216,7 @@ class PurchaseService
     private function getAlias($purchase)
     {
         // Generate an alias based on the delivery date of the purchase
-        $alias = $purchase->expected_delivery_date->format('F j, Y');
+        $alias = now()->parse($purchase->expected_delivery_date)->format('F j, Y');
         // Replace spaces and commas with underscores
         $alias = str_replace([' ', ','], ['_', ''], $alias);
         // Convert alias to lowercase

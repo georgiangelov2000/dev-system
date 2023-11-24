@@ -11,7 +11,7 @@
             <div class="alert alert-light" role="alert">
                 You have the flexibility to make updates to purchases that have not yet been delivered.
             </div>
-            <form method="PUT" onsubmit="updatePurchases(event)">
+            <form method="PUT" action="{{route('purchase.mass.update')}}" onsubmit="updatePurchases(event)">
                 @csrf
                 <table id="massEditPurchases" class="table table-hover table-sm dataTable no-footer">
                     <thead>
@@ -62,7 +62,7 @@
                         </div>
                         <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                             <label for="category_id">Categories</label>
-                            <select class="form-control" name="category_id" id="category_id">
+                            <select class="form-control" name="categories" id="categories">
                                 <option value="9999">Please select</option>
                                 @foreach ($categories as $category)
                                     <option name="category_id" value="{{ $category->id }}">
@@ -78,7 +78,7 @@
                         </div>
                         <div class="form-group col-xl-2 col-lg-2 col-md-3 col-sm-4">
                             <label for="category_id">Brands</label>
-                            <select class="form-control" name="brand_id" id="brand_id" multiple
+                            <select class="form-control" name="brands" id="brands" multiple
                                 data-selected-text-format="count > 1">
                                 <option value="">Please select</option>
                                 @foreach ($brands as $brand)
@@ -142,7 +142,6 @@
         const SUPPLIER_ID = {{ "$supplier->id" }};
         const PURCHASE_API = "{{ route('api.products') }}";
         const PURCHASE_EDIT = "{{ route('purchase.edit', ':id') }}";
-        const PURCHASE_UPDATE = "{{ route('purchase.mass.update') }}";
         const SUB_CATEGORY_API_ROUTE = "{{ route('api.subcategories') }}";
         const CONFIG_URL = "{{ config('app.url') }}";
     </script>

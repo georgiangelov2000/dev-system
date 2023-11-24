@@ -14,13 +14,15 @@ class PurchaseMassEditRequest extends FormRequest
     public function rules()
     {
         return [
-            'purchases' => 'required|array',
+            'purchase_ids' => 'required|array',
             'quantity' => 'nullable|integer',
             'price' => 'nullable|numeric',
-            'category_id' => 'nullable|integer',
+            'categories' => 'nullable|integer',
             'brands' => 'nullable|array',
             'subcategories' => 'nullable|array',
-            'discount_percent' => 'nullable|integer'
+            'discount_percent' => 'nullable|integer',
+            'expected_date_of_payment' => 'nullable|date',
+            'expected_delivery_date' => 'nullable|date'
         ];
     }
 }

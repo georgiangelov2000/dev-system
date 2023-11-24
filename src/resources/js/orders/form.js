@@ -21,6 +21,7 @@ $(function () {
     let bootstrapProduct = $(".bootstrap-select .productFilter");
     let bootstrapSelectUser = $(".bootstrap-select .selectUser");
     let bootstrapSelectPackage = $(".bootstrap-select .selectPackage");
+    let filterPurchaseStatuses = [1,4];
 
     let table = $(".productOrderTable");
 
@@ -145,6 +146,8 @@ $(function () {
                 search: text,
                 out_of_stock: 0,
                 select_json: 1,
+                status: filterPurchaseStatuses
+
             },
             function (response) {
                 let purchases = response;

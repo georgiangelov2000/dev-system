@@ -1,7 +1,7 @@
 import { APIDELETECALLER, APICaller } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 import { numericFormat } from '../helpers/functions';
-import { statusPaymentsWithIcons } from '../helpers/statuses';
+import { statusPaymentsWithIcons, paymentStatuses } from '../helpers/statuses';
 
 $(function () {
     let table = $('table#purchasedProducts');
@@ -232,30 +232,55 @@ $(function () {
             width: '20%',
             class: 'text-center',
             render: function (data, type, row) {
-                    const isPendingPayment = statusPaymentsWithIcons[row.payment.payment_status].label === 'Pending';
-                    const deleteFormTemplate = isPendingPayment
-                        ? `<form style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
+
+                    const isPendingPayment = paymentStatuses[row.payment.payment_status] ? row.payment.payment_status : 0 ; 
+
+                    const deleteFormTemplate = isPendingPayment === 2
+                        ? `<form class="dropdown-item" style='display:inline-block;' id='delete-form' action=${REMOVE_PRODUCT_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
                                 <input type='hidden' name='_method' value='DELETE'>
                                 <input type='hidden' name='id' value='${row.id}'>
                                 <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteCurrentProduct(this);'>
-                                    <i class='fa-light fa-trash text-danger'></i>
+                                    <i class='fa-light fa-trash text-danger'></i> Delete
                                 </button>
                             </form>`
                         : '';
 
-                    const previewLink = `<a title='Preview' href="${PREVIEW_ROUTE.replace(':id', row.id)}" class='btn p-0'>
-                                            <i class='fa-light fa-magnifying-glass text-info' aria-hidden='true'></i>
+                    // const refundedFormTemplate = isPendingPayment === 2
+                    // ? `<form class="dropdown-item" style='display:inline-block;' action=${UPDATE_PRODUCT_STATUS_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
+                    //     <input type='hidden' name='_method' value='DELETE'>
+                    //     <input type='hidden' name='id' value='${row.id}'>
+                    //     <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); updateCurrentProduct(this);'>
+                    //         <i class="fa-light fa-undo text-danger" aria-hidden="true"></i> Refunded
+                    //     </button>
+                    // </form>`: '';
+
+                    const previewLink = `<a  title='Preview' href="${PREVIEW_ROUTE.replace(':id', row.id)}" class='btn dropdown-item'>
+                                            <i class='fa-light fa-magnifying-glass text-info' aria-hidden='true'></i> Preview
                                         </a>`;
 
-                    const orderCart = `<a title='Orders' href="${ORDERS.replace(':id', row.id)}" class='btn p-0'>
-                                        <i class='text-success fa-light fa-basket-shopping' aria-hidden='true'></i>
+                    const orderCart = `<a title='Orders' href="${ORDERS.replace(':id', row.id)}" class='btn dropdown-item'>
+                                        <i class='text-success fa-light fa-basket-shopping' aria-hidden='true'></i> Orders
                                     </a>`;
 
-                    const editButton = `<a href=${EDIT_PRODUCT_ROUTE.replace(':id', row.id)} data-id=${row.id} class="btn p-0" title="Edit">
-                                            <i class="fa-light fa-pencil text-primary"></i>
+                    const editButton = `<a href=${EDIT_PRODUCT_ROUTE.replace(':id', row.id)} data-id=${row.id} class="btn dropdown-item" title="Edit">
+                                            <i class="fa-light fa-pencil text-primary"></i> Edit
                                         </a>`;
 
-                    return `${deleteFormTemplate} ${editButton} ${previewLink} ${orderCart}`;
+                    const dropdownContent = `
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-light fa-list" aria-hidden="true"></i>
+                            </button>
+                            <div class="dropdown-menu" role="menu">
+                                ${deleteFormTemplate}
+                                ${previewLink}
+                                ${orderCart}
+                                ${editButton}
+                            </div>
+                        </div>
+                    `;
+
+                    return `${dropdownContent}`;
                 }
             }
         ],

@@ -381,12 +381,10 @@ class OrderController extends Controller
         if($order->package_extension_date) {
             $expected_date_of_payment = $order->package_extension_date;
         }
-        elseif(!isset($expected_date_of_payment)) {
-            $expected_date_of_payment = $order->payment->expected_date_of_payment;
+        elseif(isset($expected_date_of_payment)) {
+            $payment->expected_date_of_payment = $expected_date_of_payment;
         }
         
-        $payment->expected_date_of_payment = $expected_date_of_payment;
-
         if(!$payment->exists) {
             $payment->payment_status = self::INIT_STATUS;
         }

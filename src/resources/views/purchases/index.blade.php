@@ -91,35 +91,37 @@
                             </select>
                         </div>
                     </div>     
-                </div>  
-                <table id="purchasedProducts" class="table table-hover table-sm dataTable no-footer">
-                    <thead>
-                        <th></th>
-                        <th>
-                            <div class="form-check">
-                                <input class="form-check-input selectAll" type="checkbox">
-                                <label class="form-check-label" for="flexCheckDefault"></label>
-                            </div>
-                        </th>
-                        <th>ID</th>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Disc.price</th>
-                        <th>Final price</th>
-                        <th>Regular price</th>
-                        <th>Amount</th>
-                        <th>Init.amount</th>
-                        <th>Discount</th>
-                        <th>Delivered</th>
-                        <th>Supplier</th>
-                        <th>Category</th>
-                        <th>Delivery delay</th>
-                        <th>Brands</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </thead>
-                </table>
+                </div> 
+                <div class="table-responsive">
+                    <table id="purchasedProducts" class="table table-hover table-sm dataTable no-footer">
+                        <thead>
+                            <th></th>
+                            <th>
+                                <div class="form-check">
+                                    <input class="form-check-input selectAll" type="checkbox">
+                                    <label class="form-check-label" for="flexCheckDefault"></label>
+                                </div>
+                            </th>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Disc.price</th>
+                            <th>Final price</th>
+                            <th>Regular price</th>
+                            <th>Amount</th>
+                            <th>Init.amount</th>
+                            <th>Discount</th>
+                            <th>Delivered</th>
+                            <th>Supplier</th>
+                            <th>Category</th>
+                            <th>Delivery delay</th>
+                            <th>Brands</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </thead>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

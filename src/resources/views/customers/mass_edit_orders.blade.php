@@ -31,17 +31,16 @@
                                     <th>Customer</th>
                                     <th>Driver</th>
                                     <th>Purchase</th>
-                                    <th>Track.number</th>
+                                    <th>Tracking number</th>
                                     <th>Amount</th>
                                     <th>Unit Price</th>
-                                    <th>Disc unit price</th>
+                                    <th>Discount unit price</th>
                                     <th>Official Price</th>
                                     <th>Refular price</th>
                                     <th>Discount</th>
                                     <th>Package</th>
                                     <th>Exp delivery date</th>
                                     <th>Delivery delay</th>
-                                    <th>Delivery status</th>
                                 </tr>
                             </thead>
                             <tbody>

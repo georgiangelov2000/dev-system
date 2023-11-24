@@ -119,33 +119,40 @@ class PurchaseController extends Controller
 
         try {
             $validated = $request->validated();
+            $ids = $validated['purchase_ids'];
 
-            foreach ($validated['purchases'] as $purchaseId) {
-                $this->service->purchaseMassEditProcessing($validated, $purchaseId);
+            if(count($ids)) {
+                $purchases = Purchase::whereIn('id', $ids)->get();
+            
+                foreach ($ids as $id) {
+                    $purchase = $purchases->firstWhere('id', $id);
+            
+                    if(!$purchase) {
+                        throw new \Exception('Purchase with ID ' . $id . ' not found.');
+                    }
+                    
+                    unset($validated['purchase_ids']);
+
+                    // Check if all values in $validated are null
+                    if (empty(array_filter($validated, function ($value) {
+                        return $value !== null;
+                    }))) {
+                        throw new \Exception('At least one field must be filled.');
+                    }
+                    
+                    $this->service->purchaseMassEditProcessing($purchase,$validated);
+                }
+            } else {
+                throw new \Exception('No purchase IDs provided for update.');
             }
+            
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Purchases has not been updated'], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => 'Purchases has been updated'], 200);
-    }
-    public function fetchRelatedProductData($purchaseModel)
-    {
-        $purchaseModel->load('categories:id', 'subcategories:id', 'brands:id');
-
-        $categorySubCategories = SubCategory::select('id', 'name')
-            ->whereIn('category_id', $purchaseModel->categories->pluck('id'))
-            ->get()
-            ->toArray();
-
-        return [
-            'categorySubCategories' => $categorySubCategories,
-            'purchaseCategory' => $purchaseModel->categories->pluck('id')->first(),
-            'purchaseSubCategories' => $purchaseModel->subcategories->pluck('id')->toArray(),
-            'purchaseBrands' => $purchaseModel->brands->pluck('id')->toArray(),
-        ];
     }
 
     public function delete(Purchase $purchase)
