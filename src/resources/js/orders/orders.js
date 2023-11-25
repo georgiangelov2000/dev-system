@@ -19,13 +19,24 @@ $(function () {
         }
     });
 
-    let dateRange = $('input[name="datetimes"]').val();
+    let expectedDeliveryDate = $('input[name="datetimes"]').attr('data-search','expected_delivery_date').val();
+    let deliveryDate = $('input[name="datetimes"]').attr('data-search','delivery_date').val();
 
     $('input[name="datetimes"]').on('apply.daterangepicker', function (ev, picker) {
-        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
-        dateRange = $('input[name="datetimes"]').val();
+        const formattedDateRange = picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD');
+        $(this).val(formattedDateRange);
+    
+        const dataSearch = $(this).data('search');
+        
+        if (dataSearch === 'expected_delivery_date') {
+            expectedDeliveryDate = formattedDateRange;
+        } else if (dataSearch === 'delivery_date') {
+            deliveryDate = formattedDateRange;
+        }
+    
         dataTable.ajax.reload(null, false);
     });
+    
 
     $('.datepicker').datepicker({
         format: 'mm/dd/yyyy'
@@ -276,7 +287,9 @@ $(function () {
 
         var data = {
             "search": d.search.value,
-            'date_range': dateRange,
+            'expected_delivery_date': expectedDeliveryDate,
+            'user_id':bootstrapSelectDriver.val(),
+            'delivery_date': deliveryDate,
             'order_column': orderColumnName, // send the column name being sorted
             'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
             'limit': d.custom_length = d.length,
@@ -353,9 +366,13 @@ $(function () {
     })
 
     $('.selectPackage input[type="text"]').on('keyup', function () {
-
         let text = $(this).val();
-        bootstrapSelectPackage.empty();
+        bootstrapSelectPackage.empty().append('<option value="" class="d-none"></option>');
+
+        if (text === '') {
+            bootstrapSelectPackage.append('<option value="">All</option>').selectpicker('refresh');
+            return;
+        }
 
         APICaller(PACKAGE_API_ROUTE, {
             'search': text,
@@ -376,26 +393,30 @@ $(function () {
 
     $('.selectDriver input[type="text"]').on('keyup', function () {
         let text = $(this).val();
-        bootstrapSelectPackage.empty();
-
-        APICaller(USER_API_ROUTE, {
-            'search': text,
-            'role_id': 2,
-            'no_datatable_draw': 1,
-        }, function (response) {
-            let packages = response;
-            if (packages.length > 0) {
-                bootstrapSelectPackage.append('<option value="" style="display:none;"></option>');
-                $.each(packages, function ($key, pack) {
-                    bootstrapSelectPackage.append(`<option value="${pack.id}"> ${pack.package_name} </option>`)
-                })
+        bootstrapSelectDriver.empty().append('<option value="" class="d-none"></option>');
+    
+        if (text === '') {
+            bootstrapSelectDriver.append('<option value="">All</option>').selectpicker('refresh');
+            return;
+        }
+    
+        APICaller(USER_API_ROUTE, {'search': text, 'role_id': 2, 'no_datatable_draw': 1},
+            function (response) {
+                let drivers = response;
+                if (drivers.length) {
+                    bootstrapSelectDriver.append('<option value="" style="display:none;"></option>');
+                    $.each(drivers, function ($key, user) {
+                        console.log(user);
+                        bootstrapSelectDriver.append(`<option value="${user.id}"> ${user.username} </option>`);
+                    });
+                }
+                bootstrapSelectDriver.selectpicker('refresh');
+            },
+            function (error) {
+                console.log(error);
             }
-            bootstrapSelectPackage.selectpicker('refresh');
-        }, function (error) {
-            console.log(error);
-        })
-    })
-
+        );
+    });    
 
     $(document).on('change', ".selectAll", function () {
         const isChecked = this.checked;

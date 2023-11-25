@@ -62,17 +62,7 @@ class PurchaseService
             $purchase->initial_quantity = $calculateNewInitialQuantity;
             $purchase->quantity = $finalQuantity;
 
-            // Calculate prices
-            $prices = $this->calculatePrices(
-                $purchase->price,
-                $purchase->discount_percent,
-                $purchase->initial_quantity
-            );
-            
-            // Update prices
-            $purchase->total_price = $prices['total_price'];
-            $purchase->original_price = $prices['original_price'];
-            $purchase->discount_price = $prices['discount_price'];
+            $purchase = $this->calculatePrices($purchase);
 
             // Update code
             $purchase->code = $data['code'];
@@ -84,8 +74,6 @@ class PurchaseService
 
             $this->createOrUpdatePayment($purchase ,$expected_date_of_payment);
         }
-
-        // dd($purchase);
 
         // Check for uploaded image
         if ($file) {

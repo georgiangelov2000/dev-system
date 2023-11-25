@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Factory\FactoryImportAdapter;
-use App\Adapters\Views\ImportView;
+use App\Factory\Views\ImportView;
 use App\Http\Requests\CSVRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;

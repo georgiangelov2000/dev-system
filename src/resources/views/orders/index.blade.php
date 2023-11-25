@@ -48,9 +48,13 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group col-xl-2 col-lg-3 col-md-3 col-sm-3">
+                        <label for="customRange1">Expected delivery date</label>
+                        <input type="text" class="form-control pull-right" name="datetimes" data-search="expected_delivery_date" />
+                    </div>
                     <div class="form-group col-xl-2 col-lg-3 col-md-3 col-sm-3 mb-0">
                         <label for="customRange1">Delivery date</label>
-                        <input type="text" class="form-control pull-right" name="datetimes" />
+                        <input type="text" class="form-control pull-right" name="datetimes" data-search="delivery_date" />
                     </div>
                     <div class="form-group col-xl-2 col-lg-3 col-md-3 col-sm-3 mb-0">
                         <label for="">Status</label>

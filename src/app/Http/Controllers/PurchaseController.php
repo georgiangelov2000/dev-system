@@ -62,10 +62,11 @@ class PurchaseController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->route('purchase.index')->with('error', 'Purchase has not been created');
+            return redirect()->route('purchase.index')->with('error', $e->getMessage());
         }
         return redirect()->route('purchase.index')->with('success', 'Purchase has been created');
     }
+    
     public function edit(Purchase $purchase)
     {
         $orderAmounts = $purchase->orders->sum('sold_quantity');
@@ -88,7 +89,6 @@ class PurchaseController extends Controller
     
         return view('purchases.edit', compact('purchase'));
     }
-    
 
     public function update(Purchase $purchase, PurchaseRequest $request)
     {
@@ -120,6 +120,15 @@ class PurchaseController extends Controller
         try {
             $validated = $request->validated();
             $ids = $validated['purchase_ids'];
+            
+            unset($validated['purchase_ids']);
+
+            // Check if all values in $validated are null
+            if (empty(array_filter($validated, function ($value) {
+                return $value !== null;
+            }))) {
+                throw new \Exception('At least one field must be filled.');
+            }
 
             if(count($ids)) {
                 $purchases = Purchase::whereIn('id', $ids)->get();
@@ -129,15 +138,6 @@ class PurchaseController extends Controller
             
                     if(!$purchase) {
                         throw new \Exception('Purchase with ID ' . $id . ' not found.');
-                    }
-                    
-                    unset($validated['purchase_ids']);
-
-                    // Check if all values in $validated are null
-                    if (empty(array_filter($validated, function ($value) {
-                        return $value !== null;
-                    }))) {
-                        throw new \Exception('At least one field must be filled.');
                     }
                     
                     $this->service->purchaseMassEditProcessing($purchase,$validated);
@@ -160,18 +160,23 @@ class PurchaseController extends Controller
         DB::beginTransaction();
 
         try {
+
+            if ($purchase->is_it_delivered) {
+                throw new \Exception("Invalid operation: Purchase with ID {$id} has already been delivered.");
+            }            
+            
             $imagePath = str_replace('/storage', '', $purchase->image_path);
 
             // Check if the image path exists and delete it
             if ($purchase->image_path && Storage::disk('public')->exists($imagePath)) {
                 Storage::disk('public')->delete($imagePath);
             }
-
+            
             $purchase->delete();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Purchase has not been deleted'], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json(['message' => 'Purchase has been deleted'], 200);
     }

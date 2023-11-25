@@ -2,7 +2,7 @@
 
 namespace App\Factory\Views;
 
-use App\Adapters\ViewType;
+use App\Factory\ViewType;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ImportView extends ViewType

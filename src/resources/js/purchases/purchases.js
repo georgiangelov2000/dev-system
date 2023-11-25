@@ -300,7 +300,7 @@ $(function () {
     
         APICaller(SUPPLIER_API_ROUTE, { "search": text }, function (response) {
             const suppliers = response.data;
-            if (suppliers.length > 0) {
+            if (suppliers.length) {
                 suppliers.forEach(supplier => {
                     bootstrapSelectSupplier.append(`<option value="${supplier.id}"> ${supplier.name} </option>`);
                 });
