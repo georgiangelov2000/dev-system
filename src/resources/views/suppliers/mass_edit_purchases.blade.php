@@ -11,7 +11,7 @@
             <div class="alert alert-light" role="alert">
                 You have the flexibility to make updates to purchases that have not yet been delivered.
             </div>
-            <form method="PUT" action="{{route('purchase.mass.update')}}" onsubmit="updatePurchases(event)">
+            <form method="PUT" action="{{route('purchases.mass.update')}}" onsubmit="updatePurchases(event)">
                 @csrf
                 <table id="massEditPurchases" class="table table-hover table-sm dataTable no-footer">
                     <thead>
@@ -141,7 +141,7 @@
     <script type="text/javascript">
         const SUPPLIER_ID = {{ "$supplier->id" }};
         const PURCHASE_API = "{{ route('api.products') }}";
-        const PURCHASE_EDIT = "{{ route('purchase.edit', ':id') }}";
+        const PURCHASE_EDIT = "{{ route('purchases.edit', ':id') }}";
         const SUB_CATEGORY_API_ROUTE = "{{ route('api.subcategories') }}";
         const CONFIG_URL = "{{ config('app.url') }}";
     </script>

@@ -178,7 +178,7 @@
         const USER_API_ROUTE = "{{ route('api.users') }}";
         const PACKAGE_API_ROUTE = "{{ route('api.packages') }}";
         const ORDER_API_ROUTE = "{{ route('api.orders') }}";
-        const PURCHASE_ROUTE = "{{ route('purchase.edit',':id') }}"
+        const PURCHASE_ROUTE = "{{ route('purchases.edit',':id') }}"
     
     </script>
 @endpush

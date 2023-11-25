@@ -123,7 +123,7 @@
         <script type="text/javascript">
             const SUPPLIER_PAYMENTS_API = "{{ route('api.payments') }}";
             const TYPE = "purchase";
-            const PURCHASE_EDIT_ROUTE = "{{ route('purchase.edit',':id') }}"
+            const PURCHASE_EDIT_ROUTE = "{{ route('purchases.edit',':id') }}"
             const PURCHASE_PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
             const PURCHASE_PAYMENT_DELETE_ROUTE = "{{ route('payment.delete', [':payment', ':type']) }}";
             const PURCHASE_INVOICE_UPDATE_ROUTE = "{{ route('invoice.update',[':type',':id']) }}";

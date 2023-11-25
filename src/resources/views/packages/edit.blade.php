@@ -178,7 +178,7 @@
                                         {{ $order->tracking_number }}
                                     </td>
                                     <td>
-                                       <a href="{{route('purchase.edit',$order->purchase->id)}}">{{ $order->purchase->name }}</a>
+                                       <a href="{{route('purchases.edit',$order->purchase->id)}}">{{ $order->purchase->name }}</a>
                                     </td>
                                     <td>
                                         {{ $order->date_of_sale }}
@@ -282,6 +282,6 @@
         const ORDER_API_ROUTE = "{{ route('api.orders') }}"
         const CUSTOMER = "{{ $package->customer_id }}"
         const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit',':id') }}";
-        const PURCHASE_EDIT_ROUTE = "{{ route('purchase.edit',':id') }}";
+        const PURCHASE_EDIT_ROUTE = "{{ route('purchases.edit',':id') }}";
     </script>
 @endpush

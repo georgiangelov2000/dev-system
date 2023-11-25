@@ -133,13 +133,13 @@
             const CATEGORY_API_ROUTE = "{{ route('api.categories') }}";
             const SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
             const BRAND_API_ROUTE = "{{ route('api.brands') }}";
-            const PREVIEW_ROUTE = "{{ route('purchase.preview',':id') }}";
-            const REMOVE_PRODUCT_ROUTE = "{{ route('purchase.delete', ':id') }}";
-            const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
+            const PREVIEW_ROUTE = "{{ route('purchases.show',':id') }}";
+            const REMOVE_PRODUCT_ROUTE = "{{ route('purchases.destroy', ':id') }}";
+            const EDIT_PRODUCT_ROUTE = "{{ route('purchases.edit', ':id') }}";
             const EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
             const CATEGORY_ROUTE = "{{ route('api.subcategories') }}";
             const CONFIG_URL = "{{config('app.url')}}";
-            const ORDERS = "{{route('purchase.orders',':id')}}";
+            const ORDERS = "{{route('purchases.orders',':id')}}";
             const PAYMENT = "{{ route('payment.edit', [':payment', ':type']) }}";
         </script>
     @endpush

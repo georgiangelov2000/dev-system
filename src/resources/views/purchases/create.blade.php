@@ -8,7 +8,7 @@
             </div>
         </div>
         <div class="card-body pb-0">
-            <form class="d-flex flex-wrap" action='{{ route('purchase.store') }}' method='POST' enctype="multipart/form-data">
+            <form class="d-flex flex-wrap" action='{{ route('purchases.store') }}' method='POST' enctype="multipart/form-data">
                 @csrf
                 <div class="row flex-wrap">
                     <div class="col-10 d-flex flex-wrap p-2">

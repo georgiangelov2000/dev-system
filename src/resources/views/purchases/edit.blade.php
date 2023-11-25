@@ -10,7 +10,7 @@
         </div>
 
         <div class="card-body">
-            <form class="d-flex flex-wrap" action='{{ route('purchase.update', $purchase->id) }}' method='POST'
+            <form class="d-flex flex-wrap" action='{{ route('purchases.update', $purchase->id) }}' method='POST'
                 enctype="multipart/form-data">
                 @csrf
                 @method('PUT')

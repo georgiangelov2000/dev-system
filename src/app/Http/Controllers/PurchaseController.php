@@ -62,9 +62,9 @@ class PurchaseController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->route('purchase.index')->with('error', $e->getMessage());
+            return redirect()->route('purchases.index')->with('error', $e->getMessage());
         }
-        return redirect()->route('purchase.index')->with('success', 'Purchase has been created');
+        return redirect()->route('purchases.index')->with('success', 'Purchase has been created');
     }
     
     public function edit(Purchase $purchase)
@@ -102,15 +102,9 @@ class PurchaseController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->route('purchase.create')->with('error', 'Product has not updated');
+            return redirect()->route('purchases.create')->with('error', 'Product has not updated');
         }
-        return redirect()->route('purchase.index')->with('success', 'Product has been updated');
-    }
-
-    public function preview(Purchase $purchase)
-    {
-        $purchase->load('brands', 'categories', 'supplier:id,name', 'subcategories', 'images');
-        return view('purchases.preview', compact('purchase'));
+        return redirect()->route('purchases.index')->with('success', 'Product has been updated');
     }
 
     public function massEditUpdate(PurchaseMassEditRequest $request)
@@ -155,7 +149,7 @@ class PurchaseController extends Controller
         return response()->json(['message' => 'Purchases has been updated'], 200);
     }
 
-    public function delete(Purchase $purchase)
+    public function destroy(Purchase $purchase)
     {
         DB::beginTransaction();
 

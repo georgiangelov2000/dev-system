@@ -194,7 +194,7 @@
     <script type="text/javascript">
         const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
         const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit',':id') }}";
-        const PURCHASE_EDIT_ROUTE = "{{ route('purchase.edit',':id') }}";
+        const PURCHASE_EDIT_ROUTE = "{{ route('purchases.edit',':id') }}";
         const ORDER_API_ROUTE = "{{ route('api.orders') }}";
         const SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
         const ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";

@@ -88,17 +88,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/detach/category/{category}', [SupplierController::class, 'detachCategory'])->name('detach.category');
     });
 
-    Route::prefix('purchases')->name('purchase.')->group(function () {
-        Route::get('/', [PurchaseController::class, 'index'])->name('index');
-        Route::get('/create', [PurchaseController::class, 'create'])->name('create');
-        Route::get('/edit/{purchase}', [PurchaseController::class, 'edit'])->name('edit');
-        Route::get('/orders/{purchase}', [PurchaseController::class, 'orders'])->name('orders');
-        Route::get('/preview/{purchase}', [PurchaseController::class, 'preview'])->name('preview');
-        Route::post('/store', [PurchaseController::class, 'store'])->name('store');
-        Route::put('/update/{purchase}', [PurchaseController::class, 'update'])->name('update');
-        Route::put('/mass/edit', [PurchaseController::class, 'massEditUpdate'])->name('mass.update');
-        Route::delete('/delete/{purchase}', [PurchaseController::class, 'delete'])->name('delete');
-    });
+    Route::resource('purchases', PurchaseController::class);
+    Route::put('purchases/mass/edit', [PurchaseController::class, 'massEditUpdate'])->name('purchases.mass.update');
+    Route::get('purchases/orders/{purchase}', [PurchaseController::class, 'orders'])->name('purchases.orders');
+    
 
     Route::prefix('customers')->name('customer.')->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('index');

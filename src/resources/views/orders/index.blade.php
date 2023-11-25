@@ -134,7 +134,7 @@
             const ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";
             const ORDER_DELETE_ROUTE = "{{route('order.delete',':id')}}";
             const ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
-            const EDIT_PRODUCT_ROUTE = "{{ route('purchase.edit', ':id') }}";
+            const EDIT_PRODUCT_ROUTE = "{{ route('purchases.edit', ':id') }}";
             const CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}";
             const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
             const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";

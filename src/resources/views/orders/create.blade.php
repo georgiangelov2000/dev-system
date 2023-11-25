@@ -107,7 +107,7 @@
         <script type="text/javascript">
             const ORDER_INDEX_ROUTE = "{{route('order.index')}}";
             const IS_EDITABLE = true;
-            const PURCHASE_ROUTE = "{{ route('purchase.edit',':id') }}"
+            const PURCHASE_ROUTE = "{{ route('purchases.edit',':id') }}"
             const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
             const PRODUCT_API_ROUTE = "{{ route('api.products') }}";
             const USER_API_ROUTE = "{{route('api.users')}}";
