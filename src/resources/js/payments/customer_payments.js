@@ -443,7 +443,7 @@ $(function () {
 
     const template = swalText(name);
 
-    showConfirmationDialog('Selected items!', template, function () {
+    showConfirmationDialog('Selected items!', template, 'Yes, delete it!', function () {
       APIDELETECALLER(url, function (response) {
         toastr['success'](response.message);
         dataTable.ajax.reload(null, false);

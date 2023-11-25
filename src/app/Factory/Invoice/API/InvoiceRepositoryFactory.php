@@ -1,6 +1,5 @@
 <?php
-
-namespace App\Factory;
+namespace App\Factory\Invoice\API;
 use App\Repository\API\PurchaseInvoiceRepository;
 use App\Repository\API\OrderInvoiceRepository;
 

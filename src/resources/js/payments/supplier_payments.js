@@ -219,8 +219,8 @@ $(function () {
                     data.user = bootstrapSelectSupplier.val();
                     data.date = dateRangePicker.val();
                     data.type = TYPE;
-                    data.delivery_status = bootstrapSelectPaymentStatus.val();
-                    data.payment_status = bootstrapSelectDeliveryStatus.val();
+                    data.delivery_status = bootstrapSelectDeliveryStatus.val();
+                    data.payment_status = bootstrapSelectPaymentStatus.val();
                     data.custom_length = data.length; // Corrected the property assignment
                     data.search.value = data.search.value; // Corrected the property assignment
                 },
@@ -372,6 +372,11 @@ $(function () {
                     orderable: false,
                     render: function (data, type, row) {
                         const formattedDate = row.date_of_payment ? moment(row.date_of_payment).format('MMM DD, YYYY') : '';
+                        
+                        if(row.payment_status === 5) {
+                          return `<span class = "text-danger font-weight-bold">The purchase was refunded</span>`  
+                        }
+
                         return `<span>${formattedDate}</span>`;
                     },
                 },
@@ -482,7 +487,7 @@ $(function () {
 
         const template = swalText(name);
 
-        showConfirmationDialog("Selected items!", template, function () {
+        showConfirmationDialog("Selected items!", template, 'Yes, delete it!', function () {
             APIDELETECALLER(
                 url,
                 function (response) {

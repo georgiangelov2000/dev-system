@@ -405,7 +405,7 @@ $(function () {
 
         let template = swalText(searchedNames);
 
-        showConfirmationDialog('Selected packages', template, function () {
+        showConfirmationDialog('Selected packages', template, 'Yes, delete records!', function () {
             APIDELETECALLER(PACKAGE_DELETE_ROUTE.replace(':id', id), function (response) {
                 toastr['success'](response.message);
                 dataTable.ajax.reload(null, false);

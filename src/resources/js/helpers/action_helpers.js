@@ -99,7 +99,12 @@ export function ajaxResponse(obj, modal) {
     }
 };
 
-export function showConfirmationDialog(title, template,callback) {
+export function showConfirmationDialog(title, template,confirmButtonText = null, callback) {
+    
+    if(confirmButtonText === null) {
+        confirmButtonText = "Yes, delete it!";
+    }
+
     Swal.fire({
       title: title,
       html: template,
@@ -108,7 +113,7 @@ export function showConfirmationDialog(title, template,callback) {
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonText: confirmButtonText
     }).then((result) => {
         if(result.isConfirmed) {
             callback()

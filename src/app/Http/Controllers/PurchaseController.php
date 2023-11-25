@@ -175,6 +175,32 @@ class PurchaseController extends Controller
         return response()->json(['message' => 'Purchase has been deleted'], 200);
     }
 
+    public function updateSpecificColumns(Purchase $purchase ,Request $request){
+        DB::beginTransaction();
+
+        try {
+            $specificColumns = $request->only(['status']);
+            $status = intval($specificColumns['status']);
+
+            $payment = $purchase->payment; 
+            $paymentStatus = $payment->payment_status;
+
+            if(in_array($paymentStatus,[PurchasePayment::SUCCESSFULLY_PAID_DELIVERED,$paymentStatus === PurchasePayment::OVERDUE])) {
+                throw new \Exception("Invalid operation: Purchase with id ${$purchase->id} paid or overdue statuses cannot be refunded");
+            }
+            
+            $payment->payment_status = PurchasePayment::REFUNDED;
+            $payment->delivery_status = PurchasePayment::SUCCESSFULLY_PAID_DELIVERED;
+            $payment->save();
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+        return response()->json(['message' => 'Purchase has been refunded!'], 200);
+    }
+
     public function orders(Purchase $purchase)
     {
         return view('purchases.orders', compact('purchase'));

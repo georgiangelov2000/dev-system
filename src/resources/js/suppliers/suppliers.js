@@ -294,7 +294,7 @@ $(document).ready(function () {
 
         const template = swalText(name);
 
-        showConfirmationDialog('Selected suppliers!', template, function () {
+        showConfirmationDialog('Selected suppliers!', template,'Yes, delete it!', function () {
             APIDELETECALLER(action, function (response) {
 
                 if (response.status === 500) {
@@ -322,7 +322,7 @@ $(document).ready(function () {
 
         const template = swalText(searchedNames);
 
-        showConfirmationDialog('Selected suppliers', template, function () {
+        showConfirmationDialog('Selected suppliers', template, 'Yes, delete records!', function () {
             searchedIds.forEach(function (id, index) {
                 APIDELETECALLER(REMOVE_SUPPLIER_ROUTE.replace(":id", id), function (response) {
                     if (response.status === 500) {

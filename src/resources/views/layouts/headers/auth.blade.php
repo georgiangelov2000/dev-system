@@ -264,6 +264,28 @@
 
                 <li class="nav-item">
                     <a href="#" class="nav-link">
+                        <i class="fal fa-file-invoice"></i>
+                        <p>
+                            Invoices
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="{{ route('payment.index', 'order') }}" class="nav-link">
+                                <p>Order invoices</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('payment.index', 'purchase') }}" class="nav-link">
+                                <p>Purchase invoices</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
                         <i class="fa fa-light fa-cog" aria-hidden="true"></i>
                         <p>
                             Settings

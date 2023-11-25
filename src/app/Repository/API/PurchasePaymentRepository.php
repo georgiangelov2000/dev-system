@@ -43,6 +43,7 @@ class PurchasePaymentRepository implements ApiRepository
     }
 
     private function applyFilters($request, $query){
+
         $date = $request->input('date',null);
         list($dateStart, $dateEnd) = $this->helper()->dateRange($date);
         $this->date  =$this->helper()->dateToString($dateStart, $dateEnd);

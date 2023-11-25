@@ -139,6 +139,7 @@
             const EDIT_SUPPLIER_ROUTE = "{{route('supplier.edit',':id')}}";
             const CATEGORY_ROUTE = "{{ route('api.subcategories') }}";
             const CONFIG_URL = "{{config('app.url')}}";
+            const UPDATE_PRODUCT_STATUS_ROUTE = "{{ route('purchases.update.status',':id') }}"
             const ORDERS = "{{route('purchases.orders',':id')}}";
             const PAYMENT = "{{ route('payment.edit', [':payment', ':type']) }}";
         </script>

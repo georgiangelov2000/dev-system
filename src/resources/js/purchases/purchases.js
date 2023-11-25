@@ -1,4 +1,4 @@
-import { APIDELETECALLER, APICaller } from '../ajax/methods';
+import { APIDELETECALLER, APICaller, APIPUTCALLER } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 import { numericFormat } from '../helpers/functions';
 import { statusPaymentsWithIcons, paymentStatuses } from '../helpers/statuses';
@@ -189,6 +189,9 @@ $(function () {
                 width: '10%',
                 orderable: false,
                 render: function (data, type, row) {
+                    if(row.payment.payment_status === 5) {
+                        return `<b class="text-danger">Purchase was refunded!</b>`;
+                    }
                     const expected = moment(row.expected_delivery_date);
                     const deliveryDate = moment(row.delivery_date);
                     const isDelivered = row.is_it_delivered;
@@ -245,14 +248,14 @@ $(function () {
                             </form>`
                         : '';
 
-                    // const refundedFormTemplate = isPendingPayment === 2
-                    // ? `<form class="dropdown-item" style='display:inline-block;' action=${UPDATE_PRODUCT_STATUS_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
-                    //     <input type='hidden' name='_method' value='DELETE'>
-                    //     <input type='hidden' name='id' value='${row.id}'>
-                    //     <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); updateCurrentProduct(this);'>
-                    //         <i class="fa-light fa-undo text-danger" aria-hidden="true"></i> Refunded
-                    //     </button>
-                    // </form>`: '';
+                    const refundedFormTemplate = isPendingPayment === 2
+                    ? `<form class="dropdown-item" style='display:inline-block;' action=${UPDATE_PRODUCT_STATUS_ROUTE.replace(':id', row.id)} method='POST' data-name=${row.name}>
+                        <input type='hidden' name='_method' value='DELETE'>
+                        <input type='hidden' name='id' value='${row.id}'>
+                        <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); updateCurrentProduct(this);'>
+                            <i class="fa-light fa-undo text-danger" aria-hidden="true"></i> Refunded
+                        </button>
+                    </form>`: '';
 
                     const previewLink = `<a  title='Preview' href="${PREVIEW_ROUTE.replace(':id', row.id)}" class='btn dropdown-item'>
                                             <i class='fa-light fa-magnifying-glass text-info' aria-hidden='true'></i> Preview
@@ -276,6 +279,7 @@ $(function () {
                                 ${previewLink}
                                 ${orderCart}
                                 ${editButton}
+                                ${refundedFormTemplate}
                             </div>
                         </div>
                     `;
@@ -434,6 +438,22 @@ $(function () {
         $('.actions').toggleClass('d-none', !isChecked);
     };
     
+    window.updateCurrentProduct = function(element) 
+    {
+        const form = $(element).closest('form');
+        const name = form.attr('data-name');
+        const url = form.attr('action');
+    
+        const template = swalText(name);
+        showConfirmationDialog('Selected purchases!', template, 'Yes, updated it!', () => {
+            APIPUTCALLER(url,{'status':5}, response => {
+                toastr['success'](response.message);
+                table.DataTable().ajax.reload();
+            }, error => {
+                toastr['error'](error.message);
+            });
+        });
+    }
 
     window.deleteCurrentProduct = function (element) {
         const form = $(element).closest('form');
@@ -442,12 +462,12 @@ $(function () {
     
         const template = swalText(name);
     
-        showConfirmationDialog('Selected purchases!', template, () => {
+        showConfirmationDialog('Selected purchases!', template, 'Yes, deleted it!', () => {
             APIDELETECALLER(url, response => {
-                toastr['success'](response.message);
+                toastr.success(response.message);
                 table.DataTable().ajax.reload();
             }, error => {
-                toastr['error'](error.message);
+                toastr.error(error.message);
             });
         });
     };
@@ -464,7 +484,7 @@ $(function () {
     
         const template = swalText(searchedNames);
     
-        showConfirmationDialog('Selected purchases!', template, () => {
+        showConfirmationDialog('Selected purchases!', template, 'Yes, delete records!', () => {
             searchedIds.forEach((id, index) => {
                 const apiUrl = REMOVE_PRODUCT_ROUTE.replace(':id', id);
                 APIDELETECALLER(apiUrl, response => {

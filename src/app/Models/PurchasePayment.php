@@ -33,6 +33,7 @@ class PurchasePayment extends Model
     // FOR BOTH
     const PENDING = 2;
     const OVERDUE = 4;
+    const REFUNDED = 5;
 
     protected $fillable = [
         'purchase_id',

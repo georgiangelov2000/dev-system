@@ -282,7 +282,7 @@ $(function () {
 
         let template = swalText(name);
 
-        showConfirmationDialog('Selected items!', template, function () {
+        showConfirmationDialog('Selected items!', template, 'Yes, deleted it!', function () {
             APIDELETECALLER(url, function (response) {
                 toastr['success'](response.message);
                 dataT.ajax.reload(null, false);
@@ -350,7 +350,7 @@ $(function () {
 
         let template = swalText(searchedNames);
 
-        showConfirmationDialog('Selected items!', template, function () {
+        showConfirmationDialog('Selected items!', template, 'Yes, delete records!', function () {
             searchedIds.forEach(function (id, index) {
                 APIDELETECALLER(REMOVE_CATEGORY_ROUTE.replace(':id', id), function (response) {
                     toastr['success'](response.message);

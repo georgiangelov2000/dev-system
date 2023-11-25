@@ -112,7 +112,7 @@ $(function () {
 
             const template = swalText(name);
 
-            showConfirmationDialog('Selected items!', template, function () {
+            showConfirmationDialog('Selected items!', template, 'Yes, delete it!', function () {
                 APIDELETECALLER(url, function (response) {
                     toastr['success'](response.message);
                     dataTable.ajax.reload();
@@ -155,8 +155,9 @@ $(function () {
 
             let template = swalText(searchedNames);
 
-            showConfirmationDialog('Selected items!',template,function(){
-                searchedIds.forEach(function(id,index){            let searchedIds = [];
+            showConfirmationDialog('Selected items!',template, 'Yes, delete records!',function(){
+                searchedIds.forEach(function(id,index){            
+                    let searchedIds = [];
                     let searchedNames = [];
         
                     $('tbody tr input[type="checkbox"]:checked').each(function () {

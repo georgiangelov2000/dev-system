@@ -91,7 +91,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('purchases', PurchaseController::class);
     Route::put('purchases/mass/edit', [PurchaseController::class, 'massEditUpdate'])->name('purchases.mass.update');
     Route::get('purchases/orders/{purchase}', [PurchaseController::class, 'orders'])->name('purchases.orders');
-    
+    Route::put('purchases/update/status/{purchase}', [PurchaseController::class, 'updateSpecificColumns'])->name('purchases.update.status');
+
 
     Route::prefix('customers')->name('customer.')->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('index');
