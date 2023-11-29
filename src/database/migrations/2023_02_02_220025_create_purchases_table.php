@@ -25,6 +25,9 @@ class CreatePurchasesTable extends Migration {
             $table->date('expected_delivery_date');
             $table->unsignedInteger('discount_percent')->default(0);
             $table->unsignedInteger('initial_quantity')->default(0);
+            $table->unsignedInteger('weight')->default(0);
+            $table->unsignedInteger('height')->default(0);
+            $table->unsignedInteger('color')->default('');
             $table->string('notes')->default('');
             $table->string('code',20);
             $table->string('image_path')->nullable();

@@ -32,19 +32,17 @@ class PurchaseService
             : FunctionsHelper::statusValidation($purchase->payment->payment_status, $this->statuses);
         $expected_date_of_payment = !$isNewPurchase ? $purchase->payment->expected_date_of_payment : null;
         
-        // Update purchase or create Purchase;
-        $purchase->name = $data['name'];
-        $purchase->supplier_id = $data['supplier_id'];
-        $purchase->notes = $data['notes'] ?? '';
-        
         if (($purchase && $status === self::INIT_STATUS) || $isNewPurchase) {
-            $prices = null;
+            // Update purchase or create Purchase;
+            $purchase->name = $data['name'];
+            $purchase->supplier_id = $data['supplier_id'];
+            $purchase->notes = $data['notes'] ?? '';
             
             // assign updated values to purchase
             $purchase->price = $data['price'];
             $purchase->discount_percent = intval($data['discount_percent']) ?? 0;
         
-            // Update amount
+            // Update amount                
             if ($data['quantity'] > 0) {
                 $purchase->quantity = $data['quantity'];
             }
@@ -71,23 +69,27 @@ class PurchaseService
             $purchase->expected_delivery_date = now()->parse($data['expected_delivery_date']);
             $expected_date_of_payment = now()->parse($data['expected_date_of_payment']);
             $purchase->is_it_delivered = self::INITIAL_DELIVERED;
+            $purchase->weight = $data['weight'];
+            $purchase->height = $data['height'];
+            $purchase->color = $data['color'];
 
             $this->createOrUpdatePayment($purchase ,$expected_date_of_payment);
+            
+            // Check for uploaded image
+            if ($file) {
+                FunctionsHelper::imageUploader($file, $purchase, $this->dir);
+            }
+            
+            // Create or update current purchase
+            $purchase->save();
+
+            // Sync relationships for purchase
+            FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'category_id', 'categories');
+            FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'subcategories', 'subcategories');
+            FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'brands', 'brands');
+
         }
-
-        // Check for uploaded image
-        if ($file) {
-            FunctionsHelper::imageUploader($file, $purchase, $this->dir);
-        }
-
-        // Create or update current purchase
-        $purchase->save();
-
-        // Sync relationships for purchase
-        FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'category_id', 'categories');
-        FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'subcategories', 'subcategories');
-        FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'brands', 'brands');
-
+        
         return $purchase;
     }
 

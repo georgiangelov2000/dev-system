@@ -270,8 +270,9 @@ table.dataTable {
 
 @media print {
 	.cardTemplate {
-		display: none !important;
+		// display: none !important;
 		/* Hide the cardTemplate divs during print */
+		border: none;
 	}
 
 	.print-only {

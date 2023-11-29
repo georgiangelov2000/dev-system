@@ -13,6 +13,7 @@ use App\Http\Requests\PurchaseMassEditRequest;
 use App\Services\PurchaseService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class PurchaseController extends Controller
 {
@@ -69,24 +70,23 @@ class PurchaseController extends Controller
     
     public function edit(Purchase $purchase)
     {
-        $orderAmounts = $purchase->orders->sum('sold_quantity');
-    
-        // Assuming $purchaseId is the ID you want to use in the query
-        $paymentRecord = PurchasePayment::where('purchase_id', $purchase->id)->first();
-    
-        // Check if the payment record exists and is not null
-        $isEditable = $paymentRecord && $this->helper->statusValidation($paymentRecord->payment_status, $this->statuses) === Purchase::PENDING;
-    
-        if (!$isEditable) {
+        $purchase->order_amount = $purchase->orders->sum('sold_quantity');
+        $payment = $purchase->payment;
+        $purchase->is_editable = $payment->payment_status === Purchase::PENDING ? true : false;
+
+        $purchase->category = $purchase->categories()->first();
+        $purchase->sub_categories = $purchase->subcategories()->get();
+        $purchase->brands = $purchase->brands()->get();
+        $purchase->supplier = $purchase->supplier;
+        
+        if(!$purchase->is_editable) {
             $purchase->expected_delivery_date = now()->parse($purchase->expected_delivery_date)->format('d F Y');
-            $purchase->expected_date_of_payment = now()->parse(optional($purchase->payment)->expected_date_of_payment)->format('d F Y');
+            $purchase->expected_date_of_payment = now()->parse($payment->expected_date_of_payment)->format('d F Y');
             $purchase->delivery_date = now()->parse($purchase->delivery_date)->format('d F Y');
         }
+
+        $purchase->status = $this->statuses[$payment->payment_status]; 
         
-        $purchase->status = !$isEditable ? $this->statuses[$paymentRecord->payment_status] : null;
-        $purchase->order_amount = $orderAmounts;
-        $purchase->is_editable = $isEditable;
-    
         return view('purchases.edit', compact('purchase'));
     }
 
@@ -173,6 +173,28 @@ class PurchaseController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
         return response()->json(['message' => 'Purchase has been deleted'], 200);
+    }
+
+    public function show (Purchase $purchase) {
+        $purchase->load('payment','payment.invoice','supplier','categories','brands');
+        
+        $payment_methods = config('statuses.payment_methods_statuses');
+
+        if($purchase->delivery_date) {
+            $purchase->delivery_date = Carbon::parse($purchase->delivery_date)->format('F j, Y');
+        }
+
+        if ($purchase->payment) {
+            $purchase->payment->payment_status = $this->statuses[$purchase->payment->payment_status];
+            $purchase->payment->payment_reference  == 'N/A' ? '' : $purchase->payment->payment_reference;
+            $purchase->payment->payment_method = $payment_methods[$purchase->payment->payment_method] ?? '';
+            $purchase->payment->expected_date_of_payment = Carbon::parse($purchase->payment->expected_date_of_payment)->format('F j, Y');
+            $purchase->payment->date_of_payment = Carbon::parse($purchase->payment->date_of_payment)->format('F j, Y');
+        }
+        
+        
+        $company = $companyInformation = FunctionsHelper::settings();
+        return view('purchases.show',compact('purchase','company'));
     }
 
     public function updateSpecificColumns(Purchase $purchase ,Request $request){

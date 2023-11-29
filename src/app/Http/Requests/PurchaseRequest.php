@@ -14,24 +14,26 @@ class PurchaseRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [
-            "image" => "nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048",
-            "name" => "required|string",  
-            "supplier_id" => "required|integer|not_in:0",
-            "category_id" => "required|integer|not_in:0",
-            "subcategories" => "nullable|array",
-            "notes" => "nullable|string",
-            "brands" => "nullable|array",
-            "image_path" => "nullable",          
-        ];
-
+        $rules = [];
+        
         if($this->isPaymentRequired()) {
+            $rules['image'] = "nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048";
+            $rules['name'] = 'required|string';
+            $rules['image_path'] = 'nullable|string';
+            $rules['supplier_id'] = 'required|integer';
+            $rules['category_id'] = 'required|integer';
+            $rules['subcategories'] = 'nullable|array';
+            $rules['notes'] = "nullable|string";
+            $rules['brands'] = "nullable|array";
             $rules["code"] = 'required|string|max:20';
             $rules["expected_delivery_date"] = 'required|date';
             $rules["expected_date_of_payment"] = 'required|date';
             $rules["discount_percent"] = 'required|integer|min:0';
             $rules["price"] = 'required|numeric|min:1';
-            $rules["quantity"] = 'required|integer|min:1';            
+            $rules["quantity"] = 'required|integer|min:1';
+            $rules["weight"] = 'nullable|integer|min:0';
+            $rules["height"] = 'nullable|integer|min:0';
+            $rules["color"] = 'nullable|string';            
         }
 
         return $rules;

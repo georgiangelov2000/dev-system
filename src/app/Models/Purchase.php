@@ -61,6 +61,9 @@ class Purchase extends Model {
         'discount_percent',
         'discount_price',
         'delivery_date',
+        'weight',
+        'height',
+        'color',
         'image_path',
         'is_it_delivered',
     ];

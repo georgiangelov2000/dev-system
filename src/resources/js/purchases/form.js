@@ -13,18 +13,26 @@ $(function () {
     const priceInput = $('input[name="price"]');
     const discountInput = $('input[name="discount_percent"]');
     const resultTable = $('table#result');
-    const categoryId = selectCategory.val();
 
-    if(categoryId && categoryId !== '0') {
-        APICaller(SUB_CATEGORY_ROUTE, { "category": categoryId, 'select_json':true }, response => {
-            const subCategories = response;
-            subCategories.forEach(subCategory => {
-                selectSubCategory.append(`<option value=${subCategory.id}>${subCategory.name}</option>`);
-            });
-            selectSubCategory.selectpicker('refresh');
-        }, error => {
-            console.log(error);
-        });
+    if(typeof IS_EDIT !== 'undefined' && IS_EDIT) {
+
+        if(IS_EDITABLE !== 'undefined' && IS_EDITABLE != false) {
+                APICaller(SUB_CATEGORY_ROUTE, { "category": CATEGORY_ID, 'select_json':true }, response => {
+                    const subCategories = response;
+                    
+                    subCategories.forEach(subCategory => {
+                        const isSelected = SUB_CATEGORIES.includes(subCategory.id);
+                        selectSubCategory.append(
+                            `<option value=${subCategory.id} ${isSelected ? 'selected' : ''}>
+                                ${subCategory.name}
+                            </option>`
+                        );
+                    });
+                    selectSubCategory.selectpicker('refresh');
+                }, error => {
+                    console.log(error);
+                });
+        }
     }
 
     $('.datepicker').datepicker({format: 'mm/dd/yyyy'})

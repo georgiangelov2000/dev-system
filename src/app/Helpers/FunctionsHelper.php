@@ -154,7 +154,7 @@ class FunctionsHelper
     public static function settings()
     {
         $settingsInformation = Settings::where('type', 1)->first();
-
+        
         if ($settingsInformation) {
             $result = json_decode($settingsInformation->settings, true);
         } else {
