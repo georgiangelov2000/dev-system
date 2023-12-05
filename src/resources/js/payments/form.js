@@ -18,9 +18,9 @@ $(function () {
     function getPaymentDateHtml(index) {
         let template = ``;
 
-        if (index == 1) {
+        if (index == 1 && paymentStatus != 5) {
             template = `
-                <div class="form-group col-12">
+                <div class="form-group col-3">
                         <label for="date_of_payment">Date of payment</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
@@ -36,7 +36,7 @@ $(function () {
                             }" />
                         </div>
                 </div>
-                <div class="form-group col-12">
+                <div class="form-group col-3">
                         <label for="delivery_date">Delivery date</label>
                         <div class="input-group">
                             <div class="input-group-prepend">

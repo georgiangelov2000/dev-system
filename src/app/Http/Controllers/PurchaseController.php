@@ -73,6 +73,7 @@ class PurchaseController extends Controller
         $purchase->order_amount = $purchase->orders->sum('sold_quantity');
         $payment = $purchase->payment;
         $purchase->is_editable = $payment->payment_status === Purchase::PENDING ? true : false;
+        $purchase->invoice = $purchase->payment->invoice;
 
         $purchase->category = $purchase->categories()->first();
         $purchase->sub_categories = $purchase->subcategories()->get();
@@ -83,6 +84,7 @@ class PurchaseController extends Controller
             $purchase->expected_delivery_date = now()->parse($purchase->expected_delivery_date)->format('d F Y');
             $purchase->expected_date_of_payment = now()->parse($payment->expected_date_of_payment)->format('d F Y');
             $purchase->delivery_date = now()->parse($purchase->delivery_date)->format('d F Y');
+            $purchase->invoice->invoice_date = now()->parse($purchase->invoice->invoice_date)->format('d F Y');
         }
 
         $purchase->status = $this->statuses[$payment->payment_status]; 
@@ -177,6 +179,8 @@ class PurchaseController extends Controller
 
     public function show (Purchase $purchase) {
         $purchase->load('payment','payment.invoice','supplier','categories','brands');
+
+        $payment = $purchase->payment;
         
         $payment_methods = config('statuses.payment_methods_statuses');
 
@@ -184,14 +188,15 @@ class PurchaseController extends Controller
             $purchase->delivery_date = Carbon::parse($purchase->delivery_date)->format('F j, Y');
         }
 
-        if ($purchase->payment) {
-            $purchase->payment->payment_status = $this->statuses[$purchase->payment->payment_status];
-            $purchase->payment->payment_reference  == 'N/A' ? '' : $purchase->payment->payment_reference;
-            $purchase->payment->payment_method = $payment_methods[$purchase->payment->payment_method] ?? '';
-            $purchase->payment->expected_date_of_payment = Carbon::parse($purchase->payment->expected_date_of_payment)->format('F j, Y');
-            $purchase->payment->date_of_payment = Carbon::parse($purchase->payment->date_of_payment)->format('F j, Y');
+        if($payment) {
+            $payment->payment_status = $this->statuses[$purchase->payment->payment_status] ?? '';
+            $payment->payment_method = $payment_methods[$purchase->payment->payment_method] ?? '';
+            $payment->expected_date_of_payment = Carbon::parse($payment->expected_date_of_payment)->format('F j, Y');
+
+            if($payment->date_of_payment) {
+                $payment->date_of_payment = Carbon::parse($payment->date_of_payment)->format('F j, Y');
+            }
         }
-        
         
         $company = $companyInformation = FunctionsHelper::settings();
         return view('purchases.show',compact('purchase','company'));

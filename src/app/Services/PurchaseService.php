@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\FunctionsHelper;
 use App\Models\Purchase;
 use App\Models\PurchasePayment;
+use App\Models\InvoicePurchase;
 
 
 class PurchaseService
@@ -20,8 +21,8 @@ class PurchaseService
     }
 
     public function purchaseProcessing(array $data, $purchase = null)
-    {        
-
+    {
+        
         // Check if $data['image'] exists and set it to $file
         $file = $data['image'] ?? null;
 
@@ -33,6 +34,9 @@ class PurchaseService
         $expected_date_of_payment = !$isNewPurchase ? $purchase->payment->expected_date_of_payment : null;
         
         if (($purchase && $status === self::INIT_STATUS) || $isNewPurchase) {
+            $invNumber = $data['invoice_number'];
+            $invDate = now()->parse($data['invoice_date']);
+
             // Update purchase or create Purchase;
             $purchase->name = $data['name'];
             $purchase->supplier_id = $data['supplier_id'];
@@ -73,15 +77,21 @@ class PurchaseService
             $purchase->height = $data['height'];
             $purchase->color = $data['color'];
 
-            $this->createOrUpdatePayment($purchase ,$expected_date_of_payment);
-            
             // Check for uploaded image
             if ($file) {
                 FunctionsHelper::imageUploader($file, $purchase, $this->dir);
             }
             
+                                    
             // Create or update current purchase
             $purchase->save();
+
+            $this->createOrUpdatePayment(
+                $purchase,
+                $expected_date_of_payment,
+                $invNumber,
+                $invDate
+            );
 
             // Sync relationships for purchase
             FunctionsHelper::syncRelationshipIfNotEmpty($purchase, $data, 'category_id', 'categories');
@@ -174,7 +184,12 @@ class PurchaseService
         return $model;
     }
 
-    private function createOrUpdatePayment($purchase, $expected_date_of_payment = null): PurchasePayment
+    private function createOrUpdatePayment(
+        $purchase, 
+        $expected_date_of_payment = null,
+        $invoiceNumber = null,
+        $invoiceDate = null,
+    ): PurchasePayment
     {
         $payment = $purchase->payment ? $purchase->payment : new PurchasePayment();
         
@@ -194,11 +209,20 @@ class PurchaseService
         }
 
         $payment->save();
+
+        $invoice = $payment->invoice ? $payment->invoice : new InvoicePurchase();
+
+        if($invoiceNumber) {
+            $invoice->invoice_number = $invoiceNumber;
+        }
+        if($invoiceDate) {
+            $invoice->invoice_date = $invoiceDate;
+        }
         
-        $payment->invoice()->updateOrCreate([], [
-            'price' => $payment->price,
-            'quantity' => $payment->quantity,
-        ]);
+        $invoice->price = $payment->price;
+        $invoice->quantity = $payment->quantity;
+
+        $invoice->save();
 
         return $payment;
     }

@@ -48,8 +48,7 @@ class OrderApiController extends Controller
         $this->applyFilters($request, $orderQuery);
 
         if ($select_json) {
-            return $this->applySelectFieldJSON($orderQuery);
-
+            return $this->applySelectFieldJSON($orderQuery->with('purchase'));
         }
 
         $orderQuery->with($relations);

@@ -189,6 +189,31 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="form-group col-3">
+                            <label class="form-label required" for="invoice_number">Invoice number</label>
+                            <input 
+                                type="text" 
+                                class="form-control"
+                                name="invoice_number"
+                                value=""
+                            />
+                            @error('invoice_number')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="form-group col-3">
+                            <label class="form-label required" for="invoice_date">Invoice date</label>
+                            <input 
+                                type="text" 
+                                id="invoice_date"
+                                class="datepicker form-control"
+                                name="invoice_date"
+                                value=""
+                            />
+                            @error('invoice_date')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
 
                         <div class="form-group col-12">
                             <button type="submit" class="btn btn-primary">

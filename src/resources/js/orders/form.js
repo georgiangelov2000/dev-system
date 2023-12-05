@@ -336,6 +336,7 @@ $(function () {
         let template = ``;
 
         if (isEdit) {
+            console.log(data);
             if (typeof IS_EDITABLE !== "undefined" && IS_EDITABLE == false) {
                 template += `<tr data-id=${data.order.id}>
                     <td>

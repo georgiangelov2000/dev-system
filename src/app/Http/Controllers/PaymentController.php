@@ -99,6 +99,7 @@ class PaymentController extends Controller
      */
     private function paymentProcessing(array $data, $builder, $relation)
     {   
+        
         // Validate payment method
         if (!$data['payment_method'] || !$this->helper->statusValidation($data['payment_method'], $this->paymentMethods)) {
             throw new \Exception('Invalid payment method.');

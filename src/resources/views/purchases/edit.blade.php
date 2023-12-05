@@ -347,6 +347,54 @@
                         </div>
                     </div>
 
+                    <div class="col-12 d-flex flex-wrap p-0">
+                        <h5 class="col-12 pt-2"> <i class="fa-light fa-calendar-days"></i> Invoice setup </h5>
+                        <div class="col-12">
+                            <hr class="mt-0">
+                        </div>
+                        <div class="form-group col-3">
+                            <label 
+                                class="form-label required" 
+                                for="invoice_number"
+                            >Invoice number</label>
+
+                            @if($purchase->is_editable)
+                                <input 
+                                    type="text" 
+                                    class="form-control"
+                                    name="invoice_number"
+                                    value="{{ $purchase->invoice->invoice_number }}"
+                                />
+                                @error('invoice_number')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            @else
+                                <p name="weight-label" class="input-group-text col-12 border-0">
+                                    {{ $purchase->invoice->invoice_number }}
+                                </p>
+                            @endif
+                        </div>
+                        <div class="form-group col-3">
+                            <label class="form-label required" for="invoice_date">Invoice date</label>
+                            @if($purchase->id_editable)
+                                <input 
+                                    type="text" 
+                                    id="invoice_date"
+                                    class="datepicker form-control"
+                                    name="invoice_date"
+                                    value="{{ date('m/d/Y', strtotime($purchase->invoice->invoice_date))}}"
+                                />
+                                @error('invoice_date')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            @else
+                                <p name="weight-label" class="input-group-text col-12 border-0">
+                                    {{ $purchase->invoice->invoice_date }}
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+
                     @if ($purchase->is_editable)
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary">
@@ -377,7 +425,7 @@
             @if ($purchase->is_editable)
                 </form>
             @else
-                    </div>
+                </div>
             @endif
     </div>
     <div class="card-footer bg-white pt-0">

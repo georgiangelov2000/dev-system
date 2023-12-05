@@ -8,7 +8,6 @@
                 <div class="col-12">
                     <h4>
                         <i class="fas fa-globe"></i> Supplier: {{ $purchase->supplier->name }}
-                        <small class="float-right">Date: 2/10/2014</small>
                     </h4>
                 </div>
 
@@ -50,22 +49,21 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Qty</th>
-                                <th>Purchase</th>
+                               <th>Purchase</th>
                                 <th>Tracking number</th>
-                                <th>Category</th>
-                                <th>Brand</th>
+                                <th>Qty</th>
                                 <th>Unit price</th>
                                 <th>Unit Discount price</th>
                                 <th>Total price</th>
+                                <th>Weight</th>
+                                <th>Height</th>
                                 <th>Discount %</th>
+                                <th>Category</th>
+                                <th>Brand</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>
-                                    {{$purchase->payment->quantity }}
-                                </td>
                                 <td>
                                     {{ $purchase->name }}
                                 </td>
@@ -73,10 +71,7 @@
                                     {{ $purchase->code }}
                                 </td>
                                 <td>
-                                    {{ implode(', ', $purchase->categories->pluck('name')->toArray()) }}
-                                </td>
-                                <td>
-                                    {{ implode(', ', $purchase->brands->pluck('name')->toArray()) }}
+                                    {{$purchase->payment->quantity }}
                                 </td>
                                 <td>
                                     {{ number_format($purchase->price, 2, '.', '.') }}
@@ -88,7 +83,19 @@
                                     {{ number_format($purchase->payment->price, 2, '.', '.') }}
                                 </td>
                                 <td>
+                                    {{ $purchase->weight }}
+                                </td>
+                                <td>
+                                    {{ $purchase->height }}
+                                </td>
+                                <td>
                                     {{ $purchase->discount_percent }}
+                                </td>
+                                <td>
+                                    {{ implode(', ', $purchase->categories->pluck('name')->toArray()) }}
+                                </td>
+                                <td>
+                                    {{ implode(', ', $purchase->brands->pluck('name')->toArray()) }}
                                 </td>
                             </tr>
                         </tbody>
@@ -118,7 +125,7 @@
                                 </tr>
                                 <tr>
                                     <th>Payment status:</th>
-                                    <td>{{ $purchase->delivery_date }}</td>
+                                    <td>{{ $purchase->payment->payment_status }}</td>
                                 </tr>
                             </tbody>
                         </table>

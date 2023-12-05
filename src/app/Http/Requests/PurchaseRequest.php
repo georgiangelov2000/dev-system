@@ -33,7 +33,9 @@ class PurchaseRequest extends FormRequest
             $rules["quantity"] = 'required|integer|min:1';
             $rules["weight"] = 'nullable|integer|min:0';
             $rules["height"] = 'nullable|integer|min:0';
-            $rules["color"] = 'nullable|string';            
+            $rules["color"] = 'nullable|string';
+            $rules["invoice_number"] = 'required|string';
+            $rules["invoice_date"] = 'required|date';    
         }
 
         return $rules;

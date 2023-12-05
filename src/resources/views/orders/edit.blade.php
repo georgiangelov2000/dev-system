@@ -40,14 +40,9 @@
                         <div class="form-group col-xl-2 col-lg-2 col-md-2 col-sm-2">
                             <label for="user_id">Assign to package</label>
                             @if(!$order->is_editable)
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">
-                                            <i class="fa-light fa-boxes-packing"></i>
-                                        </span>
-                                    </div>
-                                    <input disabled="" placeholder="{{ $order->package->package_name ?? "Not assigned" }}" class="form-control">
-                                </div>
+                                @if($order->package)
+                                    <p class="input-group-text col-12 border-0">{{ $order->package->package_name  }}</p>
+                                @endif
                             @else
                                 <select id="package_id" name="package_id" class="form-control selectPackage"
                                 data-live-search="true">
@@ -64,14 +59,7 @@
                         <div class="form-group col-xl-2 col-lg-2 col-md-2 col-sm-2">
                             <label class="form-label required">Expected date of payment:</label>
                             @if (!$order->is_editable)
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">
-                                            <i class="far fa-calendar-alt"></i>
-                                        </span>
-                                    </div>
-                                    <input disabled name="expected_date_of_payment" class="form-control" value="{{ $order->payment->expected_date_of_payment }}" />
-                                </div>
+                                 <p class="input-group-text col-12 border-0">{{ $order->payment->expected_date_of_payment  }}</p>
                             @else
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -93,14 +81,7 @@
                         <div class="form-group col-xl-2 col-lg-2 col-md-2 col-sm-2">
                             <label class="form-label required">Expected Delivery date:</label>
                             @if(!$order->is_editable)
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">
-                                            <i class="far fa-calendar-alt"></i>
-                                        </span>
-                                    </div>
-                                    <input disabled name="expected_delivery_date" class="form-control" value="{{ $order->expected_delivery_date }}" />
-                                </div>
+                                <p class="input-group-text col-12 border-0">{{ $order->expected_delivery_date  }}</p>
                             @else
                                 <div class="input-group">
                                     <div class="input-group-prepend">
