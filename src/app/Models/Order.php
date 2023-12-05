@@ -86,4 +86,8 @@ class Order extends Model
     {
         return $this->hasOne(OrderPayment::class);
     }
+
+    public function isDelivered() {
+        return $this->is_it_delivered === 1 ? true : false;
+    }
 }

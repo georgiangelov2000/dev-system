@@ -104,16 +104,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/mass/edit/orders/{customer}', [CustomerController::class, 'customerOrders'])->name('mass.edit.orders');
     });
 
-    Route::prefix('orders')->name('order.')->group(function () {
-        Route::get('/', [OrderController::class, 'index'])->name('index');
-        Route::get('/create', [OrderController::class, 'create'])->name('create');
-        Route::post('/store', [OrderController::class, 'store'])->name('store');
-        Route::delete('/delete/{order}', [OrderController::class, 'delete'])->name('delete');
-        Route::put('/update/{order}', [OrderController::class, 'update'])->name('update');
-        Route::post('/mass/edit', [OrderController::class, 'massUpdate'])->name('mass.update');
-        Route::get('/edit/{order}', [OrderController::class, 'edit'])->name('edit');
-        Route::put('/status/{order}', [OrderController::class, 'updateStatus'])->name('status');
-    });
+    Route::resource('orders', OrderController::class);
+    Route::post('orders/mass/edit', [OrderController::class, 'massUpdate'])->name('orders.mass.update');
+    Route::put('orders/status/{order}', [OrderController::class, 'updateStatus'])->name('orders.status');
 
     Route::prefix('packages')->name('package.')->group(function () {
         Route::get('/', [PackageController::class, 'index'])->name('index');

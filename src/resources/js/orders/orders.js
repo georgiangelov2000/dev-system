@@ -1,7 +1,7 @@
 import { APICaller,APIDELETECALLER } from '../ajax/methods';
 import { swalText, showConfirmationDialog, mapButtons } from '../helpers/action_helpers';
 import { numericFormat } from '../helpers/functions';
-import { deliveryStatusesWithIcons, statusPaymentsWithIcons } from '../helpers/statuses';
+import { deliveryStatusesWithIcons, statusPaymentsWithIcons, paymentStatuses } from '../helpers/statuses';
 
 $(function () {
     $('.selectAction, .selectType, .selectCustomer, .selectPackage, .selectDriver').selectpicker();
@@ -95,7 +95,7 @@ $(function () {
                 class: "text-center",
                 name: "tracking_number",
                 render: function(data,type,row) {
-                    return `<b class="text-primary ">${row.tracking_number}</b>`;
+                    return `<b>${row.tracking_number}</b>`;
                 }
             },
             {
@@ -235,10 +235,25 @@ $(function () {
                 orderable: false,
                 class: 'text-center',
                 render: function (data, type, row) {
-                    let edit = `
-                    <a class="dropdown-item text-primary" href="${ORDER_EDIT_ROUTE.replace(':id', row.id)}">
+                    const isPendingPayment = paymentStatuses[row.payment.payment_status] ? row.payment.payment_status : 0 ; 
+
+                    const edit = `
+                    <a class="dropdown-item" href="${ORDER_EDIT_ROUTE.replace(':id', row.id)}">
                         <i class="fa-light fa-pen text-primary"></i> Edit
                     </a>`;
+
+                    const previewLink = `<a href="${ORDER_SHOW_ROUTE.replace(':id', row.id)}" title='Preview' class='btn dropdown-item'>
+                        <i class='fa-light fa-magnifying-glass text-info' aria-hidden='true'></i> Preview
+                    </a>`;
+
+                    const refundedFormTemplate = isPendingPayment === 2
+                    ? `<form class="dropdown-item" style='display:inline-block;' method='POST' data-name=${row.tracking_number}>
+                        <input type='hidden' name='_method' value='DELETE'>
+                        <input type='hidden' name='id' value='${row.id}'>
+                        <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); updateCurrentProduct(this);'>
+                            <i class="fa-light fa-undo text-danger" aria-hidden="true"></i> Refunded
+                        </button>
+                    </form>`: '';
 
                     let detachPackage =``;
                     let deleteForm = ``;
@@ -247,7 +262,7 @@ $(function () {
                         detachPackage = `
                         <form onsubmit="detachOrder(event)" class="dropdown-item" style='display:inline-block;' id='detach-form' action="${ORDER_UPDATE_STATUS.replace(':id', row.id)}" method='PUT'>
                                 <input type='hidden' name='id' value='${row.id}'>
-                                <button type='submit' class='btn p-0 text-danger'>
+                                <button type='submit' class='btn p-0'>
                                     <i class="fa-light fa-boxes-packing text-danger"></i> Detach package
                                 </button>
                         </form>`;
@@ -258,7 +273,7 @@ $(function () {
                             <form style='display:inline-block;' data-name="${row.id}-${row.purchase.name}" class="dropdown-item" id='delete-form' action="${ORDER_DELETE_ROUTE.replace(':id', row.id)}" method='POST'>
                                 <input type='hidden' name='_method' value='DELETE'>
                                 <input type='hidden' name='id' value='${row.id}'>
-                                <button type='submit' class='btn p-0 text-danger' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
+                                <button type='submit' class='btn p-0' title='Delete' onclick='event.preventDefault(); deleteOrder(this);'>
                                     <i class='fa-light fa-trash text-danger'></i> Delete
                                 </button>
                             </form>`;
@@ -273,6 +288,8 @@ $(function () {
                             ${edit}
                             ${detachPackage}
                             ${deleteForm}
+                            ${previewLink}
+                            ${refundedFormTemplate}
                         </div>
                     </div>`;
                 }

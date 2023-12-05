@@ -127,7 +127,7 @@
         <script type="text/javascript">
             const ORDER_PAYMENT_API = "{{ route('api.payments') }}";
             const TYPE = "order";
-            const ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";
+            const ORDER_EDIT_ROUTE = "{{ route('orders.edit', ':id') }}";
             const ORDER_PAYMENT_EDIT_ROUTE = "{{ route('payment.edit', [':payment', ':type']) }}";
             const ORDER_PAYMENT_DELETE_ROUTE = "{{ route('payment.delete', [':payment', ':type']) }}";
             const ORDER_INVOICE_API_ROUTE = "{{route('api.invoices')}}"

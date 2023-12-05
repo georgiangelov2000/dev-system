@@ -80,7 +80,7 @@
         <script>
             const PACKAGE_API_ROUTE = "{{ route('api.packages') }}";
             const ORDER_API_ROUTE = "{{ route('api.orders') }}";
-            const PRODUCT_EDIT_ROUTE = "{{ route('order.edit',':id') }}"
+            const PRODUCT_EDIT_ROUTE = "{{ route('orders.edit',':id') }}"
         </script>
     @endpush
 @endsection

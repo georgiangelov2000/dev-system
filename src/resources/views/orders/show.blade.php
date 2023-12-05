@@ -7,7 +7,7 @@
             <div class="row">
                 <div class="col-12">
                     <h4>
-                        <i class="fas fa-globe"></i> Supplier: {{ $purchase->supplier->name }}
+                        <i class="fas fa-globe"></i> Customer: {{ $order->customer->name }}
                     </h4>
                 </div>
 
@@ -17,10 +17,10 @@
                 <div class="col-sm-4 invoice-col">
                     From
                     <address>
-                        <strong>{{ $purchase->supplier->name }}</strong><br>
-                        {{ $purchase->supplier->address }}<br>
-                        Phone: {{ $purchase->supplier->phone }}<br>
-                        Email: {{ $purchase->supplier->email }}
+                        <strong>{{ $order->customer->name }}</strong><br>
+                        {{ $order->customer->address }}<br>
+                        Phone: {{ $order->customer->phone }}<br>
+                        Email: {{ $order->customer->email }}
                     </address>
                 </div>
 
@@ -35,9 +35,9 @@
                 </div>
 
                 <div class="col-sm-4 invoice-col">
-                    <b>Invoice: {{ $purchase->payment->invoice->invoice_number }}</b><br>
-                    <b>Purchase ID:</b> {{ $purchase->id }}<br>
-                    <b>Payment Due:</b> {{ $purchase->payment->expected_date_of_payment  }}<br>
+                    <b>Invoice: {{ $order->payment->invoice->invoice_number }}</b><br>
+                    <b>Purchase ID:</b> {{ $order->id }}<br>
+                    <b>Payment Due:</b> {{ $order->payment->expected_date_of_payment  }}<br>
                 </div>
 
             </div>
@@ -64,37 +64,37 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    {{ $purchase->name }}
+                                    {{ $order->purchase->name }}
                                 </td>
                                 <td>
-                                    {{ $purchase->code }}
+                                    {{ $order->tracking_number }}
                                 </td>
                                 <td>
-                                    {{$purchase->payment->quantity }}
+                                    {{$order->payment->quantity }}
                                 </td>
                                 <td>
-                                    {{ number_format($purchase->price, 2, '.', '.') }}
+                                    {{ number_format($order->single_sold_price, 2, '.', '.') }}
                                 </td>
                                 <td>
-                                    {{ number_format($purchase->discount_price, 2, '.', '.') }}
+                                    {{ number_format($order->discount_single_sold_price, 2, '.', '.') }}
                                 </td>
                                 <td>
-                                    {{ number_format($purchase->payment->price, 2, '.', '.') }}
+                                    {{ number_format($order->payment->price, 2, '.', '.') }}
                                 </td>
                                 <td>
-                                    {{ $purchase->weight }}
+                                    {{ $order->purchase->weight }}
                                 </td>
                                 <td>
-                                    {{ $purchase->height }}
+                                    {{ $order->purchase->height }}
                                 </td>
                                 <td>
-                                    {{ $purchase->discount_percent }}
+                                    {{ $order->discount_percent }}
                                 </td>
                                 <td>
-                                    {{ implode(', ', $purchase->categories->pluck('name')->toArray()) }}
+                                    {{ implode(', ', $order->purchase->categories->pluck('name')->toArray()) }}
                                 </td>
                                 <td>
-                                    {{ implode(', ', $purchase->brands->pluck('name')->toArray()) }}
+                                    {{ implode(', ', $order->purchase->brands->pluck('name')->toArray()) }}
                                 </td>
                             </tr>
                         </tbody>
@@ -112,19 +112,19 @@
                             <tbody>
                                 <tr>
                                     <th style="width:50%">Payment Methods:</th>
-                                    <td>{{ $purchase->payment->payment_method }}</td>
+                                    <td>{{ $order->payment->payment_method }}</td>
                                 </tr>
                                 <tr>
                                     <th>Date of Payment:</th>
-                                    <td>{{ $purchase->payment->date_of_payment }}</td>
+                                    <td>{{ $order->payment->date_of_payment }}</td>
                                 </tr>
                                 <tr>
                                     <th>Delivery Date:</th>
-                                    <td>{{ $purchase->delivery_date }}</td>
+                                    <td>{{ $order->delivery_date }}</td>
                                 </tr>
                                 <tr>
                                     <th>Payment status:</th>
-                                    <td>{{ $purchase->payment->payment_status }}</td>
+                                    <td>{{ $order->payment->payment_status }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -138,28 +138,28 @@
                             <tbody>
                                 <tr>
                                     <th style="width:50%">Subtotal:</th>
-                                    <td>{{ number_format($purchase->total_price, 2, '.', '.') }}</td>
+                                    <td>{{ number_format($order->payment->price, 2, '.', '.') }}</td>
                                 </tr>
                                 <tr>
                                     <th>Unit discount price:</th>
-                                    <td>{{ number_format($purchase->discount_price, 2, '.', '.')}}</td>
+                                    <td>{{ number_format($order->discount_single_sold_price, 2, '.', '.')}}</td>
                                 </tr>
                                 <tr>
                                     <th>Unit price:</th>
-                                    <td>{{ number_format($purchase->price, 2, '.', '.') }}</td>
+                                    <td>{{ number_format($order->single_sold_price, 2, '.', '.') }}</td>
                                 </tr>
                                 <tr>
                                     <th>Qty:</th>
-                                    <td>{{ $purchase->initial_quantity }}</td>
+                                    <td>{{ $order->payment->quantity }}</td>
                                 </tr>
                                 <tr>
                                     <th>Discount:</th>
-                                    <td>{{ $purchase->discount_percent }} %</td>
+                                    <td>{{ $order->discount_percent }} %</td>
                                 </tr>
-                                @if($purchase->payment->payment_reference)
+                                @if($order->payment->payment_reference)
                                     <tr>
                                         <th>Payment reference:</th>
-                                        <td>{{ $purchase->payment->payment_reference}}</td>
+                                        <td>{{ $order->payment->payment_reference}}</td>
                                     </tr>
                                 @endif
                             </tbody>

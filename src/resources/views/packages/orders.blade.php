@@ -97,13 +97,13 @@
     <script type="text/javascript">
         const ORDER_API_ROUTE = "{{ route('api.orders') }}";
         const EDIT_PRODUCT_ROUTE = "{{ route('purchases.edit', ':id') }}";
-        const ORDER_DELETE_ROUTE = "{{ route('order.delete', ':id') }}";
-        const ORDER_EDIT_ROUTE = "{{route('order.edit',':id')}}";
+        const ORDER_DELETE_ROUTE = "{{ route('orders.destroy', ':id') }}";
+        const ORDER_EDIT_ROUTE = "{{route('orders.edit',':id')}}";
         const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit', ':id') }}";
         const CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
         const PACKAGE = "{{ $package->id }}"
         const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
         const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
-        const ORDER_UPDATE_STATUS = "{{route('order.status',':id')}}";
+        const ORDER_UPDATE_STATUS = "{{route('orders.status',':id')}}";
     </script>
 @endpush

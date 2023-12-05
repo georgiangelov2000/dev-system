@@ -173,7 +173,7 @@
             const CUSTOMER = "{{ $customer->id }}";
             const USER_EDIT = "{{ route('user.edit',':id') }}"
             const ORDER_API_ROUTE = "{{ route('api.orders') }}";
-            const MASS_UPDATE_ORDERS = "{{route('order.mass.update')}}"
+            const MASS_UPDATE_ORDERS = "{{route('orders.mass.update')}}"
             const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";
             const EDIT_PRODUCT_ROUTE = "{{ route('purchases.edit', ':id') }}";
             const CUSTOMER_EDIT_ROUTE = "{{ route('customer.edit', ':id') }}";

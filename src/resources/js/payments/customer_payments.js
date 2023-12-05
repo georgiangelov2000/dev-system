@@ -455,13 +455,12 @@ $(function () {
 
   window.editInvoice = function (e) {
     let id = $(e).attr('data-id');
-    APICaller(ORDER_INVOICE_API_ROUTE, { 'id': id }, function (response) {
+    APICaller(ORDER_INVOICE_API_ROUTE, { invoice: id, select_json:1, type:TYPE }, function (response) {
       let invoice = response;
 
       modalInvoice.modal('show');
 
-      modalInvoice.find('form').attr('action', ORDER_INVOICE_UPDATE_ROUTE.replace(":type",TYPE).replace(":id", id)
-      )
+      modalInvoice.find('form').attr('action', ORDER_INVOICE_UPDATE_ROUTE.replace(":type",TYPE).replace(":id", id))
 
       modalInvoice.find('form input').each(function () {
         let inputName = $(this).attr('name');

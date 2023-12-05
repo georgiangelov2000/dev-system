@@ -12,6 +12,7 @@ use App\Models\Purchase;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -332,17 +333,49 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order has been updated'], 200);
     }
 
+    public function show(Order $order){
+        $order->load([
+            'payment',
+            'payment.invoice',
+            'customer',
+            'purchase',
+            'purchase.categories',
+            'purchase.brands'
+        ]);
+
+        $payment = $order->payment;
+
+        if($order->delivery_date) {
+            $order->delivery_date = Carbon::parse($order->delivery_date)->format('F j, Y');
+        }
+
+        $payment->payment_status = $this->statuses[$payment->payment_status] ?? '';
+        $payment->payment_method = $payment_methods[$payment->payment_method] ?? '';
+        $payment->expected_date_of_payment = Carbon::parse($payment->expected_date_of_payment)->format('F j, Y');
+
+        if($payment->date_of_payment) {
+            $payment->date_of_payment = Carbon::parse($payment->date_of_payment)->format('F j, Y');
+        }
+
+        $company = $companyInformation = FunctionsHelper::settings();
+        return view('orders.show',compact('order','company'));
+    }
+
     /**
      * Delete an order and update the product quantity.
      *
      * @param Order $order
      * @return \Illuminate\Http\JsonResponse
      */
-    public function delete(Order $order)
+    public function destroy(Order $order)
     {
         DB::beginTransaction();
 
         try {
+
+            if($order->isDelivered) {
+                throw new \Exception("Invalid operation: Order with ID {$id} has already been delivered.");
+            }
 
             $product = $order->product;
             $product->quantity += $order->sold_quantity;

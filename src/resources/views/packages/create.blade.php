@@ -197,6 +197,6 @@
         const PURCHASE_EDIT_ROUTE = "{{ route('purchases.edit',':id') }}";
         const ORDER_API_ROUTE = "{{ route('api.orders') }}";
         const SUPPLIER_API_ROUTE = "{{ route('api.suppliers') }}";
-        const ORDER_EDIT_ROUTE = "{{ route('order.edit', ':id') }}";
+        const ORDER_EDIT_ROUTE = "{{ route('orders.edit', ':id') }}";
     </script>
 @endpush

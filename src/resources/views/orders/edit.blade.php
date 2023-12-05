@@ -14,7 +14,7 @@
                 </div>
             @endif
             <div class="col-12">
-                <form id="orderForm" action="{{ route('order.update', $order->id) }}" method="PUT">
+                <form id="orderForm" action="{{ route('orders.update', $order->id) }}" method="PUT">
                     <div class="row flex-wrap">
                         <div class="form-group col-xl-3 col-lg-3 col-md-3 col-sm-3 p-0">
                             <label for="customer_id">Customer</label>
@@ -152,7 +152,7 @@
 
         const IS_EDITABLE = "{{ $order->is_editable }}"
 
-        const ORDER_INDEX_ROUTE = "{{ route('order.index') }}";
+        const ORDER_INDEX_ROUTE = "{{ route('orders.index') }}";
         
         const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}"
         const PRODUCT_API_ROUTE = "{{ route('api.products') }}"

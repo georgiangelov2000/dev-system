@@ -11,7 +11,7 @@
 
             <div class="col-12">
 
-                <form id="orderForm" action="{{ route('order.store') }}" method="POST">
+                <form id="orderForm" action="{{ route('orders.store') }}" method="POST">
                     @csrf
 
                     <div class="row flex-wrap">
@@ -105,7 +105,7 @@
         <script type="text/javascript" src="{{ mix('js/helpers/render_helpers.js') }}"></script>
         <script type="text/javascript" src="{{ mix('js/orders/form.js') }}"></script>
         <script type="text/javascript">
-            const ORDER_INDEX_ROUTE = "{{route('order.index')}}";
+            const ORDER_INDEX_ROUTE = "{{route('orders.index')}}";
             const IS_EDITABLE = true;
             const PURCHASE_ROUTE = "{{ route('purchases.edit',':id') }}"
             const CUSTOMER_API_ROUTE = "{{ route('api.customers') }}";

@@ -206,12 +206,12 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('order.index') }}" class="nav-link">
+                            <a href="{{ route('orders.index') }}" class="nav-link">
                                 <p>Orders</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('order.create') }}" class="nav-link">
+                            <a href="{{ route('orders.create') }}" class="nav-link">
                                 <p>Create orders</p>
                             </a>
                         </li>

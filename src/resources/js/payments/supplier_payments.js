@@ -462,7 +462,7 @@ $(function () {
 
                 modalInvoice
                     .find("form")
-                    .attr("action",INVOICE_API_ROUTE.replace(":type",TYPE).replace(":id", id));
+                    .attr("action",PURCHASE_INVOICE_UPDATE_ROUTE.replace(":type",TYPE).replace(":id", id));
 
                 modalInvoice.find("form input").each(function () {
                     let inputName = $(this).attr("name");

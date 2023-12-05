@@ -144,8 +144,8 @@ $(function () {
         const price = parseFloat(priceInput.val()) || 0;
         const discountPercent = parseInt(discountInput.val()) || 0;
     
-        let initAmount = initialQuantity !== undefined ? initialQuantity : parseInt(quantity);    
-        let orderAmount = purchaseOrderAmount !== undefined ? purchaseOrderAmount : 0;
+        let initAmount = typeof initialQuantity !== 'undefined' ? initialQuantity : parseInt(quantity);    
+        let orderAmount =typeof purchaseOrderAmount !== 'undefined' ? purchaseOrderAmount : 0;
 
         if (updatedQuantity !== undefined) {
             initAmount = (parseInt(updatedQuantity) + parseInt(orderAmount)) || 0;
