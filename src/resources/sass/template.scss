@@ -283,7 +283,7 @@ table.dataTable {
 		border: none;
 	}
 
-	#print {
+	#print, #paymentsTable_length, #dataTables_length, #paymentsTable_filter, #paymentsTable_paginate, #paymentsTable_info{
 		display: none;
 	}
 }

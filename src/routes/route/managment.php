@@ -108,16 +108,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('orders/mass/edit', [OrderController::class, 'massUpdate'])->name('orders.mass.update');
     Route::put('orders/status/{order}', [OrderController::class, 'updateStatus'])->name('orders.status');
 
-    Route::prefix('packages')->name('package.')->group(function () {
-        Route::get('/', [PackageController::class, 'index'])->name('index');
-        Route::get('/create', [PackageController::class, 'create'])->name('create');
-        Route::post('/store', [PackageController::class, 'store'])->name('store');
-        Route::delete('/delete/{package}', [PackageController::class, 'delete'])->name('delete');
-        Route::put('/update/{package}', [PackageController::class, 'update'])->name('update');
-        Route::get('/edit/{package}', [PackageController::class, 'edit'])->name('edit');
-        Route::put('/status/{package}', [PackageController::class, 'updateSpecificColumns'])->name('status');
-        Route::get('/orders/{package}', [PackageController::class, 'orders'])->name('orders');
-    });
+    Route::resource('packages', PackageController::class);
+    Route::put('packages/updated/statuses/{package}', [PackageController::class, 'updateSpecificColumns'])->name('packages.update.statuses');
+    Route::get('packages/orders/{package}', [PackageController::class, 'orders'])->name('packages.orders');
+    Route::get('packages/operations', [PackageController::class, 'formOperations'])->name('packages.form.operations');
+    Route::put('packages/update/operations', [PackageController::class, 'updateFormOperations'])->name('packages.update.form.operations');
 
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/', [SettingsController::class, 'form'])->name('get');

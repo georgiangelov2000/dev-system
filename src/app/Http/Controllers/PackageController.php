@@ -9,6 +9,7 @@ use App\Models\Package;
 use App\Models\Order;
 use App\Helpers\LoadStaticData;
 use App\Models\Customer;
+use App\Http\Requests\OrderPaymentMassRequest;
 use Illuminate\Http\Request;
 
 class PackageController extends Controller
@@ -49,7 +50,7 @@ class PackageController extends Controller
             return back()->withInput()->with('error', 'Package has not been created');
         }
 
-        return redirect()->route('package.index')->with('success', 'Package has been created');
+        return redirect()->route('packages.index')->with('success', 'Package has been created');
     }
 
     public function edit(Package $package)
@@ -72,7 +73,7 @@ class PackageController extends Controller
             return back()->withInput()->with('error', 'Failed to update package');
         }
 
-        return redirect()->route('package.index')->with('success', 'Package updated successfully');
+        return redirect()->route('packages.index')->with('success', 'Package updated successfully');
     }
 
     public function updateSpecificColumns(Package $package, Request $request)
@@ -113,7 +114,51 @@ class PackageController extends Controller
         return view('packages.orders', compact('package'));
     }
 
-    public function delete(Package $package)
+    public function formOperations(){
+        
+    }
+
+    public function updateFormOperations(OrderPaymentMassRequest $request){
+        $data = $request->validated();
+        
+        $orderIds = $data['order_id'];
+
+        foreach ($orderIds as $key => $value) {
+            $order = Order::find($value);
+
+            if(!$order) {
+                throw new \Exception("Order has not been found");
+            }
+            
+            if($order->is_it_delivered  !== 1) {
+                throw new \Exception("Payment has been delivered");
+            }
+
+            $paymentMethod = $data['payment_method'][$key];
+            $delivered = $data['is_it_delivered'][$key];
+            $dateOfPayment = $data['date_of_payment'][$key];
+            $deliveryDate = $data['delivery_date'][$key];
+            $invoiceNumber = $data['invoice_number'][$key];
+            $invoiceDate = $data['invoice_date'][$key];
+
+    
+            $packageExpectDateOfPayment = $order->package->
+
+            $payment = $order->payment ? $order->payment : new OrderPayment();
+            
+            
+            
+        }
+    }
+
+    public function show(): \Illuminate\View\View
+    {
+        $packages = Package::select('id', 'package_name')->get();
+        return view('packages.form_operations', ['packages' => $packages]);
+    }
+    
+
+    public function destroy(Package $package)
     {
         DB::beginTransaction();
         try {

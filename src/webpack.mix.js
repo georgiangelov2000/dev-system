@@ -37,6 +37,7 @@ mix.js('resources/js/orders/payments.js', 'public/js/orders'),
 
 mix.js('resources/js/packages/form.js', 'public/js/packages'),
 mix.js('resources/js/packages/packages.js', 'public/js/packages'),
+mix.js('resources/js/packages/form_operations.js', 'public/js/packages'),
 
 mix.js('resources/js/countries/countries.js', 'public/js/countries'),
 
@@ -45,8 +46,6 @@ mix.js('resources/js/payments/supplier_payments.js', 'public/js/payments'),
 mix.js('resources/js/payments/form.js', 'public/js/payments'),
 
 mix.js('resources/js/csv/import.js', 'public/js/csv'),
-
-mix.js('resources/js/packages/customer_package_payment.js', 'public/js/packages'),
 
 // Javascript libraries
 mix.babel('resources/js/adminlte.min.js', 'public/js/adminlte.min.js'),

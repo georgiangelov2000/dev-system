@@ -123,7 +123,7 @@ $(function () {
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row" id="print">
                     <div class="col-12">
                         <p class="bg-dark p-2 font-weight-bold filters">
                             <i class="fa-solid fa-filter"></i> Filters
@@ -160,7 +160,7 @@ $(function () {
                                     <th>Exp date of payment</th>
                                     <th>Date of payment</th>
                                     <th>Payment Delay</th>
-                                    <th>Actions</th>
+                                    <th id="print">Actions</th>
                                 </tr>
                             </thead>
                         </table>
@@ -191,11 +191,8 @@ $(function () {
             </div>
             <div class="row no-print">
                 <div class="col-12">
-                    <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
+                    <button onclick="invokePrint()" type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
                         <i class="fas fa-print"></i> Print
-                    </button>
-                    <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
-                        <i class="fas fa-download"></i> Generate PDF
                     </button>
                 </div>
             </div>
@@ -385,28 +382,43 @@ $(function () {
                     class: "text-center",
                     orderable: false,
                     render: function (data, type, row) {
-                        let status = row.payment_status;
-                        if (status === 1 || status === 4) {
-                            let dateOfPayment = moment(row.date_of_payment); // Assuming you're using Moment.js
-                            let expectedDateOfPayment = moment(
-                                row.expected_date_of_payment
-                            );
+                        let paymentStatus = row.payment_status;
+                        let deliveryStatus = row.delivery_status;
+                        let dateOfPayment = row.date_of_payment ? moment(row.date_of_payment) : null;
+                        let expectedDateOfPayment = moment(row.expected_date_of_payment);
+                
+                        if (!deliveryStatus) {
+                            return '';  // No text to display if delivery status is false
+                        }
+                        if(row.payment_status === 5) {
+                            return ``;
+                        }
 
-                            let daysDifference = dateOfPayment.diff(
-                                expectedDateOfPayment,
-                                "days"
-                            );
-
-                            if (daysDifference > 0) {
-                                return `<span class="text-danger">${daysDifference} days delay in payment</span>`;
-                            } else {
-                                return `<span class="text-success">Payment made on time</span>`;
+                
+                        let currentDate = moment();
+                        let text = '';
+                
+                        if (paymentStatus === 2) {
+                            if (!dateOfPayment) {
+                                let daysLate = currentDate.diff(expectedDateOfPayment, 'days');
+                                if (daysLate > 0) {
+                                    text = `<span class="text-danger">Payment is ${daysLate} days overdue.</span>`;
+                                } else {
+                                    text = `<span class="text-info">Payment is ${-daysLate} days left.</span>`;
+                                }
                             }
                         } else {
-                            return "";
+                            let daysDifference = dateOfPayment.diff(expectedDateOfPayment, 'days');
+                            if (daysDifference > 0) {
+                                text = `<span class="text-danger">Payment was delayed by ${daysDifference} days.</span>`;
+                            } else {
+                                text = '<span class="text-success">Payment made on time.</span>';
+                            }
                         }
+
+                        return text;
                     },
-                },
+                },                
                 {
                     width: "5%",
                     class: "text-center",
@@ -428,7 +440,7 @@ $(function () {
                                                 </button>
                                             </form>`;
                 
-                        return `<div class="btn-group">
+                        return `<div id="print" class="btn-group">
                                     <button type="button" class="btn btn-sm btn-outline-primary rounded" data-toggle="dropdown" aria-expanded="false">
                                         <i class="fa-light fa-list" aria-hidden="true"></i>
                                     </button>
@@ -450,6 +462,10 @@ $(function () {
           bootstrapSelectDeliveryStatus.bind('changed.bs.select', function () {
             dataTable.ajax.reload(null, false);
           })
+    }
+
+    window.invokePrint = function(){
+        window.print();
     }
 
     // Window actions

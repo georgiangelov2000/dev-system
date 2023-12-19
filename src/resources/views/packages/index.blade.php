@@ -130,11 +130,11 @@
         <script type="text/javascript" src="{{mix('js/packages/packages.js')}}"></script>
         <script type="text/javascript">
             const PACKAGE_API_ROUTE = "{{route('api.packages')}}";
-            const PACKAGE_UPDATE_STATUS_ROUTE = "{{route('package.status',':id')}}";
-            const PACKAGE_DELETE_ROUTE = "{{route('package.delete',':id')}}";
-            const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}";
-            const PACKAGE_MASS_DELETE_ORDERS = "{{route('package.orders',':id')}}";
-            const PACKAGE_UPDATE_ROUTE = "{{route('package.status',':id')}}"
+            const PACKAGE_UPDATE_STATUS_ROUTE = "{{route('packages.update.statuses',':id')}}";
+            const PACKAGE_DELETE_ROUTE = "{{route('packages.destroy',':id')}}";
+            const PACKAGE_EDIT_ROUTE = "{{route('packages.edit',':id')}}";
+            const PACKAGE_MASS_DELETE_ORDERS = "{{route('packages.orders',':id')}}";
+            const PACKAGE_UPDATE_ROUTE = "{{route('packages.update.statuses',':id')}}"
         </script>
     @endpush
 

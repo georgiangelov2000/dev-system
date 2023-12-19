@@ -11,7 +11,7 @@
 
         <div class="card-body">
             <div class="col-12">
-                <form action='{{ route('package.update', $package->id) }}' method='POST'>
+                <form action='{{ route('packages.update', $package->id) }}' method='POST'>
                     @csrf
                     @method('PUT')
 
@@ -150,7 +150,6 @@
                                 <th>ID</th>
                                 <th>Tracking number</th>
                                 <th>Name</th>
-                                <th>Date of sale</th>
                                 <th>Unit price</th>
                                 <th>Discount unit price</th>
                                 <th>Official price</th>
@@ -160,80 +159,7 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @foreach ($package->orders as $order)
-                                <tr data-id="{{ $order->id }}">
-                                    <td>
-                                        @if ($order->status === 6)
-                                            <button onclick='removeRow(this)' class='btn p-0'>
-                                                <i class='fa-light fa-trash text-danger'></i>
-                                            </button>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        {{ $order->id }}
-                                        <input type="hidden" name="order_id[]" value="{{ $order->id }}">
-                                    </td>
-                                    <td>
-                                        {{ $order->tracking_number }}
-                                    </td>
-                                    <td>
-                                       <a href="{{route('purchases.edit',$order->purchase->id)}}">{{ $order->purchase->name }}</a>
-                                    </td>
-                                    <td>
-                                        {{ $order->date_of_sale }}
-                                    </td>
-                                    <td>
-                                        €{{$order->discount_single_sold_price}}
-                                    </td>
-                                    <td>
-                                        €{{ $order->single_sold_price }}
-                                    </td>
-                                    <td>
-                                        <input 
-                                            type="hidden" 
-                                            name="total_sold_price" 
-                                            value="{{$order->total_sold_price}}"
-                                        />
-                                        €{{ $order->total_sold_price }}
-                                    </td>
-                                    <td>
-                                        €{{ $order->original_sold_price }}                                        
-                                    </td>
-                                    <td>
-                                        {{$order->discount_percent}}%
-                                    </td>
-                                    <td>
-                                        {{$order->sold_quantity}}
-                                    </td>
-                                    <td>
-                                        @switch($order->status)
-                                            @case('1')
-                                                <i title="Paid" class="fal fa-check-circle"></i>
-                                                @break
-                                            @case('2')
-                                                <i title="Pending" class="fal fa-hourglass-half"></i>
-                                                @break
-                                            @case('3')
-                                                <i title="Partially Paid" class="fal fa-money-bill-alt"></i>
-                                                @break
-                                            @case('4')
-                                                <i title="Overdue" class="fal fa-exclamation-circle"></i>
-                                                @break
-                                            @case('5')
-                                                <i title="Refunded" class="fal fa-undo-alt"></i>
-                                                @break
-                                            @case('6')
-                                                <i title="Ordered" class="fal fa-shopping-cart"></i>
-                                                @break
-                                            {{-- Add more cases for other statuses as needed --}}
-                                            @default
-                                                <!-- Default case: no icon for unknown statuses -->
-                                        @endswitch
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
+                        <tbody></tbody>
                     </table>
 
                     <button class="btn btn-primary" type="submit">Submit</button>

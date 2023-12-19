@@ -12,7 +12,7 @@ class OrderApiController extends Controller
     {
         $relations = [
             'customer:id,name',
-            'payment:id,payment_status,order_id,alias,delivery_status',
+            'payment:id,payment_status,order_id,alias,delivery_status,price,quantity',
             'purchase:id,name,image_path,price,quantity,initial_quantity',
             'user:id,username',
             'package:id,package_name'
@@ -82,6 +82,9 @@ class OrderApiController extends Controller
         });
         $query->when($request->input('user_id'), function ($query) use ($request) {
             return $query->where('user_id', $request->input('user_id'));
+        });
+        $query->when($request->input('package'), function ($query) use ($request) {
+            return $query->where('package_id', $request->input('package'));
         });
         $query->when($request->input('package'), function ($query) use ($request) {
             return $query->where('package_id', $request->input('package'));

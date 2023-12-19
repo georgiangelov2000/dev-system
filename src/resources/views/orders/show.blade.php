@@ -17,20 +17,21 @@
                 <div class="col-sm-4 invoice-col">
                     From
                     <address>
-                        <strong>{{ $order->customer->name }}</strong><br>
-                        {{ $order->customer->address }}<br>
-                        Phone: {{ $order->customer->phone }}<br>
-                        Email: {{ $order->customer->email }}
+                        <strong>{{ $company['name'] }}</strong><br>
+                        {{ $company['address'] }}<br>
+                        Phone: {{ $company['phone_number'] }}<br>
+                        Email: {{ $company['email'] }}
                     </address>
+
                 </div>
 
                 <div class="col-sm-4 invoice-col">
                     To
                     <address>
-                        <strong>{{ $company['name'] }}</strong><br>
-                        {{ $company['address'] }}<br>
-                        Phone: {{ $company['phone_number'] }}<br>
-                        Email: {{ $company['email'] }}
+                        <strong>{{ $order->customer->name }}</strong><br>
+                        {{ $order->customer->address }}<br>
+                        Phone: {{ $order->customer->phone }}<br>
+                        Email: {{ $order->customer->email }}
                     </address>
                 </div>
 

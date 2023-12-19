@@ -55,6 +55,7 @@ $(function () {
             `;
         }
 
+        console.log(dateOfPayment);
         $("#deliveryWrapper").html(template);
 
         initializeDatepicker(".datepicker");

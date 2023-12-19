@@ -57,7 +57,7 @@ class PurchaseController extends Controller
 
         try {
             $data = $request->validated();
-
+            
             $this->service->purchaseProcessing($data);
 
             DB::commit();

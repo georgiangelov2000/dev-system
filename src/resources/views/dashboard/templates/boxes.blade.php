@@ -59,7 +59,7 @@
         <div class="icon">
             <i class="fa-light fa-boxes-packing" aria-hidden="true"></i>
         </div>
-        <a href="{{ route('package.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        <a href="{{ route('packages.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
     </div>
 </div>
 

@@ -16,13 +16,12 @@ class PaymentRequest extends FormRequest
 
         $rules = [
             'payment_method' => 'required|integer', 
-            // 'partially_paid_price' => 'nullable|numeric',
+            'date_of_payment' => 'nullable|date',
             'payment_reference' => 'nullable',
             'is_it_delivered' => 'required',
         ];
 
         if($isDelivered && $isDelivered == 1) {
-            $rules['date_of_payment'] = 'required|date';
             $rules['delivery_date'] = 'required|date';
         }
         return $rules;

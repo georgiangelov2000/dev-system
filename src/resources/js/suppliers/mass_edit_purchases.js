@@ -209,7 +209,7 @@ $(function () {
         let action = e.target.getAttribute('action');
         let data = $(form).serialize();
         let keys = {};
-
+        console.log(data);
         data.split('&').forEach(function (keyValue) {
             let pair = keyValue.split('=');
             let key = decodeURIComponent(pair[0]);

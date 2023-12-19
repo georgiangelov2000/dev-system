@@ -103,7 +103,7 @@
         const CUSTOMER_API_ROUTE = "{{route('api.customers')}}";
         const PACKAGE = "{{ $package->id }}"
         const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
-        const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}"
+        const PACKAGE_EDIT_ROUTE = "{{route('packages.edit',':id')}}"
         const ORDER_UPDATE_STATUS = "{{route('orders.status',':id')}}";
     </script>
 @endpush

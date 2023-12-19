@@ -184,13 +184,18 @@
                     </a>
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
-                            <a href="{{ route('package.index') }}" class="nav-link">
+                            <a href="{{ route('packages.index') }}" class="nav-link">
                                 <p>Packages</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('package.create') }}" class="nav-link">
+                            <a href="{{ route('packages.create') }}" class="nav-link">
                                 <p>Create package</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('packages.form.operations') }}" class="nav-link">
+                                <p>Operations</p>
                             </a>
                         </li>
                     </ul>
@@ -348,6 +353,12 @@
                         <a href="{{ route('country.index') }}" class="nav-link">
                         <i class="fa-light fa-clock-rotate-left"></i>
                             <p>Logs</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('country.index') }}" class="nav-link">
+                            <i class="fa-light fa-bell"></i>
+                            <p>Notifications</p>
                         </a>
                     </li>
                 </li>

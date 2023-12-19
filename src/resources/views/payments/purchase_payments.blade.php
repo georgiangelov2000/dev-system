@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row">
-        <div class="card col-12 cardTemplate">
+        <div class="card col-12 cardTemplate" id="print">
             <div class="card-header bg-primary">
                 <div class="col-12">
                     <h3 class="card-title">Purchase payments</h3>
@@ -48,7 +48,7 @@
                 </div>
             </div>
         </div>
-        <div id="paymentTemplate" class="card col-12 cardTemplate table-responsive d-none"></div>
+        <div id="paymentTemplate" class="card col-12 cardTemplate table-responsive d-none paymentTemplate"></div>
     </div>
 
     {{-- Invoice modal --}}

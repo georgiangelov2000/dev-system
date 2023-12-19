@@ -217,8 +217,8 @@
         <script type="text/javascript">
             const expectedDateOfPayment = new Date("{{ date('Y-m-d', strtotime($payment->expected_date_of_payment)) }}");
             const expectedDeliveryDate = new Date("{{ date('Y-m-d', strtotime($payment->expected_delivery_date)) }}");
-            const dateOfPayment = "{{ date('Y-m-d', strtotime($payment->date_of_payment)) }}";
-            const deliveryDate = "{{ date('Y-m-d', strtotime($payment->purchase->delivery_date)) }}";
+            const dateOfPayment = "{{ $payment->date_of_payment ? date('Y-m-d', strtotime($payment->date_of_payment)) : '' }}";
+            const deliveryDate = "{{ $payment->purchase->delivery_date ? date('Y-m-d', strtotime($payment->purchase->delivery_date)) : '' }}";
             const paymentStatus = "{{ $payment->payment_status }}";
         </script>
         <script type="text/javascript" src="{{ mix('js/payments/form.js') }}"></script>

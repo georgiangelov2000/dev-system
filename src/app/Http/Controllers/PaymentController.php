@@ -66,6 +66,8 @@ class PaymentController extends Controller
         DB::beginTransaction();
     
         try {
+            $data = $request->validated();
+
             $builder = PaymentViewFactory::getInstanceModel($payment, $type);
 
             if (!$builder) {
@@ -75,7 +77,6 @@ class PaymentController extends Controller
             $relation = $builder instanceof OrderPayment ? 'order' : 'purchase';
             $builder->load($relation);
     
-            $data = $request->validated();
             $this->paymentProcessing($data, $builder, $relation);
     
             DB::commit();
@@ -99,7 +100,6 @@ class PaymentController extends Controller
      */
     private function paymentProcessing(array $data, $builder, $relation)
     {   
-        
         // Validate payment method
         if (!$data['payment_method'] || !$this->helper->statusValidation($data['payment_method'], $this->paymentMethods)) {
             throw new \Exception('Invalid payment method.');
@@ -120,18 +120,17 @@ class PaymentController extends Controller
             // Update relation attributes
             $builder->$relation->is_it_delivered = $builder->$relation::IS_IT_DELIVERED_TRUE;
             $builder->$relation->delivery_date = now()->parse($delivery_date);
-
+            
+            $builder->payment_status = $statusDateOfPayment;
+            $builder->delivery_status = $statusDeliveryDate;
+            $builder->date_of_payment = $date_of_payment ? now()->parse($date_of_payment) : null;
         } else {
             // Update relation attributes for not delivered
             $builder->$relation->is_it_delivered = $builder->$relation::IS_IT_DELIVERED_FALSE;
             $builder->$relation->delivery_date = null;
         }
+        
         $builder->$relation->save();
-
-        // Set common attributes
-        $builder->payment_status = $data['is_it_delivered'] ? $statusDateOfPayment : $builder::PENDING;
-        $builder->delivery_status = $data['is_it_delivered'] ? $statusDeliveryDate : $builder::PENDING;
-        $builder->date_of_payment = $data['is_it_delivered'] ? now()->parse($date_of_payment) : null;
 
         // Set other attributes
         $builder->payment_reference = $data['payment_reference'];

@@ -37,24 +37,30 @@
                             <span name="user_id" class="text-danger"></span>
                         </div>
 
+                        @if(!$order->is_editable)
+                                @if($order->package)
+                                    <div class="form-group col-xl-2 col-lg-2 col-md-2 col-sm-2">
+                                        <label for="user_id">Assign to package</label>
+                                        <p class="input-group-text col-12 border-0">{{ $order->package->package_name  }}</p>
+                                    </div>
+                                @endif
+                        @else
                         <div class="form-group col-xl-2 col-lg-2 col-md-2 col-sm-2">
                             <label for="user_id">Assign to package</label>
-                            @if(!$order->is_editable)
-                                @if($order->package)
-                                    <p class="input-group-text col-12 border-0">{{ $order->package->package_name  }}</p>
-                                @endif
-                            @else
-                                <select id="package_id" name="package_id" class="form-control selectPackage"
-                                data-live-search="true">
-                                @if ($order->package)
-                                    <option value="{{ $order->package->id }}">
-                                        {{ $order->package->package_name }}
-                                    </option>
-                                @endif
+                                <select 
+                                    id="package_id" 
+                                    name="package_id" 
+                                    class="form-control selectPackage"
+                                    data-live-search="true">
+                                    @if ($order->package)
+                                        <option value="{{ $order->package->id }}">
+                                            {{ $order->package->package_name }}
+                                        </option>
+                                    @endif
                                 </select>
                                 <span name="package_id" class="text-danger"></span>
-                            @endif
                         </div>
+                        @endif  
 
                         <div class="form-group col-xl-2 col-lg-2 col-md-2 col-sm-2">
                             <label class="form-label required">Expected date of payment:</label>

@@ -59,7 +59,7 @@
         const CUSTOMER_EDIT_ROUTE = "{{route('customer.edit',':id')}}"
         const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
         const EDIT_PRODUCT_ROUTE = "{{ route('purchases.edit', ':id') }}";
-        const PACKAGE_EDIT_ROUTE = "{{route('package.edit',':id')}}";
+        const PACKAGE_EDIT_ROUTE = "{{route('packages.edit',':id')}}";
         const ORDER_UPDATE_STATUS = "{{route('orders.status',':id')}}";
         const ORDER_EDIT_ROUTE = "{{route('orders.edit',':id')}}";
         const ORDER_DELETE_ROUTE = "{{route('orders.destroy',':id')}}";

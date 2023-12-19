@@ -15,8 +15,7 @@ class PurchaseRequest extends FormRequest
     public function rules()
     {
         $rules = [];
-        
-        if($this->isPaymentRequired()) {
+        if($this->isEditableRequired()) {
             $rules['image'] = "nullable|file|image|mimes:jpeg,png,jpg,gif|max:2048";
             $rules['name'] = 'required|string';
             $rules['image_path'] = 'nullable|string';
@@ -40,9 +39,9 @@ class PurchaseRequest extends FormRequest
 
         return $rules;
     }
-    private function isPaymentRequired()
+    private function isEditableRequired()
     {
         $purchase = $this->purchase ?? null;
-        return $purchase && $purchase->payment && $purchase->payment->payment_status === 2;
+        return !$purchase || ($purchase->payment && $purchase->payment->payment_status === 2);
     }
 }
