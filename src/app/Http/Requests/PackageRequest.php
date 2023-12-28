@@ -19,6 +19,7 @@ class PackageRequest extends FormRequest
             "customer_notes" => "nullable|string",
         ];
 
+
         $editableRules = [
             "customer_id" => "required|integer",
             "tracking_number" => "required|string",
@@ -29,11 +30,13 @@ class PackageRequest extends FormRequest
         ];
 
 
-        return $this->isEditableRequired() ? $commonRules : array_merge($commonRules, $editableRules);
+        return $this->isEditableRequired() === false ? array_merge($commonRules, $editableRules) : $commonRules;
     }
 
     private function isEditableRequired()
     {
-        return $this->package->is_it_delivered;
+        $package = $this->package ?? null;
+
+        return $package && $package->is_it_delivered == true ? true : false;
     }
 }

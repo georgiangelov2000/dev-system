@@ -168,6 +168,7 @@ $(function () {
                 orderable: false,
                 width: "10%",
                 name: 'delivery_date',
+                class: 'text-center',
                 render: function(data,type,row){
                     return row.delivery_date ? moment(row.delivery_date).format('MMM DD, YYYY') : '';
                 }

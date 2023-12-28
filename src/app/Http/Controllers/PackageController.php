@@ -71,7 +71,7 @@ class PackageController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e->getMessage());
+            // dd($e->getMessage());
             return back()->withInput()->with('error', 'Failed to update package');
         }
 
