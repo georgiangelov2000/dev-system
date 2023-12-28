@@ -160,13 +160,17 @@ $(function () {
                 width: "15%",
                 class: 'text-center',
                 name: 'expected_delivery_date',
-                data: 'expected_delivery_date',
+                render: function(data,type,row) {
+                    return row.expected_delivery_date ? moment(row.expected_delivery_date).format('MMM DD, YYYY') : '';
+                }
             },
             {
                 orderable: false,
                 width: "10%",
                 name: 'delivery_date',
-                data: 'delivery_date',
+                render: function(data,type,row){
+                    return row.delivery_date ? moment(row.delivery_date).format('MMM DD, YYYY') : '';
+                }
             },
             {
                 orderable: false,
@@ -222,52 +226,52 @@ $(function () {
                 render: function (data, type, row) {
                     let deliveredBtn = '';
                     let deleteFormTemplate = '';
+                    let deliveryDropdown = '';
+                    let packageDropdown = '';
 
                     let editButton = `<a href="${PACKAGE_EDIT_ROUTE.replace(':id', row.id)}" data-id="${row.id}" class="btn p-1" title="Edit"><i class="fa-light fa-pen text-primary"></i></a>`;
 
-                    let deliveryDropdown = `
-                    <div class="dropdown d-inline">
-                        <button class="btn text-primary p-0" title="Change method" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa-light fa-truck-ramp"></i>
-                        </button>
-                        <div id="changeDeliveryMethod" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <form method="POST" id="delivery-form">
-                                <input type="hidden" name="order_id" value="${row.id}">
-                                <button type="button" value="1" class="dropdown-item change-delivery-method-btn">Ground</button>
-                                <button type="button" value="2" class="dropdown-item change-delivery-method-btn">Air</button>
-                                <button type="button" value="3" class="dropdown-item change-delivery-method-btn">Sea</button>
-                            </form>
-                        </div>
-                    </div>
-                    `;
-
                     let orders = `<a href="${PACKAGE_MASS_DELETE_ORDERS.replace(":id", row.id)}" class="btn p-1" title="Orders"><i class="text-primary fa fa-light fa-shopping-cart" aria-hidden="true"></i></a>`;
-
-                    let packageDropdown = `
-                    <div class="dropdown d-inline">
-                        <button class="btn text-primary p-0" title="Change type" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa-light fa-rotate-right"></i>
-                        </button>
-                        <div id="changePackageType" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <form method="POST" id="package-form">
-                                <input type="hidden" name="order_id" value="${row.id}">
-                                <button type="button" order-id="${row.id}" value="1" class="dropdown-item change-package-type-btn">Standart</button>
-                                <button type="button" order-id="${row.id}" value="2" class="dropdown-item change-package-type-btn">Express</button>
-                                <button type="button" order-id="${row.id}" value="3" class="dropdown-item change-package-type-btn">Overnight</button>
-                            </form>
-                        </div>
-                    </div>
-                    `;
 
                     if (!row.is_it_delivered) {
                         deliveredBtn = `<button data-id="${row.id}" title="Mark as delivered" class="btn p-0 text-primary deliveryBtnForm" type="button"><i class="fa-light fa-check"></i></button>`;
+                        
                         deleteFormTemplate = `
                         <form style='display:inline-block;' action="${PACKAGE_DELETE_ROUTE.replace(':id', row.id)}" id='delete-form' method='POST' data-name="${row.package_name}">
                             <input type='hidden' name='_method' value='DELETE'>
                             <input type='hidden' name='id' value='${row.id}'>
                             <button type='submit' class='btn p-1' title='Delete' onclick='event.preventDefault(); deleteCurrentPackage(this);'><i class='fa-light fa-trash text-danger'></i></button>
-                        </form>
-                        `;
+                        </form>`;
+
+                        deliveryDropdown = `
+                        <div class="dropdown d-inline">
+                            <button class="btn text-primary p-0" title="Change method" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa-light fa-truck-ramp"></i>
+                            </button>
+                            <div id="changeDeliveryMethod" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <form method="POST" id="delivery-form">
+                                    <input type="hidden" name="order_id" value="${row.id}">
+                                    <button type="button" value="1" class="dropdown-item change-delivery-method-btn">Ground</button>
+                                    <button type="button" value="2" class="dropdown-item change-delivery-method-btn">Air</button>
+                                    <button type="button" value="3" class="dropdown-item change-delivery-method-btn">Sea</button>
+                                </form>
+                            </div>
+                        </div>`;
+                        
+                        packageDropdown = `
+                        <div class="dropdown d-inline">
+                            <button class="btn text-primary p-0" title="Change type" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa-light fa-rotate-right"></i>
+                            </button>
+                            <div id="changePackageType" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <form method="POST" id="package-form">
+                                    <input type="hidden" name="order_id" value="${row.id}">
+                                    <button type="button" order-id="${row.id}" value="1" class="dropdown-item change-package-type-btn">Standart</button>
+                                    <button type="button" order-id="${row.id}" value="2" class="dropdown-item change-package-type-btn">Express</button>
+                                    <button type="button" order-id="${row.id}" value="3" class="dropdown-item change-package-type-btn">Overnight</button>
+                                </form>
+                            </div>
+                        </div>`;
                     }
 
                     return `${deleteFormTemplate} ${editButton} ${orders} ${packageDropdown}${deliveryDropdown} ${deliveredBtn}`;

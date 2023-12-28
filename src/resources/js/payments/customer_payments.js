@@ -325,8 +325,15 @@ $(function () {
           class: "text-center",
           orderable: false,
           render: function (data, type, row) {
-              const formattedDate = row.order.expected_delivery_date ? moment(row.order.expected_delivery_date).format('MMM DD, YYYY') : '';
-              return `<span>${formattedDate}</span>`;
+            let formattedExpectedDate;
+
+            if(row.order.package_id && row.order.package_extension_date) {
+              formattedExpectedDate = moment(row.order.package_extension_date).format('MMM DD, YYYY');
+            } else {
+              formattedExpectedDate = moment(row.order.delivery_date).format('MMM DD, YYYY');
+            }
+
+            return `<span>${formattedExpectedDate}</span>`;
           },
         },
         {

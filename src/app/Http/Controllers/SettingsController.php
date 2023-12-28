@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Http\Requests\SettingsRequest;
 
 class SettingsController extends Controller
 {
@@ -25,78 +26,89 @@ class SettingsController extends Controller
 
     public function form()
     {
-        $settingsData = $this->helper->settings();
+        $settings = Settings::where('type', 1)->first()->settings;
+        $data = [];
+        
+        $country = null;
+        $states = [];
 
-        $data = $this->getData($settingsData['country']);
+        if(isset($settings['country'])) {
+            $country = Country::find($settings['country'])->first();
+            $states = $country->states()->select('id', 'name')->get();
+        }
 
+
+        $settings['country'] = $country->name;
+        $data['countries'] = $this->staticDataHelper->callStatesAndCountries('countries');
+        $data['states'] =  $country->states()->select('id', 'name')->get();
+
+        $serverInformation = [
+            'php_version' => phpversion(),
+            'server_software' => $_SERVER['SERVER_SOFTWARE'],
+            'server_name' => $_SERVER['SERVER_NAME'],
+            'server_address' => $_SERVER['SERVER_ADDR'],
+            'server_port' => $_SERVER['SERVER_PORT'],
+            'protocol' => $_SERVER['REQUEST_SCHEME'],
+            'server_load' => sys_getloadavg(),
+        ];
+        
         return view('settings.form', [
-            'settings' => $settingsData,
-            'data' => $data
+            'settings' => $settings,
+            'data' => $data,
+            'server_information' => $serverInformation,
+            'cpu_cores' => trim(shell_exec('nproc'))
         ]);
     }
 
-    public function update(Request $request)
+    public function update(SettingsRequest $request)
     {
         DB::beginTransaction();
 
         try {
-            $data  = $request->all();
+            $data  = $request->validated();
+            
             $attributes = [];
-
-            if ($data['type'] == 1) {
-                $attributes['email'] = $data['email'];
-                $attributes['name'] = $data['name'];
-                $attributes['country'] = isset($data['country_id']) ? Country::find($data['country_id'])->name : null;
-                $attributes['state'] = isset($data['state_id']) ? State::find($data['state_id'])->name : null;
-                $attributes['phone_number'] = $data['phone_number'];
-                $attributes['tax_number'] = $data['tax_number'];
-                $attributes['address'] = $data['address'];
-                $attributes['website'] = $data['website'];
-                $attributes['owner_name'] = $data['owner_name'];
-                $attributes['business_type'] = $data['bussines_type'];
-                $attributes['registration_date'] = date('Y-m-d', strtotime($data['registration_date']));
-                $attributes['image_path'] = null;
-
-                $settings = Settings::where('type', 1)
-                    ->first();
-
-                if (!$settings) {
-                    $settings = new Settings;
-                    $settings->settings_description = "Company settings";
-                    $settings->type = 1;
-                } else {
-                    $decoded = json_decode($settings->settings, true);
-                    if ($decoded['image_path'] !== null) {
-                        $attributes['image_path'] = $decoded['image_path'];
-                    }
-                }
-
-                if (isset($data['image']) && is_file($data['image'])) {
-                    $imageInfo  = getimagesize($data['image']);
-                    $storedFolder = 'public/images/company';
-
-                    if ($imageInfo && ($imageInfo[2] == IMAGETYPE_JPEG || $imageInfo[2] == IMAGETYPE_PNG || $imageInfo[2] == IMAGETYPE_GIF)) {
-                        $hashedImage = Str::random(10) . '.' . $data['image']->getClientOriginalExtension();
-
-                        if (!Storage::exists($storedFolder)) {
-                            Storage::makeDirectory($storedFolder);
-                        }
-
-                        if (Storage::putFileAs($storedFolder, $data['image'], $hashedImage)) {
-                            $imagePathBuilder = asset('storage/images/company') . '/' . $hashedImage;
-
-                            $attributes['image_path'] = $imagePathBuilder;
-                        } else {
-                            throw new \Exception('Error uploading file');
-                        }
-                    };
-                }
+            
+            if(!$data['type'] == 1) {
+                throw new \Exception('Invalid type');
             }
 
-            $attributes = json_encode($attributes, true);
+            $country = isset($data['country']) ? Country::find($data['country'])->id : null;
+            $state = isset($data['state']) ? State::find($data['state'])->id : null;
+            $registrationDate = isset($data['registration_date']) ? date('Y-m-d', strtotime($data['registration_date'])) : null;
 
-            $settings->settings = $attributes;
-            $settings->save();
+            $data['country'] = $country;
+            $data['state'] = $state;
+            $data['registration_date'] = $registrationDate;
+
+            if (isset($data['image']) && is_file($data['image'])) {
+                $imageInfo  = getimagesize($data['image']);
+                $storedFolder = 'public/images/company';
+
+                if ($imageInfo && ($imageInfo[2] == IMAGETYPE_JPEG || $imageInfo[2] == IMAGETYPE_PNG || $imageInfo[2] == IMAGETYPE_GIF)) {
+                    $hashedImage = Str::random(10) . '.' . $data['image']->getClientOriginalExtension();
+
+                    if (!Storage::exists($storedFolder)) {
+                        Storage::makeDirectory($storedFolder);
+                    }
+
+                    if (Storage::putFileAs($storedFolder, $data['image'], $hashedImage)) {
+                        $imagePathBuilder = asset('storage/images/company') . '/' . $hashedImage;
+
+                        $data['image_path'] = $imagePathBuilder;
+                    } else {
+                        throw new \Exception('Error uploading file');
+                    }
+                };
+            }
+                        
+            $companySettings = Settings::where('type', 1)->first()
+            ? Settings::where('type', 1)->first() : new Settings;
+
+            dd($data);
+            $companySettings->settings = $data;
+
+            $companySettings->save();
 
             DB::commit();
             return redirect()->back()->with('success', 'Settings has been updated');
@@ -104,21 +116,5 @@ class SettingsController extends Controller
             DB::rollback();
             return back()->withInput()->with('error', 'Settings has not been updated');
         }
-    }
-
-    private function getData($country)
-    {
-        $countries = $this->staticDataHelper->callStatesAndCountries('countries');
-        $states = [];
-
-        if ($country) {
-            $country = Country::where('name', $country)->first();
-            $states = $country->states()->select('id', 'name')->get();
-        }
-
-        return [
-            'countries' => $countries,
-            'states' => $states,
-        ];
     }
 }

@@ -15,7 +15,7 @@ class OrderApiController extends Controller
             'payment:id,payment_status,order_id,alias,delivery_status,price,quantity',
             'purchase:id,name,image_path,price,quantity,initial_quantity',
             'user:id,username',
-            'package:id,package_name'
+            'package:id,package_name,delivery_date'
         ];
 
         $select_json = $request->input('select_json');
@@ -46,12 +46,14 @@ class OrderApiController extends Controller
         );
 
         $this->applyFilters($request, $orderQuery);
+        $orderQuery->with($relations);
 
         if ($select_json) {
-            return $this->applySelectFieldJSON($orderQuery->with('purchase'));
+            return $this->applySelectFieldJSON(
+                $orderQuery,
+                $request->input('collection')
+            );
         }
-
-        $orderQuery->with($relations);
 
         $filteredRecords = $orderQuery->count();
         $totalRecords = Order::count();
@@ -77,14 +79,14 @@ class OrderApiController extends Controller
         $query->when($request->input('id'), function ($query) use ($request) {
             return $query->where('id', $request->input('id'));
         });
+        $query->when($request->input('is_it_delivered') === '0', function ($query) use ($request) {
+            return $query->where('is_it_delivered', 0);
+        });
         $query->when($request->input('customer'), function ($query) use ($request) {
             return $query->where('customer_id', $request->input('customer'));
         });
         $query->when($request->input('user_id'), function ($query) use ($request) {
             return $query->where('user_id', $request->input('user_id'));
-        });
-        $query->when($request->input('package'), function ($query) use ($request) {
-            return $query->where('package_id', $request->input('package'));
         });
         $query->when($request->input('package'), function ($query) use ($request) {
             return $query->where('package_id', $request->input('package'));
@@ -126,7 +128,10 @@ class OrderApiController extends Controller
         });
     }
 
-    private function applySelectFieldJSON($query){
+    private function applySelectFieldJSON($query,$collection){
+        if($collection) {
+            return response()->json(["orders" => $query->get()]);
+        }
         return response()->json(["order" => $query->first()]);
     }
 }

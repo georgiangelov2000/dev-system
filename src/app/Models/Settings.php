@@ -37,6 +37,10 @@ class Settings extends Model
         'settings',
     ];
 
+    // protected $casts = [
+    //     'settings' => 'array',
+    // ];
+
     public static function getStruct(){
         return [
             'email' => null,
@@ -50,7 +54,8 @@ class Settings extends Model
             'owner_name' => null,
             'business_type' => null,
             'registration_date' => date('Y-m-d'),
-            'image_path' => null
+            'image_path' => null,
+            'notification_email' => null
         ];
     }
 }

@@ -6,7 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PackageRequest extends FormRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -14,16 +13,27 @@ class PackageRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            "tracking_number" => "required|string",
-            "customer_id" => "required|integer",
+        $commonRules = [
             "package_name" => "required|string",
-            "package_type" => "required|string",
-            "delivery_method" => "required|string",
             "package_notes" => "nullable|string",
             "customer_notes" => "nullable|string",
-            "order_id" => "required|array",
-            'expected_delivery_date' => "required|date"
         ];
+
+        $editableRules = [
+            "customer_id" => "required|integer",
+            "tracking_number" => "required|string",
+            "package_type" => "required|string",
+            "delivery_method" => "required|string",
+            "order_id" => "required|array",
+            "expected_delivery_date" => "required|date",
+        ];
+
+
+        return $this->isEditableRequired() ? $commonRules : array_merge($commonRules, $editableRules);
+    }
+
+    private function isEditableRequired()
+    {
+        return $this->package->is_it_delivered;
     }
 }

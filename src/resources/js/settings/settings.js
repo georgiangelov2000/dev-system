@@ -1,7 +1,7 @@
 import { APICallerWithoutData, APICaller } from '../ajax/methods';
 
 $(function () {
-    $('select[name="country_id"], select[name="state_id"]').selectpicker()
+    $('select[name="country"], select[name="state"]').selectpicker()
 
     $('.datepicker').datepicker({
         format: 'yyyy-mm-dd'
@@ -14,7 +14,7 @@ $(function () {
 
     selectCountry.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
         let countryId = $(this).val();
-        let url = LOCATION_API_ROUTE.replace("country_id", countryId);
+        let url = LOCATION_API_ROUTE.replace("country", countryId);
 
         APICallerWithoutData(url, function (response) {
             let options = "";

@@ -2,9 +2,9 @@
 
 @section('content')
     <div class="card card-default cardTemplate">
-        <div class="card-header">
+        <div class="card-header bg-primary">
             <div class="col-12">
-                <h3 class="card-title">Orders for {{ $package->package_name }}</h3>
+                <h3 class="card-title">Package: <span class="text-dark">{{ $package->package_name }}</span></h3>
             </div>
         </div>
         <div class="card-body">
@@ -21,10 +21,6 @@
                             <option value=''>All</option>
                         </select>
                     </div>
-                </div>
-                <div class="col-3">
-                    <label for="customRange1">Date of sale</label>
-                    <input type="text" class="form-control pull-right" name="datetimes" />
                 </div>
                 <div class="form-group col-3">
                     <label for="">Status</label>
@@ -60,33 +56,35 @@
                     <span>When you delete order, the order's quantity will be returned to the current product</span>
                 </div>
             </div>
-            <table id="ordersTable" class="table table-hover table-sm dataTable no-footer">
-                <thead>
-                    <tr>
-                        <th>
-                            <div class="form-check">
-                                <input class="form-check-input selectAll" type="checkbox">
-                                <label class="form-check-label" for="flexCheckDefault"></label>
-                            </div>
-                        </th>
-                        <th>ID</th>
-                        <th>Payment</th>
-                        <th>Customer</th>
-                        <th>Purchase</th>
-                        <th>Amount</th>
-                        <th title="Unut price">Unit Price</th>
-                        <th title="Discount unit price">Discount unit price</th>
-                        <th title="Official price">Official Price</th>
-                        <th title="Regular price">Regular price</th>                            
-                        <th>Discount</th>
-                        <th>Date of sale</th>
-                        <th>Expired</th>
-                        <th>Payment date</th>
-                        <th>Package</th>
-                        <th class="text-center">Status</th>
-                        <th>Actions</th>
-                </thead>
-            </table>
+            <div class="row table-responsive">
+                <table id="ordersTable" class="table table-hover table-sm dataTable no-footer">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="form-check">
+                                    <input class="form-check-input selectAll" type="checkbox">
+                                    <label class="form-check-label" for="flexCheckDefault"></label>
+                                </div>
+                            </th>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Purchase</th>
+                            <th>Track.numer</th>
+                            <th>Amount</th>
+                            <th>Unit Price</th>
+                            <th>Official Price</th>
+                            <th>Regular price</th>
+                            <th>Discount</th>
+                            <th>Delivered</th>
+                            <th>Exp delivery date</th>
+                            <th>Delivery date</th>
+                            <th>Delivery delay</th>
+                            <th>Package</th>
+                            <th>Delivery Status</th>
+                            <th>Actions</th>
+                    </thead>
+                </table>
+            </div>
         </div>
     </div>
 @endsection
@@ -105,5 +103,6 @@
         const PAYMENT_EDIT = "{{ route('payment.edit', [':payment', ':type']) }}";
         const PACKAGE_EDIT_ROUTE = "{{route('packages.edit',':id')}}"
         const ORDER_UPDATE_STATUS = "{{route('orders.status',':id')}}";
+        const ORDER_SHOW_ROUTE = "{{route('orders.show',':id')}}";
     </script>
 @endpush

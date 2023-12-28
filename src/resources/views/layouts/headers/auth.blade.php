@@ -290,20 +290,12 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{ route('settings.get') }}" class="nav-link">
                         <i class="fa fa-light fa-cog" aria-hidden="true"></i>
                         <p>
                             Settings
-                            <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('settings.get') }}" class="nav-link">
-                                <p>Company info</p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
                 <li class="nav-item">
                     <a href="#" class="nav-link">

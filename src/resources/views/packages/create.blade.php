@@ -154,12 +154,11 @@
                                 <th>ID</th>
                                 <th>Tracking number</th>
                                 <th>Name</th>
-                                <th>Date of sale</th>
                                 <th>Unit price</th>
                                 <th>Discount unit price</th>
                                 <th>Official price</th>
                                 <th>Regular price</th>
-                                <th>Discount</th>
+                                <th>Discount %</th>
                                 <th>Amount</th>
                                 <th>Status</th>
                             </tr>

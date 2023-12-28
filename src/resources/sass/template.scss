@@ -304,3 +304,9 @@ table.dataTable {
 		border-bottom-right-radius: initial !important;
 	}
 }
+
+.bootstrap-select.btn-group.form-control-sm > .dropdown-toggle {
+		height: 100%;
+		padding-bottom: 0;
+		padding-top: 0;
+}
