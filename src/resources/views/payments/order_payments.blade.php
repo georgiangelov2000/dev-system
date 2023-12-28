@@ -7,7 +7,7 @@
 
 @section('content')
     <div class="row">
-        <div class="card col-12 cardTemplate">
+        <div class="card col-12 cardTemplate" id="print">
             <div class="card-header bg-primary">
                 <div class="col-12">
                     <h3 class="card-title">Order payments</h3>

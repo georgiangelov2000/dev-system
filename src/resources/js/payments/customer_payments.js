@@ -112,7 +112,7 @@ $(function () {
           </div>
         </div>
 
-        <div class="row">
+        <div class="row" id="print">
             <div class="col-12">
               <p class="bg-dark p-2 font-weight-bold filters">
                 <i class="fa-solid fa-filter"></i> Filters
@@ -148,7 +148,7 @@ $(function () {
                           <th>Exp date of payment</th>
                           <th>Date of payment</th>
                           <th>Payment Delay</th>
-                          <th>Actions</th>
+                          <th id="print">Actions</th>
                       </tr>
                   </thead>
               </table>
@@ -180,12 +180,9 @@ $(function () {
       
       <div class="row no-print">
           <div class="col-12">
-              <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
-                  <i class="fas fa-print"></i> Print
-              </button>
-              <button type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
-                  <i class="fas fa-download"></i> Generate PDF
-              </button>
+            <button onclick="invokePrint()" type="button" class="btn btn-primary float-right" style="margin-right: 5px;">
+              <i class="fas fa-print"></i> Print
+            </button>
           </div>
       </div>
 
@@ -416,7 +413,7 @@ $(function () {
                             </form>
             `;
 
-            return `<div class="btn-group">
+            return `<div id="print" class="btn-group">
               <button type="button" class="btn btn-sm btn-outline-primary rounded" data-toggle="dropdown" aria-expanded="false">
                   <i class="fa-light fa-list" aria-hidden="true"></i>
               </button>
@@ -459,6 +456,10 @@ $(function () {
       });
     });
   };
+ 
+  window.invokePrint = function(){
+    window.print();
+  }
 
   window.editInvoice = function (e) {
     let id = $(e).attr('data-id');
