@@ -52,7 +52,7 @@
                         <strong>Date of Birth:</strong> {{ $formattedDate }}
                     </div>
                     <div class="col-md-6">
-                        <strong>Role:</strong> {{ $user->role->name }}
+                        <strong>Role:</strong> {{ $user->role }}
                     </div>
                 </div>
             </div>

@@ -14,7 +14,7 @@ use App\Http\Controllers\Api\PaymentApiController as PaymentApiController;
 use App\Http\Controllers\Api\UserApiController as UserApiController;
 use App\Http\Controllers\Api\StateApiController as StateApiController;
 use App\Http\Controllers\Api\InvoiceApiController as InvoiceApiController;
-
+use App\Http\Controllers\Api\RolesManagementApiController as RolesManagementApiController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/api/categories', [CategoryApiController::class, 'getData'])->name('api.categories');
@@ -29,6 +29,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api//invoices', [InvoiceApiController::class, 'getData'])->name('api.invoices');
     Route::get('/api/users', [UserApiController::class, 'getData'])->name('api.users');
     Route::get('/api/location', [StateApiController::class, 'getData'])->name('api.location');
-    Route::get('/api/countries', [CountryApiController::class, 'getData'])->name('api.countries');
+    Route::get('/api/countries', [CountryApiController::class, 'getData'])->name('api.countries');    
+    Route::get('/api/roles/management', [RolesManagementApiController::class, 'getData'])->name('api.roles.management');
+
 });
 

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Role extends Model
+class AccessManagement extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class Role extends Model
      *
      * @var string
      */
-    protected $table = 'roles';
+    protected $table = 'access_management';
 
     /**
      * The primary key associated with the table.
@@ -30,29 +30,11 @@ class Role extends Model
      */
     public $timestamps = false;
 
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
+    protected $fillable = ['id', 'access','identity'];
 
-    protected $fillable = [
-        'id',
-        'name',
-    ];
-
-    public function rolesAccessManagement()
-    {
-        return $this->belongsToMany(
-            AccessManagement::class, 
-            'roles_access_management', 
-            'role_id', 
-            'access_id'
-        );
-    }
-
-    public function userRoles(){
-        return $this->hasMany(User::class);
-    }
 }

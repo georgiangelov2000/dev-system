@@ -13,7 +13,7 @@
                 @php
                     $user = Auth::user();
                     $email = $user->email;
-                    $role = $user->role->name;
+                    $role = $user->role;
                 @endphp
                 <span style="color: #555;">
                     <b>User:</b> {{ $email }}
@@ -60,7 +60,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('country.index') }}" class="nav-link">
+                    <a href="{{ route('roles.index') }}" class="nav-link">
                         <i class="fa-light fa-lock"></i>
                         <p>Role managment</p>
                     </a>
@@ -85,7 +85,7 @@
                     <a href="#" class="nav-link">
                         <i class="fa-light fa-box"></i>
                         <p>
-                            Product widgets
+                            Product Widgets
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>

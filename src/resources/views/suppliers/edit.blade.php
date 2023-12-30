@@ -161,6 +161,20 @@
                             </div>
                         </div>
 
+                        <div class="col-12 d-flex flex-wrap mb-2">
+                            <h5 class="col-12 pt-2">Categories</h5>
+                            <div class="col-12">
+                                <hr class="mt-0">
+                            </div>
+                            @if(count($supplier->categories))
+                                @foreach ($supplier->categories as $item)
+                                    <h4> 
+                                        <span class="badge badge-secondary ml-1">{{ $item->name }}</span>
+                                    </h4>
+                                @endforeach
+                            @endif
+                        </div>
+
                         <div class="form-group col-12">
                             <button type="submit" class="btn btn-primary">
                                 Save changes

@@ -18,6 +18,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -93,7 +94,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('purchases/orders/{purchase}', [PurchaseController::class, 'orders'])->name('purchases.orders');
     Route::put('purchases/update/status/{purchase}', [PurchaseController::class, 'updateSpecificColumns'])->name('purchases.update.status');
 
-
+    Route::resource('roles', RoleManagementController::class);
+    
     Route::prefix('customers')->name('customer.')->group(function () {
         Route::get('/', [CustomerController::class, 'index'])->name('index');
         Route::get('/create', [CustomerController::class, 'create'])->name('create');

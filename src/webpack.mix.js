@@ -45,6 +45,10 @@ mix.js('resources/js/payments/customer_payments.js', 'public/js/payments'),
 mix.js('resources/js/payments/supplier_payments.js', 'public/js/payments'),
 mix.js('resources/js/payments/form.js', 'public/js/payments'),
 
+mix.js('resources/js/roles_management/form.js', 'public/js/roles_management'),
+mix.js('resources/js/roles_management/roles_management.js', 'public/js/roles_management'),
+
+
 mix.js('resources/js/csv/import.js', 'public/js/csv'),
 
 // Javascript libraries

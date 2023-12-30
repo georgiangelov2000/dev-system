@@ -91,7 +91,7 @@
                     </div>
                 </div>
                 <div class="row table-responsive">
-                    <table id="ordersTable" class="table  table-hover table-sm dataTable no-footer">
+                    <table id="ordersTable" class="table table-hover table-sm dataTable no-footer">
                         <thead>
                             <tr>
                                 <th>
