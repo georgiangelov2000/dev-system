@@ -40,6 +40,11 @@
     <!-- Sidebar -->
     <div class="sidebar">
 
+        @php
+            $permisssions = $user->role->rolesAccessManagement->pluck('identity')->toArray();
+        @endphp
+
+        
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
@@ -47,48 +52,59 @@
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/330px-No-Image-Placeholder.svg.png"
                     alt="Company logo" id="company-logo" />
                 </li>
-                <li class="nav-item">
-                    <a href="{{ route('profile.index') }}" class="nav-link">
-                        <i class="fa-light fa-user"></i>
-                        <p>My profile</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('country.index') }}" class="nav-link">
-                        <i class="fal fa-flag"></i>
-                        <p>Countries</p>
-                    </a>
-                </li>
+                
+                @if(in_array(1,$permisssions))
+                    <li class="nav-item">
+                        <a href="{{ route('profile.index') }}" class="nav-link">
+                            <i class="fa-light fa-user"></i>
+                            <p>My profile</p>
+                        </a>
+                    </li>
+                @endif
+                @if(in_array(2,$permisssions))
+                    <li class="nav-item">
+                        <a href="{{ route('country.index') }}" class="nav-link">
+                            <i class="fal fa-flag"></i>
+                            <p>Countries</p>
+                        </a>
+                    </li>
+                @endif
+                @if(in_array(3,$permisssions))
                 <li class="nav-item">
                     <a href="{{ route('roles.index') }}" class="nav-link">
                         <i class="fa-light fa-lock"></i>
                         <p>Role managment</p>
                     </a>
                 </li>
+                @endif
+                @if(in_array(4,$permisssions))
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa-light fa-house"></i>
+                            <p>
+                                General
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('dashboard') }}">
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-house"></i>
-                        <p>
-                            General
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('dashboard') }}">
-                                <p>Dashboard</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-box"></i>
-                        <p>
-                            Product Widgets
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                    @if(in_array(5,$permisssions))
+                        <a href="#" class="nav-link">
+                            <i class="fa-light fa-box"></i>
+                            <p>
+                                Product Widgets
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                    @endif
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
                             <a href="{{ route('category.index') }}" class="nav-link">
@@ -108,251 +124,272 @@
                     </ul>
                 </li>
 
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-truck"></i>
-                        <p>
-                            Supplier Managment
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('supplier.index') }}" class="nav-link">
-                                <p>Suppliers</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('supplier.create') }}" class="nav-link">
-                                <p>Create supplier</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-user-plus" aria-hidden="true"></i>
-                        <p>
-                            Customer Managment
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('customer.index') }}" class="nav-link">
-                                <p>Customers</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('customer.create') }}" class="nav-link">
-                                <p>Create customer</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-cart-shopping"></i>
-                        <p>
-                            Purchase Management
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('purchases.index') }}" class="nav-link">
-                                <p>Purchases</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('purchases.create') }}" class="nav-link">
-                                <p>Create purchase</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-boxes-packing"></i>
-                        <p>
-                            Package Management
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('packages.index') }}" class="nav-link">
-                                <p>Packages</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('packages.create') }}" class="nav-link">
-                                <p>Create package</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('packages.form.operations') }}" class="nav-link">
-                                <p>Operations</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-bookmark"></i>
-                        <p>
-                            Order Management
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('orders.index') }}" class="nav-link">
-                                <p>Orders</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('orders.create') }}" class="nav-link">
-                                <p>Create orders</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa fa-light fa-users"></i>
-                        <p>
-                            Staff members
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('user.index') }}" class="nav-link">
-                                <p>Staff</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('user.create') }}" class="nav-link">
-                                <p>Create member</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-credit-card"></i>
-                        <p>
-                            Payments
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('payment.index', 'order') }}" class="nav-link">
-                                <p>Order payments</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('payment.index', 'purchase') }}" class="nav-link">
-                                <p>Purchase payments</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fal fa-file-invoice"></i>
-                        <p>
-                            Invoices
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('payment.index', 'order') }}" class="nav-link">
-                                <p>Order invoices</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('payment.index', 'purchase') }}" class="nav-link">
-                                <p>Purchase invoices</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('settings.get') }}" class="nav-link">
-                        <i class="fa fa-light fa-cog" aria-hidden="true"></i>
-                        <p>
-                            Settings
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-flag"></i>
-                        <p>
-                            Reports
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('settings.get') }}" class="nav-link">
-                                <p></p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fa-light fa-file-import"></i>
-                        <p>
-                            Imports
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview" style="display: none;">
-                        <li class="nav-item">
-                            <a href="{{ route('import.index', 'supplier') }}" class="nav-link">
-                                <p>Suppliers</p>
-                            </a>
-                            <a href="{{ route('import.index', 'customer') }}" class="nav-link">
-                                <p>Customers</p>
-                            </a>
-                            <a href="{{ route('import.index', 'purchase') }}" class="nav-link">
-                                <p>Purchases</p>
-                            </a>
-                            <a href="{{ route('import.index', 'category') }}" class="nav-link">
-                                <p>Categories</p>
-                            </a>
-                            </a>
-                            <a href="{{ route('import.index', 'brand') }}" class="nav-link">
-                                <p>Brands</p>
-                            </a>
-                        </li>
-                    </ul>
+                @if(in_array(6,$permisssions))
                     <li class="nav-item">
-                        <a href="{{ route('country.index') }}" class="nav-link">
-                        <i class="fa-light fa-clock-rotate-left"></i>
-                            <p>Logs</p>
+                            <a href="#" class="nav-link">
+                                <i class="fa-light fa-truck"></i>
+                                <p>
+                                    Supplier Managment
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+
+                            <ul class="nav nav-treeview" style="display: none;">
+                                <li class="nav-item">
+                                    <a href="{{ route('supplier.index') }}" class="nav-link">
+                                        <p>Suppliers</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('supplier.create') }}" class="nav-link">
+                                        <p>Create supplier</p>
+                                    </a>
+                                </li>
+                            </ul>
+                    </li>
+                @endif
+
+                @if(in_array(7,$permisssions))
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa-light fa-user-plus" aria-hidden="true"></i>
+                            <p>
+                                Customer Managment
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{{ route('customer.index') }}" class="nav-link">
+                                    <p>Customers</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('customer.create') }}" class="nav-link">
+                                    <p>Create customer</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+
+                @if(in_array(8,$permisssions))
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa-light fa-cart-shopping"></i>
+                            <p>
+                                Purchase Management
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{{ route('purchases.index') }}" class="nav-link">
+                                    <p>Purchases</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('purchases.create') }}" class="nav-link">
+                                    <p>Create purchase</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+                @if(in_array(9,$permisssions))
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa-light fa-boxes-packing"></i>
+                            <p>
+                                Package Management
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{{ route('packages.index') }}" class="nav-link">
+                                    <p>Packages</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('packages.create') }}" class="nav-link">
+                                    <p>Create package</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('packages.form.operations') }}" class="nav-link">
+                                    <p>Operations</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+                @if(in_array(10,$permisssions))
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa-light fa-bookmark"></i>
+                            <p>
+                                Order Management
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{{ route('orders.index') }}" class="nav-link">
+                                    <p>Orders</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('orders.create') }}" class="nav-link">
+                                    <p>Create orders</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+                @if(in_array(11,$permisssions))
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa fa-light fa-users"></i>
+                            <p>
+                                Staff members
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{{ route('user.index') }}" class="nav-link">
+                                    <p>Staff</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('user.create') }}" class="nav-link">
+                                    <p>Create member</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+                @if(in_array(12,$permisssions))
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fa-light fa-credit-card"></i>
+                            <p>
+                                Payments
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{{ route('payment.index', 'order') }}" class="nav-link">
+                                    <p>Order payments</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('payment.index', 'purchase') }}" class="nav-link">
+                                    <p>Purchase payments</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+                @if(in_array(13,$permisssions))
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fal fa-file-invoice"></i>
+                            <p>
+                                Invoices
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{{ route('payment.index', 'order') }}" class="nav-link">
+                                    <p>Order invoices</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('payment.index', 'purchase') }}" class="nav-link">
+                                    <p>Purchase invoices</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+                @if(in_array(14,$permisssions))
+                    <li class="nav-item">
+                        <a href="{{ route('settings.get') }}" class="nav-link">
+                            <i class="fa fa-light fa-cog" aria-hidden="true"></i>
+                            <p>
+                                Settings
+                            </p>
                         </a>
                     </li>
+                @endif
+                @if(in_array(15,$permisssions))
                     <li class="nav-item">
-                        <a href="{{ route('country.index') }}" class="nav-link">
-                            <i class="fa-light fa-bell"></i>
-                            <p>Notifications</p>
+                        <a href="#" class="nav-link">
+                            <i class="fa-light fa-flag"></i>
+                            <p>
+                                Reports
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
                         </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{{ route('settings.get') }}" class="nav-link">
+                                    <p></p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
+                @endif
+                <li class="nav-item">
+                    @if(in_array(16,$permisssions))
+                        <a href="#" class="nav-link">
+                            <i class="fa-light fa-file-import"></i>
+                            <p>
+                                Imports
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview" style="display: none;">
+                            <li class="nav-item">
+                                <a href="{{ route('import.index', 'supplier') }}" class="nav-link">
+                                    <p>Suppliers</p>
+                                </a>
+                                <a href="{{ route('import.index', 'customer') }}" class="nav-link">
+                                    <p>Customers</p>
+                                </a>
+                                <a href="{{ route('import.index', 'purchase') }}" class="nav-link">
+                                    <p>Purchases</p>
+                                </a>
+                                <a href="{{ route('import.index', 'category') }}" class="nav-link">
+                                    <p>Categories</p>
+                                </a>
+                                </a>
+                                <a href="{{ route('import.index', 'brand') }}" class="nav-link">
+                                    <p>Brands</p>
+                                </a>
+                            </li>
+                        </ul>
+                    @endif
+                    @if(in_array(17,$permisssions))
+                        <li class="nav-item">
+                            <a href="{{ route('country.index') }}" class="nav-link">
+                            <i class="fa-light fa-clock-rotate-left"></i>
+                                <p>Logs</p>
+                            </a>
+                        </li>
+                    @endif
+                    @if(in_array(18,$permisssions))
+                        <li class="nav-item">
+                            <a href="{{ route('country.index') }}" class="nav-link">
+                                <i class="fa-light fa-bell"></i>
+                                <p>Notifications</p>
+                            </a>
+                        </li>
+                    @endif
                 </li>
 
             </ul>
