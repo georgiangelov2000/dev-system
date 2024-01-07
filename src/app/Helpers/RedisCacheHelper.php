@@ -28,4 +28,16 @@ class RedisCacheHelper
     {
         Redis::del($key);
     }
+
+    private function logAction($key, $action, $data)
+    {
+        $logKey = $key;
+        $logEntry = [
+            'action' => $action,
+            'timestamp' => now(),
+            'data' => $data,
+        ];
+
+        $this->redisModel->pushToList($logKey, json_encode($logEntry));
+    }
 }
