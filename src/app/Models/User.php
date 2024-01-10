@@ -30,10 +30,11 @@ class User extends Authenticatable
         'gender',
         'phone',
         'address',
-        'image',
+        'image_path',
         'card_id',
         'birth_date',
         'pdf_file_path',
+        'last_seen'
     ];
 
     /**

@@ -5,14 +5,14 @@
     <div class="row">
         <div class="card col-12 cardTemplate">
 
-            <div class="card-header d-flex align-items-center p-2">
+            <div class="card-header d-flex align-items-center p-2 bg-primary">
                 <div class="col-10">
                     <h3 class="card-title">Staff members</h3>
                 </div>
                 <div class="col-2 text-right">
-                    <button type="button" class="btn btn-primary createBrand">
-                        <i class="fa fa-plus"></i> Crate member
-                    </button>
+                    <a type="button" class="btn btn-sm btn-light" href="{{ route('user.create') }}" >
+                        <i class="fa fa-plus"></i> Create member
+                    </a>
                 </div>
             </div>
 
@@ -33,17 +33,13 @@
                 <table id="users" class="table table-hover table-sm">
                     <thead>
                         <tr>
+                            <th>ON/OFF</th>
                             <th>ID</th>
+                            <th>Last seen</th>
                             <th>Image</th>
                             <th>Email</th>
                             <th>Role</th>
                             <th>Username</th>
-                            <th>First name</th>
-                            <th>Middle name</th>
-                            <th>Last name</th>
-                            <th>Card ID</th>
-                            <th>Birth date</th>
-                            <th>Gender</th>
                             <th>Phone</th>
                             <th>Address</th>
                             <th>Contract</th>

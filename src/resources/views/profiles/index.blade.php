@@ -1,61 +1,66 @@
 @extends('app')
 
 @section('content')
-@php
-    $user = $data['user'];
-    $genders = $data['genders'];
-@endphp
     <div class="container">
-        <div class="card shadow-lg cardTemplate">
-            <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-                <div class="col-6">
-                    <h3 class="mb-0">Profile</h3>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    @if ($user->photo)
-                        <img class="img-fluid rounded-circle w-25" src="{{ $user->photo }}" alt="Profile Picture">
-                    @else
-                        <img class="img-fluid rounded-circle w-25" src="https://via.placeholder.com/150"
-                            alt="Profile Placeholder">
-                    @endif
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <strong>Email:</strong> {{ $user->email }}
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Username:</strong> {{ $user->username }}
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <strong>Address:</strong> {{ $user->address }}
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Gender:</strong> {{ $genders[$user->gender] }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        @php
-                            // Extract year, month, and day from the original date
-                            [$year, $month, $day] = explode('-', $user->birth_date);
+        <div class="col-md-12">
 
-                            // Convert month number to month name
-                            $monthName = date('F', mktime(0, 0, 0, $month, 1));
+            <div class="card card-primary card-outline">
+                <div class="card-body box-profile">
+                    <div class="text-center">
+                        @if ($user->photo)
+                            <img class="profile-user-img img-fluid img-circle" src="{{ $user->photo }}" alt="Profile Picture">
+                        @else
+                            <img class="img-fluid rounded-circle w-25" src="https://via.placeholder.com/150"
+                                alt="Profile Placeholder">
+                        @endif
+                    </div>
+                    <h3 class="profile-username text-center">{{ $user->username }}</h3>
+                    <p class="text-muted text-center">{{ $user->role->name }}</p>
+                    <ul class="list-group list-group-unbordered mb-3">
+                        <li class="list-group-item">
+                            <b>Email</b> <a class="float-right">{{ $user->email }}</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Username</b> <a class="float-right">{{ $user->username }}</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Address</b> <a class="float-right">{{ $user->address }}</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Gender</b> <a class="float-right">{{ $genders[$user->gender] }}</a>
+                        </li>
+                        <li class="list-group-item">
+                            @php
+                                // Extract year, month, and day from the original date
+                                [$year, $month, $day] = explode('-', $user->birth_date);
 
-                            // Create the formatted date string
-                            $formattedDate = $monthName . ' ' . $day . ', ' . $year;
-                        @endphp
-                        <strong>Date of Birth:</strong> {{ $formattedDate }}
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Role:</strong> {{ $user->role }}
-                    </div>
+                                // Convert month number to month name
+                                $monthName = date('F', mktime(0, 0, 0, $month, 1));
+
+                                // Create the formatted date string
+                                $formattedDate = $monthName . ' ' . $day . ', ' . $year;
+                            @endphp
+                            <b>Birth date</b> <a class="float-right">{{ $formattedDate }}</a>
+                        </li>
+                        <li class="list-group-item">
+                            <b>Permissions</b> 
+                            @if(count($user->role->rolesAccessManagement))
+                                <div class="float right d-flex flex-wrap">
+                                    @foreach ($user->role->rolesAccessManagement as $item)
+                                    <h6 class="mr-1">
+                                        <span class="badge badge-primary">
+                                            {{ $item->access }}
+                                        </span>
+                                    </h6>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </li>
+                    </ul>
                 </div>
+
             </div>
+
         </div>
     </div>
 @endsection

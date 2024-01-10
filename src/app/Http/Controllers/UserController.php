@@ -4,15 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\UploadedFile;
+use App\Helpers\FunctionsHelper;
 use Illuminate\Support\Facades\Log;
-
+use Auth;
 class UserController extends Controller
 {
+
+    private $helper;
+    private $dir = 'public/images/users';
+    private $pdfDir = "public/pdfs";
+
+    public function __construct(FunctionsHelper $helper)
+    {
+        $this->helper = $helper;
+    }
 
     public function index()
     {
@@ -20,7 +31,8 @@ class UserController extends Controller
     }
     public function create()
     {
-        return view('users.create');
+        $roles = Role::all();
+        return view('users.create',['roles' => $roles]);
     }
 
     public function store(UserRequest $request)
@@ -29,12 +41,11 @@ class UserController extends Controller
 
         try {
             $data = $request->validated();
+            $roles = Role::pluck('id')->toArray();
 
-            $data['password'] = Hash::make($data['password']);
-
-            // Handle for not expected statuses
-            $data['gender'] = array_key_exists($data['gender'], config('statuses.genders')) ? $data['gender'] : 3;
-            $data['role_id'] = array_key_exists($data['role_id'], config('statuses.roles')) ? $data['role_id'] : 2;
+            if( !in_array($data['role_id'], $roles) ) {
+                throw new \Exception("Invalid type");
+            }
 
             // Set up User
             $user = new User();
@@ -47,19 +58,21 @@ class UserController extends Controller
             $user->gender = $data['gender'];
             $user->role_id = $data['role_id'];
             $user->phone = $data['phone'];
+
             if ($data['birth_date']) {
                 $user->birth_date = date('Y-m-d', strtotime($data['birth_date']));
             }
             if ($data['card_id']) {
                 $user->card_id = $data['card_id'];
             }
+
             $user->address = $data['address'];
+            $user->password = Hash::make($data['password']);
 
             $user->save();
 
             // if user is saved set the pdf and picture of the user;
             if ($user) {
-
                 if (isset($data['pdf']) && $data['pdf'] instanceof UploadedFile) {
                     $file = $data['pdf'];
                     $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -67,26 +80,14 @@ class UserController extends Controller
                     finfo_close($finfo);
 
                     if ($mime_type === 'application/pdf') {
-                        try {
-                            $pdfPath = $file->store('public/pdfs');
-                            $user->pdf_file_path = Storage::url($pdfPath);
-                        } catch (\Exception $e) {
-                            Log::error('Error storing PDF file: ' . $e->getMessage());
-                        }
+                        $this->helper->imageUploader($file,$user,$this->pdfDir,'pdf_file_path');
                     }
                 }
-
                 if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
                     $file = $data['image'];
                     $extension = $file->getClientOriginalExtension();
-
                     if (in_array($extension, ['png', 'jpg', 'jpeg'], true)) {
-                        try {
-                            $hashedImage = $file->store('public/users');
-                            $user->photo = Storage::url($hashedImage);
-                        } catch (\Exception $e) {
-                            Log::error('Error storing image file: ' . $e->getMessage());
-                        }
+                        $this->helper->imageUploader($file,$user,$this->dir,'image_path');
                     }
                 }
             }
@@ -97,13 +98,14 @@ class UserController extends Controller
             DB::rollback();
             return back()->withInput()->with('error', 'User has not been created');
         }
-        return redirect()->route('user.create')->with('success', 'User has been created');
+        return redirect()->route('user.index')->with('success', 'User has been created');
     }
 
     public function edit(User $user)
     {
         $user->load('role');
-        return view('users.edit', compact('user'));
+        $roles = Role::all();
+        return view('users.edit', compact('user','roles'));
     }
 
     public function update(User $user, UserRequest $request)
@@ -112,12 +114,11 @@ class UserController extends Controller
         try {
             
             $data = $request->validated();
-
-            $data['password'] = Hash::make($data['password']);
-
-            // Handle for not expected statuses
-            $data['gender'] = array_key_exists($data['gender'], config('statuses.genders')) ? $data['gender'] : 3;
-            $data['role_id'] = array_key_exists($data['role_id'], config('statuses.roles')) ? $data['role_id'] : 2;
+            $roles = Role::pluck('id')->toArray();
+            
+            if( !in_array($data['role_id'], $roles) ) {
+                throw new \Exception("Invalid type");
+            }
 
             $user->email = $data['email'];
             $user->username = $data['username'];
@@ -135,9 +136,8 @@ class UserController extends Controller
                 $user->card_id = $data['card_id'];
             }
             $user->address = $data['address'];
-
-            $user->save();
-
+            $user->password = Hash::make($data['password']);
+            
             if ($user) {
                 if (isset($data['pdf']) && $data['pdf'] instanceof UploadedFile) {
                     $file = $data['pdf'];
@@ -146,50 +146,24 @@ class UserController extends Controller
                     finfo_close($finfo);
 
                     if ($mime_type === 'application/pdf') {
-                        try {
-                            $existingPdf = $user->pdf_file_path;
-
-                            if (file_exists(public_path($existingPdf))) {
-                                // Delete the existing PDF file
-                                unlink(public_path($existingPdf));
-                            }
-
-                            // Store the new PDF file
-                            $newPdfPath = $file->store('public/pdfs');
-                            $user->pdf_file_path = Storage::url($newPdfPath);
-                        } catch (\Exception $e) {
-                            Log::error('Error storing PDF file: ' . $e->getMessage());
-                        }
+                        $this->helper->imageUploader($file,$user,$this->pdfDir,'pdf_file_path');
                     }
                 }
                 if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
                     $file = $data['image'];
                     $extension = $file->getClientOriginalExtension();
                     if (in_array($extension, ['png', 'jpg', 'jpeg'], true)) {
-                        try {
-                            $existingImage = $user->photo;
-                            if ($existingImage !== null) {
-                                $imagePath = public_path($existingImage);
-
-                                if (file_exists($imagePath)) {
-                                    // Delete the existing image file
-                                    unlink($imagePath);
-                                }
-                            }
-
-                            // Store the new image file
-                            $newImagePath = $file->store('public/users');
-                            $user->photo = Storage::url($newImagePath);
-                        } catch (\Exception $e) {
-                            Log::error('Error storing image file: ' . $e->getMessage());
-                        }
+                        $this->helper->imageUploader($file,$user,$this->dir,'image_path');
                     }
                 }
             }
 
             $user->save();
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (\Exception $e) 
+        {
+            DB::rollback();
+            dd($e->getMessage());
             return back()->withInput()->with('error', 'User has not been updated');
         }
         return redirect()->route('user.index')->with('success', 'User has been updated');

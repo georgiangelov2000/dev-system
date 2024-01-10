@@ -27,9 +27,10 @@ class CreateUsersTable extends Migration {
             $table->boolean('is_active')->default(true);
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
-            $table->string('photo')->nullable();
+            $table->string('image_path')->nullable();
             $table->string('pdf_file_path')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('last_seen')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

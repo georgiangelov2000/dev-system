@@ -98,17 +98,17 @@ class FunctionsHelper
      * @param string $dir
      * @throws \Exception
      */
-    public static function imageUploader(UploadedFile $file, $model, $dir)
+    public static function imageUploader(UploadedFile $file, $model, $dir, $uploadedColumn)
     {
         try {
             if ($file->isValid()) {
                 $hashedImage = md5(uniqid()) . '.' . $file->getClientOriginalExtension();
 
                 // Check if the model has an existing image path
-                if (isset($model->image_path)) {
+                if (isset($model->$uploadedColumn)) {
 
                     // Get the stored file path without the '/storage' prefix
-                    $storedFile = str_replace('/storage', '', $model->image_path);
+                    $storedFile = str_replace('/storage', '', $model->$uploadedColumn);
 
                     // Check if the stored file exists and delete it if it does
                     if (Storage::disk('public')->exists($storedFile)) {
@@ -118,7 +118,9 @@ class FunctionsHelper
 
                 // Upload the new image file
                 Storage::putFileAs($dir, $file, $hashedImage);
-                $model->image_path = self::getImagePath($dir) . '/' . $hashedImage;
+                $model->$uploadedColumn = self::getImagePath($dir) . '/' . $hashedImage;
+
+                return $model;
             } else {
                 throw new \Exception("Invalid file uploaded.");
             }

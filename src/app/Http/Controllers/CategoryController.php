@@ -7,29 +7,34 @@ use App\Models\Category;
 use App\Models\SubCategory;
 use App\Helpers\LoadStaticData;
 use App\Helpers\FunctionsHelper;
+use App\Helpers\RedisCacheHelper;
 use App\Services\CategoryService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\CategoryRequest;
+use App\Models\RedisModel;
 
 class CategoryController extends Controller
 {
     private $staticDataHelper;
-
     private $dir = 'public/images/categories';
-
     private $helper;
-
     private $categoryService;
+    private $redisModel;
+    private $redisCacheHelper;
 
     public function __construct(
         LoadStaticData $staticDataHelper,
         FunctionsHelper $helper,
-        CategoryService $categoryService
+        CategoryService $categoryService,
+        RedisModel $redisModel,
+        RedisCacheHelper $redisCacheHelper
     ) {
         $this->staticDataHelper = $staticDataHelper;
         $this->helper = $helper;
         $this->categoryService = $categoryService;
+        $this->redisModel = $redisModel;
+        $this->redisCacheHelper = $redisCacheHelper;
     }
 
     /**
@@ -57,6 +62,9 @@ class CategoryController extends Controller
         try {
             $data = $request->validated();
             $this->categoryProcessing(null, $data);
+            
+            $this->logAction('category_logs','created_category', ['category_name' => $data['name']]);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -222,7 +230,7 @@ class CategoryController extends Controller
 
         // If an image file is provided, upload it and update the image_path attribute.
         if (isset($data['image'])) {
-            $this->helper->imageUploader($data['image'], $category, $this->dir);
+            $this->helper->imageUploader($data['image'], $category, $this->dir,'image_path');
         }
 
         // Attach the selected subcategories to the Category.

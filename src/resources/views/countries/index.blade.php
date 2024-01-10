@@ -5,7 +5,7 @@
     <div class="row">
         <div class="card col-12 cardTemplate">
 
-            <div class="card-header d-flex align-items-center p-2">
+            <div class="card-header bg-primary d-flex align-items-center">
                 <div class="col-10">
                     <h3 class="card-title">Countries</h3>
                 </div>

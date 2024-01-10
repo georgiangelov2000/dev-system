@@ -1,5 +1,3 @@
-import { initializeMap, setMapView } from '../ajax/leaflet';
-
 $(function () {
   let searchAddress = $('#searchAddress');
   let addresses = $('.addresses');
@@ -52,8 +50,6 @@ $(function () {
     var longitude = parseFloat($(e).data('longitude'));
     setMapView([latitude, longitude], 15);
   }
-
-  initializeMap()
 
   $('#pdf').on('change', function () {
     $('#pdfMockUpImage').remove();

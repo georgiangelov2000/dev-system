@@ -173,7 +173,7 @@ class CustomerController extends Controller
         ]);
 
         if (isset($data['image'])) {
-            $this->helper->imageUploader($data['image'], $customer, $this->dir);
+            $this->helper->imageUploader($data['image'], $customer, $this->dir,'image_path');
         }
 
         $customer->save();

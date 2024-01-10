@@ -79,7 +79,7 @@ class PurchaseService
 
             // Check for uploaded image
             if ($file) {
-                FunctionsHelper::imageUploader($file, $purchase, $this->dir);
+                FunctionsHelper::imageUploader($file, $purchase, $this->dir,'image_path');
             }
             
                                     

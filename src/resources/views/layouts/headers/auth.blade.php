@@ -72,6 +72,16 @@
                         </a>
                     </li>
                 @endcan
+                @can('access-staff-members')
+                    <li class="nav-item">
+                        <a href="{{ route('user.index') }}" class="nav-link">
+                            <i class="fa fa-light fa-users"></i>
+                            <p>
+                                Staff
+                            </p>
+                        </a>
+                    </li>
+                @endcan
                 @can('access-general')
                     <li class="nav-item">
                         <a href="#" class="nav-link">
@@ -234,29 +244,6 @@
                                 <li class="nav-item">
                                     <a href="{{ route('orders.create') }}" class="nav-link">
                                         <p>Create orders</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    @endcan
-                    @can('access-staff-members')
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fa fa-light fa-users"></i>
-                                <p>
-                                    Staff members
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview" style="display: none;">
-                                <li class="nav-item">
-                                    <a href="{{ route('user.index') }}" class="nav-link">
-                                        <p>Staff</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('user.create') }}" class="nav-link">
-                                        <p>Create member</p>
                                     </a>
                                 </li>
                             </ul>

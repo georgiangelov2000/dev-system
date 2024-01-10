@@ -15,6 +15,7 @@ $(function () {
 
                 return $.extend({}, d, {
                     "search": d.search.value,
+                    'limit': d.custom_length = d.length,
                     'order_column': orderColumnName, // send the column name being sorted
                     'order_dir': d.order[0].dir, // send the sorting direction (asc or desc)
                     'role_id': bootstrapRole.val()
@@ -23,11 +24,29 @@ $(function () {
         },
         columns: [
             {
+                orderable: false,
+                width: "0%",
+                class: 'text-center',
+                render: function (data, type, row) {
+                    return `${row.online ? '<i class="fa-light fa-toggle-on text-success"></i>' : '<i class="fa-light fa-toggle-on text-danger"></i>'}`;
+                }
+            },
+            {
                 orderable: true,
                 width: "1%",
                 name: "id",
+                class: 'text-center',
                 render: function (data, type, row) {
                     return `<strong>${row.id}</strong>`
+                }
+            },
+            {
+                orderable: false,
+                width: "2%",
+                name: "last_seen",
+                class: 'text-center',
+                render: function (data, type, row) {
+                    return `<strong>${row.last_seen ?? ""}</strong>`
                 }
             },
             {
@@ -37,8 +56,8 @@ $(function () {
                 class:'text-center',
                 render: function (data, type, row) {
 
-                    if (row.photo) {
-                        return `<img class="rounded mx-auto w-100" src="${row.photo}" />`
+                    if (row.image_path) {
+                        return `<img class="rounded mx-auto w-100" src="${row.image_path}" />`
                     } else {
                         return "<img class='rounded mx-auto w-100' src='https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png'/>";
                     }
@@ -56,7 +75,7 @@ $(function () {
                 orderable: false,
                 width: '1%',
                 render: function (data, type, row) {
-                    return `<b>${row.role.name}</b>`;
+                    return `<b>${row.role ? row.role.name : ""}</b>`;
                 }
             },
             {
@@ -64,59 +83,6 @@ $(function () {
                 width: '1%',
                 render: function (data, type, row) {
                     return `${row.username}`;
-                }
-            },
-            {
-                orderable: false,
-                width: '5%',
-                render: function (data, type, row) {
-                    return `${row.first_name ?? ''}`;
-                }
-            },
-            {
-                orderable: false,
-                width: '5%',
-                render: function (data, type, row) {
-                    return `${row.middle_name ?? ''}`;
-                }
-            },
-            {
-                orderable: false,
-                width: '5%',
-                render: function (data, type, row) {
-                    return `${row.last_name ?? ''}`;
-                }
-            },
-            {
-                orderable: false,
-                width: '1%',
-                class:'text-center',
-                render: function (data, type, row) {
-                    return `<b>${row.card_id ?? ''}</b>`
-                }
-            },
-            {
-                orderable: false,
-                width: '3%',
-                class:'text-center',
-                render: function (data, type, row) {
-                    return `<b>${row.birth_date ?? ''}</b>`
-                }
-            },
-            {
-                orderable: false,
-                width: '1%',
-                class:'text-center',
-                render: function (data, type, row) {
-                    let gender;
-                    if (row.gender === 1) {
-                        gender = "Male";
-                    } else if (row.gender === 2) {
-                        gender = "Female";
-                    } else {
-                        gender = 'Other';
-                    }
-                    return `<b>${gender}</b>`
                 }
             },
             {

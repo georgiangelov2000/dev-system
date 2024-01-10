@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class UserApiController extends Controller
 {
@@ -14,12 +15,8 @@ class UserApiController extends Controller
 
         $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
-        $search = isset($request->search) && $request->search ? $request->search : null;
-        $order_dir = isset($request->order_dir) ? $request->order_dir : null;
-        $column_name = isset($request->order_column) ? $request->order_column : null;
-        $role_id = isset($request->role_id) ? $request->role_id : null;
-        $no_datatable_draw = isset($request->no_datatable_draw) ? boolval($request->no_datatable_draw) : null;
-
+        $select_json = $request->input('select_json');
+        
         $userQuery = User::select(
             'id',
             'email',
@@ -34,32 +31,25 @@ class UserApiController extends Controller
             'gender',
             'phone',
             'address',
-            'photo',
-            'pdf_file_path'
+            'image_path',
+            'pdf_file_path',
+            'last_seen'
         )->with($relations);
 
-        if ($search) {
-            $userQuery->where(function ($query) use ($search) {
-                $query->where('username', 'LIKE', '%' . $search . '%')
-                    ->orWhere('first_name', 'LIKE', '%' . $search . '%')
-                    ->orWhere('middle_name', 'LIKE', '%' . $search . '%')
-                    ->orWhere('last_name', 'LIKE', '%' . $search . '%');
-            });
-        }
-        if ($column_name && $order_dir) {
-            $userQuery->orderBy($column_name, $order_dir);
-        }
-        if ($role_id) {
-            $userQuery->where('role_id', $role_id);
-        }
-        if ($no_datatable_draw) {
-            return response()->json($userQuery->get());
+        $this->applyFilters($request,$userQuery);
+
+        if (boolval($select_json)) {
+            return $this->applySelectFieldJSON($userQuery);
         }
 
-        $result = $userQuery->skip($offset)->take($limit)->get();
-        $totalRecords = User::count();
         $filteredRecords = $userQuery->count();
+        $totalRecords = User::count();
+        $result = $userQuery->skip($offset)->take($limit)->get();
 
+        $currentTime = now();
+        $result->each(function ($user) use ($currentTime) {
+            $user->online = $user->last_seen >= $currentTime->subMinutes(2);
+        });
         return response()->json(
             [
                 'draw' => intval($request->input('draw')),
@@ -68,5 +58,20 @@ class UserApiController extends Controller
                 'data' => $result
             ]
         );
+    }
+
+    private function applyFilters($request,$query) {
+        $query->when($request->input('order_column') && $request->input('order_dir'), function ($query) use ($request) {
+            return $query->orderBy($request->order_column, $request->order_dir);
+        });
+        $query->when($request->input('role_id') , function ($query) use ($request) {
+            return $query->where('role_id',$request->role_id);
+        });
+        $query->when($request->input('search'), function ($query) use ($request) {
+            $query->where('username', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('first_name', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('middle_name', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $request->search . '%');
+        });
     }
 }

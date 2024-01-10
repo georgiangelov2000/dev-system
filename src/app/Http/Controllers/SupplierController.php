@@ -205,7 +205,7 @@ class SupplierController extends Controller
         $supplier->website = isset($data['website']) ? $data['website'] : "";
 
         if (isset($data['image'])) {
-            $this->helper->imageUploader($data['image'], $supplier, $this->dir);
+            $this->helper->imageUploader($data['image'], $supplier, $this->dir,'image_path');
         }
 
         $supplier->save();

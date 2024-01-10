@@ -165,7 +165,7 @@ class BrandController extends Controller
         $brand->description = $brand['description'];
 
         if (isset($data['image'])) {
-            $this->helper->imageUploader($data['image'], $brand, $this->dir);
+            $this->helper->imageUploader($data['image'], $brand, $this->dir,'image_path');
         }
 
         $brand->save();

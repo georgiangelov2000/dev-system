@@ -68,7 +68,6 @@ class AuthController extends Controller {
 
             Log::info('Succesfully registered user');
         } catch (\Exception $e) {
-            dd($e);
             DB::rollback();
             Log::info($e->getMessage());
         }
