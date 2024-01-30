@@ -50,8 +50,9 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
-            'ignore_exceptions' => false,
+            'channels' => ['daily', 'http_requests']
+            // 'channels' => ['single'],
+            // 'ignore_exceptions' => false,
         ],
 
         'single' => [
@@ -66,7 +67,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
         ],
-
+        'http_requests' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/http_requests.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

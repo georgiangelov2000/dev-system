@@ -108,10 +108,10 @@ export function APIDELETECALLER(url, data, callback) {
                 method: "POST",
                 dataType: 'json',
                 data: requestData,
-                success: function (response) {
+                success: function (response, textStatus, jqXHR) {
                     successCount++;
                     if (typeof callback === 'function') {
-                        callback(response);
+                        callback(response, jqXHR);
                     }
                     checkCompletion();
                 },

@@ -11,6 +11,8 @@ use App\Models\SupplierCategory;
 use App\Helpers\LoadStaticData;
 use App\Services\SupplierService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Log as LogModel;
 
 class SupplierController extends Controller
 {
@@ -80,11 +82,26 @@ class SupplierController extends Controller
 
         try {
             $data = $request->validated();
-            $this->supplierProcessing($data);
+            $supplier = $this->supplierProcessing($data);
+            
+            if(!$supplier) {
+                throw new \Exception("Supplier has not been created");
+            }
+
+            $log = $this->helper->logData(
+                'store_supplier',
+                'store_supplier_action',
+                $supplier->name,
+                Auth::user(),
+                now(),
+            );
+
+            LogModel::create($log);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withInput()->with('error', 'Supplier has not been created');
+            // dd($e->getMessage());
+            return back()->withInput()->with('error', 'Supplier has been created');
         }
 
         return redirect()->route('supplier.index')->with('success', 'Supplier has been created');
@@ -116,7 +133,21 @@ class SupplierController extends Controller
 
         try {
             $data = $request->validated();
-            $this->supplierProcessing($data, $supplier);
+            $supplier = $this->supplierProcessing($data, $supplier);
+
+            if(!$supplier) {
+                throw new \Exception("Error updating provider");
+            }
+
+            $log = $this->helper->logData(
+                'update_supplier',
+                'update_supplier_action',
+                $supplier->name,
+                Auth::user(),
+                now(),
+            );
+
+            LogModel::create($log);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -139,9 +170,33 @@ class SupplierController extends Controller
 
         DB::beginTransaction();
         try {
+            // Check if the category exists before proceeding with deletion
+            if (!$supplier->exists) {
+                throw new \Exception("Supplier not found");
+            }
+
+            // Check if the supplier has been assigned to products
+            if ($supplier->purchases->isNotEmpty()) {
+                throw new \Exception("Supplier has been assigned to purchases");
+            }
+
             if ($supplier->image_path) {
                 $this->helper->deleteImage($supplier);
             }
+            
+            $name = $supplier->name;
+
+            // Log the deletion action
+            $log = $this->helper->logData(
+                'delete_supplier',
+                'delete_supplier_action',
+                $name,
+                Auth::user(),
+                now(),
+            );
+            
+            LogModel::create($log);
+
             $supplier->delete();
             DB::commit();
         } catch (\Exception $e) {
@@ -193,23 +248,29 @@ class SupplierController extends Controller
     {
         $supplier = $supplier ? $supplier : new Supplier;
 
-        $supplier->name = $data['name'];
+        $supplier->name = $data['name'] ?? "";
         $supplier->email = $data['email'];
         $supplier->phone = $data['phone'];
-        $supplier->address = $data['address'];
-        $supplier->website = $data['website'];
+        $supplier->address = $data['address'] ?? "";
+        $supplier->website = $data['website'] ?? "";
         $supplier->zip = $data['zip'];
         $supplier->country_id = $data['country_id'];
         $supplier->state_id = $data['state_id'];
         $supplier->notes = isset($data['notes']) ? $data['notes'] : "";
         $supplier->website = isset($data['website']) ? $data['website'] : "";
 
-        if (isset($data['image'])) {
-            $this->helper->imageUploader($data['image'], $supplier, $this->dir,'image_path');
+        // Check if 'image' key exists in $data and if it contains a valid file
+        if (isset($data['image']) && $data['image']->isValid()) {
+            $this->helper->imageUploader($data['image'], $supplier, $this->dir, 'image_path');
         }
 
         $supplier->save();
 
-        $this->supplierService->syncCategories($data['categories'], $supplier);
+        // Check if 'categories' key exists in $data
+        if (isset($data['categories'])) {
+            $this->supplierService->syncCategories($data['categories'], $supplier);
+        }
+
+        return $supplier;
     }
 }

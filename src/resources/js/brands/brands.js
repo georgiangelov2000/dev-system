@@ -7,6 +7,7 @@ import {
 } from '../helpers/action_helpers';
 
 $(function () {
+    $('.selectAction').selectpicker();
     const table = $('#brandsTable');
 
     const dataTable = table.DataTable({
@@ -105,31 +106,31 @@ $(function () {
         $(this).siblings('label.custom-file-label').text(fileName);
     });
 
-    const handleFormSubmission = function () {
+    
+    $('#submitForm, #updateForm').on("click", function (e) {
+        e.preventDefault();
+
         const visibleModal = $('.modal:visible');
         const modalForm = visibleModal.find('form');
         const actionUrl = modalForm.attr('action');
         const formData = new FormData(modalForm[0]);
-    
+
         APIPOSTCALLER(actionUrl, formData,
             (response, xhr) => {
-                if (xhr === 'success') {
+                if(response.status === 200) {
                     toastr['success'](response.message);
-                    visibleModal.modal('toggle');
-                    modalForm.trigger('reset');
-                    dataTable.ajax.reload(null, false);
+                } else {
+                    toastr['error'](response.responseJSON.message);
                 }
+                visibleModal.modal('toggle');
+                modalForm.trigger('reset');
+                dataT.ajax.reload(null, false);
             },
             (error) => {
-                toastr['error'](error.responseJSON.message);
+                toastr['error'](response.responseJSON.message);
                 ajaxResponse(error.responseJSON.errors);
             }
         );
-    };
-    
-    $('#submitForm, #updateForm').on("click", function (e) {
-        e.preventDefault();
-        handleFormSubmission();
     });
 
     $('.selectAction').on('change', function () {
@@ -161,9 +162,23 @@ $(function () {
         const name = form.attr('data-name');
         const template = swalText(name);
 
-        showConfirmationDialog('Selected items!', template, 'Yes, deleted it!', () => {
-            APIDELETECALLER(url, (response) => {
-                toastr['success'](response.message);
+        showConfirmationDialog('Selected iteкакms!', template, 'Yes, deleted it!', () => {
+            APIDELETECALLER(url, (response,jqXHR) => {
+                let status = response.status;
+
+                let message = '';
+                let toastColor = '';
+                
+                if (status === 500) {
+                    message = response.responseJSON.error;
+                    toastColor = 'warning';
+                } else if (status === 200) {
+                    message = response.message;
+                    toastColor = 'success';
+                }
+                
+                toastr[toastColor](message);
+                
                 dataTable.ajax.reload(null, false);
             }, (error) => {
                 toastr['error'](error.message);

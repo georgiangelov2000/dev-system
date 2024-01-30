@@ -10,6 +10,7 @@ class SubCategoryApiController extends Controller
 {
     public function getData(Request $request)
     {
+        $relations = ['category'];
         $offset = $request->input('start', 0);
         $limit = $request->input('length', 10);
         $select_json = $request->input('select_json');
@@ -17,6 +18,8 @@ class SubCategoryApiController extends Controller
 
         $this->applyFilters($request,$subCategoryQ);
 
+        $subCategoryQ->with('category')->withCount('purchases');
+        
         if(boolval($select_json)) {
             return $this->applySelectFieldJSON($subCategoryQ);
         }

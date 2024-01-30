@@ -28,7 +28,7 @@ class SettingsController extends Controller
     {
         $settings = Settings::where('type', 1)->first()->settings;
         $data = [];
-        
+
         $country = null;
         $states = [];
 
@@ -36,7 +36,6 @@ class SettingsController extends Controller
             $country = Country::find($settings['country'])->first();
             $states = $country->states()->select('id', 'name')->get();
         }
-
 
         $settings['country'] = $country->name;
         $data['countries'] = $this->staticDataHelper->callStatesAndCountries('countries');

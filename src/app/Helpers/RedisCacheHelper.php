@@ -35,7 +35,7 @@ class RedisCacheHelper
         $logEntry = [
             'action' => $action,
             'timestamp' => now(),
-            'data' => $data,
+            'message' => $data,
         ];
 
         $this->redisModel->pushToList($logKey, json_encode($logEntry));

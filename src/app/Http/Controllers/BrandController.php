@@ -10,6 +10,8 @@ use App\Models\Brand;
 use App\Http\Requests\BrandRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
+use App\Models\Log as LogModel;
+use Illuminate\Support\Facades\Auth;
 
 class BrandController extends Controller
 {
@@ -44,15 +46,29 @@ class BrandController extends Controller
 
         try {
             $data = $request->validated();
-            $this->brandProcessing($data);
+            $brand = $this->brandProcessing($data);
+            if(!$brand) {
+                throw new \Exception("Brand has not been created");
+            }
+
+            // Log the deletion action
+            $log = $this->helper->logData(
+                'store_brand',
+                'store_brand_action',
+                $brand->name,
+                Auth::user(),
+                now(),
+            );
+                        
+            LogModel::create($log);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
 
-            return response()->json(['error' => 'Brand has not been created'], 500);
+            return response()->json(['error' => $e->getMessage(),"status" => 500], 500);
         }
-        return response()->json(['message' => 'Brand has been created'], 200);
+        return response()->json(['message' => "Brand has been created","status" => 200], 200);
     }
 
     /**
@@ -81,16 +97,30 @@ class BrandController extends Controller
 
         try {
             $data = $request->validated();
-            $this->brandProcessing($data, $brand);
+            $brand = $this->brandProcessing($data, $brand);
+
+            if(!$brand) {
+                throw new \Exception("Brand has not been updated");
+            }
+                        
+            // Log the deletion action
+            $log = $this->helper->logData(
+                'update_brand',
+                'update_brand_action',
+                $brand->name,
+                Auth::user(),
+                now(),
+            );
+            
+            LogModel::create($log);
+            
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
-
-            return response()->json(['error' => 'Brand has not been updated'], 500);
+            return response()->json(['error' => $e->getMessage(),"status" => 500], 500);
         }
-
-        return response()->json(['message' => 'Brand has been updated'], 200);
+        return response()->json(['message' => "Brand has been updated","status" => 200], 200);
     }
 
     /**
@@ -134,19 +164,45 @@ class BrandController extends Controller
         DB::beginTransaction();
 
         try {
+            // Check if the brand exists before proceeding with deletion
+            if (!$brand->exists) {
+                throw new \Exception("Brand not found");
+            }
+
+            // Check if the brand has been assigned to products
+            if ($brand->purchases->isNotEmpty()) {
+                throw new \Exception("Brand has been assigned to products");
+            }
+
             if ($brand->image_path) {
                 $this->helper->deleteImage($brand);
             }
+
+            $name = $brand->name;
+
+            // // Delete the category
             $brand->delete();
+
+            // Log the deletion action
+            $log = $this->helper->logData(
+                'delete_brand',
+                'delete_brand_action',
+                $name,
+                Auth::user(),
+                now(),
+            );
+
+            LogModel::create($log);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
 
-            return response()->json(['error' => 'Brand has not been deleted'], 500);
+            return response()->json(['error' => $e->getMessage(),"status" => 500],500);
         }
-
-        return response()->json(['message' => 'Brand has been deleted'], 200);
+        
+        return response()->json(['message' => "Brand has been deleted","status" => 200], 200);
     }
 
 
@@ -169,5 +225,7 @@ class BrandController extends Controller
         }
 
         $brand->save();
+
+        return $brand;
     }
 }

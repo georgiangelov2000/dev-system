@@ -3,12 +3,12 @@
 @section('content')
     <div class="row">
         <div class="card col-12 cardTemplate">
-            <div class="card-header d-flex align-items-center p-2">
+            <div class="card-header bg-primary d-flex align-items-center p-2">
                 <div class="col-10">
                     <h3 class="card-title">Subcategories</h3>
                 </div>
                 <div class="col-2 text-right">
-                    <button type="button" class="btn btn-primary createSubCategory">
+                    <button type="button" class="btn btn-sm btn-light createSubCategory">
                         <i class="fa fa-plus"></i> Add subcategory
                     </button>
                 </div>
@@ -37,6 +37,7 @@
                             <th>ID</th>
                             <th>Name</th>
                             <th>Category</th>
+                            <th>Purchases</th>
                             <th>Actions</th>
                         </tr>
                     </thead>

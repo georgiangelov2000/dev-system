@@ -23,8 +23,8 @@
                             <label for="role_id">Roles</label>
                             <select class="form-control" name="role_id" id="role_id">
                                 <option value="">All</option>
-                                @foreach (config('statuses.roles') as $key => $item)
-                                    <option value="{{$key}}">{{$item}}</option>
+                                @foreach ($roles as $key => $item)
+                                    <option value="{{$item->id}}">{{$item->name}}</option>
                                 @endforeach
                             </select>
                         </div>

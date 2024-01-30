@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use id;
 use App\Models\Category;
 use App\Models\SubCategory;
+use App\Models\Log as LogModel;
 use App\Helpers\LoadStaticData;
 use App\Helpers\FunctionsHelper;
 use App\Helpers\RedisCacheHelper;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\CategoryRequest;
 use App\Models\RedisModel;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
@@ -61,10 +63,22 @@ class CategoryController extends Controller
 
         try {
             $data = $request->validated();
-            $this->categoryProcessing(null, $data);
+            $record = $this->categoryProcessing(null, $data);
             
-            $this->logAction('category_logs','created_category', ['category_name' => $data['name']]);
+            if(!$record) {
+                throw new \Exception("Category has not been created");
+            }
 
+            $log = $this->helper->logData(
+                'store_category',
+                'store_category_action',
+                $record->name,
+                Auth::user(),
+                now(),
+            );
+
+            LogModel::create($log);
+            
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -110,7 +124,21 @@ class CategoryController extends Controller
             $data = $request->validated();
             
             // Call the categoryProcessing method to update the Category model.
-            $this->categoryProcessing($category, $data);
+            $record = $this->categoryProcessing($category, $data);
+
+            if(!$record) {
+                throw new \Exception("Category has not been updated");
+            }
+
+            $log = $this->helper->logData(
+                'update_category',
+                'update_category_action',
+                $record->name,
+                Auth::user(),
+                now(),
+            );
+
+            LogModel::create($log);
 
             // Commit the database transaction.
             DB::commit();
@@ -173,17 +201,44 @@ class CategoryController extends Controller
         DB::beginTransaction();
 
         try {
-            
-            if($category->image_path) {
+
+            // Check if the category exists before proceeding with deletion
+            if (!$category->exists) {
+                throw new \Exception("Category not found");
+            }
+
+            // Check if the category has been assigned to products
+            if ($category->products->isNotEmpty()) {
+                throw new \Exception("Category has been assigned to purchases");
+            }
+
+            // If the category has an image, delete it
+            if ($category->image_path) {
                 $this->helper->deleteImage($category);
             }
+
+            $name = $category->name;
+
+            // Delete the category
             $category->delete();
+
+            // Log the deletion action
+            $log = $this->helper->logData(
+                'delete_category',
+                'delete_category_action',
+                $name,
+                Auth::user(),
+                now(),
+            );
+
+            LogModel::create($log);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
 
-            return response()->json(['error' => 'Category has not been deleted'], 500);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
 
         return response()->json(['message' => 'Category has been deleted'], 200);
@@ -233,10 +288,14 @@ class CategoryController extends Controller
             $this->helper->imageUploader($data['image'], $category, $this->dir,'image_path');
         }
 
-        // Attach the selected subcategories to the Category.
-        $this->categoryService->attachSubCategories($data['sub_categories'], $category->id);
-
         // Save the Category model to the database.
         $category->save();
+
+        // Attach the selected subcategories to the Category.
+        if(!empty($data['sub_categories'])) {
+            $this->categoryService->attachSubCategories($data['sub_categories'], (int) $category->id);
+        }
+        
+        return $category;
     }
 }

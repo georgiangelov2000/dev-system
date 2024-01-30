@@ -14,6 +14,8 @@ use App\Services\PurchaseService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Models\Log as LogModel;
+use Illuminate\Support\Facades\Auth;
 
 class PurchaseController extends Controller
 {
@@ -58,7 +60,21 @@ class PurchaseController extends Controller
         try {
             $data = $request->validated();
             
-            $this->service->purchaseProcessing($data);
+            $purchase = $this->service->purchaseProcessing($data);
+
+            if(!$purchase) {
+                throw new \Exception("Error creating purchase");
+            }
+
+            $log = $this->helper->logData(
+                'store_purchase',
+                'store_purchase_action',
+                $purchase->name,
+                Auth::user(),
+                now(),
+            );
+
+            LogModel::create($log);
 
             DB::commit();
         } catch (\Exception $e) {
@@ -99,8 +115,20 @@ class PurchaseController extends Controller
         try {
             $data = $request->validated();
 
-            $this->service->purchaseProcessing($data, $purchase);
+            $purchase = $this->service->purchaseProcessing($data, $purchase);
 
+            if(!$purchase) {
+                throw new \Exception("Error updating purchase");
+            }
+
+            $log = $this->helper->logData(
+                'update_purchase',
+                'update_purchase_action',
+                $purchase->name,
+                Auth::user(),
+                now(),
+            );
+            LogModel::create($log);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();

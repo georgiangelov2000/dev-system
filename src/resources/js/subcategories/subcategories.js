@@ -8,7 +8,8 @@ import {
 
 import {
     APIDELETECALLER,
-    APICallerWithoutData
+    APICallerWithoutData,
+    APIPOSTCALLER
 } from '../ajax/methods';
 
 $(function () {
@@ -22,9 +23,6 @@ $(function () {
     const selectAction = $('.selectAction');
     const createSubCategory = $('.createSubCategory');
     const closeModalBtn = $('.modalCloseBtn');
-
-    const createSubmitButton = createModal.find('#submitForm');
-    const editSubmitButton = editModal.find('#submitForm');
 
     $('.selectAction')
     .selectpicker('refresh')
@@ -83,8 +81,17 @@ $(function () {
                 }
             },
             {
+                orderable: true,
+                name: 'purchases_count',
+                class: 'text-center',
+                width: '1%',
+                render: function (data, type, row) {
+                    return `<span>${row.purchases_count}</span>`;
+                }
+            },
+            {
                 orderable: false,
-                width: '35%',
+                width: '5%',
                 render: function (data, type, row) {
                     const deleteFormTemplate = `
                     <form style="display:inline-block;" action="${DELETE_SUB_CATEGORY_ROUTE.replace(':id', row.id)}" id="delete-form" method="POST" data-name="${row.name}">
@@ -114,8 +121,12 @@ $(function () {
 
             showConfirmationDialog('Selected items!', template, 'Yes, delete it!', function () {
                 APIDELETECALLER(url, function (response) {
-                    toastr['success'](response.message);
-                    dataTable.ajax.reload();
+                    if(response.responseJSON) {
+                        toastr['warning'](response.responseJSON.error);
+                    } else {
+                        toastr['success'](response.message);
+                    }    
+                    dataTable.ajax.reload(null,false);
                 }, function (error) {
                     toastr['error'](error.message);
                 });
@@ -165,7 +176,11 @@ $(function () {
                         searchedNames.push($(this).attr('data-name'));
                     });
                     APIDELETECALLER(DELETE_SUB_CATEGORY_ROUTE.replace(':id',id),function(response){
-                        toastr['success'](response.message);
+                        if(response.responseJSON) {
+                            toastr['warning'](response.responseJSON.error);
+                        } else {
+                            toastr['success'](response.message);
+                        }    
                         dataTable.ajax.reload();
                     },function(error){
                         toastr['error'](error.message);
@@ -179,15 +194,29 @@ $(function () {
         openModal(createModal, STORE_SUB_CATEGORY_ROUTE);
     });      
 
-    createSubmitButton.on('click', function (e) {
+    $('#submitForm, #updateForm').on("click", function (e) {
         e.preventDefault();
-        submit(e, createModal, table);
-    });
 
-    editSubmitButton.on('click',function(e){
-        e.preventDefault();
-        submit(e,editModal,table);
-    })
+        const visibleModal = $('.modal:visible');
+        const modalForm = visibleModal.find('form');
+        const actionUrl = modalForm.attr('action');
+        const formData = new FormData(modalForm[0]);
+
+        APIPOSTCALLER(actionUrl, formData,
+            (response, xhr) => {
+                if (xhr === 'success') {
+                    toastr['success'](response.message);
+                    visibleModal.modal('toggle');
+                    modalForm.trigger('reset');
+                    dataTable.ajax.reload(null, false);
+                }
+            },
+            (error) => {
+                toastr['error'](response.responseJSON.message);
+                ajaxResponse(error.responseJSON.errors);
+            }
+        );
+    });
 
     closeModalBtn.on('click',function(){
         closeModal($('.modal'));

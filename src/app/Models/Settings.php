@@ -37,9 +37,9 @@ class Settings extends Model
         'settings',
     ];
 
-    // protected $casts = [
-    //     'settings' => 'array',
-    // ];
+    protected $casts = [
+        'settings' => 'array',
+    ];
 
     public static function getStruct(){
         return [

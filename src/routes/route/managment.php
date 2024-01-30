@@ -19,6 +19,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleManagementController;
+use App\Http\Controllers\LogController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -121,6 +122,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::resource('roles', RoleManagementController::class);
+    Route::resource('logs', LogController::class);
     
     Route::prefix('settings')->name('settings.')->middleware('can:access-settings-management')->group(function () {
         Route::get('/', [SettingsController::class, 'form'])->name('get');

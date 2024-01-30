@@ -284,9 +284,16 @@ $(function () {
 
         showConfirmationDialog('Selected items!', template, 'Yes, deleted it!', function () {
             APIDELETECALLER(url, function (response) {
-                toastr['success'](response.message);
+                console.log(response.responseJSON)                
+                if(response.responseJSON.error) {
+                    toastr['warning'](response.responseJSON.error);
+                } else {
+                    toastr['success'](response.message);
+                }
+
                 dataT.ajax.reload(null, false);
             }, function (error) {
+                console.log(error);
                 toastr['error'](error.message);
             });
         });

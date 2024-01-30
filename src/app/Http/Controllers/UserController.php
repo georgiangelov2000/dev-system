@@ -27,7 +27,8 @@ class UserController extends Controller
 
     public function index()
     {
-        return view('users.index');
+        $roles = Role::all();
+        return view('users.index',['roles' => $roles]);
     }
     public function create()
     {

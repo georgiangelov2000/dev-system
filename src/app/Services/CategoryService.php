@@ -5,7 +5,7 @@ use App\Models\SubCategory;
 
 class CategoryService {
 
-    public function attachSubCategories(array $subCategories, string $category){
+    public function attachSubCategories(array $subCategories, int $category){
 
         if(isset($subCategories) && !empty($subCategories)) {
             foreach ($subCategories as $key => $subCategoryId) {

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class TableSubcategories extends Migration
+class CreateLogsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class TableSubcategories extends Migration
      */
     public function up()
     {
-        Schema::create('subcategories', function (Blueprint $table) {
+        Schema::create('logs', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->unsignedBigInteger('category_id')->default(0);
+            $table->string('action')->index();
+            $table->varchar('message')->default('');
+            $table->unsignedBigInteger('user_id')->index();
+            $table->timestamps();
         });
     }
 
@@ -27,6 +29,6 @@ class TableSubcategories extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('subcategories');
+        Schema::dropIfExists('logs');
     }
 }

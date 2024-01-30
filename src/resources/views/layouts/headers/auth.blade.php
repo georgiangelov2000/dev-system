@@ -345,9 +345,15 @@
                         @endcan
                         @can('access-logs-management')
                         <li class="nav-item">
-                            <a href="{{ route('country.index') }}" class="nav-link">
+                            <a href="{{ route('logs.index') }}" class="nav-link">
                                 <i class="fa-light fa-clock-rotate-left"></i>
                                 <p>Logs</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('logs.index') }}" class="nav-link">
+                                <i class="fa-light fa-desktop" aria-hidden="true"></i>
+                                <p>System logs</p>
                             </a>
                         </li>
                     @endcan

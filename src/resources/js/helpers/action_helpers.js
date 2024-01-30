@@ -41,7 +41,7 @@ export function submit(e, modal, table) {
     const form = modal.find('form');
     const url = form.attr('action');
     const data = form.serialize();
-
+    
     APIPOSTCALLER(url, data, function (response,xhr) {
         let status = xhr;
         

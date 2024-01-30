@@ -238,4 +238,25 @@ class FunctionsHelper
             $model->{$relationship}()->sync($data[$relationshipKey]);
         }
     }
+
+    public static function logData($messageKey, $actionKey, $name, $user, $created = null, $updated = null, $deleted = null){
+        $logs = config('logs');
+        $message = $action = '';
+        $user_id = $user->id;
+
+        if(array_key_exists($messageKey, $logs['messages'])) {
+            $message = str_replace(["{{name}}", "{{user}}"], [$name, $user->username], $logs['messages'][$messageKey]);
+            if(str_contains($message,"{{created_at}}")) {
+                $message = str_replace("{{created_at}}", $created, $message);
+            } elseif(str_contains($message,"{{updated_at}}")) {
+                $message = str_replace("{{updated_at}}", $updated, $message);
+            } elseif(str_contains($message,"{{deleted_at}}")) {
+                $message = str_replace("{{deleted_at}}", $deleted, $message);
+            }
+        }
+        
+        $action = array_key_exists($actionKey, $logs['actions']) ? $logs['actions'][$actionKey] : '';
+    
+        return compact('action', 'message', 'user_id');
+    }    
 }

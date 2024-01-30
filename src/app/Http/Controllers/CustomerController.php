@@ -11,6 +11,8 @@ use App\Helpers\FunctionsHelper;
 use App\Helpers\LoadStaticData;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Log as LogModel;
 
 class CustomerController extends Controller
 {
@@ -62,7 +64,22 @@ class CustomerController extends Controller
 
         try {
             $data = $request->validated();
-            $this->createOrUpdate($data);
+            $customer = $this->createOrUpdate($data);
+
+            if(!$customer) {
+                throw new \Exception("Error creating customer");
+            }
+
+            $log = $this->helper->logData(
+                'store_customer',
+                'store_customer_action',
+                $customer->name,
+                Auth::user(),
+                now(),
+            );
+
+            LogModel::create($log);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -97,10 +114,26 @@ class CustomerController extends Controller
 
         try {
             $data = $request->validated();
-            $this->createOrUpdate($data, $customer);
+            $customer = $this->createOrUpdate($data, $customer);
+
+            if(!$customer) {
+                throw new \Exception("Error updating customer");
+            }
+
+            $log = $this->helper->logData(
+                'store_customer',
+                'store_customer_action',
+                $customer->name,
+                Auth::user(),
+                now(),
+            );
+
+            LogModel::create($log);
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
+            // dd($e->getMessage());
             return back()->withInput()->with('error', 'Customer has not been updated');
         }
 
@@ -118,11 +151,34 @@ class CustomerController extends Controller
         DB::beginTransaction();
 
         try {
+             // Check if the customer exists before proceeding with deletion
+            if (!$customer->exists) {
+                throw new \Exception("Customer not found");
+            }
+
+            // Check if the customer has been assigned to products
+            if ($customer->orders->isNotEmpty()) {
+                throw new \Exception("Category has been assigned to orders");
+            }
+
             if ($customer->image_path) {
                 $this->helper->deleteImage($customer);
             }
+
+            $name = $customer->name;
+
             $customer->delete();
 
+            // Log the deletion action
+            $log = $this->helper->logData(
+                'delete_customer',
+                'delete_customer_action',
+                $name,
+                Auth::user(),
+                now(),
+            );
+            
+            LogModel::create($log);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
@@ -161,11 +217,11 @@ class CustomerController extends Controller
         $customer = $customer ?? new Customer;
 
         $customer->fill([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'],
-            'address' => $data['address'],
-            'website' => $data['website'],
+            'name' => $data['name'] ?? "",
+            'email' => $data['email'] ?? "",
+            'phone' => $data['phone'] ?? "",
+            'address' => $data['address'] ?? "",
+            'website' => $data['website'] ?? "",
             'zip' => $data['zip'],
             'country_id' => $data['country_id'],
             'state_id' => $data['state_id'],
@@ -177,5 +233,7 @@ class CustomerController extends Controller
         }
 
         $customer->save();
+
+        return $customer;
     }
 }
